@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="PmEmpleadosListDlg" widgetVar="PmEmpleadosListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" closable="false"
+              class="mr1024_60 mr500_90" closeOnEscape="true" responsive="true" position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Listado de empleados
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('PmEmpleadosListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="frmPmEmpleadoList">
+            <p:dataTable var="vht" value="#{gestionDanoNovPuntBean.lstEmpleados}" 
+                         id="dtEmpleados"
+                         widgetVar="wVPmEmpleadosListDialog"
+                         selectionMode="single" selection="#{gestionDanoNovPuntBean.empleado}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         rowIndexVar="nroFila"
+                         rowKey="#{vht.idEmpleado}"
+                         emptyMessage="No existen empleados registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{gestionDanoNovPuntBean.onRowDblClckSelect}"
+                        update=":frmNovedadesPm:operador"
+                        oncomplete="PF('PmEmpleadosListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código_TM" filterBy="#{vht.codigoTm}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.codigoTm}" />
+                </p:column>
+                <p:column headerText="Nombre completo" filterBy="#{vht.nombres} #{vht.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.nombres} #{vht.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

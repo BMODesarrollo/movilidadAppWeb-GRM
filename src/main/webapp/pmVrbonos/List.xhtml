@@ -1,0 +1,140 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form id="PmVrbonosListForm">
+            <p:growl id="upPmVrB" showDetail="true" showSummary="true" />
+            <p:panel header="Pm Valor Bono">
+                <p:dataTable id="datalist" 
+                             value="#{pmVrbonosController.items}" 
+                             var="item"
+                             selectionMode="single" 
+                             selection="#{pmVrbonosController.selected}"
+                             paginator="true"
+                             rowKey="#{item.idPmVrbonos}"
+                             rows="20"
+                             filterDelay="2000"
+                             emptyMessage="No existen registros"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             widgetVar="dtdatalist"
+                             >
+
+                    <p:ajax event="rowSelect"   update="createButton,viewButton,editButton"/>
+                    <p:ajax event="rowUnselect" update="createButton,viewButton,editButton" listener="#{pmVrbonosController.reset()}"/>
+
+                    <p:column filterBy="#{item.desde}" headerText="Desde"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:calendar id="search" 
+                                        pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" 
+                                        showTodayButton="true"
+                                        inputStyle="width: 99%;"
+                                        placeholder="Clic para filtrar fecha"
+                                        onkeyup="PF('dtdatalist').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dtdatalist').filter()" update="datalist"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.desde}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.hasta}" headerText="Hasta"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:calendar id="id-hasta" 
+                                        pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" 
+                                        showTodayButton="true"
+                                        inputStyle="width: 99%;"
+                                        placeholder="Clic para filtrar fecha"
+                                        onkeyup="PF('dtdatalist').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dtdatalist').filter()" update="datalist"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.hasta}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.vrBonoSalarial}"
+                              filterMatchMode="exact">
+                        <f:facet name="header">
+                            <h:outputText value="Valor bono salarial"/>
+                        </f:facet>
+                        <h:outputText value="#{item.vrBonoSalarial}">
+                            <f:convertNumber pattern="$#,###.###" currencySymbol="$" type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.vrBonoAlimentos}"
+                              filterMatchMode="exact">
+                        <f:facet name="header">
+                            <h:outputText value="Valor bono alimentos"/>
+                        </f:facet>
+                        <h:outputText value="#{item.vrBonoAlimentos}">
+                            <f:convertNumber pattern="$#,###.###" currencySymbol="$" type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.idEmpleadoTipoCargo.nombreCargo}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Empleado"/>
+                        </f:facet>
+                        <i class="fa fa-id-badge"/>
+                        <p:spacer width="3px"/>
+                        <h:outputText value="#{item.idEmpleadoTipoCargo.nombreCargo}"/>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             value="Nuevo" 
+                                             actionListener="#{pmVrbonosController.prepareCreate}" 
+                                             update="PmVrbonosCreateForm,PmVrbonosCreateDlg" 
+                                             oncomplete="PF('PmVrbonosCreateDialog').show()">
+                                <p:resetInput target="PmVrbonosCreateForm"/>
+                            </p:commandButton>
+                            <p:commandButton id="viewButton"   
+                                             icon="fa fa-search"
+                                             value="Visualizar" 
+                                             rendered="false"
+                                             class="cssWhite OrangeButton"
+                                             update=":PmVrbonosViewForm" 
+                                             oncomplete="PF('PmVrbonosViewDialog').show()" 
+                                             disabled="#{empty pmVrbonosController.selected.idPmVrbonos}"/>
+                            <p:commandButton id="editButton"  
+                                             actionListener="#{pmVrbonosController.cargarEdit}"
+                                             icon="fa fa-pencil"
+                                             value="Editar" 
+                                             class="cssWhite GreenButton"
+                                             update="PmVrbonosCreateForm,PmVrbonosCreateDlg" 
+                                             oncomplete="PF('PmVrbonosCreateDialog').show()" 
+                                             disabled="#{empty pmVrbonosController.selected.idPmVrbonos}"/>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="View.xhtml"/>
+    </ui:define>
+</ui:composition>

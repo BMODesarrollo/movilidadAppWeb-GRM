@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="novedadDocumentos" id="modalDocumentos" modal="true" closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)" position="center,top"
+              class="mr1024_40 mr500_90">
+        <f:facet name="header">
+            Nuevo documento asistencia
+        </f:facet>
+        <h:form id="frmNuevoDocumento">
+
+            <p:messages id="messages" showDetail="true" closable="true"/>
+
+            <div class="ui-fluid">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                    <p:outputLabel value="Fecha Asistencia" for="lastDate"/>
+                    <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                value="#{recapacitacionBean.fechaAsistencia}"
+                                readonlyInput="true"
+                                navigator="true"
+                                placeholder="Fecha Asistencia"
+                                pattern="dd-MM-yyyy" locale="es"
+                                style="width: 99.9999%; margin-right: 10px;">
+                    </p:calendar>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                    <p:outputLabel value="Capacitador" for="@next"/>
+                    <p:selectOneMenu filter="true"
+                                     style="width: 99.9999%;"
+                                     value="#{recapacitacionBean.idCapacitador}">
+                        <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}" />
+                        <f:selectItems 
+                            var="user"
+                            value="#{recapacitacionBean.lstCapacitadores}"
+                            itemLabel="#{user.nombresApellidos}"
+                            itemValue="#{user.idEmpleado}"
+                            />
+                    </p:selectOneMenu>
+                </div>
+                
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                    <p:outputLabel value="Subir Archivos" />
+                    <div align="center">
+                        <p:commandButton title="Cargar documento de la novedad"
+                                         icon="fa fa-upload"
+                                         value="Cargar Documentos"
+                                         class="cssWhite OrangeButton"
+                                         style="width: 40%"
+                                         process="@this"
+                                         update="frmAddFiles"
+                                         oncomplete="PF('AddFilesListDialog').show()">
+                        </p:commandButton>
+                    </div>
+                </div>
+            </div>
+
+            <p:remoteCommand name="rc_doc"
+                             update="msg, frmPrincipalAsistente"
+                             action="#{recapacitacionBean.guardarDocumento(1)}"/>
+        </h:form>
+        <f:facet name="footer">
+            <center>
+                <p:commandButton value="Guardar"
+                                 icon="fa fa-save"
+                                 class="cssWhite"
+                                 onclick="rc_doc();"
+                                 />
+            </center>
+        </f:facet>
+    </p:dialog>
+
+    <ui:include src="AddFiles.xhtml"/>
+</ui:composition>

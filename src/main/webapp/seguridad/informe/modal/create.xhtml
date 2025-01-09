@@ -1,0 +1,147 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="informeSeguridad"
+              widgetVar="wlvInformeSeguridad" 
+              modal="true" 
+              class="mr1024_50 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{informeSeguridadBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{informeSeguridadBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmInformeSeguridad">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <p:messages id="messages" showDetail="true" closable="true"/>
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha Ini Op" for="@next"/>
+                        </div>
+                        <p:calendar showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar fecha inicio"
+                                    pattern="yyyy-MM-dd"
+                                    readonlyInput="true"
+                                    value="#{informeSeguridadBean.informeSeguridad.fechaIni}">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha Fin Op" for="@next"/>
+                        </div>
+                        <p:calendar showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar fecha fin"
+                                    pattern="yyyy-MM-dd"
+                                    readonlyInput="true"
+                                    value="#{informeSeguridadBean.informeSeguridad.fechaFin}">
+                        </p:calendar>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Empresa" for="@next"/>
+                        </div>
+                        <p:selectOneMenu  
+                            filter="true"
+                            required="true"
+                            style="width: 99.9999%"
+                            requiredMessage="Debe seleccionar una empresa"
+                            value="#{informeSeguridadBean.i_sstEmpresa}">
+                            <f:selectItem itemDisabled="true"
+                                          itemLabel="Seleccione uno" 
+                                          itemValue="#{null}" />
+                            <f:selectItems 
+                                var="empresa"
+                                value="#{informeSeguridadBean.lstEmpresas}"
+                                itemLabel="#{empresa.razonSocial}"
+                                itemValue="#{empresa.idSstEmpresa}"
+                                />
+                            <p:ajax event="change" update="btnVisitante" />
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                            <p:outputLabel value="Empleado" for="@next"/>
+                        </div>
+                        <div class="ui-g-10 12-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nomVisitante"
+                                         readonly="true"
+                                         value="#{informeSeguridadBean.visitante.nombre} #{informeSeguridadBean.visitante.apellidos}"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-list"
+                                                 id="btnVisitante"
+                                                 style="margin: 0px"
+                                                 disabled="#{informeSeguridadBean.i_sstEmpresa eq null}"
+                                                 update="messages,:frmVisitanteList:dtVisitantes"
+                                                 action="#{informeSeguridadBean.prepareListVisitantes()}"
+                                                 oncomplete="PF('VisitantesListDialog').show();"
+                                                 process="@this"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding10">
+                        <div class="ui-g-3 ui-md-3 ui-lg-4">
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-4">
+                            <p:commandButton value="Cargar Documento"
+                                             update=":frmAddFiles"
+                                             oncomplete="PF('AddFilesListDialog').show()"
+                                             icon="fa fa-upload"
+                                             styleClass="OrangeButton cssWhite"/>
+                        </div>
+                        <div class="ui-g-3 ui-md-3 ui-lg-4">
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Observación" for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         value="#{informeSeguridadBean.informeSeguridad.observacion}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmInformeSeguridad,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtInformeSeguridad" 
+                             action="#{informeSeguridadBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmInformeSeguridad,@this"
+                             update=":msgs,:frmPrincipal:dtInformeSeguridad"
+                             action="#{informeSeguridadBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{informeSeguridadBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{informeSeguridadBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListaVisitante.xhtml"/>
+    <ui:include src="AddFiles.xhtml"/>
+</ui:composition>     

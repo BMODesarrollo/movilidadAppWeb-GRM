@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Reporte Operación Cabinas">
+            <h:form id="dt_reporte_op_cab">
+                <div class="ui-g">
+                    <p:dataTable id="dt_reporte_op_cab" var="item" 
+                                 scrollable="true"
+                                 styleClass="verticalHeader"
+                                 widgetVar="wlVdt_reporte_op_cab"
+                                 scrollHeight="600"
+                                 disabledTextSelection="false"
+                                 reflow="true"
+                                 rows="50"
+                                 filterDelay="1000"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="50,100,200"
+                                 emptyMessage="No existen registros"
+                                 value="#{reporteOperacionCab.list}">
+
+                        <f:facet name="header">
+                            <div align="right" jsf:id="botones">
+                                <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                                <p:calendar id="fecha_desde" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{reporteOperacionCab.desde}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{reporteOperacionCab.consultar()}"
+                                            update="dt_reporte_op_cab"/>
+                                </p:calendar>
+                                <p:calendar id="fecha_hasta" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{reporteOperacionCab.hasta}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{reporteOperacionCab.consultar()}"
+                                            update="dt_reporte_op_cab"/>
+                                </p:calendar>
+                            </div>
+                        </f:facet>
+
+
+                        <p:column headerText="Fecha" width="9%" styleClass="text-center">
+                            <h:outputText value="#{item.fecha}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Cabina" 
+                                  filterBy="#{item.idCableCabina.nombre}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-word-wrap">
+                            <h:outputText value="#{item.idCableCabina.nombre}" />
+                        </p:column>
+                        <p:column filterBy="#{item.idCablePinza.nombre}"
+                                  filterMatchMode="contains"
+                                  headerText="Pinza por Defecto" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.idCablePinza.nombre}" />
+                        </p:column>
+                        <p:column filterBy="#{item.idCablePinzaParaHoy.nombre}"
+                                  filterMatchMode="contains" headerText="Pinza cargada" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.idCablePinzaParaHoy.nombre}" />
+                        </p:column>
+                        <p:column  headerText="Operó" visible="false" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.operando == 1 ?'Si':'No'}" />
+                        </p:column>
+                        <p:column filterBy="#{item.operando}" 
+                                  exportable="false"
+                                  headerText="Operó"
+                                  styleClass="#{item.operando eq 1 ? 'cssGreen' : 'cssRed'}" 
+                                  filterMatchMode="exact">
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('wlVdt_reporte_op_cab').filter()" 
+                                                 styleClass="custom-filter" >
+                                    <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                    <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.operando == 1 ?'Si':'No'}" class="cssWhite" />
+                        </p:column>
+                        <p:column headerText="Horas" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.horas}" />
+                        </p:column>
+                        <p:column headerText="Batería AM" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.bateriaAm}" />
+                        </p:column>
+                        <p:column headerText="Batería PM" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.bateriaPm}" />
+                        </p:column>
+                        <p:column headerText="Usuario" styleClass="text-word-wrap"
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.username}">
+                            <h:outputText value="#{item.username}" />
+                        </p:column>
+
+                        <f:facet name="footer">
+                            En total existen #{reporteOperacionCab.list.size()} registros.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="dt_reporte_op_cab" 
+                                                    fileName="Reporte de operación cabina"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

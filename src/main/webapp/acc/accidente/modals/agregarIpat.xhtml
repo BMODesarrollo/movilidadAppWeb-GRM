@@ -1,0 +1,61 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="ipat-dlg" 
+              closeOnEscape="true"
+              widgetVar="ipatDlg" 
+              modal="true"
+              closable="false"
+              resizable="false"
+              appendTo="@(body)"
+              position="center top"
+              height="auto"
+              width="auto">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Agregar Número Ipat
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('ipatDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <p:ajax event="close" listener="#{accidenteJSF.limpiarNumIpat()}" update="tabView:form-info-caso:ipat" process="@this" />
+        <h:form id="form-ipat">
+            <div class="ui-fluid no-print">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Número de Ipat:" />
+                        </div>
+                        <p:inputText id="num-ipat" value="#{accidenteJSF.accidente.nroIpat}" class="cssBlack" />
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand id="guardar"
+                             name="rc_add_ipat"
+                             process="@form"
+                             update=":accidente-form:msg,tabView:form-info-caso:ipat"
+                             oncomplete="PF('ipatDlg').hide();" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             onclick="rc_add_ipat();"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

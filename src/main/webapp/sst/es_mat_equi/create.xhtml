@@ -1,0 +1,171 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="EsMatEqui"
+              widgetVar="wlvEsMatEqui" 
+              modal="true" 
+              class="modalResponsivo"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{sstEsMatEquiBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{sstEsMatEquiBean.selected != null}">
+            <f:facet name="header">
+                EDITAR DATOS
+            </f:facet>
+        </c:if>
+        <h:form id="frmEsMatEquiAdd">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4">
+                        <p:fieldset legend="E/S Materiales y Equipos">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                Tipo Acceso
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <p:selectOneMenu  
+                                    style="width: 99.999%"
+                                    filter="true"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar un tipo de acceso"
+                                    value="#{sstEsMatEquiBean.i_tipoAcceso}">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                    <f:selectItem itemLabel="Entrada" itemValue="#{0}" />
+                                    <f:selectItem itemLabel="Salida" itemValue="#{1}" />
+                                    <f:selectItem itemLabel="Ambos" itemValue="#{2}" />
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                Visitante
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <p:selectOneMenu  
+                                    style="width: 99.999%"
+                                    filter="true"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar un visitante"
+                                    value="#{sstEsMatEquiBean.i_sstEmpresaVisitante}">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                    <f:selectItems 
+                                        var="visitante"
+                                        value="#{sstEsMatEquiBean.lstEmpresaVisitante}"
+                                        itemLabel="#{visitante.nombre} #{visitante.apellidos}"
+                                        itemValue="#{visitante.idSstEmpresaVisitante}"
+                                        />
+                                </p:selectOneMenu>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-8 ui-lg-8">
+                        <p:fieldset legend="Listado de Materiales/herramientas">
+                            <p:dataTable id="dtMateriales" 
+                                         rowIndexVar="index"
+                                         var="material" 
+                                         scrollable="true"
+                                         widgetVar="wlVMateriales"
+                                         scrollHeight="600"
+                                         disabledTextSelection="false"
+                                         reflow="true"
+                                         rows="10"
+                                         filterDelay="1700"
+                                         paginator="true"
+                                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="10,50,100"
+                                         emptyMessage="No existen registros"
+                                         value="#{sstEsMatEquiBean.lstEsMatEquiDet}">
+
+
+                                <f:facet name="header">
+                                    <div align="right" jsf:id="botones">
+                                        <p:commandButton
+                                            icon="fa fa-plus"
+                                            value="Agregar Item"
+                                            process="@this"
+                                            actionListener="#{sstEsMatEquiBean.nuevoDetalle()}"
+                                            oncomplete="PF('wlvEsMatEquiDet').show();"
+                                            class="cssWhite"
+                                            update=":EsMatEquiDet,:frmMateriales"
+                                            >
+                                            <p:resetInput target=":frmMateriales:pGridDatos"/>
+                                        </p:commandButton>    
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="Material"
+                                          style="text-align: center;">
+                                    <h:outputText value="#{material.idSstMatEqui.nombre}"/>
+                                </p:column>
+                                <p:column headerText="Serial"
+                                          style="text-align: center;">
+                                    <h:outputText value="#{material.serial}" rendered="#{material.serial != null}"/>
+                                    <h:outputText value="N/A" rendered="#{material.serial == null}"/>
+                                </p:column>
+                                <p:column headerText="Cantidad"
+                                          width="20%"
+                                          style="text-align: center;">
+                                    <h:outputText value="#{material.cantidad}"/>
+                                </p:column>
+
+                                <p:column headerText="Acciones" style="text-align: center;"
+                                          exportable="false">
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:commandButton styleClass="cssWhite GreenButton"
+                                                             title="Editar"
+                                                             process="@this"
+                                                             actionListener="#{sstEsMatEquiBean.editarDetalle(material)}"
+                                                             update=":EsMatEquiDet ,:frmMateriales:pGridDatos"
+                                                             oncomplete="PF('wlvEsMatEquiDet').show();"
+                                                             icon="fa fa-pencil">
+                                                <p:resetInput target=":frmMateriales:pGridDatos"/>
+                                            </p:commandButton>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:commandButton styleClass="cssWhite RedButton"
+                                                             title="Eliminar detalle"
+                                                             process="@this"
+                                                             actionListener="#{sstEsMatEquiBean.eliminarDetalle(material)}"
+                                                             update="dtMateriales,:msgs"
+                                                             icon="fa fa-times">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </p:column>
+                            </p:dataTable>
+                        </p:fieldset>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             process="frmEsMatEquiAdd,@this"
+                             update=":msgs,pGridDatos,:frmEsMatEqui:dtMatEqui" 
+                             actionListener="#{sstEsMatEquiBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmEsMatEquiAdd,@this"
+                             update=":msgs,:frmEsMatEqui:dtMatEqui"
+                             actionListener="#{sstEsMatEquiBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton type="button" value="Guardar" icon="fa fa-floppy-o"
+                                 rendered="#{sstEsMatEquiBean.selected == null}"
+                                 class="cssWhite" onclick="guardar()"/>
+                <p:commandButton type="button" value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{sstEsMatEquiBean.selected != null}"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>    
+</ui:composition>     

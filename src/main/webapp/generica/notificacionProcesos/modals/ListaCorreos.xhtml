@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="CorreosListDlg" widgetVar="CorreosListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de correos"
+              class="mr1024_50 mr500_90" fitViewport="true"
+              width="auto" closeOnEscape="true" responsive="true" position="center top"
+              >
+        <p:messages id="alerta" showDetail="true" showSummary="false" closable="true">
+        </p:messages>
+        <h:form id="frmCorreosList">
+            <p:dataTable id="dtCorreos" 
+                         widgetVar="wdtCorreos"
+                         var="empleado" value="#{genericaNotifProcesosBean.lstCorreos}"
+                         paginator="true"
+                         rows="10"
+                         filterDelay="1000"
+                         reflow="true"
+                         selection="#{genericaNotifProcesosBean.selectedEmpleados}" 
+                         rowKey="#{empleado.idEmpleado}"
+                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                         rowSelectMode="checkbox"
+                         emptyMessage="No existen seguimientos registrados">
+
+                <p:column selectionMode="multiple" style="width:20px;text-align:center "/>
+                <p:column headerText="Código TM" 
+                          selectRow="false"
+                          filterBy="#{empleado.codigoTm}"
+                          width="90"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{empleado.codigoTm}"/>
+                </p:column>
+                <p:column headerText="Nombre completo" 
+                          selectRow="false"
+                          filterBy="#{empleado.nombres} #{empleado.apellidos}"
+                          width="120"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{empleado.nombres} #{empleado.apellidos}"/>
+                </p:column>
+                <p:column headerText="Correo electrónico" selectRow="false"
+                          width="200">
+                    <h:outputText value="#{empleado.emailCorporativo}" />
+                </p:column>
+                <f:facet name="footer">
+                    <p:commandButton class="cssWhite"
+                                     icon="fa fa-check" value="Seleccionar"
+                                     update=":alerta,:frmNuevaNotificacionProceso:pGridEmails,
+                                     :frmNuevaNotificacionProceso:otros"
+                                     action="#{genericaNotifProcesosBean.asignarEmails()}">
+                        <p:resetInput target=":frmNuevaNotificacionProceso:pGridEmails"/>
+                    </p:commandButton>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

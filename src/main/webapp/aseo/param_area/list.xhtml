@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="PARAMETRIZACIÓN AREAS (ASEO)">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtAseoParamArea" var="area" 
+                             scrollable="true"
+                             widgetVar="wlVdtAseoParamArea"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{aseoParamAreaBean.lstAseoParamAreas}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{aseoParamAreaBean.nuevo()}"
+                                oncomplete="PF('wlvAseoParamArea').show();"
+                                class="cssWhite"
+                                update="dtAseoParamArea,:AseoParamArea,:frmAseoParamArea"
+                                >
+                                <p:resetInput target=":frmAseoParamArea:pGridDatos"/>
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Cable Estación" 
+                              filterBy="#{area.idCableEstacion.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{area.idCableEstacion.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre" 
+                              filterBy="#{area.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{area.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Código" 
+                              filterBy="#{area.codigo}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{area.codigo}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción" styleClass="text-word-wrap">
+                        <h:outputText value="#{area.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Code Qr" exportable="false">
+                        <p:barcode value="#{area.hashString}" width="100%" type="qr"/>
+                    </p:column>
+
+                    <p:column headerText="Acciones"
+                              exportable="false">
+                        <p:commandButton styleClass="cssWhite GreenButton"
+                                         title="Editar"
+                                         action="#{aseoParamAreaBean.editar()}"
+                                         process="@this"
+                                         update=":AseoParamArea,:frmAseoParamArea"
+                                         oncomplete="PF('wlvAseoParamArea').show();"
+                                         icon="fa fa-pencil">
+                            <f:setPropertyActionListener value="#{area}" target="#{aseoParamAreaBean.selected}"/>
+                            <p:resetInput target=":frmAseoParamArea:pGridDatos"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{aseoParamAreaBean.lstAseoParamAreas.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtAseoParamArea" 
+                                                fileName="Áreas de aseo"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

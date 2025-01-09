@@ -1,0 +1,149 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="novedadSeguimiento" id="modal" modal="true" closeOnEscape="true"
+              responsive="true" fitViewport="true" resizable="false" 
+              appendTo="@(body)" position="center top" class="mr1024_50 mr500_90">
+        <c:if test="#{novSeguiBean.selectedSeguimiento.idNovedadSeguimiento == null }">
+            <f:facet name="header">
+                Nuevo seguimiento
+            </f:facet>
+        </c:if>
+        <c:if test="#{novSeguiBean.selectedSeguimiento.idNovedadSeguimiento != null }">
+            <f:facet name="header">
+                Editar seguimiento : #{novSeguiBean.selectedSeguimiento.seguimiento}
+            </f:facet>
+        </c:if>
+        <h:form id="frmNuevoSeguimiento">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <p:fieldset legend="Novedad">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:staticMessage severity="warn" 
+                                             summary="AVISO" 
+                                             rendered="#{novSeguiBean.tamanoNovedadSeguimiento eq null}"
+                                             detail="Si desea agregar archivos al seguimiento, DEBE crear una llave con el nombre novedad_seguimiento_tamano y como valor colocar limite ( en BYTES ) por archivo... En el módulo Configuración Empresa ( Configuración / Empresa ) ===> Avisar a tecnología"/>
+                        </div>
+                    </div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel for="tipo_novedad" 
+                                           value="Tipo novedad: " />
+
+                            <p:inputText value="#{novSeguiBean.selected.idNovedadTipo.nombreTipoNovedad}"
+                                         id="tipo_novedad" readonly="true"/>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel value="Detalle novedad: " />
+                            <p:inputText readonly="true" value="#{novSeguiBean.selected.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novSeguiBean.selected.idNovedadDano eq null and novSeguiBean.selected.idMulta eq null}"/>
+                            <p:inputText readonly="true" value="#{novSeguiBean.selected.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novSeguiBean.selected.idNovedadTipoDetalle.idNovedadTipoDetalle gt 0 and novSeguiBean.selected.idMulta.idMulta gt 0}"/>
+                            <p:inputText readonly="true" value="#{novSeguiBean.selected.idNovedadDano.idVehiculoDanoSeveridad.nombre}" rendered="#{novSeguiBean.selected.idNovedadDano.idNovedadDano gt 0}"/>
+                            <p:inputText readonly="true" value="#{novSeguiBean.selected.idMulta.idMultaTipo.tipo}"
+                                         rendered="#{novSeguiBean.selected.idMulta.idMulta gt 0 and novSeguiBean.selected.idNovedadTipoDetalle eq null}"/>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="observacion"
+                                               value="Observación:" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputTextarea value="#{novSeguiBean.selected.observaciones}"
+                                                 autoResize="false"
+                                                 readonly="true"
+                                                 id="observacion"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p:fieldset>
+            <p:fieldset toggleable="true"  legend="Seguimiento">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel for="fecha" value="Fecha:" />
+                            <p:calendar id="fecha" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{novSeguiBean.novedadSeguimiento.fecha}" 
+                                        maxdate="today"
+                                        showOn="button" 
+                                        locale="es"
+                                        readonlyInput="true"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha"
+                                        showTodayButton="true"
+                                        navigator="true">
+                                <p:ajax event="dateSelect" process="@this" global="false"/>
+                            </p:calendar>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="-" 
+                                               style="visibility: hidden"/>
+                            </div>
+                            <p:commandButton title="Anexar audio/video"
+                                             icon="fa fa-upload"
+                                             disabled="#{novSeguiBean.tamanoNovedadSeguimiento eq null}"
+                                             value="Cargar Archivo(s)"
+                                             class="cssWhite OrangeButton"
+                                             process="@this"
+                                             update="frmAddFilesSeguimientos"
+                                             oncomplete="PF('AddFilesSeguimientoDialog').show()">
+                            </p:commandButton>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                            <p:outputLabel for="seguimiento" value="Seguimiento:" />
+                            <p:inputTextarea id="seguimiento" value="#{novSeguiBean.novedadSeguimiento.seguimiento}"
+                                             autoResize="false"
+                                             required="true"
+                                             requiredMessage="Debe ingresar el seguimiento de la novedad"/>
+                        </div>
+                    </div>
+                </div>
+            </p:fieldset>
+            <p:remoteCommand name="rc_seg"
+                             action="#{novSeguiBean.guardarSeguimiento()}"
+                             process="@this,frmNuevoSeguimiento"
+                             update=":frmNovedadSeguimientoList:dtNovedadSeguimiento,
+                             messages,
+                             @form,
+                             msgs"
+                             rendered="#{novSeguiBean.selectedSeguimiento.idNovedadSeguimiento == null }"
+                             />
+            <p:remoteCommand name="rc_update_seg" 
+                             action="#{novSeguiBean.actualizarSeguimiento()}"
+                             process="@this,frmNuevoSeguimiento"
+                             update=":frmNovedadSeguimientoList:dtNovedadSeguimiento,
+                             @form,
+                             messages,
+                             msgs"
+                             rendered="#{novSeguiBean.selectedSeguimiento.idNovedadSeguimiento != null }"
+                             />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_seg();"
+                             value="Guardar"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             rendered="#{novSeguiBean.selectedSeguimiento.idNovedadSeguimiento == null }"
+                             >
+            </p:commandButton>
+            <p:commandButton onclick="rc_update_seg();"
+                             value="Actualizar"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             rendered="#{novSeguiBean.selectedSeguimiento.idNovedadSeguimiento != null }"
+                             />
+        </f:facet>
+    </p:dialog>  
+</ui:composition>

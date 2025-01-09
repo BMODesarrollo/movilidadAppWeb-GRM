@@ -1,0 +1,133 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <h:form id="cierre_turno_form">
+            <p:panel >
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding0" >
+                                <p:outputLabel class="cssWhite"  value="Cierre de turno"/>
+                            </div>
+
+                            <div class="ui-g-6 ui-md-3 ui-lg-2 Padding1">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Una unidad funcional" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax update="msgs,cierre_turno_form:info_cierre_turno" 
+                                            listener="#{cierreTurnoBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-6 ui-md-3 ui-lg-2 Padding1" >
+                                <p:calendar id="fecha_id" 
+                                            value="#{cierreTurnoBean.fechaConsulta}"
+                                            placeholder="Fecha"
+                                            navigator="true"
+                                            maxdate="today"
+                                            pattern="dd-MM-yyyy" locale="es">
+                                    <p:ajax process="@this"
+                                            event="dateSelect"
+                                            update="cierre_turno_form:cierre_select"
+                                            listener="#{cierreTurnoBean.consultarCierresTurnosByFecha()}"/>
+                                </p:calendar>
+                            </div>
+                            <div class="ui-g-6 ui-md-3 ui-lg-2 Padding1" >
+                                <p:selectOneMenu id="cierre_select" value="#{cierreTurnoBean.idGopCierreTurno}" 
+                                                 filter="true" 
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione un cierre" itemValue="#{null}" />
+                                    <f:selectItems value="#{cierreTurnoBean.listGopCierreTurno}" 
+                                                   var="item" 
+                                                   itemLabel="#{cierreTurnoBean.dateFormat(item.fechaHora)}"
+                                                   itemValue="#{item.idGopCierreTurno}"/>
+                                    <p:ajax update="msgs,cierre_turno_form:info_cierre_turno" 
+                                            listener="#{cierreTurnoBean.selectCierreTurno()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-6 ui-md-3 ui-lg-2 Padding1" align="right" >
+                                <p:commandButton
+                                    icon="fa fa-plus"
+                                    value="Nuevo"
+                                    actionListener="#{cierreTurnoBean.nuevo()}"
+                                    class="cssWhite"
+                                    update="dlg_cierre_turno_form,msgs"/>   
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+
+                <div class="ui-fluid" jsf:id="info_cierre_turno">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5 titulo_bg">
+                            <h2>
+                                <spam class="spam_value">
+                                    Ult. cierre turno: <p:outputLabel value="#{cierreTurnoBean.gopCierreTurno.fechaHora}">
+                                        <f:convertDateTime type="both" pattern="dd/MM/yyyy HH:mm:ss" />
+                                    </p:outputLabel>
+                                </spam>
+                            </h2>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5 titulo_bg">
+                            <h2>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                    <spam class="spam_value">
+                                        Usuario Tec. Control: <p:outputLabel value="#{cierreTurnoBean.gopCierreTurno.userTecControl}"/>
+                                    </spam>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                    <spam class="spam_value">
+                                        Usuario Tec. Patio: <p:outputLabel value="#{cierreTurnoBean.gopCierreTurno.userTecPatio}"/>
+                                    </spam>
+                                </div>
+                            </h2>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5 titulo_bg">
+                            <h2>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                    <spam class="spam_value">
+                                        Usuario Tec. Control Recibe: <p:outputLabel value="#{cierreTurnoBean.gopCierreTurno.userTecControlRecibe}"/>
+                                    </spam>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                    <spam class="spam_value">
+                                        Usuario Tec. Patio Recibe: <p:outputLabel value="#{cierreTurnoBean.gopCierreTurno.userTecPatioRecibe}"/>
+                                    </spam>
+                                </div>
+                            </h2>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 sub_titulo_bg">
+                            <h2>
+                                Descripción: <p:outputLabel value="#{cierreTurnoBean.gopCierreTurno.descripcion}" escape="false" />
+                            </h2>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 titulo_bg">
+                            <h2>
+                                <spam class="spam_value">
+                                    Observación: <p:outputLabel value="#{cierreTurnoBean.gopCierreTurno.observacion}"/>
+                                </spam>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+            </p:panel>
+        </h:form>
+        <ui:include src="create.xhtml"/>
+    </ui:define>
+</ui:composition>

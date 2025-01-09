@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              closable="false"
+              resizable="false" 
+              class="mr1024_40 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            DEFINIR PLAN DE ACCIÓN
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('modalDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="form-modal">
+            <div class="ui-fluid Padding0">
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Seleccione plan(es) de acción a ejecutar *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:selectManyCheckbox id="grid2"
+                                              value="#{accidentePlanAccionJSF.planAccionSelect}"
+                                              layout="responsive" 
+                                              style="display: block;
+                                              width: 99.99999%;
+                                              max-height:  200px;
+                                              overflow-y: auto;
+                                              scroll-behavior: smooth;" 
+                                              columns="1">
+                            <f:selectItems value="#{accPlanAccionBean.lstAccPlanAccion}"
+                                           var="apa" 
+                                           itemLabel="#{apa.plan}" 
+                                           itemDescription="#{apa.descripcion}"
+                                           itemValue="#{accidentePlanAccionJSF.toStringInteger(apa.idAccPlanAccion)}" />
+                        </p:selectManyCheckbox>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="@form" 
+                             oncomplete="PF('modalDlg').hide()"
+                             update="tabView:form-plan-accion,@form,:msgs"
+                             actionListener="#{accidentePlanAccionJSF.guardarPlanAccionGM()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" 
+                             icon="fa fa-save"
+                             class="cssWhite" 
+                             onclick="guardar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PrgTareaCreateDlg" widgetVar="PrgTareaCreateDialog" 
+              closeOnEscape="true"
+              class="mr1024_50 mr500_90"
+              position="center top"
+              responsive="true"
+              modal="true" resizable="false" appendTo="@(body)" 
+              header="Gestión Programacion Tarea">
+        <h:form id="PrgTareaCreateForm">
+            <p:messages id="msgs" showDetail="true"/>  
+            <div class="ui-fluid" jsf:rendered="#{prgTareaController.selected != null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre tarea" for="tarea" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText
+                                id="tarea" 
+                                maxlength="45"
+                                required="true"
+                                requiredMessage="Debe ingresar TAREA"
+                                value="#{prgTareaController.selected.tarea}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Suma de Distancia" for="sumDistancia" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton 
+                                converter="javax.faces.Boolean"
+                                id="sumDistancia" 
+                                onLabel="Sí" 
+                                class="cssWhite"
+                                offLabel="No" 
+                                onIcon="fa fa-check" 
+                                offIcon="fa fa-close"
+                                value="#{prgTareaController.bsumaDis}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Comercial" for="comercial" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton 
+                                converter="javax.faces.Boolean"
+                                id="comercial" 
+                                onLabel="Sí" 
+                                class="cssWhite"
+                                offLabel="No" 
+                                onIcon="fa fa-check" 
+                                offIcon="fa fa-close"
+                                value="#{prgTareaController.bcomercial}" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Mantenimiento" for="mantenimiento" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton
+                                converter="javax.faces.Boolean"
+                                onLabel="Sí" 
+                                offLabel="No" 
+                                class="cssWhite"
+                                onIcon="fa fa-check" 
+                                offIcon="fa fa-close" 
+                                id="mantenimiento" 
+                                value="#{prgTareaController.bmantenimeinto}" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Disponible" for="dispo_id" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton
+                                converter="javax.faces.Boolean"
+                                onLabel="Sí" 
+                                class="cssWhite"
+                                offLabel="No" 
+                                onIcon="fa fa-check" 
+                                offIcon="fa fa-close" 
+                                id="dispo_id" 
+                                value="#{prgTareaController.bdisponible}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p:remoteCommand name="rc_save_tarea" 
+                             class="cssWhite"
+                             actionListener="#{prgTareaController.guardar()}"
+                             rendered="#{empty prgTareaController.selected.idPrgTarea}"
+                             update="@form,:PrgTareaListForm:datalist,PrgTareaCreateForm:msgs,msgs"/>
+            <p:remoteCommand name="rc_update_tarea" 
+                             class="cssWhite"
+                             rendered="#{!empty prgTareaController.selected.idPrgTarea}"
+                             actionListener="#{prgTareaController.modificar()}" 
+                             update="@form,:PrgTareaListForm:datalist,@form,msgs" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton icon="fa fa-save" value="Guardar" 
+                             rendered="#{empty prgTareaController.selected.idPrgTarea}"
+                             class="cssWhite" onclick="rc_save_tarea()"/>
+            <p:commandButton icon="fa fa-save" value="Actualizar" 
+                             rendered="#{!empty prgTareaController.selected.idPrgTarea}"
+                             class="cssWhite" onclick="rc_update_tarea()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+

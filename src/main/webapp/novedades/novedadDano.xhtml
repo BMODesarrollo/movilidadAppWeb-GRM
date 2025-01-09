@@ -1,0 +1,257 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="./../WEB-INF/template.xhtml">
+    <ui:define name="head">
+        <style>
+            .calendarFilter .ui-inputfield
+            {
+                width:90px !important;
+                margin: 0 0.2em !important;
+            }
+            .ui-datatable .ui-datatable-header, .ui-datatable .ui-datatable-footer{
+                padding: 0px;
+            }    
+            .ui-galleria-caption  {
+                width: 973.98px;
+                height: 40px;
+                visibility: hidden  
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Novedades de daño
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmPrincipalNvdDano:tbl_danos" 
+                                            oncomplete="PF('dtNovedades').getPaginator().setPage(0);"
+                                            listener="#{novedadDanoBean.getByDateRange()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <p:hotkey bind="ctrl+shift+d" 
+                      update="frmPrincipalNvdDano:tbl_danos" 
+                      action="#{novedadDanoBean.clearFilters()}"/>
+            <h:form id="frmPrincipalNvdDano">
+
+                <p:dataTable var="novedadDano" value="#{novedadDanoBean.listaV1}"
+                             id="tbl_danos"
+                             widgetVar="dtNovedades"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1500"
+                             paginator="true"
+                             sortBy="#{novedadDano.fecha}"
+                             sortOrder="descending"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100,200"
+                             emptyMessage="No existen novedades de daño registradas">
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <h:outputText value="Fechas: " title="Fecha Inicio"/>
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{novedadDanoBean.fechaInicio}"
+                                        placeholder="Fecha Ini"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es">
+                                <p:ajax event="dateSelect"  update="tbl_danos" 
+                                        listener="#{novedadDanoBean.LoadV1()}"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{novedadDanoBean.fechaFin}"
+                                        placeholder="Fecha Fin"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es">
+                                <p:ajax event="dateSelect" update="tbl_danos" 
+                                        listener="#{novedadDanoBean.LoadV1()}"/>
+                            </p:calendar>
+                            <p:commandButton actionListener="#{novedadDanoBean.nuevo(true,null)}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             rendered="false"
+                                             title="Agregar nueva novedad" 
+                                             icon="fa fa-plus"
+                                             style="color: white"
+                                             update="frmDano,modalDano"
+                                             value="Nuevo">
+                                <p:resetInput target="frmDano" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggle" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify"  
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="tbl_danos" trigger="toggle" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px" 
+                              toggleable="false" exportable="false">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Fecha" filterBy="#{novedadDano.fecha}" 
+                              filterMatchMode="startsWith" >
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        placeholder="Seleccione fecha"
+                                        onkeyup="PF('dtNovedades').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dtNovedades').filter()" update="tbl_danos"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{novedadDano.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vehículo" filterBy="#{novedadDano.idVehiculo.codigo}">
+                        <h:outputText value="#{novedadDano.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Operador" filterBy="#{novedadDano.idEmpleado.nombres} #{novedadDano.idEmpleado.apellidos}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedadDano.idEmpleado.nombres} #{novedadDano.idEmpleado.apellidos}" />
+                    </p:column>
+                    <p:column headerText="Código TM" filterBy="#{novedadDano.idEmpleado.codigoTm}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedadDano.idEmpleado.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Componente">
+                        <h:outputText value="#{novedadDano.idVehiculoComponente.descripcion} (#{novedadDano.idVehiculoComponente.nombre})" 
+                                      rendered="#{novedadDano.idVehiculoComponente != null}"/>
+                        <h:outputText value="No tiene" rendered="#{novedadDano.idVehiculoComponente == null}"/>
+                    </p:column>
+                    <p:column headerText="Severidad Daño">
+                        <h:outputText value="#{novedadDano.idVehiculoDanoSeveridad.nombre}" />
+                    </p:column>
+                    <p:column headerText="Puntos" rendered="false" class="TexAlCenter">
+                        <h:outputText value="#{novedadDano.idVehiculoDanoSeveridad.puntosPm}" />
+                    </p:column>
+                    <p:column headerText="Descripción" class="cortar" style="max-width: 150px !important">
+                        <h:outputText value="#{novedadDano.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{novedadDano.username}"/>
+                    </p:column>
+                    <p:column id="procede"
+                              rendered="#{novedadDanoBean.validarRolSeg()}"
+                              styleClass="#{novedadUtilJSFManagedBean.verificarProcedeNovedad(novedadDano) gt 0 ? 'cssGreen': novedadUtilJSFManagedBean.verificarProcedeNovedad(novedadDano) eq 0 ? 'cssRed' : ''}">
+                        <f:facet name="header">
+                            <h:outputText value="Procede"/>
+                        </f:facet>
+                        <h:outputText value="Si" rendered="#{novedadUtilJSFManagedBean.verificarProcedeNovedad(novedadDano) eq 1}"
+                                      class="cssWhite"/>
+                        <h:outputText value="No" rendered="#{novedadUtilJSFManagedBean.verificarProcedeNovedad(novedadDano) eq 0}"
+                                      class="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Calificar Novedad" 
+                              class="TexAlCenter"
+                              exportable="false" rendered="#{novedadDanoBean.validarRolSeg()}">
+                        <p:commandButton actionListener="#{novedadUtilJSFManagedBean.procedeConciliacion(novedadDano)}"
+                                         icon="fa fa-thumbs-up"
+                                         class="cssWhite GreenButton"
+                                         title="Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea aplicar los puntos?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                        <p:commandButton actionListener="#{novedadUtilJSFManagedBean.noProcedeConciliacion(novedadDano)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite RedButton"
+                                         title="No Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea NO proceder con la conciliación?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column headerText="Acción" exportable="false">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="cssWhite GreenButton"
+                                         title="Editar registro"
+                                         action="#{novedadDanoBean.editar(false)}"
+                                         rendered="#{novedadDanoBean.renderedEdit(novedadDano.username)}"
+                                         update=":frmDano,:modalDano"
+                                         oncomplete="PF('mtipo').show();">
+                            <f:setPropertyActionListener target="#{novedadDanoBean.selected}" value="#{novedadDano}"/>
+                        </p:commandButton>
+                        <p:commandButton title="Ver fotos"
+                                         icon="fa fa-camera"
+                                         class="cssWhite OrangeButton"
+                                         update="galeria_fotos_form"  
+                                         rendered="#{!empty(novedadDano.pathFotos)}"
+                                         action="#{novedadDanoBean.obtenerFotosNovedad()}"
+                                         oncomplete="PF('galeria_foto_dialog_wv').show()" >
+                            <f:setPropertyActionListener target="#{novedadDanoBean.selected}" value="#{novedadDano}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh"
+                                         class="cssWhite"
+                                         title="Cambiar estado"
+                                         action="#{novedadDanoBean.cambiarEstado()}"
+                                         update=":frmDano:messages,tbl_danos"
+                                         disabled="true">
+                            <f:setPropertyActionListener target="#{novedadDanoBean.selected}" value="#{novedadDano}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{novedadDanoBean.lista.size()} novedades de daño.
+                        <div style="float: right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="tbl_danos" fileName="novedad-dano #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="tbl_danos" fileName="novedad-dano #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="tbl_danos" fileName="novedad-dano #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modals/novedadDano/Create.xhtml" />
+        <ui:include src="../galeriaFotos.xhtml" />
+    </ui:define>
+</ui:composition>
+

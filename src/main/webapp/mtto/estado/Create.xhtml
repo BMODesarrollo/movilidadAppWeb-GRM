@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="estadoMtto" id="modalEstadoMtto" modal="true" closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)" position="center,top"
+              class="mr1024_30 mr500_90">
+        <c:if test="#{mttoEstadoBean.selected == null }">
+            <f:facet name="header">
+                Nuevo estado
+            </f:facet>
+        </c:if>
+        <c:if test="#{mttoEstadoBean.selected != null }">
+            <f:facet name="header">
+                Editar estado
+            </f:facet>
+        </c:if>
+        <h:form id="mtto_estado_form">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid" >
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Estado " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText value="#{mttoEstadoBean.mttoEstado.estado}"
+                                         id="estado"
+                                         required="true"
+                                         requiredMessage="Debe ingresar un estado"
+                                         />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Descripción: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea value="#{mttoEstadoBean.mttoEstado.descripcion}"
+                                             id="descripcion"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"
+                                             />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand 
+                name="rc_estado"
+                action="#{mttoEstadoBean.guardar()}"
+                update=":frmMttoEstado:dtMttoEstado,messages"
+                rendered="#{mttoEstadoBean.selected == null }"/>
+            <p:remoteCommand name="rc_update_estado"
+                             action="#{mttoEstadoBean.actualizar()}"
+                             update=":frmMttoEstado:dtMttoEstado,:msgs"
+                             rendered="#{mttoEstadoBean.selected != null }"
+                             />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_estado();"
+                rendered="#{mttoEstadoBean.selected == null }"
+                class="cssWhite"
+                value="Guardar"/>
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_update_estado();"
+                rendered="#{mttoEstadoBean.selected != null }"
+                class="cssWhite"
+                value="Actualizar"/>
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

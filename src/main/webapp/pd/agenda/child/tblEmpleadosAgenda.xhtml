@@ -1,0 +1,84 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dataTable id="dtEmpleadosAgenda" var="agenda" 
+                 scrollable="true"
+                 widgetVar="wlVdtEmpleadosAgenda"
+                 scrollHeight="600"
+                 disabledTextSelection="false"
+                 reflow="true"
+                 rows="10"
+                 filterDelay="1700"
+                 paginator="true"
+                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                 rowsPerPageTemplate="10,50,100"
+                 emptyMessage="No existen registros"
+                 value="#{pdMaestroBean.lstMaestroAsistente}">
+
+        <f:facet name="header">
+            <div align="right" jsf:id="botones">
+                <p:commandButton
+                    icon="fa fa-plus"
+                    value="Asignar o actualizar citación"
+                    action="#{pdMaestroBean.cargarListadoEmpleados()}"
+                    oncomplete="PF('EmpleadosAgendaDialog').show();"
+                    class="cssWhite"
+                    update=":frmEmpleadosAgendaList:dtEmpleadosAgendaPd"
+                    >
+                    <p:resetInput target=":frmEmpleadosAgendaList:dtEmpleadosAgendaPd"/>
+                </p:commandButton>  
+            </div>
+        </f:facet>
+        <p:column headerText="Código TM"
+                  filterBy="#{agenda.idEmpleado.codigoTm}"
+                  filterMatchMode="contains">
+            <h:outputText value="#{agenda.idEmpleado.codigoTm == null ? 'N/A' : agenda.idEmpleado.codigoTm}" />
+        </p:column>
+        <p:column headerText="Cédula"
+                  filterBy="#{agenda.idEmpleado.identificacion}"
+                  filterMatchMode="contains">
+            <h:outputText value="#{agenda.idEmpleado.identificacion}" />
+        </p:column>
+        <p:column filterBy="#{agenda.idEmpleado.nombres}"
+                  filterMatchMode="contains"
+                  headerText="Nombres">
+            <h:outputText value="#{agenda.idEmpleado.nombres}"/>
+        </p:column>
+        <p:column filterBy="#{agenda.idEmpleado.apellidos}"
+                  filterMatchMode="contains"
+                  headerText="Apellidos">
+            <h:outputText value="#{agenda.idEmpleado.apellidos}"/>
+        </p:column>
+        <p:column headerText="Asiste" class="cortar">
+            <div class="Padding1">
+                <p:selectOneMenu disabled="true"
+                filter="true"
+                style="width: 50%"
+                value="#{pdMaestroBean.idEstadoAsistencia}">
+                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                <f:selectItem itemLabel="No" itemValue="0" />
+                <f:selectItem itemLabel="Sí" itemValue="1" />
+                <f:selectItem itemLabel="No se atendió" itemValue="2" />
+                <p:ajax update="msgs, frmPrincipal" listener="#{pdMaestroBean.ActualizarAsistencia(empleados)}" />
+            </p:selectOneMenu>
+            </div>
+        </p:column>
+        <p:column headerText="Eliminar" width="10%" style="text-align: center;">
+            <p:commandButton styleClass="cssWhite RedButton"
+                             title="Editar"
+                             action="#{pdMaestroBean.eliminarAsistente(agenda)}"
+                             process="@this"
+                             update=":frmListaAgenda,dtEmpleadosAgenda,:msgs"
+                             icon="fa fa-times">
+                <p:confirm header="Confirmación" message="Está seguro de eliminar éste detalle?" icon="fa fa-exclamation-triangle" />
+            </p:commandButton>
+        </p:column>
+
+
+    </p:dataTable>
+</ui:composition>     

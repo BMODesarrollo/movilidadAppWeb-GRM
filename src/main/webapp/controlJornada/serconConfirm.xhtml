@@ -1,0 +1,196 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="content">
+        <h:form id="form_prg_sercon_det">
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Reporte Presentación y Cierre Operador
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <div class="Wid100" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <ui:include src="../zComponent/selectUnidadFuncional.xhtml" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:dataTable id="sercon_confirm_id" 
+                             value="#{serconConfirmBean.list}" 
+                             var="item"
+                             rowIndexVar="rowIdx"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             scrollHeight="600"
+                             reflow="true"
+                             filterDelay="1000"
+                             rowKey="#{item.idMyAppSerconConfirm}"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rows="20"
+                             widgetVar="dtsercon_confirm_wv"
+                             rowsPerPageTemplate="20,100,200,500">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="sercon_confirm_id" fileName="presentacion y cierre operador"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:outputLabel value="Fecha " class="cssWhite Fs20" for="desde"></p:outputLabel>
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{serconConfirmBean.desde}"
+                                        locale="es"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" global="false" process="@this"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{serconConfirmBean.hasta}"
+                                        locale="es"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" global="false" process="@this"/>
+                            </p:calendar>
+                            <p:commandButton id="consultar"
+                                             value="Consultar"
+                                             icon="fa fa-search"
+                                             class="cssWhite"
+                                             update="form_prg_sercon_det:sercon_confirm_id"
+                                             actionListener="#{serconConfirmBean.consultar()}">
+                            </p:commandButton>
+                            <p:commandButton id="toggler_id" type="button" 
+                                             title="Columnas"
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="sercon_confirm_id" trigger="toggler_id"/>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 40px">
+                        <h:outputText  value="#{rowIdx+1}" />
+                    </p:column>
+                    <p:column headerText="Fecha">
+                        <h:outputText  value="#{item.fecha}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.idEmpleado.codigoTm}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter"
+                              headerText="Código TM">
+                        <h:outputText value="#{item.idEmpleado.codigoTm}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idEmpleado.identificacion}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter"
+                              headerText="Identificación">
+                        <h:outputText value="#{item.idEmpleado.identificacion}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter"
+                              headerText="Operador">
+                        <h:outputText value="#{item.idEmpleado.nombresApellidos()}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.sercon}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter"
+                              headerText="Tarea">
+                        <h:outputText value="#{item.sercon}"/>
+                    </p:column>
+                    <p:column class="TexAlCenter"
+                              sortBy="#{item.realTimeOrigin != null? ((item.autorizado==null || item.autorizado==0) ? item.timeOrigin:  item.realTimeOrigin) : item.timeOrigin}"
+                              headerText="Hr. Inicio Jornada">
+                        <h:outputText value="#{item.realTimeOrigin != null? ((item.autorizado==null || item.autorizado==0) ? item.timeOrigin:  item.realTimeOrigin) : item.timeOrigin}"/>
+                    </p:column>
+                    <p:column class="TexAlCenter"
+                              sortBy="#{item.idMyAppSerconConfirm.fecha}"
+                              headerText="Hora Presentación">
+                        <h:outputText value="#{item.idMyAppSerconConfirm.fecha}">
+                            <f:convertDateTime pattern="HH:mm:ss" type="time"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.idFromStop.name}"
+                              sortBy="#{item.idFromStop.name}"
+                              filterMatchMode="contains"
+                              headerText="Patio/Estación Programado">
+                        <h:outputText value="#{item.idFromStop.name}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idMyAppSerconConfirm.idPrgStopPoint.name}"
+                              filterMatchMode="contains"
+                              headerText="Patio Presentación">
+                        <h:outputText value="#{item.idMyAppSerconConfirm.idPrgStopPoint.name}"/>
+                    </p:column>
+                    <p:column headerText="Se presentó?"
+                              filterBy="#{item.idMyAppSerconConfirm != null}"
+                              filterMatchMode="exact"
+                              class="TexAlCenter">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('dtsercon_confirm_wv').filter()" 
+                                             style="max-width: 400px"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Sí" itemValue="true"  />
+                                <f:selectItem itemLabel="No" itemValue="false"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idMyAppSerconConfirm != null ? 'Sí' : 'No'}"/>
+                    </p:column>
+                    <p:column headerText="Presentado en" 
+                              class="TexAlCenter" 
+                              filterBy="#{item.idMyAppSerconConfirm.verbo eq 'POST'}"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('dtsercon_confirm_wv').filter()" 
+                                             style="max-width: 400px"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Rigel" itemValue="false"  />
+                                <f:selectItem itemLabel="MyMovil" itemValue="true"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idMyAppSerconConfirm.verbo == 'POST' ? 'MyMovil' : item.idMyAppSerconConfirm.verbo}"/>
+                    </p:column>
+                    <p:column headerText="Cierre de turno MyMovil?"
+                              filterBy="#{item.idMyAppSerconConfirmLast != null}"
+                              filterMatchMode="exact"
+                              class="TexAlCenter">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('dtsercon_confirm_wv').filter()" 
+                                             style="max-width: 400px"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Sí" itemValue="true"  />
+                                <f:selectItem itemLabel="No" itemValue="false"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idMyAppSerconConfirmLast != null ? 'Sí' : 'No'}"/>
+                    </p:column>
+                    <p:column class="TexAlCenter"
+                              sortBy="#{serconConfirmBean.horaFinalTurno(item)}"
+                              headerText="Hr. Fin Jornada">
+                        <h:outputText value="#{serconConfirmBean.horaFinalTurno(item)}"/>
+                    </p:column>
+                    <p:column class="TexAlCenter"
+                              sortBy="#{item.idMyAppSerconConfirmLast.fecha}"
+                              headerText="Hora Cierre Turno">
+                        <h:outputText value="#{item.idMyAppSerconConfirmLast.fecha}">
+                            <f:convertDateTime pattern="HH:mm:ss" type="time"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

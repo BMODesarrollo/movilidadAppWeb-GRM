@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-right{
+                text-align: right;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="frmBitacoraAccInIt">
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Accidentes In Itinere
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="bitacoraAccList" 
+                                            listener="#{bitacoraAccInItinereBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:panel>
+                    <f:facet name="header">
+                        <div align="center">
+                            <p:outputLabel for="@next" value="FECHA INICIO:"
+                                           styleClass="cssWhite"/>
+                            <p:spacer width="5"/>
+                            <p:calendar id="fechaIncio" label="Fecha de Consulta" 
+                                        value="#{bitacoraAccInItinereBean.fecha}"
+                                        pattern="dd-MM-yyyy"
+                                        locale="es"
+                                        maxdate="today"
+                                        readonlyInput="true"
+                                        showOn="button"
+                                        title="Fecha Inicio"
+                                        navigator="true">
+                                <p:ajax  event="dateSelect" process="@this"/>
+                            </p:calendar>
+                            <p:spacer width="20"/>
+                            <p:outputLabel value=" - " styleClass="cssWhite"/>
+                            <p:spacer width="20"/>
+                            <p:outputLabel for="fechaFin" value="FECHA FIN:"
+                                           styleClass="cssWhite"/>
+                            <p:spacer width="5"/>
+                            <p:calendar id="fechaFin" label="Fecha de Consulta" 
+                                        value="#{bitacoraAccInItinereBean.fechaFin}"
+                                        locale="es"
+                                        pattern="dd-MM-yyyy"
+                                        readonlyInput="true"
+                                        title="Fecha Fin"
+                                        maxdate="today"
+                                        showOn="button"
+                                        navigator="true">
+                                <p:ajax  event="dateSelect" process="@this"/>
+                            </p:calendar>
+                            <p:spacer width="20"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                actionListener="#{bitacoraAccInItinereBean.consultar()}"
+                                class="cssWhite"
+                                update="bitacoraAccList"
+                                >
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:dataTable id="bitacoraAccList" value="#{bitacoraAccInItinereBean.lista}" 
+                                 var="item" widgetVar="dtbitacoraAccList"
+                                 emptyMessage="No hay registros que mostrar!!"
+                                 paginator="true"
+                                 rows="100"
+                                 tableStyle="table-layout:auto"
+                                 filterDelay="1500"
+                                 rowsPerPageTemplate="100,200,500"
+                                 >
+
+                        <f:facet name="paginatorTopRight">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="bitacoraAccList" 
+                                                fileName="Bitácora de accidentalidad In Itinere"/>
+                            </h:commandLink>
+                        </f:facet>
+
+                        <p:column headerText="Fecha" 
+                                  sortBy="#{item.fecha}"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.fecha}" />
+                        </p:column>
+                        <p:column headerText="Hora" 
+                                  sortBy="#{item.hora}"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.hora}" />
+                        </p:column>
+                        <p:column headerText="Placa Vehículo" 
+                                  filterBy="#{item.placa}"
+                                  filterMatchMode="contains"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.placa}" />
+                        </p:column>
+
+                        <p:column headerText="Número Vehículo" 
+                                  filterBy="#{item.codigo}"
+                                  filterMatchMode="contains"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.codigo}" />
+                        </p:column>
+
+                        <p:column headerText="Código Operador" 
+                                  filterBy="#{item.codigoOperador}"
+                                  filterMatchMode="contains"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.codigoOperador}" />
+                        </p:column>
+
+                        <p:column headerText="Nombre Operador" 
+                                  filterBy="#{item.nombreOperador}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.nombreOperador}" />
+                        </p:column>
+
+                        <p:column headerText="Identificación" 
+                                  filterBy="#{item.identificacion}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.identificacion}" />
+                        </p:column>
+
+                        <p:column headerText="Tipo" 
+                                  filterBy="#{item.tipo}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.tipo}" />
+                        </p:column>
+
+                        <p:column headerText="Tipo Evento" 
+                                  filterBy="#{item.tipoEvento}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.tipoEvento}" />
+                        </p:column>
+
+                        <p:column headerText="Observacion" class="cortar" 
+                                  style="max-width: 150px !important">
+                            <h:outputText value="#{item.observaciones}" />
+                        </p:column>
+                        <f:facet name="footer">
+                            <div align="center">
+                                En total existen #{bitacoraAccInItinereBean.lista.size()} registro(s)
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

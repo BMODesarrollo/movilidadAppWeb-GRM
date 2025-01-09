@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="ordenaIncapacidad" id="modalOrdenaIncapacidad" 
+              modal="true" closeOnEscape="true"
+              responsive="true" resizable="false" 
+              appendTo="@(body)" position="center,top" closable="false"
+              class="mr1024_30 mr500_90" fitViewport="true">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{ordenaIncapacidadBean.selected == null }">
+                                Nuevo registro
+                            </c:if>
+                            <c:if test="#{ordenaIncapacidadBean.selected != null }">
+                                Editar registro
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('ordenaIncapacidad').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmOrdenaCreate">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+
+            <div class="ui-fluid" >
+                <div class="ui-g" jsf:id="pGrid">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Ordena: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="ordena"
+                                         value="#{ordenaIncapacidadBean.incapacidadOrdena.ordena}"
+                                         maxlength="15"
+                                         autocomplete="off"
+                                         required="true"
+                                         requiredMessage="Debe ingresar un nombre"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p:remoteCommand name="guardar"
+                             action="#{ordenaIncapacidadBean.guardar()}"
+                             update=":frmOrdenaList:dtOrdena,pGrid,messages,:msgs"/>
+            <p:remoteCommand name="actualizar"
+                             action="#{ordenaIncapacidadBean.actualizar()}"
+                             update=":frmOrdenaList:dtOrdena,:msgs"/>
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             onclick="guardar()"
+                             rendered="#{ordenaIncapacidadBean.selected == null }"
+                             >
+            </p:commandButton>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             onclick="actualizar()"
+                             rendered="#{ordenaIncapacidadBean.selected != null }"
+                             />
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

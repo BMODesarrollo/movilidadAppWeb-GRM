@@ -1,0 +1,123 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="EsMatEquiDet"
+              widgetVar="wlvEsMatEquiDet" 
+              modal="true" 
+              class="modalResponsivoMaterial"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{not(sstAutorizacionPublicoJSF.isEditingDetalle)}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{sstAutorizacionPublicoJSF.isEditingDetalle}">
+            <f:facet name="header">
+                EDITAR DATOS
+            </f:facet>
+        </c:if>
+        <h:form id="frmMateriales">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            Tipo Material
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:selectOneMenu  
+                                filter="true"
+                                required="true"
+                                requiredMessage="Debe seleccionar un tipo de material/herramienta"
+                                value="#{sstAutorizacionPublicoJSF.i_sstMatEquiTipo}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="marca"
+                                    value="#{sstAutorizacionPublicoJSF.lstMatEquiTipos}"
+                                    itemLabel="#{marca.tipo}"
+                                    itemValue="#{marca.idSstMatEquiTipo}"
+                                    />
+                                <p:ajax global="false" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            Marca
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:selectOneMenu  
+                                filter="true"
+                                required="true"
+                                requiredMessage="Debe seleccionar una marca"
+                                value="#{sstAutorizacionPublicoJSF.i_sstMatEquiMarca}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="marca"
+                                    value="#{sstAutorizacionPublicoJSF.lstMatEquiMarcas}"
+                                    itemLabel="#{marca.marca}"
+                                    itemValue="#{marca.idSstMatEquiMarca}"
+                                    />
+                                <p:ajax global="false" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            Nombre del Material
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:inputText
+                                required="true"
+                                requiredMessage="Debe ingresar nombre del material/herramienta"
+                                value="#{sstAutorizacionPublicoJSF.sstMatEqui.nombre}"
+                                />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            Serial
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:inputText 
+                                value="#{sstAutorizacionPublicoJSF.sstEsMatEquiDet.serial}"
+                                />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            Cantidad
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:spinner 
+                                min="0" 
+                                required="true" 
+                                value="#{sstAutorizacionPublicoJSF.sstEsMatEquiDet.cantidad}"
+                                requiredMessage="Debe ingresar una cantidad"
+                                label="Cantidad"
+                                />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardarMaterial"
+                             process="frmMateriales,@this"
+                             update=":msgs,pGridDatos,:frmAutorizacion:dtMateriales" 
+                             action="#{sstAutorizacionPublicoJSF.guardarDetalleEnLista()}"/>
+            <p:remoteCommand name="actualizarMaterial"
+                             process="frmMateriales,@this"
+                             update=":msgs,:frmAutorizacion:dtMateriales"
+                             action="#{sstAutorizacionPublicoJSF.guardarDetalleEnLista()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                 rendered="#{not(sstAutorizacionPublicoJSF.isEditingDetalle)}"
+                                 class="cssWhite" onclick="guardarMaterial()"/>
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{sstAutorizacionPublicoJSF.isEditingDetalle}"
+                                 class="cssWhite" onclick="actualizarMaterial()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

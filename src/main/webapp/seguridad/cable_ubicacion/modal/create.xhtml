@@ -1,0 +1,145 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="Ubicacion"
+              widgetVar="wvUbicaciones" 
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{cableUbicacionBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{cableUbicacionBean.selected != null}">
+            <f:facet name="header">
+                EDITAR DATOS : #{cableUbicacionBean.selected.nombre.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <h:form id="frmUbicaciones">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Código" for="@next"/>
+                            </div>
+                            <p:inputText 
+                                required="true" 
+                                maxlength="6"
+                                value="#{cableUbicacionBean.codigo}"
+                                requiredMessage="Debe ingresar código"
+                                >
+                            </p:inputText>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Nombre" for="@next"/>
+                            </div>
+                            <p:inputText 
+                                required="true" 
+                                value="#{cableUbicacionBean.nombre}"
+                                requiredMessage="Debe ingresar nombre"
+                                />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Estación" for="@next"/>
+                            </div>
+                            <p:selectOneMenu  
+                                style="width: 99.9999%"
+                                filter="true"
+                                required="true"
+                                requiredMessage="Debe seleccionar una estación"
+                                value="#{cableUbicacionBean.i_CableEstacion}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="estacion"
+                                    value="#{cableUbicacionBean.lstCableEstacion}"
+                                    itemLabel="#{estacion.nombre}"
+                                    itemValue="#{estacion.idCableEstacion}"
+                                    />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Armamento" for="@next"/>
+                            </div>
+                            <p:selectOneMenu 
+                                style="width: 99.9999%"
+                                filter="true"
+                                title="MARCA - CALIBRE - (SERIAL)"
+                                value="#{cableUbicacionBean.i_RegArmamento}">
+                                <f:selectItem itemLabel="No aplica" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="armamento"
+                                    value="#{cableUbicacionBean.lstRegistroArmamentos}"
+                                    itemLabel="#{armamento.marca.concat(' - ').concat(armamento.calibre).concat(' ( ').concat(armamento.serial).concat(' )')}"
+                                    itemValue="#{armamento.idSegRegistroArmamento}"
+                                    />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Medio comunicación" for="@next"/>
+                            </div>
+                            <p:selectOneMenu  
+                                style="width: 99.9999%"
+                                filter="true"
+                                title="MODELO - MARCA - (CÓDIGO)"
+                                value="#{cableUbicacionBean.i_MedioComunicacion}">
+                                <f:selectItem itemLabel="No aplica" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="medio"
+                                    value="#{cableUbicacionBean.lstMediosComunicacion}"
+                                    itemLabel="#{medio.modelo.concat(' - ').concat(medio.marca).concat(' ( ').concat(medio.codigo).concat(' )')}"
+                                    itemValue="#{medio.idSegMedioComunicacion}"
+                                    />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         value="#{cableUbicacionBean.cableUbicacion.descripcion}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update=":msgs,pGridDatos,:frmPrincipal:dtUbicaciones" 
+                             action="#{cableUbicacionBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmPrincipal:dtUbicaciones"
+                             action="#{cableUbicacionBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{cableUbicacionBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{cableUbicacionBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

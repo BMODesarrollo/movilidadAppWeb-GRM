@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-Cc" closeOnEscape="true" widgetVar="CcDlg" modal="true" header="#{paramCargoCcJSF.paramCargoCc.idParamCargoCc != null ? 'EDITAR PARAMETRIZACIÓN DE CARGO CENTRO COSTO' : 'NUEVA PARAMETRIZACIÓN DE CARGO CENTRO COSTO'}"
+              resizable="false" appendTo="@(body)" position="center top" responsive="true">
+        <h:form id="form-Cc">
+            <div class="ui-fluid">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <h:outputText value="Centro Costo *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:inputText id="centro-costo"
+                                         maxlength="5"
+                                         required="true"
+                                         requiredMessage="Cenntro Costo es requerido"
+                                         value="#{paramCargoCcJSF.paramCargoCc.centroCosto}" />
+                        </div>
+                    </div>
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <h:outputText value="Cargo *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:selectOneMenu id="cargo" 
+                                             value="#{paramCargoCcJSF.idCargo}" 
+                                             style="width: 99.999%" 
+                                             required="true"
+                                             requiredMessage="Cargo es requerido"
+                                             filter="true" 
+                                             filterMatchMode="contains" >
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{paramCargoCcJSF.listEmpleadoTipoCargo}" 
+                                               var="listcargo" 
+                                               itemLabel="#{listcargo.nombreCargo}" 
+                                               itemDescription="#{listcargo.nombreCargo}"
+                                               itemValue="#{listcargo.idEmpleadoTipoCargo}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:inputTextarea id="descripcion"
+                                             rows="7"
+                                             maxlength="65000"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             value="#{paramCargoCcJSF.paramCargoCc.descripcion}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                            <p:commandButton id="btn-guardar"
+                                             value="Guardar"
+                                             rendered="#{empty paramCargoCcJSF.paramCargoCc.idParamCargoCc}"
+                                             class="cssWhite"
+                                             icon="fa fa-check"
+                                             actionListener="#{paramCargoCcJSF.guardar()}"
+                                             update=":CcListForm,@form"
+                                             process="@form" />
+                            <p:commandButton id="btn-editar"
+                                             value="Actualizar"
+                                             rendered="#{not empty paramCargoCcJSF.paramCargoCc.idParamCargoCc}"
+                                             class="cssWhite"
+                                             icon="fa fa-check"
+                                             actionListener="#{paramCargoCcJSF.editar()}"
+                                             update=":CcListForm"/>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                            <p:commandButton id="btn-cancel"
+                                             value="Cancelar"
+                                             class="cssWhite"
+                                             icon="fa fa-times"
+                                             actionListener="#{paramCargoCcJSF.reset()}"
+                                             update=":CcListForm"
+                                             oncomplete="PF('CcDlg').hide()"
+                                             process="@this" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

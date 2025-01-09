@@ -1,0 +1,299 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <style type="text/css">
+            @media print {
+                body{
+                    min-width: 1024px;
+                    font-size: 20px !important;
+                    font-family: sans-serif !important;
+                }
+                .no-print{
+                    display: none !important;
+                }
+                .noNone{
+                    display: initial !important;
+                }
+                .H100{
+                    margin-top: 0 !important;
+                }
+                .ui-gp{
+                    display: block !important;
+                }
+                img{
+                    max-height: 980px;
+                }
+                .imagen{
+                    display: block;
+                }
+                .page-break-aft {
+                    page-break-after: always !important;
+                }
+                .page-break-bef {
+                    page-break-before: always !important;
+                }
+            }
+            @page {
+                margin-top: 40px !important;
+            }
+            @media screen and (max-width: 500px ) {
+                .modalResponsivo {
+                    width: 90% !important;
+                }
+            }
+
+            @media screen and (min-width: 1024px ) {
+                .modalResponsivo {
+                    width: 50% !important;
+                }
+            }
+            .page-break {
+                page-break-after: always;
+                display: block;
+                clear: both;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-fluid no-print Padding0">
+            <div class="ui-g Padding0">
+                <div class="ui-g-12 ui-md-12 ui-lg-8 Padding3" jsf:id="pnl-empleados">
+                    <ui:include src="ListaEmpleados.xhtml" />
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3" jsf:id="panel-busq">
+                    <h:form id="form">
+                        <p:growl id="msg" showDetail="true" showSummary="true" life="1500" class="no-print" />
+                        <p:panel id="panel-busqueda" header="Búsqueda" toggleable="true">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:calendar id="fechaIni" 
+                                                value="#{novedadBalanceConsJSF.dInicio}" 
+                                                pattern="yyyy-MM-dd"
+                                                title="Fecha de Inicio"
+                                                mask="true"
+                                                locale="es"
+                                                navigator="true"
+                                                showOn="button"/>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:calendar id="fechaFin" 
+                                                value="#{novedadBalanceConsJSF.dFin}" 
+                                                pattern="yyyy-MM-dd"
+                                                mask="true"
+                                                locale="es"
+                                                navigator="true"
+                                                title="Fecha Fin"
+                                                showOn="button"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" style="text-transform: uppercase">
+                                    <p:inputText id="cod-ope"
+                                                 title="Operador"
+                                                 value="#{novedadBalanceConsJSF.empleado.codigoTm} - #{novedadBalanceConsJSF.empleado.nombres} #{novedadBalanceConsJSF.empleado.apellidos}" 
+                                                 readonly="true" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:commandButton id="buscar"
+                                                     actionListener="#{novedadBalanceConsJSF.buscarNovedades()}"
+                                                     icon="fa fa-search"
+                                                     value="Buscar"
+                                                     class="cssWhite"
+                                                     update=":form,container-print"
+                                                     process="@form" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:commandButton id="limpiar"
+                                                     actionListener="#{novedadBalanceConsJSF.init()}"
+                                                     icon="fa fa-remove"
+                                                     value="Limpiar"
+                                                     class="cssWhite"
+                                                     update=":form"
+                                                     process="@this" />
+                                </div>
+                            </div>
+                            <f:facet name="footer" >
+                                <div class="ui-g Padding0">
+                                    <div class="ui-g-12 ui-lg-12 ui-md-12 Padding3" style="text-align: center">
+                                        <p:commandButton value="Imprimir"
+                                                         type="button"
+                                                         rendered="#{novedadBalanceConsJSF.listNovedad.size() > 0}"
+                                                         onclick="window.print()"
+                                                         icon="fa fa-print"
+                                                         class="cssWhite" />
+                                    </div>
+                                </div>
+                            </f:facet>
+                        </p:panel>
+                    </h:form> 
+                </div>
+            </div>
+        </div>
+        <div jsf:id="container-print" class="noNone DispNone">
+            <div jsf:id="container" style="text-transform: uppercase">
+                <div class="ui-g Padding0">
+                    <div class="ui-g-4 ui-md-4 ui-lg-4 Padding3" style="border: #000000 solid 1px;text-align: center">
+                        <p:graphicImage name="#{novedadBalanceConsJSF.loadGif}" height="50" library="sentinel-layout"/>
+                    </div>
+                    <div class="ui-g-8 ui-md-8 ui-lg-8 Padding3"
+                         style="border: #000000 solid 1px;
+                         display: flex;
+                         justify-content: center;
+                         align-items: center">
+                        <h:outputText class="cssBlack" value="Balance por consecuencia" />
+                    </div>
+                </div>
+                <div class="EmptyBox20" />
+                <div class="ui-g Padding0">
+                    <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0">
+                        <h:panelGrid cellpadding="0" cellspacing="0" columns="1" class="Wid100 Padding3" border="0">
+                            <p:graphicImage cache="false"
+                                            styleClass="imagen"
+                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                            width="100%">
+                                <f:param name="path_foto" value="#{novedadBalanceConsJSF.empleado.pathFoto}" />
+                            </p:graphicImage>
+                        </h:panelGrid>
+                    </div>
+                    <div class="ui-g-8 ui-md-8 ui-lg-8 Padding0">
+                        <h:panelGrid cellpadding="0" cellspacing="0" columns="1" class="Wid100 Padding0" border="0">
+                            <h:panelGrid cellpadding="5" cellspacing="0" columns="4" class="Wid100 Padding3" border="0" style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Información del Operador" />
+                                </f:facet>
+                                <h:outputText value="Nombre" class="cssBlack" />
+                                <h:outputText value="#{novedadBalanceConsJSF.empleado.nombres} #{novedadBalanceConsJSF.empleado.apellidos}" />
+                                <h:outputText value="Código" class="cssBlack" />
+                                <h:outputText value="#{novedadBalanceConsJSF.empleado.codigoTm}" />
+                                <h:outputText value="Cargo" class="cssBlack" />
+                                <h:outputText value="#{novedadBalanceConsJSF.empleado.idEmpleadoCargo.nombreCargo}" />
+                                <h:outputText value="Dirección" class="cssBlack" />
+                                <h:outputText value="#{novedadBalanceConsJSF.empleado.direccion}" />
+                                <h:outputText value="Celular" class="cssBlack" />
+                                <h:outputText value="#{novedadBalanceConsJSF.empleado.telefonoMovil}" />
+                                <h:outputText value="Sexo" class="cssBlack" />
+                                <h:outputText value="#{novedadBalanceConsJSF.empleado.genero}" />
+                                <h:outputText value="Fecha de Ingreso" class="cssBlack" />
+                                <h:outputText value="#{novedadBalanceConsJSF.empleado.fechaIngreso}" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                </h:outputText>
+                            </h:panelGrid><br/>
+                            <h:panelGrid cellpadding="5" cellspacing="0" columns="3" class="Wid100 Padding3" border="0" style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Información de Novedades" />
+                                </f:facet>
+                                <h:outputText value="Núm. de Novedades" class="cssBlack" />
+                                <h:outputText value="Desde" class="cssBlack" />
+                                <h:outputText value="Hasta" class="cssBlack" />
+                                <h:outputText value="#{novedadBalanceConsJSF.listNovedad.size()}" />
+                                <h:outputText value="#{novedadBalanceConsJSF.getdInicio()}" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                </h:outputText>
+                                <h:outputText value="#{novedadBalanceConsJSF.getdFin()}" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                </h:outputText>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </div>
+                </div>
+                <div class="page-break-aft" />
+                <div class="ui-g Padding0" jsf:id="list-novedades">
+                    <p:repeat value="#{novedadBalanceConsJSF.listNovedad}" var="nov" varStatus="novSts" id="rept">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0"> 
+                            <h:panelGrid cellpadding="0" cellspacing="0" columns="4" class="Wid100 Padding3" border="0">
+                                <h:outputText class="cssBlack" value="#{novSts.index + 1}. Fecha" />
+                                <h:outputText class="cssBlack" value="Novedad" />
+                                <h:outputText class="cssBlack" value="Desde" />
+                                <h:outputText class="cssBlack" value="Hasta" />
+                                <h:outputText value="#{nov.fecha}" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                </h:outputText>
+                                <h:outputText value="#{nov.idNovedadTipo.nombreTipoNovedad}" />
+                                <h:outputText value="#{nov.desde}" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                </h:outputText>
+                                <h:outputText value="#{nov.hasta}" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                </h:outputText>
+                            </h:panelGrid>
+                            <h:panelGrid cellpadding="0" cellspacing="0" columns="1" class="Wid100 Padding3" border="0" style="text-align: justify">
+                                <div class="cssBlack">Observaciones</div>
+                                <h:outputText value="#{nov.observaciones}" />
+                            </h:panelGrid>
+                            <div jsf:rendered="#{nov.idNovedadDano != null}" class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <div class="EmptyBox5" />
+                                <h:panelGrid cellpadding="0" cellspacing="0" columns="3" class="Wid100 Padding3" border="0">
+                                    <h:outputText value="Componente" class="cssBlack" />
+                                    <h:outputText value="Daño" class="cssBlack" />
+                                    <h:outputText value="Severidad" class="cssBlack" />
+                                    <h:outputText value="#{nov.idNovedadDano.idVehiculoComponente.nombre}" />
+                                    <h:outputText value="#{nov.idNovedadDano.idVehiculoComponenteDano.idVehiculoDano.nombre}" />
+                                    <h:outputText value="#{nov.idNovedadDano.idVehiculoDanoSeveridad.nombre}" />
+                                </h:panelGrid>
+                                <h:panelGrid cellpadding="0" cellspacing="0" columns="1" class="Wid100 Padding3" border="0" style="text-align: justify">
+                                    <div class="cssBlack Wid100">Descripción</div>
+                                    <h:outputText value="#{nov.idNovedadDano.descripcion}" class="Wid100"/>
+                                </h:panelGrid>
+                                <h:panelGrid cellpadding="0" cellspacing="0" columns="1" class="Wid100 Padding3" border="0">
+                                    <h:outputText value="Fotos" class="cssBlack" />
+                                </h:panelGrid>
+                                <p:repeat value="#{novedadBalanceConsJSF.getArchivoDanos(nov.idNovedadDano)}" var="novDan">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" style="text-align: center">
+                                        <p:graphicImage cache="false"
+                                                        styleClass="imagen"
+                                                        width="100%"
+                                                        value="#{uploadFotoJSFManagedBean.imagenDinamica}">
+                                            <f:param name="path_foto" value="#{novDan}" />
+                                        </p:graphicImage>
+                                    </div>
+                                </p:repeat>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{nov.novedadSeguimientoList != null and nov.novedadSeguimientoList.size() > 0}">
+                                <h:panelGrid cellpadding="0" cellspacing="0" columns="1" class="Wid100 Padding3" border="0">
+                                    <h:outputText value="Seguimientos (#{nov.novedadSeguimientoList.size()})" class="cssBlack" />
+                                </h:panelGrid>
+                                <p:repeat value="#{nov.novedadSeguimientoList}" var="novSg" class="Padding0" varStatus="novSgSts">
+                                    <h:panelGrid cellpadding="0" cellspacing="0" columns="2" class="Wid100 Padding0" border="0" columnClasses="ui-g-3 ui-md-3 ui-lg-3, ui-g-9 ui-md-9 ui-lg-9">
+                                        <h:outputText value="#{novSts.index + 1}.#{novSgSts.index + 1}. Fecha" class="cssBlack" />
+                                        <h:outputText value="Seguimiento" class="cssBlack" />
+                                    </h:panelGrid>
+                                    <h:panelGrid cellpadding="0" cellspacing="0" columns="2" class="Wid100 Padding0" border="0" columnClasses="ui-g-3 ui-md-3 ui-lg-3, ui-g-9 ui-md-9 ui-lg-9" style="text-align: justify">
+                                        <h:outputText value="#{novSg.fecha}" >
+                                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                                        </h:outputText>
+                                        <h:outputText value="#{novSg.seguimiento}" class="Wid100" />
+                                    </h:panelGrid>
+                                </p:repeat>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{nov.novedadDocumentosList != null and nov.novedadDocumentosList.size() > 0}">
+                                <h:panelGrid cellpadding="0" cellspacing="0" columns="1" class="Wid100 Padding3" border="0">
+                                    <h:outputText value="Más documentos" class="cssBlack" />
+                                </h:panelGrid>
+                                <p:repeat value="#{novedadBalanceConsJSF.getArchivoDocu(nov)}" var="novDoc">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" style="text-align: center;margin-top: 0 !important">
+                                        <p:graphicImage cache="false"
+                                                        styleClass="imagen"
+                                                        width="100%"
+                                                        value="#{uploadFotoJSFManagedBean.imagenDinamica}">
+                                            <f:param name="path_foto" value="#{novDoc}" />
+                                        </p:graphicImage>
+                                    </div>
+                                </p:repeat>
+                            </div>
+                            <hr class="cssBlack Wid100"/>
+                        </div>
+                    </p:repeat>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

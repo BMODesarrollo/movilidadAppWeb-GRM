@@ -1,0 +1,845 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+            .text-left{
+                text-align: left;
+            }
+
+            @media only screen and (max-width: 600px) {
+                .texto-blanco {
+                    color: white !important;
+                    font-weight: bolder !important;
+                }
+            }
+
+            .titulo{
+                font-size: 20px !important;
+            }
+
+            .valorNegativo{
+                color:red !important;
+                font-weight: bold !important;
+            }
+
+            .fondoFestivo{
+                background-color: #dbb626 !important;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-7 ui-lg-7 Padding0" jsf:id="filtros">
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                Gestión Novedades
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding1"
+                                 jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                <h:form id="uf">
+                                    <h:outputText value="UNIDAD FUNCIONAL: " 
+                                                  title="Seleccione Unidad Funcional"/>
+                                    <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                                     filter="true" 
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                       var="uniFunc" 
+                                                       itemLabel="#{uniFunc.nombre}"
+                                                       itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                        <p:ajax update="filtros,botones,:frmPrincipal:dtGestorNovedadDet,
+                                                :frmPrincipal:dtGestionNovedad,frmPrincipal:dtGestorNovedadReqDet,
+                                                frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes,:msgs" 
+                                                listener="#{gestionNovedadBean.consultar()}"
+                                                process="@this"/>
+                                    </p:selectOneMenu>
+                                </h:form>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding1">
+                                <h:form id="frmCargo">
+                                    <h:outputText value="CARGO: " 
+                                                  title="Seleccione Cargo"/>
+                                    <p:selectOneMenu id="cargo" value="#{gestionNovedadBean.i_EmpleadoCargo}"
+                                                     filter="true" 
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{gestionNovedadBean.lstTipoCargos}" 
+                                                       var="cargo" 
+                                                       itemLabel="#{cargo.nombreCargo}"
+                                                       itemValue="#{cargo.idEmpleadoTipoCargo}"/>
+                                        <p:ajax update="filtros,botones,:frmPrincipal:dtGestorNovedadDet,
+                                                :frmPrincipal:dtGestionNovedad,frmPrincipal:dtGestorNovedadReqDet,
+                                                frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes,:msgs" 
+                                                listener="#{gestionNovedadBean.consultar()}"
+                                                process="@this"/>
+                                    </p:selectOneMenu>
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-5 Padding0"
+                             align="left" jsf:id="botones">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding1">
+                                <h:form id="frmFecha">
+                                    <div class="ui-g-12 ui-md-5 ui-lg-5 Padding1">
+                                        <h:outputText value="Fecha: " title="Fecha"/>
+                                        <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                                    value="#{gestionNovedadBean.fecha}"
+                                                    placeholder="Fecha"
+                                                    readonlyInput="true"
+                                                    navigator="true"
+                                                    pattern="dd-MM-yyyy" locale="es">
+                                            <p:ajax event="dateSelect"
+                                                    listener="#{gestionNovedadBean.consultar()}"
+                                                    update="botones,:frmPrincipal:dtGestorNovedadDet,:frmPrincipal:dtGestionNovedad,frmPrincipal:dtGestorNovedadReqDet,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes,:msgs"/>
+                                        </p:calendar>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-7 ui-lg-7 Padding1" jsf:rendered="#{gestionNovedadBean.flagNoExistenRegistros and gestionNovedadBean.flagModificacionRegistros}">
+                                        <h:outputText value="- " style="visibility: hidden"/>
+                                        <p:commandButton
+                                            icon="fa fa-refresh"
+                                            value="Obtener Datos"
+                                            action="#{gestionNovedadBean.cargarDetalles()}"
+                                            class="cssWhite OrangeButton"
+                                            update=":frmPrincipal:dtGestorNovedadDet,:frmPrincipal:dtGestionNovedad,frmPrincipal:dtGestorNovedadReqDet,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes,:msgs,botones,filtros"
+                                            >
+                                        </p:commandButton>
+                                    </div>
+                                </h:form>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding1">
+                                <h:form id="frmBotones">
+                                    <div class="ui-g-12 ui-md-5 ui-lg-5 Padding1" jsf:rendered="#{gestionNovedadBean.gestorNovedad.liquidado eq 0 and gestionNovedadBean.flagModificacionRegistros}">
+                                        <h:outputText value="- " style="visibility: hidden"/>
+                                        <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                                         class="cssWhite" onclick="actualizar()">
+                                            <p:confirm header="Confirmación" message="Ésta seguro de actualizar los datos?" icon="fa fa-exclamation-triangle" />
+                                        </p:commandButton>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-7 Padding1" jsf:rendered="#{gestionNovedadBean.gestorNovedad.liquidado eq 0  and gestionNovedadBean.flagModificacionRegistros}">
+                                        <h:outputText value="- " style="visibility: hidden"/>
+                                        <p:commandButton value="Cerrar Semana" icon="fa fa-bullseye"
+                                                         class="cssWhite OrangeButton" onclick="liquidarSemana()">
+                                            <p:confirm header="Confirmación" message="Ésta seguro de cerrar la semana actual?" icon="fa fa-exclamation-triangle" />
+                                        </p:commandButton>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-7 Padding1" jsf:rendered="#{gestionNovedadBean.gestorNovedad.liquidado eq 1  and gestionNovedadBean.flagModificacionRegistros}">
+                                        <h:outputText value="- " style="visibility: hidden"/>
+                                        <p:commandButton value="Generar Reporte" icon="fa fa-download"
+                                                         ajax="false"
+                                                         class="cssWhite" 
+                                                         actionListener="#{gestionNovedadBean.generarReporte()}"
+                                                         oncomplete="location.reload();"
+                                                         >
+                                            <p:fileDownload value="#{gestionNovedadBean.file}" />
+                                        </p:commandButton>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <p:remoteCommand name="actualizar" 
+                                 update=":msgs,dtGestionNovedad,frmPrincipal:dtGestorNovedadDet,frmPrincipal:dtGestorNovedadReqDet,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes" 
+                                 action="#{gestionNovedadBean.actualizar()}"/>
+                <p:remoteCommand name="liquidarSemana" 
+                                 update=":msgs,dtGestionNovedad,frmPrincipal:dtGestorNovedadDet,frmPrincipal:dtGestorNovedadReqDet,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes,:botones" 
+                                 action="#{gestionNovedadBean.liquidarSemana()}"/>
+
+                <p:remoteCommand name="onCellEditTblProgramacion"
+                                 global="false"
+                                 update=":msgs,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes"/>
+
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:dataTable id="dtGestionNovedad"
+                                         value="#{gestionNovedadBean.listaBloque1}"
+                                         sortBy="#{parametro.idGestorNovedadParam.idGestorNovedadParam}"
+                                         var="parametro"
+                                         emptyMessage="No se encontraron datos">
+
+                                <f:facet name="header">
+                                    <h:outputText value="ESTADO: LIQUIDADO" styleClass="cssWhite TexAlCenter titulo" rendered="#{gestionNovedadBean.gestorNovedad.liquidado == 1}"/>
+                                    <h:outputText value="ESTADO: NO LIQUIDADO" styleClass="cssWhite TexAlCenter titulo" rendered="#{gestionNovedadBean.gestorNovedad.liquidado == 0}"/>
+                                </f:facet>
+
+                                <p:columnGroup type="header">
+                                    <p:row>
+                                        <p:row>
+                                            <p:column rowspan="2"/>
+                                            <ui:repeat value="#{gestionNovedadBean.lstFechasSemana}" var="item">
+                                                <p:column styleClass="#{item.clase}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{item.fecha}" >
+                                                            <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                                                        </h:outputText>
+                                                    </f:facet>
+                                                </p:column>
+                                            </ui:repeat>
+                                        </p:row>
+                                    </p:row>
+                                    <p:row>
+                                        <ui:repeat value="#{gestionNovedadBean.lstDiasSemana}" var="dia">
+                                            <p:column headerText="#{dia}"/>
+                                        </ui:repeat>
+                                    </p:row>
+                                </p:columnGroup>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{parametro.idGestorNovedadParam.txt}" />
+                                </p:column>
+
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{parametro.dia1}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{parametro.dia2}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{parametro.dia3}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{parametro.dia4}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{parametro.dia5}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{parametro.dia6}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{parametro.dia7}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:dataTable id="dtGestorNovedadDet"
+                                         var="detalle"
+                                         scrollable="true"
+                                         widgetVar="dtGestorNovedadReqDet_wv"
+                                         scrollHeight="600"
+                                         disabledTextSelection="false"
+                                         reflow="true"
+                                         editable="true" 
+                                         sortBy="#{detalle.idNovedadTipoDetalle.tituloTipoNovedad}"
+                                         editMode="cell"
+                                         rowIndexVar="indexRow"
+                                         value="#{gestionNovedadBean.lstGestorNovDetSemana}"
+                                         rowKey="#{indexRow}"
+                                         emptyMessage="No existen registros">
+
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{detalle.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                                </p:column>
+
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{detalle.dia1}"/>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{detalle.dia2}"/>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{detalle.dia3}"/>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{detalle.dia4}"/>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{detalle.dia5}"/>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{detalle.dia6}"/>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{detalle.dia7}"/>
+                                </p:column>
+
+
+                                <f:facet name="footer">
+                                    <div style="float: right;padding-bottom: 5px">
+                                        <h:commandLink>
+                                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                            <p:dataExporter type="xlsx" target="dtGestorNovedadDet" 
+                                                            fileName="Lista detalles"/>
+                                        </h:commandLink>
+                                    </div>
+                                </f:facet>
+
+                            </p:dataTable> 
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:dataTable id="dtGestorNovedadReqDet" var="requerimiento" 
+                                         scrollable="true"
+                                         widgetVar="dtGestorNovedadDet_wv"
+                                         scrollHeight="600"
+                                         disabledTextSelection="false"
+                                         reflow="true"
+                                         rows="10"
+                                         editable="#{gestionNovedadBean.flagModificacionRegistros}" 
+                                         editMode="cell"
+                                         rowIndexVar="indexRowReq"
+                                         sortBy="#{requerimiento.idGestorNovRequerimiento.idGestorNovRequerimiento}"
+                                         rowKey="#{requerimiento.idGestorNovReqSemana ==null ? indexRowReq:requerimiento.idGestorNovReqSemana}"
+                                         emptyMessage="No existen registros"
+                                         value="#{gestionNovedadBean.lstGestorNovReqSemana}">
+
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{requerimiento.idGestorNovRequerimiento.nombre}" />
+                                </p:column>
+
+                                <p:column styleClass="text-center" id="dia1">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{requerimiento.dia1}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="0"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{requerimiento.dia1}">
+                                                <p:ajax process="@this" update=":msgs"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column styleClass="text-center" id="dia2">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{requerimiento.dia2}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="0"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{requerimiento.dia2}">
+                                                <p:ajax process="@this" update=":msgs"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column styleClass="text-center" id="dia3">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{requerimiento.dia3}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="0"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{requerimiento.dia3}">
+                                                <p:ajax process="@this" update=":msgs"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column styleClass="text-center" id="dia4">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{requerimiento.dia4}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="0"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{requerimiento.dia4}">
+                                                <p:ajax process="@this" update=":msgs"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column styleClass="text-center" id="dia5">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{requerimiento.dia5}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="0"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{requerimiento.dia5}">
+                                                <p:ajax process="@this" update=":msgs"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column styleClass="text-center" id="dia6">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{requerimiento.dia6}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="0"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{requerimiento.dia6}">
+                                                <p:ajax process="@this" update=":msgs"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column styleClass="text-center" id="dia7">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{requerimiento.dia7}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="0"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{requerimiento.dia7}">
+                                                <p:ajax process="@this" update=":msgs"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+
+                                <f:facet name="footer" rendered="false">
+                                    <div style="float: right;padding-bottom: 5px">
+                                        <h:commandLink>
+                                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                            <p:dataExporter type="xlsx" target="dtGestorNovedadReqDet" 
+                                                            fileName="Lista de Requerimientos"/>
+                                        </h:commandLink>
+                                    </div>
+                                </f:facet>
+
+                                <p:ajax event="cellEdit" 
+                                        process="@this"
+                                        listener="#{gestionNovedadBean.onCellEditTblGestorNovReqDet}" 
+                                        update="frmPrincipal:dtGestionNovedad,frmPrincipal:dtGestorNovedadFaltantes,:msgs" />
+
+                            </p:dataTable>  
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:dataTable id="dtGestorNovedadProgramacion" var="programacion" 
+                                         scrollable="true"
+                                         widgetVar="dtGestorNovedadProgramacion_wv"
+                                         scrollHeight="600"
+                                         disabledTextSelection="false"
+                                         reflow="true"
+                                         editable="#{gestionNovedadBean.flagModificacionRegistros}" 
+                                         editMode="cell"
+                                         rowIndexVar="indexRowPrg"
+                                         sortBy="#{programacion.idGestorNovedadParam.idGestorNovedadParam}"
+                                         rowKey="#{ indexRowPrg + 1}"
+                                         emptyMessage="No existen registros"
+                                         value="#{gestionNovedadBean.listaBloque4}">
+
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{programacion.idGestorNovedadParam.txt}" />
+                                </p:column>
+
+                                <p:column styleClass="text-center" id="prgDia1">
+                                    <p:cellEditor rendered="#{gestionNovedadBean.validarFilaEditable(programacion)}">
+                                        <f:facet name="output">
+                                            <h:outputText value="#{programacion.dia1}" rendered="#{programacion.idGestorNovedadParam.txt eq 'ICB'}"/>
+
+                                            <h:outputText value="#{programacion.dia1}" rendered="#{not(programacion.idGestorNovedadParam.txt eq 'ICB')}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="2"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{programacion.dia1}">
+                                                <p:ajax event="blur"  
+                                                        listener="#{gestionNovedadBean.onEditTblProgramacion('prgDia1', indexRowPrg)}"
+                                                        process="@this" 
+                                                        update=":msgs,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+
+                                    <h:outputText value="#{programacion.dia1}" rendered="#{not(gestionNovedadBean.validarFilaEditable(programacion))}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+
+                                </p:column>
+                                <p:column styleClass="text-center" id="prgDia2">
+                                    <p:cellEditor rendered="#{gestionNovedadBean.validarFilaEditable(programacion)}">
+                                        <f:facet name="output">
+                                            <h:outputText value="#{programacion.dia2}" rendered="#{programacion.idGestorNovedadParam.txt eq 'ICB'}"/> 
+
+                                            <h:outputText value="#{programacion.dia2}" rendered="#{not(programacion.idGestorNovedadParam.txt eq 'ICB')}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="2"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{programacion.dia2}">
+                                                <p:ajax event="blur" 
+                                                        listener="#{gestionNovedadBean.onEditTblProgramacion('prgDia2', indexRowPrg)}"
+                                                        process="@this" 
+                                                        update=":msgs,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+
+                                    <h:outputText value="#{programacion.dia2}" rendered="#{not(gestionNovedadBean.validarFilaEditable(programacion))}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+
+                                </p:column>
+                                <p:column styleClass="text-center" id="prgDia3">
+                                    <p:cellEditor rendered="#{gestionNovedadBean.validarFilaEditable(programacion)}">
+                                        <f:facet name="output">
+                                            <h:outputText value="#{programacion.dia3}" rendered="#{programacion.idGestorNovedadParam.txt eq 'ICB'}" />
+
+                                            <h:outputText value="#{programacion.dia3}" rendered="#{not(programacion.idGestorNovedadParam.txt eq 'ICB')}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="2"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{programacion.dia3}">
+                                                <p:ajax event="blur"
+                                                        listener="#{gestionNovedadBean.onEditTblProgramacion('prgDia3', indexRowPrg)}"
+                                                        process="@this" 
+                                                        update=":msgs,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+
+                                    <h:outputText value="#{programacion.dia3}" rendered="#{not(gestionNovedadBean.validarFilaEditable(programacion))}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+
+                                </p:column>
+                                <p:column styleClass="text-center" id="prgDia4">
+                                    <p:cellEditor rendered="#{gestionNovedadBean.validarFilaEditable(programacion)}">
+                                        <f:facet name="output">
+                                            <h:outputText value="#{programacion.dia4}" rendered="#{programacion.idGestorNovedadParam.txt eq 'ICB'}"/>
+
+                                            <h:outputText value="#{programacion.dia4}" rendered="#{not(programacion.idGestorNovedadParam.txt eq 'ICB')}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="2"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{programacion.dia4}">
+                                                <p:ajax event="blur"   
+                                                        listener="#{gestionNovedadBean.onEditTblProgramacion('prgDia4', indexRowPrg)}"
+                                                        process="@this" 
+                                                        update=":msgs,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+
+                                    <h:outputText value="#{programacion.dia4}" rendered="#{not(gestionNovedadBean.validarFilaEditable(programacion))}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+
+                                </p:column>
+                                <p:column styleClass="text-center" id="prgDia5">
+                                    <p:cellEditor rendered="#{gestionNovedadBean.validarFilaEditable(programacion)}">
+                                        <f:facet name="output">
+                                            <h:outputText value="#{programacion.dia5}" rendered="#{programacion.idGestorNovedadParam.txt eq 'ICB'}"/>
+
+                                            <h:outputText value="#{programacion.dia5}" rendered="#{not(programacion.idGestorNovedadParam.txt eq 'ICB')}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="2"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{programacion.dia5}">
+                                                <p:ajax event="blur"   
+                                                        listener="#{gestionNovedadBean.onEditTblProgramacion('prgDia5', indexRowPrg)}"
+                                                        process="@this" 
+                                                        update=":msgs,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+
+                                    <h:outputText value="#{programacion.dia5}" rendered="#{not(gestionNovedadBean.validarFilaEditable(programacion))}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+
+                                </p:column>
+                                <p:column styleClass="text-center" id="prgDia6">
+                                    <p:cellEditor rendered="#{gestionNovedadBean.validarFilaEditable(programacion)}">
+                                        <f:facet name="output">
+                                            <h:outputText value="#{programacion.dia6}" rendered="#{programacion.idGestorNovedadParam.txt eq 'ICB'}"/>
+
+                                            <h:outputText value="#{programacion.dia6}" rendered="#{not(programacion.idGestorNovedadParam.txt eq 'ICB')}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces="2"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{programacion.dia6}">
+                                                <p:ajax event="blur"
+                                                        listener="#{gestionNovedadBean.onEditTblProgramacion('prgDia6', indexRowPrg)}"
+                                                        process="@this" 
+                                                        update=":msgs,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+
+                                    <h:outputText value="#{programacion.dia6}" rendered="#{not(gestionNovedadBean.validarFilaEditable(programacion))}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+
+                                </p:column>
+                                <p:column styleClass="text-center" id="prgDia7">
+                                    <p:cellEditor rendered="#{gestionNovedadBean.validarFilaEditable(programacion)}">
+                                        <f:facet name="output">
+                                            <h:outputText value="#{programacion.dia7}" rendered="#{programacion.idGestorNovedadParam.txt eq 'ICB'}"/>
+
+                                            <h:outputText value="#{programacion.dia7}" rendered="#{not(programacion.idGestorNovedadParam.txt eq 'ICB')}">
+                                                <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber 
+                                                required="true"
+                                                requiredMessage="Debe ingresar valor"
+                                                minValue="0"
+                                                validatorMessage="Debe ingresar un valor válido"
+                                                decimalPlaces=""
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }"
+                                                value="#{programacion.dia7}">
+                                                <p:ajax event="blur"  
+                                                        listener="#{gestionNovedadBean.onEditTblProgramacion('prgDia7', indexRowPrg)}"
+                                                        process="@this" 
+                                                        update=":msgs,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes"/>
+                                            </p:inputNumber>
+                                        </f:facet>
+                                    </p:cellEditor>
+
+                                    <h:outputText value="#{programacion.dia7}" rendered="#{not(gestionNovedadBean.validarFilaEditable(programacion))}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+
+                                </p:column>
+
+                                <f:facet name="footer" rendered="false">
+                                    <div style="float: right;padding-bottom: 5px">
+                                        <h:commandLink>
+                                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                            <p:dataExporter type="xlsx" target="dtGestorNovedadProgramacion" 
+                                                            fileName="Lista"/>
+                                        </h:commandLink>
+                                    </div>
+                                </f:facet>
+
+                                <p:ajax event="cellEdit" 
+                                        process="@this"
+                                        update=":msgs,frmPrincipal:dtGestorNovedadProgramacion,frmPrincipal:dtGestorNovedadFaltantes"
+                                        listener="#{gestionNovedadBean.onCellEditTblProgramacion}"  
+                                        />
+
+                            </p:dataTable>  
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:dataTable id="dtGestorNovedadFaltantes" var="faltante" 
+                                         scrollable="true"
+                                         widgetVar="dtGestorNovedadFaltantes_wv"
+                                         scrollHeight="600"
+                                         disabledTextSelection="false"
+                                         reflow="true"
+                                         editable="#{gestionNovedadBean.flagModificacionRegistros}" 
+                                         editMode="cell"
+                                         rowIndexVar="indexRowFalt"
+                                         rowKey="#{faltante.idGestorNovParamDet ==null ? indexRowFalt:faltante.idGestorNovParamDet}"
+                                         emptyMessage="No existen registros"
+                                         value="#{gestionNovedadBean.listaBloqueTotales}">
+
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{faltante.idGestorNovedadParam.txt}" />
+                                </p:column>
+
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{faltante.dia1}"
+                                                  styleClass="#{faltante.dia1 lt 0 ? 'valorNegativo' : null}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{faltante.dia2}"
+                                                  styleClass="#{faltante.dia2 lt 0 ? 'valorNegativo' : null}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{faltante.dia3}"
+                                                  styleClass="#{faltante.dia3 lt 0 ? 'valorNegativo' : null}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{faltante.dia4}"
+                                                  styleClass="#{faltante.dia4 lt 0 ? 'valorNegativo' : null}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{faltante.dia5}"
+                                                  styleClass="#{faltante.dia5 lt 0 ? 'valorNegativo' : null}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{faltante.dia6}"
+                                                  styleClass="#{faltante.dia6 lt 0 ? 'valorNegativo' : null}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column styleClass="text-center">
+                                    <h:outputText value="#{faltante.dia7}" 
+                                                  styleClass="#{faltante.dia7 lt 0 ? 'valorNegativo' : null}">
+                                        <f:convertNumber integerOnly="true" groupingUsed="false"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <f:facet name="footer" rendered="false">
+                                    <div style="float: right;padding-bottom: 5px">
+                                        <h:commandLink>
+                                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                            <p:dataExporter type="xlsx" target="dtGestorNovedadFaltantes" 
+                                                            fileName="Totales"/>
+                                        </h:commandLink>
+                                    </div>
+                                </f:facet>
+
+                            </p:dataTable>  
+                        </div>
+
+                    </div>
+
+                </div>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

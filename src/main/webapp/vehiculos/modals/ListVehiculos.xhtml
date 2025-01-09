@@ -1,0 +1,42 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="VehiculoListDlg" widgetVar="VehiculoListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de vehículos"
+              closeOnEscape="true"
+              position="center top"
+              class="mr1024_30 mr500_90" responsive="true">
+        <h:form id="frmPrincipalListVehiculo">
+            <p:cache disabled="true"/>
+            <p:dataTable var="vht" value="#{novedadDanoBean.lstVehiculos}"
+                         id="dtVehiculos"
+                         widgetVar="wvVehiculoListDialog"
+                         selectionMode="single" selection="#{novedadDanoBean.vehiculo}"                       
+                         rowIndexVar="nroFila"
+                         tableStyle="table-layout:auto"
+                         filterDelay="700"
+                         paginator="true"
+                         rows="10"
+                         rowKey="#{vht.idVehiculo}"
+                         emptyMessage="No existen vehículos registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{novedadDanoBean.onRowDblClckSelect}"
+                        update="frmDano:vehiculo, frmDano"
+                        oncomplete="PF('VehiculoListDialog').hide()" />
+                <p:column headerText="#" >
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código" filterBy="#{vht.codigo}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.codigo}" />
+                </p:column>
+                <p:column headerText="Placa" filterBy="#{vht.placa}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.placa}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

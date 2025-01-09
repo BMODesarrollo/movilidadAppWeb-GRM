@@ -1,0 +1,56 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="ContratistaListDlg" widgetVar="ContratistaListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de Contratistas" 
+              class="mr1024_40 mr500_90" closeOnEscape="true" 
+              responsive="true" position="center top">
+        <h:form id="frmContratistaList">
+            <p:dataTable id="dtLavadoContratista" var="contratista" 
+                             widgetVar="wlVdtLavadoContratista"
+                             disabledTextSelection="false"
+                             selectionMode="single" 
+                             selection="#{lavadoCostoBean.lavadoContratista}"
+                             rowKey="#{contratista.idLavadoContratista}"
+                             reflow="true"
+                             rows="8"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="8,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{lavadoCostoBean.lstContratistas}">
+                
+                <p:ajax event="rowSelect" 
+                        listener="#{lavadoCostoBean.onRowLavadoContratistaClckSelect}"
+                        update=":frmLavadoCosto:contratista"
+                        oncomplete="PF('ContratistaListDialog').hide()"
+                        global="false" />
+
+                <p:column headerText="Nombre" 
+                          filterBy="#{tipo.nombre}"
+                          filterMatchMode="contains"
+                          styleClass="text-center">
+                        <h:outputText value="#{contratista.nombre}" />
+                    </p:column>
+
+                    <p:column style="text-align: center;"
+                              styleClass="#{contratista.activo == 1 ? 'cssGreen texto-blanco' : contratista.activo == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Activo"/>
+                        </f:facet>
+                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{contratista.activo == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{contratista.activo == 0}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción" styleClass="text-word-wrap">
+                        <h:outputText value="#{contratista.descripcion}" />
+                    </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

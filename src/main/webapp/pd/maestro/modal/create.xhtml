@@ -1,0 +1,220 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="pdMaestro"
+              widgetVar="wlvPdMaestro" 
+              modal="true" 
+              closeOnEscape="false"
+              closable="false"
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{pdMaestroBean.selectedDto == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{pdMaestroBean.selectedDto != null}">
+            <f:facet name="header">
+                EDITAR DATOS
+            </f:facet>
+        </c:if>
+        <h:form id="frmPdMaestro" prependId="false">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo sanción" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  
+                                required="true"
+                                requiredMessage="Debe seleccionar un tipo sanción,"
+                                filter="true"
+                                style="width: 99.9999%"
+                                value="#{pdMaestroBean.idTipoSancion}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}" />
+                                <f:selectItems 
+                                    var="tipoSancion"
+                                    value="#{pdMaestroBean.lstTipoSancion}"
+                                    itemLabel="#{tipoSancion.nombre}"
+                                    itemValue="#{tipoSancion.idPdTipoSancion}"
+                                    />
+                                <p:ajax update="frmPdMaestro" 
+                                        listener="#{pdMaestroBean.renderFechaSancion(pdMaestroBean.idTipoSancion)}"
+                                        process="@this"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha Apertura" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha de apertura"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{pdMaestroBean.pdMaestro.fechaApertura}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha Cierre" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{pdMaestroBean.pdMaestro.fechaCierre}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Estado proceso" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  
+                                filter="true"
+                                required="true"
+                                style="width: 99.9999%"
+                                requiredMessage="Debe seleccionar un estado"
+                                value="#{pdMaestroBean.idEstadoProceso}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="estadoProceso"
+                                    value="#{pdMaestroBean.lstEstadoProcesos}"
+                                    itemLabel="#{estadoProceso.nombre}"
+                                    itemValue="#{estadoProceso.idPdEstadoProceso}"
+                                    />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Responsable" rendered="#{pdMaestroBean.renderResponsable}" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu              
+                                filter="true"
+                                rendered="#{pdMaestroBean.renderResponsable}"
+                                style="width: 99.9999%"
+                                value="#{pdMaestroBean.idResponsablePd}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="responsables"
+                                    value="#{pdMaestroBean.lstResponsablesPd}"
+                                    itemLabel="#{responsables.user.username} - #{responsables.user.nombres}"
+                                    itemValue="#{responsables.idResponsable}"
+                                    />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div id="fechaSancionInicio" class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel rendered="#{pdMaestroBean.renderFechasSancion}" value="Fecha inicio sanción" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="false"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        rendered="#{pdMaestroBean.renderFechasSancion}"
+                                        readonlyInput="true"
+                                        value="#{pdMaestroBean.fechaInicioSancion}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div id="fechaSancionFin" class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel rendered="#{pdMaestroBean.renderFechasSancion}" value="Fecha fin sanción" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fechaSancionFinControl"
+                                        showOn="button" 
+                                        rendered="#{pdMaestroBean.renderFechasSancion}"
+                                        locale="es"
+                                        required="false"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{pdMaestroBean.fechaFinSancion}">
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Comentarios" for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         value="#{pdMaestroBean.pdMaestro.comentarios}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar un comentario"/>
+                    </div>
+                </div>
+            </div>
+            <div class="Padding5">
+                <div class="Padding0">
+                    <p:outputLabel value="Detalles" for="@next"/>
+                </div>
+                <ui:include src="../child/tblDetalles.xhtml"/>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="messages,:msgs,@form,:frmPrincipal:dtPdMaestro" 
+                             action="#{pdMaestroBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update="messages,:msgs,:frmPrincipal:dtPdMaestro"
+                             action="#{pdMaestroBean.guardar()}"/>
+            <div class="Padding5">
+                <p:remoteCommand name="guardar" 
+                                 update="messages,:msgs,@form,:frmPrincipal:dtPdMaestro" 
+                                 action="#{pdMaestroBean.guardar()}"/>
+                <p:remoteCommand name="actualizar"
+                                 update="messages,:msgs,:frmPrincipal:dtPdMaestro"
+                                 action="#{pdMaestroBean.guardar()}"/>
+                <p:remoteCommand name="cerrar" 
+                                 update="messages,:msgs,:frmPrincipal:dtPdMaestro"
+                                 action="#{pdMaestroBean.cerrar()}"/>
+                <center>
+                    <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                     rendered="#{pdMaestroBean.selectedDto == null}"
+                                     class="cssWhite" onclick="guardar()">
+                        <p:confirm id="confirmModal" header="Confirmación"
+                                   message="El colaborador tiene #{pdMaestroBean.pdAbierto} procesos disciplinarios abiertos." 
+                                   icon="fa fa-exclamation-triangle"/>
+                    </p:commandButton>
+                    <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                     rendered="#{pdMaestroBean.selectedDto != null}"
+                                     class="cssWhite" onclick="actualizar()"/>
+                    <p:commandButton value="Cerrar" icon="fa fa-times" action="#{pdMaestroBean.cerrar()}"
+                                     class="cssWhite RedButton" onclick="PF('wlvPdMaestro').hide()"  >
+                    </p:commandButton>
+                </center>
+            </div>
+        </h:form>
+    </p:dialog>
+    <ui:include src="../modal/ListaNovedades.xhtml"/>
+</ui:composition>     

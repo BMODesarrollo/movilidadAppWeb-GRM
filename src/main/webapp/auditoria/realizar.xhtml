@@ -1,0 +1,86 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <h:form id="audi_realizar_form">
+            <p:panel header="Auditoría">
+                <p:dataTable id="datalist_realizar" 
+                             widgetVar="datalist_realizar_wv"
+                             value="#{auditoriaRealizarJSFMB.list}"
+                             var="item"
+                             paginator="true"
+                             rowKey="#{item.idAuditoria}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             reflow="true"
+                             filterDelay="2000"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen registros"
+                             scrollable="true"
+                             scrollHeight="1000">
+
+                    <p:column headerText="Código"
+                              width="10%"
+                              filterBy="#{item.codigo}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Tipo"
+                              filterBy="#{item.idAuditoriaEncabezado.idAuditoriaTipo.nombre}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idAuditoriaEncabezado.idAuditoriaTipo.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Encabezado"
+                              filterBy="#{item.idAuditoriaEncabezado.titulo}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idAuditoriaEncabezado.titulo}"/>
+                    </p:column>
+                    <p:column headerText="Fecha Desde">
+                        <h:outputText value="#{item.idAuditoriaEncabezado.fechaDesde}">
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Hasta">
+                        <h:outputText value="#{item.idAuditoriaEncabezado.fechaHasta}">
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Aciones" 
+                              width="10%" class="TexAlCenter">
+                        <p:commandButton id="realizarButton"   
+                                         action="#{auditoriaRealizarJSFMB.viewRealizar(item)}"
+                                         icon="fa fa-play" 
+                                         title="Realizar"
+                                         update="audi_resolver_form,crear_audi_resolver_dialog,msgs"
+                                         class="cssWhite CyanButton">
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist_realizar" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist_realizar" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist_realizar" fileName="parametros area usuario #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/auditoriaResolver.xhtml"/>
+    </ui:define>
+</ui:composition>

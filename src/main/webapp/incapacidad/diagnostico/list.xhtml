@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="DIAGNÓSTICOS DE INCAPACIDADES">
+            <h:form id="frmIncapacidadDxList">
+                <p:dataTable id="dtIncapacidadDx" var="diagnostico"
+                             scrollable="true"
+                             scrollHeight="600"
+                             reflow="true"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,80,200"
+                             emptyMessage="No se han encontrado diagnósticos registrados."
+                             rowStyleClass="text-center"
+                             value="#{incapacidadDxBean.lstIncapacidadDxs}" 
+                             rowIndexVar="idx" rows="20">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton class="cssWhite" 
+                                             icon="fa fa-plus"
+                                             action="#{incapacidadDxBean.nuevo()}"
+                                             update=":frmIncapacidadDxCreate,:modalIncapacidadDx"
+                                             oncomplete="PF('incapacidadDx').show();"
+                                             value="Nuevo"
+                                             >
+                                <p:resetInput target=":frmIncapacidadDxCreate:pGrid"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Código"
+                              filterBy="#{diagnostico.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{diagnostico.codigo}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{diagnostico.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="Sexo" 
+                              visible="false" 
+                              exportable="false">
+                        <h:outputText value="#{diagnostico.sexo}" />
+                    </p:column>
+
+                    <p:column headerText="Acción" width="10%">
+                        <p:commandButton icon="fa fa-pencil" 
+                                         class="GreenButton cssWhite"
+                                         action="#{incapacidadDxBean.editar()}"
+                                         update=":frmIncapacidadDxCreate,:modalIncapacidadDx"
+                                         title="Editar Registro">
+                            <p:resetInput target=":frmIncapacidadDxCreate:pGrid"/>
+                            <f:setPropertyActionListener value="#{diagnostico}" 
+                                                         target="#{incapacidadDxBean.selected}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="Create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

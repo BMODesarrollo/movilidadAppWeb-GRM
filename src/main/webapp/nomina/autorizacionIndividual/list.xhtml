@@ -1,0 +1,494 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .aTexAlRight{
+                text-align: right;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Autorización Nómina Individual
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="uf">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5"
+                                     jsf:rendered="#{not(autorizacionNominaIndividualBean.flagGhNomina)}"/>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5"
+                                     jsf:rendered="#{autorizacionNominaIndividualBean.flagGhNomina}">
+                                    <p:outputLabel value="Fecha Pago " for="fecha_pago" class="cssWhite"/>
+                                    <p:calendar id="fecha_pago" 
+                                                readonlyInput="true"
+                                                locale="es" navigator="true"
+                                                value="#{autorizacionNominaIndividualBean.fechaPago}" placeholder="Fecha pago">
+                                        <p:ajax event="dateSelect" 
+                                                process="@this"/>
+                                    </p:calendar>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                    <p:outputLabel for="uni_func" class="cssWhite" value="Unidad Funcional"/>
+                                    <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                                     rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                     filter="true" 
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                       var="uniFunc" 
+                                                       itemLabel="#{uniFunc.nombre}"
+                                                       itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                        <p:ajax update="frmPrincipal:dtAutorizacionNomina,:msgs" 
+                                                listener="#{autorizacionNominaIndividualBean.cargarListaEmpleados()}"
+                                                process="@this"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <!-- TABLA PRINCIPAL-->
+                <p:dataTable id="dtAutorizacionNomina" var="item" 
+                             scrollable="true"
+                             widgetVar="wlVdt_autorizacion_nomina_id"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{autorizacionNominaIndividualBean.lista}">
+
+                    <f:facet name="header">
+                        <div jsf:id="botones">
+                            <div class="ui-fluid">
+                                <div align="right">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" style="text-align: left">
+                                                <ui:include src="../../zComponent/selectListaEmpleados.xhtml"/>
+                                            </div>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5">
+                                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Desde: " for="fecha_desde" class="cssWhite"/>
+                                                <p:calendar id="fecha_desde" 
+                                                            maxdate="today"
+                                                            readonlyInput="true"
+                                                            locale="es" navigator="true"
+                                                            value="#{autorizacionNominaIndividualBean.fecha_inicio}" placeholder="Fecha">
+                                                    <p:ajax event="dateSelect" 
+                                                            listener="#{autorizacionNominaIndividualBean.calcularFecha()}"
+                                                            update="fecha_fin"
+                                                            process="@this"/>
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Hasta: " for="fecha_fin" class="cssWhite"/>
+                                                <p:calendar id="fecha_fin"
+                                                            maxdate="today"
+                                                            readonlyInput="true"
+                                                            locale="es" navigator="true"
+                                                            value="#{autorizacionNominaIndividualBean.fecha_fin}" placeholder="Fecha">
+                                                    <p:ajax event="dateSelect" process="@this"/>
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-search"
+                                                    value="Buscar"
+                                                    process="@this"
+                                                    disabled="true"
+                                                    action="#{autorizacionNominaIndividualBean.consultar()}"
+                                                    class="cssWhite"
+                                                    update="frmPrincipal:dtAutorizacionNomina,:msgs,botones"
+                                                    >
+                                                </p:commandButton>       
+                                            </div>
+                                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" jsf:rendered="#{autorizacionNominaIndividualBean.flagNoExisteAutorizacion}">
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-plus"
+                                                    value="Agregar datos"
+                                                    disabled="true"
+                                                    action="#{autorizacionNominaIndividualBean.generarAutorizacion()}"
+                                                    class="OrangeButton cssWhite"
+                                                    update="frmPrincipal:dtAutorizacionNomina,:msgs"
+                                                    >
+                                                </p:commandButton>       
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+                    <p:column exportable="false" filterBy="#{item.idEmpleado.codigoTm} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              class="cortar"
+                              headerText="Operador">
+                        <h:outputText value="#{item.idEmpleado.codigoTm} - " class="cssBlack"/>
+                        <h:outputText value=" #{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Código operador">
+                        <h:outputText value="#{item.idEmpleado.codigoTm}" rendered="#{item.idEmpleado != null}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Operador" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}" rendered="#{item.idEmpleado != null}"/>
+                    </p:column>
+                    <p:column headerText="Desde"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.desde}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Hasta"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.hasta}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha Pago"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.fechaPago}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Diurnas"/>
+                        </f:facet>
+                        <h:outputText value="#{item.diurnas}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Nocturnas (35)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.nocturnas}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Extra Diurna (125)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.extraDiurna}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Extra Nocturna (175)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.extraNocturna}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Festivo Diurno (175)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.festivoDiurno}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Festivo Nocturno (210)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.festivoNocturno}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Festivo Extra Diurno (200)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.festivoExtraDiurno}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Festivo Extra Nocturno (250)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.festivoExtraNocturno}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Dominical Comp Diurnas (75)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.dominicalCompDiurnas}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Dominical Comp Nocturnas (110)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.dominicalCompNocturnas}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Dominical Comp Diurna Extra (110)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.dominicalCompDiurnaExtra}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Dominical Comp Nocturna Extra (150)"/>
+                        </f:facet>
+                        <h:outputText value="#{item.dominicalCompNocturnaExtra}">
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column  style="text-align: center;"
+                               width="90"
+                               filterBy="#{item.aprobacionGestor}" 
+                               filterMatchMode="exact"
+                               styleClass="#{item.aprobacionGestor == 1 ? 'cssGreen texto-blanco' : item.aprobacionGestor == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Aprobación Gestor"/>
+                        </f:facet>
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('wlVdt_autorizacion_nomina_id').filter()" 
+                                             styleClass="custom-filter" style="width: 99.9999%">
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="SI"/>
+                                <f:selectItem itemValue="#{2}" itemLabel="NO"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.aprobacionGestor == 1? 'Si':'No'}" style="color: white;"/>
+                    </p:column>
+                    <p:column  style="text-align: center;"
+                               width="90"
+                               filterBy="#{item.aprobacionProfOp}" 
+                               filterMatchMode="exact"
+                               styleClass="#{item.aprobacionProfOp == 1 ? 'cssGreen texto-blanco' : item.aprobacionProfOp == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Aprobación Prof Op"/>
+                        </f:facet>
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('wlVdt_autorizacion_nomina_id').filter()" 
+                                             styleClass="custom-filter" style="width: 99.9999%">
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="SI"/>
+                                <f:selectItem itemValue="#{2}" itemLabel="NO"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.aprobacionProfOp == 1? 'Si':'No'}" style="color: white;"/>
+                    </p:column>
+                    <p:column  style="text-align: center;"
+                               width="90"
+                               filterBy="#{item.aprobacionDirOp}" 
+                               filterMatchMode="exact"
+                               styleClass="#{item.aprobacionDirOp == 1 ? 'cssGreen texto-blanco' : item.aprobacionDirOp == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Aprobación Dir Op"/>
+                        </f:facet>
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('wlVdt_autorizacion_nomina_id').filter()" 
+                                             styleClass="custom-filter" style="width: 99.9999%">
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="SI"/>
+                                <f:selectItem itemValue="#{2}" itemLabel="NO"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.aprobacionDirOp == 1? 'Si':'No'}" style="color: white;"/>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Usr Gestor"/>
+                        </f:facet>
+                        <h:outputText value="#{item.usrGestor}">
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Usr Prof Op"/>
+                        </f:facet>
+                        <h:outputText value="#{item.usrProfOp}">
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Usr Dir Op"/>
+                        </f:facet>
+                        <h:outputText value="#{item.usrDirOp}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Acciones" style="text-align: center;"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+
+                            <!-- Botones aprobación/rechazo Gestor -->
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNominaIndividualBean.flagGestor}">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Aprobar Autorización"
+                                                 action="#{autorizacionNominaIndividualBean.aprobarAutorizacion()}"
+                                                 disabled="#{item.aprobacionGestor eq 1}"
+                                                 update="dtAutorizacionNomina,:msgs"
+                                                 icon="fa fa-thumbs-up">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNominaIndividualBean.autorizacionNomina}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNominaIndividualBean.flagGestor}">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Rechazar Autorización"
+                                                 disabled="#{item.aprobacionGestor eq 1}"
+                                                 action="#{autorizacionNominaIndividualBean.reprobarAutorizacion()}"
+                                                 update="dtAutorizacionNomina,:msgs"
+                                                 icon="fa fa-thumbs-down">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNominaIndividualBean.autorizacionNomina}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de rechazar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+
+                            <!-- Botones aprobación/rechazo Prof Op -->
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNominaIndividualBean.flagProfOp}">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Aprobar Autorización"
+                                                 action="#{autorizacionNominaIndividualBean.aprobarAutorizacion()}"
+                                                 disabled="#{item.aprobacionProfOp eq 1}"
+                                                 update="dtAutorizacionNomina,:msgs"
+                                                 icon="fa fa-thumbs-up">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNominaIndividualBean.autorizacionNomina}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNominaIndividualBean.flagProfOp}">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Rechazar Autorización"
+                                                 disabled="#{item.aprobacionProfOp eq 1}"
+                                                 action="#{autorizacionNominaIndividualBean.reprobarAutorizacion()}"
+                                                 update="dtAutorizacionNomina,:msgs"
+                                                 icon="fa fa-thumbs-down">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNominaIndividualBean.autorizacionNomina}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de rechazar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+
+                            <!-- Botones aprobación/rechazo Dir Op -->
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNominaIndividualBean.flagDirOp}">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Aprobar Autorización"
+                                                 action="#{autorizacionNominaIndividualBean.aprobarAutorizacion()}"
+                                                 disabled="#{item.aprobacionDirOp eq 1}"
+                                                 update="dtAutorizacionNomina,:msgs"
+                                                 icon="fa fa-thumbs-up">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNominaIndividualBean.autorizacionNomina}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNominaIndividualBean.flagDirOp}">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Rechazar Autorización"
+                                                 disabled="#{item.aprobacionDirOp eq 1}"
+                                                 action="#{autorizacionNominaIndividualBean.reprobarAutorizacion()}"
+                                                 update="dtAutorizacionNomina,:msgs"
+                                                 icon="fa fa-thumbs-down">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNominaIndividualBean.autorizacionNomina}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de rechazar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{item.aprobacionGestor eq 1 and item.aprobacionProfOp eq 1 and item.aprobacionDirOp eq 1 and autorizacionNominaIndividualBean.flagGhNomina}">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Enviar Nómina"
+                                                 disabled="#{item.enviadoNomina gt 0}"
+                                                 action="#{autorizacionNominaIndividualBean.enviarNomina()}"
+                                                 update="dtAutorizacionNomina,:msgs,:uf"
+                                                 icon="fa fa-paper-plane">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNominaIndividualBean.autorizacionNomina}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de enviar las novedades de nómina a pago?. Ésta acción NO se puede deshacer" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{item.aprobacionGestor eq 1 and item.aprobacionProfOp eq 1 and item.aprobacionDirOp eq 1 and autorizacionNominaIndividualBean.flagGhNomina}">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Ver errores"
+                                                 rendered="#{autorizacionNominaIndividualKactusErroresBean.isAutorizationWithErrors(item.idNominaAutorizacionIndividual)}"
+                                                 action="#{autorizacionNominaIndividualKactusErroresBean.obtenerNovedadesConErrores()}"
+                                                 update=":erroresKactus,:frmErroresNovedades:pGridDatos,:msgs"
+                                                 icon="fa fa-exclamation-triangle">
+                                    <f:setPropertyActionListener value="#{item.idNominaAutorizacionIndividual}" target="#{autorizacionNominaIndividualKactusErroresBean.idNominaAutorizacion}"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{item.aprobacionGestor eq 1 and item.aprobacionProfOp eq 1 and item.aprobacionDirOp eq 1 and autorizacionNominaIndividualBean.flagGhNomina}">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Reenviar Nómina"
+                                                 rendered="#{autorizacionNominaIndividualKactusErroresBean.isAutorizationWithErrors(item.idNominaAutorizacionIndividual)}"
+                                                 action="#{autorizacionNominaIndividualBean.enviarNomina()}"
+                                                 update="dtAutorizacionNomina,:msgs,botones"
+                                                 icon="fa fa-retweet">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNominaIndividualBean.autorizacionNomina}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de reenviar las novedades de nómina a pago?. Ésta acción NO se puede deshacer" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{autorizacionNominaIndividualBean.lista.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtAutorizacionNomina" 
+                                                fileName="Listado Autorizaciones"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                </p:dataTable>
+
+                <!-- FIN TABLA PRINCIPAL-->
+
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+        <ui:include src="modals/errores-nomina.xhtml"/>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="apro" closeOnEscape="true" widgetVar="aproDlg" modal="true" closable="false"
+              resizable="false" appendTo="@(body)" position="center top" height="auto" width="auto">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Aprobar Solicitud
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('aproDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="form-aprobacion">
+            <h:panelGrid columns="1" style="width: 100%" rendered="#{accidenteBorradorJSF.accidenteBorrador != null}">
+                <h:panelGrid columns="2" style="width: 100%" >
+                    <p:outputLabel value="Evento:" />
+                    <p:outputLabel value="#{accidenteBorradorJSF.accidenteBorrador.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                    <p:outputLabel value="Fecha Evento:" />
+                    <p:outputLabel value="#{accidenteBorradorJSF.accidenteBorrador.idAccidente.fechaAcc}"  >
+                        <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss" />
+                    </p:outputLabel>
+                    <p:outputLabel value="Solicitado Por:" />
+                    <p:outputLabel value="#{accidenteBorradorJSF.accidenteBorrador.userSolicitado}"  />
+                    <p:outputLabel value="Fecha Solicitud:" />
+                    <p:outputLabel value="#{accidenteBorradorJSF.accidenteBorrador.fechaSolicitado}"  >
+                        <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss" />
+                    </p:outputLabel>
+                </h:panelGrid>
+                <p:separator/>
+                <p:outputLabel value="Descripción Sobre Aprobación" />
+                <p:inputTextarea id="desc" 
+                                 value="#{accidenteBorradorJSF.accidenteBorrador.descripcionAprobado}" 
+                                 style="width: 95%"
+                                 maxlength="65000"
+                                 rows="7"/>
+                <p:spacer/>
+                <p:commandButton id="guardar"
+                                 value="Guardar"
+                                 icon="fa fa-check"
+                                 class="cssWhite GreenButton"
+                                 process="@form"
+                                 update=":form-accBorrador"
+                                 actionListener="#{accidenteBorradorJSF.guardarAccAprobado()}">
+                    <p:confirm header="Confirmación" message="Está seguro de aprobar esta solicitud?" icon="fa fa-exclamation-triangle" />
+                </p:commandButton>
+            </h:panelGrid>
+        </h:form>
+    </p:dialog>
+</ui:composition>

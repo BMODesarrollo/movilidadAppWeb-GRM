@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Notificación de procesos">
+            <h:form id="frmNotificacionProcesosList">
+                <p:dataTable id="dtNotificacionProcesos" 
+                             filterDelay="1000"
+                             value="#{notificacionProcesosBean.lstNotificacionProcesos}"
+                             widgetVar="wlvNotificacionProcesos"
+                             var="notificacionProceso" 
+                             reflow="true"
+                             rows="10"
+                             paginator="true"
+                             rowIndexVar="numFila"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,20"
+                             emptyMessage="No existen procesos de notificación registrados">
+                    
+                    <p:ajax event="rowToggle" listener="#{notificacionProcesosBean.onRowToggle}" update="dtDetalles" />
+                    
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton value="Nuevo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             actionListener="#{notificacionProcesosBean.nuevo()}"
+                                             update=":frmNuevaNotificacionProceso,:modalCreateNotificacionProceso"
+                                             oncomplete="PF('notificacionProceso').show();">
+                                <p:resetInput target=":frmNuevaNotificacionProceso:panel"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column width="30">
+                        <p:rowToggler />
+                    </p:column>
+                    <p:column headerText="Codigo_Proceso" 
+                              filterBy="#{notificacionProceso.codigoProceso}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{notificacionProceso.codigoProceso}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre_Proceso"
+                              filterBy="#{notificacionProceso.nombreProceso}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{notificacionProceso.nombreProceso}" />
+                    </p:column>
+                    <p:column headerText="Emails" 
+                              class="cortar"
+                              width="500">
+                        <h:outputText value="#{notificacionProceso.emails}" />
+                    </p:column>
+                    <p:column headerText="Mensaje">
+                        <h:outputText value="#{notificacionProceso.mensaje}" />
+                    </p:column>
+                    <p:column headerText="Acción" width="10%">
+                        <div align="center">
+                            <p:commandButton icon="fa fa-pencil" 
+                                             class="GreenButton cssWhite"
+                                             title="Editar proceso"
+                                             action="#{notificacionProcesosBean.editar()}"
+                                             update=":frmNuevaNotificacionProceso,:modalCreateNotificacionProceso"
+                                             oncomplete="PF('notificacionProceso').show();">
+                                <p:resetInput target=":frmNuevaNotificacionProceso:panel"/>
+                                <f:setPropertyActionListener target="#{notificacionProcesosBean.selected}" value="#{notificacionProceso}"/>
+                            </p:commandButton>
+                        </div>
+
+                    </p:column>
+
+                    <p:rowExpansion>
+                        <p:dataTable id="dtDetalles" var="detalle" 
+                                     scrollable="true"
+                                     widgetVar="wlVdtDetalles"
+                                     scrollHeight="600"
+                                     disabledTextSelection="false"
+                                     reflow="true"
+                                     rows="10"
+                                     filterDelay="1700"
+                                     paginator="true"
+                                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="10,50,100"
+                                     emptyMessage="No existen registros"
+                                     value="#{notificacionProceso.notificacionProcesoDetList}">
+
+                            <p:column headerText="Unidad Funcional" 
+                                      filterBy="#{detalle.idGopUnidadFuncional.codigo}"
+                                      filterMatchMode="contains"
+                                      styleClass="TexAlCenter">
+                                <h:outputText value="#{detalle.idGopUnidadFuncional.codigo}" />
+                            </p:column>
+
+                            <p:column headerText="Emails" styleClass="text-word-wrap">
+                                <h:outputText value="#{detalle.emails}" />
+                            </p:column>
+
+                            <f:facet name="footer">
+                                En total existen #{notificacionProceso.notificacionProcesoDetList.size()} registros.
+                                <div style="float: right;padding-bottom: 5px">
+                                    <h:commandLink>
+                                        <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="dtDetalles" 
+                                                        fileName="Listado de detalles"/>
+                                    </h:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:rowExpansion>
+
+                    <f:facet name="footer">
+                        En total existen #{notificacionProcesosBean.lstNotificacionProcesos.size()} proceso(s) de notificación registrados.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modals/Create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

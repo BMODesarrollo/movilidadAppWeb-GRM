@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .align-center{
+                text-align: center !important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="JORNADA CARGA">
+            <div class="ui-fluid">
+                <h:form id="frmCargaJornada" enctype="multipart/form-data">
+                    <p:messages id="messages" showDetail="true" closable="true">
+                        <p:effect type="pulsate" event="load" delay="500" />
+                    </p:messages>
+
+                    <div class="ui-g">
+                        <div class="ui-g-2 ui-md-2 ui-lg-2"/>
+                        <div class="ui-g-8 ui-md-8 ui-lg-8 align-center MarTop10">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:outputLabel value="Seleccione archivo Excel: "
+                                               styleClass="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:fileUpload fileUploadListener="#{jornadaCargaBean.handleFileUpload}"
+                                              id="fCargaJornada"
+                                              auto="true" mode="advanced" 
+                                              dragDropSupport="false" multiple="false"
+                                              update="messages,frmGenerarJornada:generarReporte" 
+                                              sizeLimit="2000000" 
+                                              fileLimit="1" 
+                                              process="@this"
+                                              accept=".xlsx"
+                                              allowTypes="/(\.|\/)(xlsx)$/" 
+                                              label="Buscar archivo" 
+                                              chooseIcon="fa fa-upload"
+                                              invalidFileMessage="Debe cargar un archivo excel válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"
+                                              fileLimitMessage="Solo se permite cargar un archivo"
+                                              >
+                                </p:fileUpload>
+                            </div>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2"/>
+                    </div>
+                </h:form>
+
+                <h:form id="frmGenerarJornada">
+                    <div class="ui-g">
+                        <div class="ui-g-2 ui-md-2 ui-lg-2"/>
+                        <div class="ui-g-8 ui-md-8 ui-lg-8 align-center"
+                             jsf:id="generarReporte">
+                            <div class="ui-g-2 ui-md-4 ui-lg-4"/>
+                            <div class="ui-g-8 ui-md-4 ui-lg-4">
+                                <p:commandButton value="Cargar Datos"
+                                                 icon="fa fa-upload"
+                                                 update=":frmCargaJornada,:msgs"
+                                                 class="cssWhite OrangeButton"
+                                                 actionListener="#{jornadaCargaBean.cargarDatos()}"
+                                                 rendered="false"
+                                                 >
+                                </p:commandButton>
+                                <p:commandButton value="Generar reporte"
+                                                 icon="fa fa-download"
+                                                 update=":frmCargaJornada,:msgs"
+                                                 ajax="false"
+                                                 class="cssWhite OrangeButton"
+                                                 actionListener="#{jornadaCargaBean.generarReporte()}"
+                                                 oncomplete="location.reload();"
+                                                 rendered="#{jornadaCargaBean.flagBtn}"
+                                                 >
+                                    <p:fileDownload value="#{jornadaCargaBean.file}" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-2 ui-md-4 ui-lg-4"/>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2"/>
+                    </div>
+                </h:form>
+            </div>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

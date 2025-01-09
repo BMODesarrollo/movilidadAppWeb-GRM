@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgPlaRecuGrupoVacaciones"
+              widgetVar="wvPlaRecuGrupoVacaciones"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              width="20%"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{plaRecuGrupoVacacionesBean.b_editar ? 'Editar Grupo Vacaciones':'Crear Grupo Vacaciones'}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvPlaRecuGrupoVacaciones').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-grupoVacaciones">
+            <p:messages id="msgs_grupoVacaciones" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g-12">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Grupo: *"/>
+                        <p:inputText id="grupoVacaciones_id"
+                                     value="#{plaRecuGrupoVacacionesBean.plaRecuGrupoVacaciones.grupo}" 
+                                     maxlength="60"
+                                     required="true"
+                                     requiredMessage="'Grupo' es requerido"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Inicio" for="fecha_inicio_id"/>
+                        <p:calendar id="fecha_inicio_id" required="true" 
+                                    requiredMessage="'Fecha Inicio' es requerido"
+                                    value="#{plaRecuGrupoVacacionesBean.plaRecuGrupoVacaciones.fechaInicio}"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Fin" for="fecha_fin_id"/>
+                        <p:calendar id="fecha_fin_id" required="true" 
+                                    requiredMessage="'Fecha Fin' es requerido"
+                                    value="#{plaRecuGrupoVacacionesBean.plaRecuGrupoVacaciones.fechaFin}"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cupo: *"/>
+                        <p:inputText id="cupo_id"
+                                     value="#{plaRecuGrupoVacacionesBean.plaRecuGrupoVacaciones.cupo}" 
+                                     maxlength="10"
+                                     required="true"
+                                     requiredMessage="'Cupo' es requerido"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Unidad Funcional: *"/>
+                        <p:selectOneMenu id="uni_func" 
+                                         value="#{plaRecuGrupoVacacionesBean.idUFSelected}" 
+                                         filter="true" 
+                                         required="true"
+                                         requiredMessage="Debe seleccionar una Unidad Funcional"
+                                         style="width: 150px;margin-left: 5px;"
+                                         filterMatchMode="contains">
+                            <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                            <f:selectItems value="#{plaRecuGrupoVacacionesBean.listUnidadFuncional}" 
+                                           var="uniFunc" 
+                                           itemLabel="#{uniFunc.codigo}"
+                                           itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Descripción: "/>
+                        <p:inputTextarea id="descripcion_id"
+                                         value="#{plaRecuGrupoVacacionesBean.plaRecuGrupoVacaciones.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuGrupoVacacionesBean.crear()}"
+                             process="@this,@form"
+                             rendered="#{!plaRecuGrupoVacacionesBean.b_editar}"  
+                             update=":form-semana-param:tabView:grupoVacacionesList, @form, :msgs"/>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuGrupoVacacionesBean.editar()}"
+                             process="@form"
+                             rendered="#{plaRecuGrupoVacacionesBean.b_editar}"
+                             update=":form-semana-param:tabView:grupoVacacionesList, @form, :msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarGrupoVacaciones" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

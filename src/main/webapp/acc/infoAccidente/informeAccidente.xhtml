@@ -1,0 +1,1256 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style type="text/css">
+            ::placeholder { 
+                color: #000000;
+                opacity: 0.6;
+            }
+        </style>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDX8EfDI5P5RUJkl3G1F1sBKwQCaYVfV4"></script>
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="form-info-msg">
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:autoUpdate />
+            </p:messages>
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000" />
+        </h:form>
+        <div class="ui-fluid">
+            <ui:include src="accidentes.xhtml" />
+        </div>
+        <div class="ui-fluid">
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                <h:form id="form-info-acc">
+                    <p:panel header="INFORMDE DE OPERADOR" rendered="#{not empty accInformeOperadorJSF.accInformeOpe.idAccidente}">
+                        <p:accordionPanel id="acc-panel" style="margin-top:10px">
+                            <p:tab title="1. GRAVEDAD">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank">
+                                        <p:outputLabel value="EVENTO:" />
+                                        <p:inputText id="evento" value="#{accInformeOperadorJSF.accInformeOpe.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}" readonly="true" />
+                                        <p:outputLabel value="MÓVIL:" />
+                                        <p:inputText id="movil" value="#{accInformeOperadorJSF.accInformeOpe.idAccidente.idVehiculo.codigo}" readonly="true" />
+                                        <p:outputLabel value="FECHA:" />
+                                        <p:inputText id="fecha"
+                                                     readonly="true"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.idAccidente.fechaAcc}">
+                                            <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                        </p:inputText>
+                                        <p:selectOneRadio id="tp-gravedad" 
+                                                          value="#{accInformeOperadorJSF.accInformeOpe.condicion}"
+                                                          layout="responsive" 
+                                                          columns="1" 
+                                                          required="true"
+                                                          requiredMessage="Gravedad es requerido - Ventana #1">
+                                            <f:selectItem itemLabel="CON MUERTOS" itemValue="0" />
+                                            <f:selectItem itemLabel="CON HERIDOS" itemValue="1" />
+                                            <f:selectItem itemLabel="CON MUERTOS y CON HERIDOS" itemValue="2" />
+                                            <f:selectItem itemLabel="SOLO DAÑOS" itemValue="3" />
+                                        </p:selectOneRadio>
+                                    </p:panelGrid>
+                                </div>
+                            </p:tab>
+                            <p:tab title="2. CLASE DE ACCIDENTE">
+                                <div class="ui-md-12 ui-g-12 ui-lg-12 Padding0">
+                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank">
+                                        <p:selectOneRadio id="clase-acc" 
+                                                          value="#{accInformeOperadorJSF.i_idAccClase}" 
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Clase de Accidente es requerido - Ventana #2">
+                                            <f:selectItems value="#{accClaseJSF.listAccClase}" var="clase" itemLabel="#{clase.clase}" itemValue="#{clase.idAccClase}"/>
+                                            <p:ajax global="false"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">2.1 CHOQUE CON </div>
+                                        <p:selectManyCheckbox id="choque-con" value="#{accInformeOperadorJSF.accTipoVehArray}" layout="responsive" columns="1">
+                                            <f:selectItems value="#{accTipoVehiculoJSF.listAccTipoVehiculo}" var="vehiculo" itemLabel="#{vehiculo.tipoVehiculo}" itemValue="#{vehiculo.idAccTipoVehiculo}" />
+                                        </p:selectManyCheckbox>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">2.2 OBJETO FIJO </div>
+                                        <p:selectManyCheckbox id="obj-fijo" value="#{accInformeOperadorJSF.accObjetoFijoArray}" layout="responsive" columns="1">
+                                            <f:selectItems value="#{accObjetoFijoJSF.listAccObjetoFijo}" var="ob" itemLabel="#{ob.objetoFijo}" itemValue="#{ob.idAccObjetoFijo}" />
+                                        </p:selectManyCheckbox>
+                                    </p:panelGrid>
+                                </div>
+                            </p:tab>
+                            <p:tab id="tab-lugar" title="3. LUGAR">
+                                <div class="ui-g Padding0">
+                                    <div class="ui-md-12 ui-g-12 ui-lg-12">
+                                        <p:gmap id="gmapD" center="#{accInformeOperadorJSF.c_latLog}" 
+                                                zoom="16" 
+                                                style="width: 100%;height: 400px" 
+                                                type="HYBRID" 
+                                                model="#{accInformeOperadorJSF.simpleModel}"
+                                                streetView="true" >
+                                            <p:ajax event="pointSelect" 
+                                                    update="form-info-acc:acc-panel:gmapD,form-info-acc:acc-panel:lugar-x,form-info-acc:acc-panel:lugar-y"
+                                                    listener="#{accInformeOperadorJSF.onPointSelect}"/>
+                                        </p:gmap>
+                                    </div>
+                                </div>
+                                <div class="ui-g Padding0">
+                                    <div class="ui-md-12 ui-g-12 ui-lg-12">
+                                        <p:inputText id="lugar-x" value="#{accInformeOperadorJSF.accInformeOpe.longitude}" placeholder="LONGITUD" readonly="true" />
+                                    </div>
+                                    <div class="ui-md-12 ui-g-12 ui-lg-12">
+                                        <p:inputText id="lugar-y" value="#{accInformeOperadorJSF.accInformeOpe.latitude}" placeholder="LATITUD" readonly="true" />
+                                    </div>
+                                    <div class="ui-md-12 ui-g-12 ui-lg-12">
+                                        <p:inputText id="lugar-dir" 
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.direccion}"
+                                                     placeholder="VÍA Y KILOMETRO O SITIO, DIRECCIÓN Y CIUDAD"
+                                                     maxlength="65000"
+                                                     required="true"
+                                                     requiredMessage="Dirección es requerido - Ventana #3"/>
+                                    </div>                           
+                                </div>
+                                <div class="ui-g Padding0">
+                                    <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">3.1 TRONCAL</div>
+                                    <div class="ui-md-12 ui-g-12 ui-lg-12">
+                                        <p:selectOneMenu id="troncal"
+                                                         value="#{accInformeOperadorJSF.i_idAccViaTroncal}" 
+                                                         filter="true" 
+                                                         filterMatchMode="contains" 
+                                                         required="true"
+                                                         requiredMessage="Troncal es requerido - Ventana #3">
+                                            <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                            <f:selectItems value="#{accViaTroncalJSF.listAccViaTroncal}" 
+                                                           var="vt" 
+                                                           itemLabel="#{vt.viaTroncal}" 
+                                                           itemDescription="#{vt.descripcion}"
+                                                           itemValue="#{vt.idAccViaTroncal}" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+                            </p:tab>
+                            <p:tab title="4. FECHA Y HORA">
+                                <div class="ui-md-12 ui-g-12 ui-lg-12 Padding0">
+                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank">
+                                        <p:calendar id="fecha-hora"
+                                                    value="#{accInformeOperadorJSF.accInformeOpe.fecha}"
+                                                    showOn="button"
+                                                    locale="es"
+                                                    mask="true"
+                                                    required="true"
+                                                    requiredMessage="Fecha es requerida - Ventana #4"
+                                                    pattern="yyyy-MM-dd" />
+                                        <p:separator/>
+                                        <p:inputMask id="hora-ocu" 
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.horaOcurrencia}" 
+                                                     placeholder="HORA DE OCURRENCIA" 
+                                                     mask="99:99"
+                                                     required="true"
+                                                     requiredMessage="Hora de Ocurrencia es requerido - Ventana #4"/>
+                                        <p:inputMask id="hora-lev" 
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.horaLevantamiento}" 
+                                                     placeholder="HORA DE LEVANTAMIENTO" 
+                                                     mask="99:99"
+                                                     required="true"
+                                                     requiredMessage="Hora de Levantamiento es requerido - Ventana #4"/>
+                                        <p:separator/>
+                                    </p:panelGrid>
+                                </div>
+                            </p:tab>
+                            <p:tab title="5. CARACTERÍSTICAS DEL LUGAR">
+                                <div class="ui-md-12 ui-g-12 ui-lg-12 Padding0">
+                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank">
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">5.1 ÁREA</div>
+                                        <p:selectOneRadio id="area" 
+                                                          value="#{accInformeOperadorJSF.accInformeOpe.area}" 
+                                                          layout="responsive"
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Área es requerido - Ventana #5">
+                                            <f:selectItem itemLabel="URBANA" itemValue="0" />
+                                            <f:selectItem itemLabel="RURAL" itemValue="1" />
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">5.2 SECTOR</div>
+                                        <p:selectOneRadio id="sector" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaSector}" 
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Sector es requerido - Ventana #5">
+                                            <f:selectItems value="#{accViaSectorJSF.listAccViaSector}" var="sector" itemLabel="#{sector.viaSector}" itemValue="#{sector.idAccViaSector}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">5.3 ZONA</div>
+                                        <p:selectOneRadio id="zona"
+                                                          value="#{accInformeOperadorJSF.i_idAccViaZona}" 
+                                                          layout="responsive"
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Zona es requerido - Ventana #5">
+                                            <f:selectItems value="#{accViaZonaJSF.listAccViaZona}" var="zona" itemLabel="#{zona.viaZona}" itemValue="#{zona.idAccViaZona}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">5.4 DISEÑO</div>
+                                        <p:selectOneRadio id="diseno" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaDiseno}" 
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Diseño es requerido - Ventana #5">
+                                            <f:selectItems value="#{accViaDisenoJSF.listAccViaDiseno}" var="diseno" itemLabel="#{diseno.viaDiseno}" itemValue="#{diseno.idAccViaDiseno}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">5.5 TIEMPO</div>
+                                        <p:selectOneRadio id="tiempo"
+                                                          value="#{accInformeOperadorJSF.i_idAccViaClima}" 
+                                                          layout="responsive"
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Tiempo es requerido - Ventana #5">
+                                            <f:selectItems value="#{accViaClimaJSF.listAccViaClima}" var="clima" itemLabel="#{clima.viaClima}" itemValue="#{clima.idAccViaClima}"/>
+                                        </p:selectOneRadio>
+                                    </p:panelGrid>
+                                </div>
+                            </p:tab>
+                            <p:tab id="tabSix" title="6. CARACTERÍSTICAS DE LA VÍA">
+                                <div class="ui-g-6 ui-g-12 Padding0">
+                                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank">
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.1 GEOMÉTRICA</div>
+                                        <p:selectOneRadio id="rect-curv" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaGeometrica}"
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Geométrica es requerido - Ventana #6">
+                                            <f:selectItems value="#{accViaGeometricaJSF.listAccViaGeometrica}" var="geometrica" itemLabel="#{geometrica.viaGeometrica}" itemValue="#{geometrica.idAccViaGeometrica}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.2 UTILIZACÍON</div>
+                                        <p:selectOneRadio id="utilizacion" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaUtilizacion}" 
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Utilización es requerido - Ventana #6">
+                                            <f:selectItems value="#{accViaUtilizacionJSF.listAccViaUtilizacion}" var="util" itemLabel="#{util.viaUtilizacion}" itemValue="#{util.idAccViaUtilizacion}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.3 CALZADAS</div>
+                                        <p:selectOneRadio id="calzada" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaCalzada}" 
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Calzadas es requerido - Ventana #6">
+                                            <f:selectItems value="#{accViaCalzadasJSF.listAccViaCalzadas}" var="calzada" itemLabel="#{calzada.viaCalzadas}" itemValue="#{calzada.idAccViaCalzadas}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.4 CARRILES</div>
+                                        <p:selectOneRadio id="carriles" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaCarriles}" 
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Carriles es requerido - Ventana #6">
+                                            <f:selectItems value="#{accViaCarrilesJSF.listAccViaCarriles}" var="carriles" itemLabel="#{carriles.viaCarriles}" itemValue="#{carriles.idAccViaCarriles}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.5 MATERIAL</div>
+                                        <p:selectOneRadio id="material" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaMaterial}" 
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Material es requerido - Ventana #6">
+                                            <f:selectItems value="#{accViaMaterialJSF.listAccViaMaterial}" var="material" itemLabel="#{material.viaMaterial}" itemValue="#{material.idAccViaMaterial}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.6 ESTADO</div>
+                                        <p:selectOneRadio id="estado-via" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaEstado}" 
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Estado es requerido - Ventana #6">
+                                            <f:selectItems value="#{accViaEstadoJSF.listAccViaEstado}" var="estado" itemLabel="#{estado.viaEstado}" itemValue="#{estado.idAccViaEstado}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.7 CONDICIONES</div>
+                                        <p:selectOneRadio id="condicion-via" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaCondicion}" 
+                                                          layout="responsive" 
+                                                          columns="1"
+                                                          required="true"
+                                                          requiredMessage="Condiciones es requerido - Ventana #6">
+                                            <f:selectItems value="#{accViaCondicionJSF.listAccViaCondicion}" var="condicion" itemLabel="#{condicion.viaCondicion}" itemValue="#{condicion.idAccViaCondicion}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.8 ILUMINACIÓN ARTIFICIAL</div>
+                                        <p:selectOneRadio id="con-sin" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaIluminacion}"
+                                                          layout="responsive" 
+                                                          columns="1">
+                                            <f:selectItems value="#{accViaIluminacionJSF.listAccViaIluminacion}" var="iluminacion" itemLabel="#{iluminacion.viaIluminacion}" itemValue="#{iluminacion.idAccViaIluminacion}"/>
+                                        </p:selectOneRadio>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.9 CONTROLES</div>
+                                        <p:selectBooleanCheckbox id="agente" value="#{accInformeOperadorJSF.b_agente}" itemLabel="AGENTE" class="cssBlack" />
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssBlack">SEMAFORO</div>
+                                        <p:selectOneRadio id="semaforo" 
+                                                          value="#{accInformeOperadorJSF.i_idAccViaSemaforo}"
+                                                          layout="responsive" 
+                                                          columns="1">
+                                            <f:selectItems value="#{accViaSemaforoJSF.listAccViaSemaforo}" var="semaforo" itemLabel="#{semaforo.viaSemaforo}" itemValue="#{semaforo.idAccViaSemaforo}"/>
+                                        </p:selectOneRadio>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssBlack">DEMARCACIÓN y SEÑALIZACIÓN</div>
+                                        <p:selectManyCheckbox id="demarcacion" 
+                                                              value="#{accInformeOperadorJSF.accDemarcacionArray}"
+                                                              layout="responsive" 
+                                                              columns="1">
+                                            <f:selectItems value="#{accViaDemarcacionJSF.listAccViaDemarcacion}" var="demar" itemLabel="#{demar.viaDemarcacion}" itemValue="#{demar.idAccViaDemarcacion}"/>
+                                        </p:selectManyCheckbox>
+                                        <p:separator/>
+                                        <div class="ui-md-12 ui-g-12 ui-lg-12 cssWhite cssGreen">6.10 VISUAL DISMINUIDA</div>
+                                        <p:selectManyCheckbox id="visual-disminuida" 
+                                                              value="#{accInformeOperadorJSF.accViaVisualArray}" 
+                                                              layout="responsive" 
+                                                              columns="1">
+                                            <f:selectItems value="#{accViaVisualJSF.listAccViaVisual}" var="visual" itemLabel="#{visual.viaVisual}" itemValue="#{visual.idAccViaVisual}"/>
+                                        </p:selectManyCheckbox>
+                                    </p:panelGrid>
+                                </div>   
+                            </p:tab>
+                            <p:tab title="7. CONDUCTORES, VEHÍCULOS Y PROPIETARIOS">
+                                <p:panel id="panel-sev" style="border: none">
+                                    <div class="ui-g Padding0">
+                                        <p:panel id="panel-ope" style="border: none" class="Wid100">
+                                            <div class="ui-g Padding0">
+                                                <div class="ui-g-8 ui-md-6 ui-lg-8">
+                                                    <p:inputText id="cod-tm" 
+                                                                 value="#{accInformeOperadorJSF.i_codTm}"
+                                                                 maxlength="10"
+                                                                 placeholder="CÓDIGO TM" />
+                                                </div>
+                                                <div class="ui-g-4 ui-md-6 ui-lg-4">
+                                                    <p:commandButton id="btn-bus-tm"
+                                                                     icon="fa fa-search"
+                                                                     class="cssWhite OrangeButton"
+                                                                     update="form-info-acc:acc-panel:panel-ope,form-info-msg:msg"
+                                                                     process="form-info-acc:acc-panel:cod-tm,@this"
+                                                                     actionListener="#{accInformeOperadorJSF.buscarOperador()}"/>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g Padding0">
+                                                <p:panelGrid id="panel-conduc" columns="1" layout="grid" styleClass="ui-panelgrid-blank" style="width: 100%">
+                                                    <div class="ui-g-12 cssWhite cssGreen">7.1 CONDUCTOR</div>
+                                                    <p:inputText id="cond-nombres" 
+                                                                 value="#{accInformeOperadorJSF.accInformeVehCond.nombres}" 
+                                                                 maxlength="150"
+                                                                 placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRE" />
+                                                    <p:outputLabel value="DOC." class="cssBlack" />
+                                                    <p:selectOneMenu id="sel-doc-conductor"
+                                                                     value="#{accInformeOperadorJSF.i_tpIdentiVeh}" 
+                                                                     filter="true" 
+                                                                     filterMatchMode="contains">
+                                                        <f:selectItem itemValue="" itemLabel="Seleccione Uno"/>
+                                                        <f:selectItems value="#{accInformeOperadorJSF.listEmpleadoTipoIdentificaicion}" 
+                                                                       var="tpdocum" itemLabel="#{tpdocum.nombre}" 
+                                                                       itemValue="#{tpdocum.idEmpleadoTipoIdentificacion}"/>
+                                                    </p:selectOneMenu>
+                                                    <p:inputText id="num-doc" 
+                                                                 value="#{accInformeOperadorJSF.accInformeVehCond.nroDocumento}" 
+                                                                 maxlength="15"
+                                                                 placeholder="NÚMERO DE DOCUMENTO"/>
+                                                    <p:outputLabel value="FECHA DE NACIMIENTO:" class="cssBlack"/>
+                                                    <p:calendar id="fecha-nac"
+                                                                value="#{accInformeOperadorJSF.accInformeVehCond.fechaNac}"
+                                                                navigator="true"
+                                                                locale="es"
+                                                                showOn="button"
+                                                                maxdate="today"
+                                                                mask="true"
+                                                                pattern="yyyy-MM-dd" />
+                                                    <p:outputLabel value="SEXO" class="cssBlack" />
+                                                    <p:selectOneRadio id="sexo" 
+                                                                      value="#{accInformeOperadorJSF.accInformeVehCond.sexo}" 
+                                                                      layout="responsive" 
+                                                                      columns="1">
+                                                        <f:selectItem itemLabel="MASCULINO" itemValue="M" />
+                                                        <f:selectItem itemLabel="FEMENINO" itemValue="F" />
+                                                    </p:selectOneRadio>
+                                                    <p:inputText id="dir" value="#{accInformeOperadorJSF.accInformeVehCond.direccion}"
+                                                                 maxlength="60"
+                                                                 placeholder="DIRECCIÓN DOMICILIO"/>
+                                                    <p:inputText id="ciudad" 
+                                                                 value="#{accInformeOperadorJSF.accInformeVehCond.ciudad}" 
+                                                                 maxlength="45"
+                                                                 placeholder="CIUDAD"/>
+                                                    <p:inputText id="telefono" 
+                                                                 value="#{accInformeOperadorJSF.accInformeVehCond.telefono}" 
+                                                                 maxlength="45"
+                                                                 placeholder="TELÉFONO" />
+                                                    <p:separator/>
+                                                    <p:outputLabel value="CONDICIÓN" class="cssBlack" />
+                                                    <p:selectOneRadio id="estado" 
+                                                                      value="#{accInformeOperadorJSF.accInformeVehCond.condicion}" 
+                                                                      layout="responsive" 
+                                                                      columns="1">
+                                                        <f:selectItem itemLabel="HERIDO" itemValue="1" />
+                                                        <f:selectItem itemLabel="MUERTO" itemValue="0" />
+                                                        <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                                    </p:selectOneRadio>
+                                                    <p:outputLabel value="CINTURON" class="cssBlack" />
+                                                    <p:selectOneRadio id="cinturon" 
+                                                                      value="#{accInformeOperadorJSF.accInformeVehCond.cinturon}" 
+                                                                      layout="responsive" 
+                                                                      columns="1">
+                                                        <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                        <f:selectItem itemLabel="NO" itemValue="0" />
+                                                        <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                                    </p:selectOneRadio>
+                                                    <p:outputLabel value="CASCO" class="cssBlack" />
+                                                    <p:selectOneRadio id="casco" 
+                                                                      value="#{accInformeOperadorJSF.accInformeVehCond.casco}" 
+                                                                      layout="responsive" 
+                                                                      columns="1">
+                                                        <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                        <f:selectItem itemLabel="NO" itemValue="0" />
+                                                        <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                                    </p:selectOneRadio>
+                                                    <p:separator/>
+                                                    <p:outputLabel value="PORTA LICENCIA" class="cssBlack"/>
+                                                    <p:selectOneRadio id="port-lic" 
+                                                                      value="#{accInformeOperadorJSF.accInformeVehCond.licencia}" 
+                                                                      layout="responsive" 
+                                                                      columns="1">
+                                                        <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                        <f:selectItem itemLabel="NO" itemValue="0" />
+                                                        <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                                    </p:selectOneRadio>
+                                                </p:panelGrid>
+                                            </div>
+                                            <div class="ui-g Padding0">
+                                                <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                                    <p:inputText id="licencia" value="#{accInformeOperadorJSF.accInformeVehCond.nroLicencia}" 
+                                                                 maxlength="45"
+                                                                 placeholder="Nro. LICENCIA DE CONDUCCIÓN" /> 
+                                                </div>
+                                                <div class="ui-g-6 ui-md-4 ui-lg-4">
+                                                    <p:inputText id="categoria" value="#{accInformeOperadorJSF.accInformeVehCond.categoria}" 
+                                                                 maxlength="45"
+                                                                 placeholder="CATEGORIA" />
+                                                </div>
+                                                <div class="ui-g-6 ui-md-4 ui-lg-4">
+                                                    <p:inputText id="restric" value="#{accInformeOperadorJSF.accInformeVehCond.restriccion}" 
+                                                                 maxlength="45"
+                                                                 placeholder="RESTRICCIÓN" />
+                                                </div>
+                                            </div>
+                                            <div class="ui-g Padding0">
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                    <p:outputLabel value="FECHA EXP." class="cssBlack"/>
+                                                </div>
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                    <p:calendar id="fecha-exp"
+                                                                value="#{accInformeOperadorJSF.accInformeVehCond.fechaExp}"
+                                                                navigator="true"
+                                                                locale="es"
+                                                                showOn="button"
+                                                                maxdate="today"
+                                                                mask="true"
+                                                                pattern="yyyy-MM-dd" />
+                                                </div>
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                    <p:outputLabel value="FECHA VENCI." class="cssBlack"/>
+                                                </div>
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                    <p:calendar id="fecha-vencimiento"
+                                                                value="#{accInformeOperadorJSF.accInformeVehCond.fechaVencimiento}"
+                                                                navigator="true"
+                                                                locale="es"
+                                                                showOn="button"
+                                                                mask="true"
+                                                                pattern="yyyy-MM-dd" />
+                                                </div>
+                                            </div>
+                                            <p:separator/>
+                                            <div class="ui-g Padding0">
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                                    <p:inputText id="hospital" value="#{accInformeOperadorJSF.accInformeVehCond.sitioAtencion}" 
+                                                                 maxlength="60"
+                                                                 placeholder="HOSPITAL, CLINICA O SITIO DE ATENCIÓN" />
+                                                </div>
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                                    <p:outputLabel value="SE LLEVÓ A EXAMEN DE:" class="cssBlack"/>
+                                                </div>
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                    <div class="ui-g-1"><p:outputLabel value="EMBRIAGUEZ:" class="cssBlack"/></div>
+                                                    <p:selectOneRadio id="embriaguez" 
+                                                                      value="#{accInformeOperadorJSF.accInformeVehCond.pruebaEmbriaguez}" 
+                                                                      layout="responsive" 
+                                                                      columns="1">
+                                                        <f:selectItem itemLabel="POSITIVO" itemValue="1" />
+                                                        <f:selectItem itemLabel="NEGATIVO" itemValue="0" />
+                                                        <f:selectItem itemLabel="NO SE REALIZÓ" itemValue="2" />
+                                                        <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                                    </p:selectOneRadio>
+                                                </div>
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                    <div class="ui-g-1"><p:outputLabel value="DROGA:" class="cssBlack"/></div>
+                                                    <p:selectOneRadio id="droga" 
+                                                                      value="#{accInformeOperadorJSF.accInformeVehCond.pruebaDroga}"
+                                                                      layout="responsive" 
+                                                                      columns="1">
+                                                        <f:selectItem itemLabel="POSITIVO" itemValue="1" />
+                                                        <f:selectItem itemLabel="NEGATIVO" itemValue="0" />
+                                                        <f:selectItem itemLabel="NO SE REALIZÓ" itemValue="2" />
+                                                        <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                                    </p:selectOneRadio>
+                                                </div>
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                    <p:inputText id="grado" value="#{accInformeOperadorJSF.accInformeVehCond.resulDroga}"
+                                                                 maxlength="30"
+                                                                 placeholder="GRADO" />
+                                                </div>
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                    <p:inputText id="embriaguez-resul" value="#{accInformeOperadorJSF.accInformeVehCond.resultEmbriaguez}"
+                                                                 maxlength="30"
+                                                                 placeholder="GRADO" />
+                                                </div>
+                                            </div>
+                                        </p:panel>
+                                    </div>
+                                    <div class="ui-g Padding0" style="margin-top: 10px">
+                                        <div class="ui-g-12 cssWhite cssGreen">7.2 VEHÍCULO</div>
+                                    </div>
+                                    <p:panel id="info-veh" style="border: none">
+                                        <p:separator />
+                                        <div class="ui-g Padding0">
+                                            <div class="ui-g-8 ui-md-6 ui-lg-3">
+                                                <p:inputText id="codigo-bus" 
+                                                             value="#{accInformeOperadorJSF.c_codVehiculo}" 
+                                                             maxlength="10"
+                                                             placeholder="CODIGO VEHÍCULO" />
+                                            </div>
+                                            <div class="ui-g-4 ui-md-6 ui-lg-3">
+                                                <p:commandButton id="btn-buscar-veh"
+                                                                 class="cssWhite OrangeButton"
+                                                                 icon="fa fa-search"
+                                                                 actionListener="#{accInformeOperadorJSF.buscarVehiculo()}"
+                                                                 process="form-info-acc:acc-panel:codigo-bus,@this"
+                                                                 update="form-info-acc:acc-panel:info-veh" />
+                                            </div>
+                                        </div>
+                                        <div class="ui-g Padding0">
+                                            <div class="ui-g-6 ui-md-6 ui-lg-3">
+                                                <p:inputText id="placa" 
+                                                             value="#{accInformeOperadorJSF.accInformeVehCond.placa}" 
+                                                             maxlength="45"
+                                                             placeholder="PLACA"/>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-3">
+                                                <p:inputText id="marca" 
+                                                             value="#{accInformeOperadorJSF.accInformeVehCond.marca}" 
+                                                             maxlength="45"
+                                                             placeholder="MARCA"/>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-3">
+                                                <p:inputText id="linea" 
+                                                             value="#{accInformeOperadorJSF.accInformeVehCond.linea}" 
+                                                             maxlength="45"
+                                                             placeholder="LINEA"/>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-3">
+                                                <p:inputText id="modelo" 
+                                                             value="#{accInformeOperadorJSF.accInformeVehCond.modelo}" 
+                                                             maxlength="45"
+                                                             placeholder="MODELO"/>
+                                            </div>
+                                        </div>
+                                        <div class="ui-g Padding0">
+                                            <div class="ui-g-4 ui-md-6 ui-lg-3">
+                                                <p:inputText id="carga" 
+                                                             value="#{accInformeOperadorJSF.accInformeVehCond.cargaTonelada}" 
+                                                             maxlength="45"
+                                                             placeholder="CARGA TONS." /> 
+                                            </div>
+                                            <div class="ui-g-4 ui-md-6 ui-lg-3">
+                                                <p:inputText id="color" 
+                                                             value="#{accInformeOperadorJSF.accInformeVehCond.color}" 
+                                                             maxlength="45"
+                                                             placeholder="COLOR" /> 
+                                            </div>
+                                            <div class="ui-g-4 ui-md-12 ui-lg-3">
+                                                <p:inputNumber id="nro-pasajeros" 
+                                                               value="#{accInformeOperadorJSF.accInformeVehCond.nroPasajeros}" 
+                                                               maxValue="9999999999"
+                                                               placeholder="Nro. PASAJEROS" /> 
+                                            </div>
+                                        </div>
+                                    </p:panel>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-6">
+                                            <h:outputText value="EMPRESA OPERADORA"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-6">
+                                            <p:selectOneMenu id="empr-ope"
+                                                             value="#{accInformeOperadorJSF.i_idEmpresaOperadora}" 
+                                                             filter="true" filterMatchMode="contains">
+                                                <f:selectItem itemValue="#{null}" itemLabel="Seleccione Uno"/>
+                                                <f:selectItems value="#{accEmpresaOperadoraJSF.listAccEmpresaOperadora}" 
+                                                               var="emp" itemLabel="#{emp.empresaOperadora}" 
+                                                               itemValue="#{emp.idAccEmpresaOperadora}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-6">
+                                            <p:inputText id="inmovilizado" 
+                                                         value="#{accInformeOperadorJSF.accInformeVehCond.inmovilizado}" 
+                                                         maxlength="45"
+                                                         placeholder="INMOVILIZADO EN:" /> 
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-6">
+                                            <p:inputText id="disposicion" 
+                                                         value="#{accInformeOperadorJSF.accInformeVehCond.disposicion}" 
+                                                         maxlength="45"
+                                                         placeholder="A DISPOSICIÓN DE:"/> 
+                                        </div>
+                                    </div>
+                                    <p:separator/>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12">
+                                            <p:outputLabel value="SEGURO OBLIGATORIO" class="cssBlack"/>
+                                        </div>
+                                        <div class="ui-g-12">
+                                            <p:selectOneRadio id="seguro" value="#{accInformeOperadorJSF.accInformeVehCond.seguroObligatorio}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                            <p:inputText id="poliza" 
+                                                         value="#{accInformeOperadorJSF.accInformeVehCond.nroPoliza}" 
+                                                         maxlength="15"
+                                                         placeholder="Nro. POLIZA" /> 
+                                        </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                            <p:inputText id="compania-asegura" 
+                                                         value="#{accInformeOperadorJSF.accInformeVehCond.companiaAseguradora}" 
+                                                         maxlength="45"
+                                                         placeholder="COMPAÑIA ASEGURADORA" /> 
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                            <p:outputLabel value="FECHA DE VENCI." class="cssBlack"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                            <p:calendar id="fecha-venc-seguro"
+                                                        value="#{accInformeOperadorJSF.accInformeVehCond.fechaVencSeguro}"
+                                                        label="FECHA DE VENCI."
+                                                        navigator="true"
+                                                        locale="es"
+                                                        showOn="button"
+                                                        mask="true"
+                                                        pattern="yyyy-MM-dd" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0" style="margin-top: 10px">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen">7.3 PROPIETARIO</div>
+                                    </div>
+                                    <p:separator/>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="propietario" 
+                                                         value="#{accInformeOperadorJSF.accInformeVehCond.nombresPropietario}" 
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRE"/>
+                                        </div>
+                                        <div class="ui-g-3 ui-md-2 ui-lg-6">
+                                            <p:outputLabel value="DOCUMENTO:" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-9 ui-md-10 ui-lg-6">
+                                            <p:selectOneMenu id="sel-doc-propietario"
+                                                             value="#{accInformeOperadorJSF.i_tpIdentiPropietario}" 
+                                                             filter="true" filterMatchMode="contains">
+                                                <f:selectItem itemValue="" itemLabel="Seleccione Uno"/>
+                                                <f:selectItems value="#{accInformeOperadorJSF.listEmpleadoTipoIdentificaicion}" 
+                                                               var="tpdocum" itemLabel="#{tpdocum.nombre}" 
+                                                               itemValue="#{tpdocum.idEmpleadoTipoIdentificacion}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="num-doc-propi" 
+                                                         value="#{accInformeOperadorJSF.accInformeVehCond.nroDocPropietario}" 
+                                                         maxlength="15"
+                                                         placeholder="NÚMERO DE DOCUMENTO"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0" style="margin-top: 10px">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen">7.4 CLASE DE VEHÍCULO</div>
+                                    </div>
+                                    <p:separator />
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="clase" value="#{accInformeOperadorJSF.i_idAccTipoVehiculo}" layout="responsive" columns="1">
+                                                <f:selectItems value="#{accTipoVehiculoJSF.listAccTipoVehiculo}"
+                                                               var="tpveh" itemLabel="#{tpveh.tipoVehiculo}" 
+                                                               itemValue="#{tpveh.idAccTipoVehiculo}"/>
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen" style="margin-top: 10px">7.5 TIPO SERVICIO</div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="tp-servicio" value="#{accInformeOperadorJSF.i_idTipoServ}" layout="responsive" columns="1">
+                                                <f:selectItems value="#{accTipoServJSF.listAccTipoServ}"
+                                                               var="servicio" itemLabel="#{servicio.tipoServ}"
+                                                               itemValue="#{servicio.idAccTipoServ}"/>
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0" >
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen" style="margin-top: 10px">7.6 SEGURO DE RESPONSABILIDAD CIVIL</div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="seguro-civil" value="#{accInformeOperadorJSF.accInformeVehCond.seguroRespCivil}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen" style="margin-top: 10px">7.7 NACIONALIDAD</div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="nacionalidad" value="#{accInformeOperadorJSF.accInformeVehCond.nacionalidad}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="COLOMBIANO" itemValue="1" />
+                                                <f:selectItem itemLabel="EXTRANJERO" itemValue="0" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen" style="margin-top: 10px">7.8 FALLAS EN</div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="fallas" value="#{accInformeOperadorJSF.i_idAccFalla}" layout="responsive" columns="1">
+                                                <f:selectItems value="#{accVehFallaJSF.listAccVehFalla}" 
+                                                               var="falla" 
+                                                               itemLabel="#{falla.falla}" 
+                                                               itemValue="#{falla.idAccVehFalla}"/>
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:commandButton id="guardar-carc-veh"
+                                                             icon="fa fa-save"
+                                                             process="form-info-acc:acc-panel:panel-sev"
+                                                             update="form-info-acc:acc-panel:panel-sev,form-info-msg:msg"
+                                                             actionListener="#{accInformeOperadorJSF.agregarAccInformeVehCond()}"
+                                                             class="cssWhite GreenButton"/>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-vehiculo"
+                                                 var="veh" 
+                                                 rowIndexVar="vehIdx"
+                                                 rows="5"
+                                                 paginator="true"
+                                                 value="#{accInformeOperadorJSF.listAccInformeVehCond}" 
+                                                 reflow="true" 
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            VEHÍCULOS Y CONDUCTORES REGISTRADOS
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{vehIdx + 1}"/>
+                                        </p:column>
+                                        <p:column headerText="Placa">
+                                            <h:outputText value="#{veh.placa}"/>
+                                        </p:column>
+                                        <p:column headerText="Marca">
+                                            <h:outputText value="#{veh.marca}"/>
+                                        </p:column>
+                                        <p:column headerText="Modelo">
+                                            <h:outputText value="#{veh.modelo}"/>
+                                        </p:column>
+                                        <p:column headerText="Conductor">
+                                            <h:outputText value="#{veh.nombres}"/>
+                                        </p:column>
+                                        <p:column headerText="Identidicación">
+                                            <h:outputText value="#{veh.nroDocumento}"/>
+                                        </p:column>
+                                        <p:column headerText="Teléfono">
+                                            <h:outputText value="#{veh.telefono}"/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:panel>
+                            </p:tab>
+                            <p:tab title="8. DAÑOS" rendered="false">
+                                <div class="ui-g Padding0">
+                                    <div class="ui-g-11 ui-md-6 ui-lg-10">
+                                        <a href="../../art.jsf" target="_black"><h:outputText value="Ir a generar el daños del vehículo" class="cssBlack" /></a>
+                                        <a href="../../bi.jsf" target="_black"><h:outputText value="Ir a generar el daños del vehículo" class="cssBlack" /></a>
+                                    </div>
+                                    <div class="ui-g-1 ui-md-6 ui-lg-1">
+                                    </div>
+                                </div>
+                                <div class="ui-g Padding0">
+                                    <div class="ui-g-12 ui-md-4 ui-lg-3">
+
+                                    </div>
+                                </div>
+                            </p:tab>
+                            <p:tab title="9. CROQUIS" id="tbCroquis">
+                                <div class="ui-g Padding0" jsf:id="dvCroquis">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:commandButton id="btn-cargar-croquis"
+                                                         icon="fa fa-upload"
+                                                         update=":gialogo-croquis"
+                                                         process="@this"
+                                                         oncomplete="PF('croquisDlg').show()"
+                                                         value="Cargar Croquis"
+                                                         class="cssWhite GreenButton" />
+                                        <!--                                        <a href="../../croquis.jsf" target="_black"><h:outputText value="Ir a generar el croquis" class="cssBlack" /></a>-->
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <h:outputText value="Archivo cargado: #{accInformeOperadorJSF.fileCroquis.fileName}"/>
+                                        <!--                                        <a href="../../croquis.jsf" target="_black"><h:outputText value="Ir a generar el croquis" class="cssBlack" /></a>-->
+                                    </div>
+                                </div>
+                            </p:tab>
+                            <p:tab title="10. VÍCTIMAS">
+                                <p:panel id="victima-ten" style="border: none">
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen" style="margin-top: 10px">10. VÍCTIMAS: PASAJEROS Y PEATONES</div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="vic-nombres" 
+                                                         value="#{accInformeOperadorJSF.accInformeVic.nombres}" 
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRE"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:outputLabel value="DOCUMENTO" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:selectOneMenu id="sel-doc-vic"
+                                                             value="#{accInformeOperadorJSF.i_tpIdentiVictima}" 
+                                                             filter="true" filterMatchMode="contains">
+                                                <f:selectItem itemValue="" itemLabel="Seleccione Uno"/>
+                                                <f:selectItems value="#{accInformeOperadorJSF.listEmpleadoTipoIdentificaicion}" 
+                                                               var="tpdocu" itemLabel="#{tpdocu.nombre}" 
+                                                               itemValue="#{tpdocu.idEmpleadoTipoIdentificacion}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputNumber id="vic-num-doc" 
+                                                           value="#{accInformeOperadorJSF.accInformeVic.nroDoc}" 
+                                                           maxValue="99999999999999"
+                                                           placeholder="NÚMERO DE DOCUMENTO"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:outputLabel value="FECHA DE NACIMIENTO:" class="cssBlack"/>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:calendar id="vic-fecha-nac"
+                                                        value="#{accInformeOperadorJSF.accInformeVic.fechaNac}"
+                                                        navigator="true"
+                                                        locale="es"
+                                                        showOn="button"
+                                                        maxdate="today"
+                                                        mask="true"
+                                                        pattern="yyyy-MM-dd" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-4">
+                                            <p:inputText id="vic-dir" 
+                                                         value="#{accInformeOperadorJSF.accInformeVic.direccion}" 
+                                                         maxlength="60"
+                                                         placeholder="DIRECCIÓN DOMICILIO"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                            <p:inputText id="vic-ciudad" 
+                                                         value="#{accInformeOperadorJSF.accInformeVic.ciudad}" 
+                                                         maxlength="45"
+                                                         placeholder="CIUDAD"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                            <p:inputNumber id="vic-telefono" 
+                                                           value="#{accInformeOperadorJSF.accInformeVic.telefono}" 
+                                                           maxValue="999999999999999999999999999"
+                                                           placeholder="TELÉFONO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <div class="ui-g-1">
+                                                <p:outputLabel value="CINTURON" class="cssBlack" />
+                                            </div>
+                                            <p:selectOneRadio id="vic-cinturon" value="#{accInformeOperadorJSF.accInformeVic.cinturon}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <div class="ui-g-1">
+                                                <p:outputLabel value="CASCO" class="cssBlack" />
+                                            </div>
+                                            <p:selectOneRadio id="vic-casco" value="#{accInformeOperadorJSF.accInformeVic.casco}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="vic-hospital" 
+                                                         value="#{accInformeOperadorJSF.accInformeVic.sitioAtencion}" 
+                                                         maxlength="45"
+                                                         placeholder="HOSPITAL, CLINICA O SITIO DE ATENCIÓN" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:outputLabel value="SE LLEVÓ A EXAMEN DE:" class="cssBlack"/>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <div class="ui-g-1"><p:outputLabel value="EMBRIAGUEZ:" class="cssBlack"/></div>
+                                            <p:selectOneRadio id="vic-embriaguez" value="#{accInformeOperadorJSF.accInformeVic.prebaEmbriaguez}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="POSITIVO" itemValue="1" />
+                                                <f:selectItem itemLabel="NEGATIVO" itemValue="0" />
+                                                <f:selectItem itemLabel="NO SE REALIZÓ" itemValue="2" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <div class="ui-g-1"><p:outputLabel value="DROGA:" class="cssBlack"/></div>
+                                            <p:selectOneRadio id="vic-droga" value="#{accInformeOperadorJSF.accInformeVic.pruebaDrogra}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="POSITIVO" itemValue="1" />
+                                                <f:selectItem itemLabel="NEGATIVO" itemValue="0" />
+                                                <f:selectItem itemLabel="NO SE REALIZÓ" itemValue="2" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputText id="vic-grado-embriaguez" 
+                                                         value="#{accInformeOperadorJSF.accInformeVic.resultEmbriaguez}" 
+                                                         maxlength="30"
+                                                         placeholder="GRADO DE EXA. EMBRIA." />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputText id="vic-grado-droga" 
+                                                         value="#{accInformeOperadorJSF.accInformeVic.resultDroga}" 
+                                                         maxlength="30"
+                                                         placeholder="GRADO DE EXA. DROGA" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen" style="margin-top: 10px">10.1 CONDICIÓN</div>
+                                    <p:selectOneRadio id="vic-condicion" value="#{accInformeOperadorJSF.accInformeVic.condicion}" layout="responsive" columns="1">
+                                        <f:selectItem itemLabel="PEATON" itemValue="1" />
+                                        <f:selectItem itemLabel="PASAJERO" itemValue="0" />
+                                    </p:selectOneRadio>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen" style="margin-top: 10px">10.2 SEXO</div>
+                                    <p:selectOneRadio id="vic-sexo" value="#{accInformeOperadorJSF.accInformeVic.sexo}" layout="responsive" columns="1">
+                                        <f:selectItem itemLabel="MASCULINO" itemValue="M" />
+                                        <f:selectItem itemLabel="FEMENINO" itemValue="F" />
+                                    </p:selectOneRadio>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 cssWhite cssGreen" style="margin-top: 10px">10.3 GRAVEDAD</div>
+                                    <p:selectOneRadio id="vic-gravedad" value="#{accInformeOperadorJSF.accInformeVic.gravedad}" layout="responsive" columns="1">
+                                        <f:selectItem itemLabel="HERIDO" itemValue="1" />
+                                        <f:selectItem itemLabel="MUERTO" itemValue="0" />
+                                        <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                    </p:selectOneRadio>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:commandButton id="btn-guardar-vic"
+                                                         icon="fa fa-save"
+                                                         update="form-info-acc:acc-panel:victima-ten,form-info-msg:msg"
+                                                         process="form-info-acc:acc-panel:victima-ten,@this"
+                                                         actionListener="#{accInformeOperadorJSF.agregarAccInformeVic()}"
+                                                         class="GreenButton cssWhite" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:dataTable id="tabla-victima"
+                                                     var="victima" 
+                                                     rowIndexVar="victimaIdx"
+                                                     paginator="true"
+                                                     rows="5"
+                                                     value="#{accInformeOperadorJSF.listAccInformeVic}" 
+                                                     reflow="true" 
+                                                     style="margin-top:10px">
+                                            <f:facet name="header">
+                                                VÍCTIMAS: PASAJEROS Y PEATONES
+                                            </f:facet>
+                                            <p:column headerText="#">
+                                                <h:outputText value="#{victimaIdx + 1}"/>
+                                            </p:column>
+                                            <p:column headerText="Nombres">
+                                                <h:outputText value="#{victima.nombres}"/>
+                                            </p:column>
+                                            <p:column headerText="Identidicación">
+                                                <h:outputText value="#{victima.nroDoc}"/>
+                                            </p:column>
+                                            <p:column headerText="Teléfono">
+                                                <h:outputText value="#{victima.telefono}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                    <p:separator/>
+                                </p:panel>
+                            </p:tab>
+                            <p:tab title="11. TESTIGOS">
+                                <p:panel id="testigo-eleven" style="border:none">
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="margin-top: 10px">
+                                            <p:inputText id="test-nombres" 
+                                                         value="#{accInformeOperadorJSF.accInformeTestigo.nombres}"
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRE"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <div class="ui-g-6 ui-md-4 ui-lg-4">
+                                                <p:outputLabel value="DOCUMENTO" class="cssBlack" />
+                                            </div>
+                                            <div class="ui-g-6 ui-md-3 ui-lg-4">
+                                                <p:selectOneMenu id="sel-doc-testigo"
+                                                                 value="#{accInformeOperadorJSF.i_tpIdentiTestigo}" 
+                                                                 filter="true" 
+                                                                 filterMatchMode="contains">
+                                                    <f:selectItem itemValue="" itemLabel="Seleccione Uno"/>
+                                                    <f:selectItems value="#{accInformeOperadorJSF.listEmpleadoTipoIdentificaicion}" 
+                                                                   var="tpdocume" itemLabel="#{tpdocume.nombre}" 
+                                                                   itemValue="#{tpdocume.idEmpleadoTipoIdentificacion}"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-5 ui-lg-4">
+                                                <p:inputNumber id="test-num-doc" 
+                                                               value="#{accInformeOperadorJSF.accInformeTestigo.nroDoc}" 
+                                                               maxValue="99999999999999"
+                                                               placeholder="NÚMERO DE DOCUMENTO"/>
+                                            </div>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <div class="ui-g-12 ui-md-12 ui-lg-4">
+                                                <p:inputText id="test-dir" 
+                                                             value="#{accInformeOperadorJSF.accInformeTestigo.direccion}" 
+                                                             maxlength="60"
+                                                             placeholder="DIRECCIÓN DOMICILIO"/>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-4">
+                                                <p:inputText id="test-ciudad" 
+                                                             value="#{accInformeOperadorJSF.accInformeTestigo.ciudad}" 
+                                                             maxlength="45"
+                                                             placeholder="CIUDAD"/>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-4">
+                                                <p:inputNumber id="test-telefono" 
+                                                               value="#{accInformeOperadorJSF.accInformeTestigo.telefono}" 
+                                                               maxValue="99999999999999"
+                                                               placeholder="TELÉFONO" />
+                                            </div>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                                <p:commandButton id="btn-guardar-testigo"
+                                                                 icon="fa fa-save"
+                                                                 update="form-info-acc:acc-panel:testigo-eleven,form-info-msg:msg"
+                                                                 actionListener="#{accInformeOperadorJSF.agregarAccInformeTestigo()}"
+                                                                 process="form-info-acc:acc-panel:testigo-eleven,@this"
+                                                                 class="GreenButton cssWhite" />
+                                            </div>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <p:dataTable id="tabla-testigo"
+                                                         var="testigo"
+                                                         rowIndexVar="testigoIdx"
+                                                         rows="5"
+                                                         paginator="true"
+                                                         value="#{accInformeOperadorJSF.listAccInformeTestigo}" 
+                                                         reflow="true" 
+                                                         style="margin-top:20px">
+                                                <f:facet name="header">
+                                                    TESTIGOS
+                                                </f:facet>
+                                                <p:column headerText="#">
+                                                    <h:outputText value="#{testigoIdx + 1}" />
+                                                </p:column>
+                                                <p:column headerText="Nombres">
+                                                    <h:outputText value="#{testigo.nombres}" />
+                                                </p:column>
+                                                <p:column headerText="Identidicación">
+                                                    <h:outputText value="#{testigo.nroDoc}" />
+                                                </p:column>
+                                                <p:column headerText="Teléfono">
+                                                    <h:outputText value="#{testigo.telefono}" />
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </p:panel>
+                            </p:tab>
+                            <p:tab title="13. OBSERVACIONES">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="margin-top: 10px">
+                                    <p:inputTextarea id="observacion"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.observaciones}"
+                                                     maxlength="65000"
+                                                     rows="7"
+                                                     placeholder="OBSERVACIONES" />
+                                </div>
+                            </p:tab>
+                            <p:tab title="14. ANEXOS">
+                                <div class="ui-g">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12" style="margin-top: 10px">
+                                        <p:inputTextarea id="anexos"
+                                                         value="#{accInformeOperadorJSF.accInformeOpe.anexos}"
+                                                         maxlength="65000"
+                                                         rows="3"
+                                                         placeholder="ANEXOS" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:inputText id="anexos-nombres"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.anexoNombres}"
+                                                     maxlength="60"
+                                                     placeholder="NOMBRES Y APELLIDOS" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-2 ui-lg-2">
+                                        <p:inputText id="anexos-placa"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.anexoPlaca}"
+                                                     maxlength="15"
+                                                     placeholder="PLACA" />
+                                    </div>
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                        <p:inputText id="anexos-corresponde"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.anexoCorresponde}"
+                                                     maxlength="45"
+                                                     placeholder="CORRESPONDIÓ" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-4 ui-lg-4">
+                                        <p:inputText id="anexs-entidad"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.anexoEntidad}"
+                                                     maxlength="45"
+                                                     placeholder="ENTIDAD" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:commandButton icon="fa fa-times" type="button" onclick="PF('firmaAnx').clear()" class="cssWhite OrangeButton"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:signature id="firma-anexo"
+                                                     style="width:400px;height:100px"
+                                                     widgetVar="firmaAnx" 
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.anexoFirma}"
+                                                     guideline="false"/>   
+                                    </div>
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6" >
+                                        <p:commandButton id="btn-cargar-anexos"
+                                                         icon="fa fa-upload"
+                                                         type="button"
+                                                         onclick="PF('anexosDlg').show()"
+                                                         value="Cargar Anexos"
+                                                         class="cssWhite GreenButton" />
+                                    </div>
+                                </div>
+                            </p:tab>
+                            <p:tab title="15. CAUSALIDAD">
+                                <ui:include src="causalidad.xhtml" />
+                            </p:tab>
+                            <p:tab title="16. VERSIÓN DEL OPERADOR">
+                                <div class="ui-g Padding0" style="margin-top: 10px">
+                                    <div class="ui-g-12 cssWhite cssGreen">
+                                        Nota: Su versión debe ser lo más detallada posible, tenga encuenta
+                                        todos los detalles de la ocurrencia del evento (ejm: hora, fecha, sentido,
+                                        condiciones atmosféricas, otros)
+                                    </div>
+                                </div>
+                                <div class="ui-g Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:inputTextarea id="version-ope"
+                                                         value="#{accInformeOperadorJSF.accInformeOpe.versionOperador}"
+                                                         rows="17"
+                                                         maxlength="64000"
+                                                         required="true"
+                                                         requiredMessage="Versión del operador es requerido - Ventana #16"
+                                                         placeholder="VERSIÓN DEL OPERADOR" />
+                                    </div>
+                                </div>
+                            </p:tab>
+                            <p:tab title="17. FIRMA">
+                                <div class="ui-g Padding0" style="margin-top: 10px">
+                                    <div class="ui-g-12 cssWhite cssGreen">
+                                        NOMBRE, CÉDULA Y FIRMA DEL OPERADOR QUE LEVANTA LA INFORMACIÓN DEL ACCIDENTE
+                                    </div>
+                                </div>
+                                <div class="ui-g Padding0">
+                                    <div class="ui-g-12 ui-md-6 ui-lg-8">
+                                        <p:inputText id="firma-nombres"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.idOperadorPrincipal.apellidos} #{accInformeOperadorJSF.accInformeOpe.idOperadorPrincipal.nombres}"
+                                                     readonly="true"
+                                                     placeholder="1er APELLIDO, 2do APELLIDO, NOMBRES" />
+                                    </div>
+                                    <div class="ui-g-6 ui-md-3 ui-lg-2">
+                                        <p:inputText id="firma-cedula"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.idOperadorPrincipal.identificacion}"
+                                                     readonly="true"
+                                                     placeholder="CÉDULA" />
+                                    </div>
+                                    <div class="ui-g-6 ui-md-3 ui-lg-2">
+                                        <p:inputText id="firma-cod"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.idOperadorPrincipal.codigoTm}"
+                                                     readonly="true"
+                                                     placeholder="CÓD TM" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:signature id="firma" style="width: 400px; height: 100px" 
+                                                     widgetVar="firmaSig"
+                                                     required="true"
+                                                     requiredMessage="Firma de Operador es requerida - Ventana #17"
+                                                     value="#{accInformeOperadorJSF.accInformeOpe.firma}"
+                                                     guideline="false" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:commandButton icon="fa fa-times" type="button" onclick="PF('firmaSig').clear()" class="cssWhite OrangeButton"/>
+                                        FIRMA
+                                    </div>
+                                </div>
+                            </p:tab>
+                        </p:accordionPanel>
+                        <f:facet name="footer">
+                            <div class="ui-fluid">
+                                <div class="ui-g Padding0">
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                        <p:commandButton id="btn-guardar"
+                                                         value="Guardar"
+                                                         icon="fa fa-save"
+                                                         actionListener="#{accInformeOperadorJSF.guardarTodo()}"
+                                                         class="cssWhite GreenButton"
+                                                         process="@form"
+                                                         update="@form,:form-info-msg:msg,:list-accidente-ope" >
+                                            <p:confirm header="Confirmación" message="Seguro de guardar? una vez realice la confirmación no podra editar los datos" icon="fa fa-exclamation-triangle" class="cssWhite"/>
+                                        </p:commandButton>
+                                    </div>
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                        <p:commandButton id="btn-cancelar"
+                                                         value="Cancelar"
+                                                         icon="fa fa-times"
+                                                         actionListener="#{accInformeOperadorJSF.cancelarTodo()}"
+                                                         class="cssWhite RedButton"
+                                                         process="@this"
+                                                         update="@form,:form-info-msg:msg,:list-accidente-ope" >
+                                            <p:confirm header="Confirmación" message="Seguro desea cancelar todo el proceso?" icon="fa fa-exclamation-triangle" class="cssWhite"/>
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </h:form>
+            </div>
+        </div>
+        <ui:include src="modal/cargarAnexos.xhtml" />
+        <ui:include src="modal/cargarCroquis.xhtml" />
+    </ui:define>
+</ui:composition>

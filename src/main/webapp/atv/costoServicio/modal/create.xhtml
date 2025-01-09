@@ -1,0 +1,164 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="id_dialog_costo_servicio"
+              widgetVar="wv_costo_servicio" 
+              modal="true" 
+              class="mr1024_30 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{atvCostoServicioBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{atvCostoServicioBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="form_costo_servicio">
+            <div class="ui-fluid">
+                <p:messages id="messages" showDetail="true" closable="true"/>
+                <div class="ui-g">
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Desde"/>
+                        </div>
+                        <p:calendar id="desde" required="true"
+                                    value="#{atvCostoServicioBean.desde}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="desde" global="false"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Hasta"/>
+                        </div>
+                        <p:calendar id="hasta" required="true"
+                                    value="#{atvCostoServicioBean.hasta}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="hasta" global="false"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Costo"/>
+                        </div>
+                        <p:inputNumber decimalSeparator="," 
+                                       maxlength="6"
+                                       decimalPlaces="0"
+                                       id="costo" 
+                                       value="#{atvCostoServicioBean.costo}">  
+                        </p:inputNumber>  
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Prestador" for="@next"/>
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:selectOneMenu id="prestador" 
+                                             value="#{atvCostoServicioBean.idAtvPrestador}" 
+                                             filter="true"
+                                             required="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{atvCostoServicioBean.lstPrestadores}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}"
+                                               itemValue="#{item.idAtvPrestador}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0">
+                            <p:commandButton title="Cargar Prestadores"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{atvCostoServicioBean.cargarPrestadores(true)}"
+                                             update="prestador"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Vehículo" for="@next" />
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:selectOneMenu id="tipoVehiculo" 
+                                             value="#{atvCostoServicioBean.idVehiculoTipo}" 
+                                             filter="true"
+                                             required="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{atvCostoServicioBean.lstVehiculoTipo}" 
+                                               var="item"
+                                               itemLabel="#{item.nombreTipoVehiculo}"
+                                               itemDescription="#{item.descripcionTipoVehiculo}"
+                                               itemValue="#{item.idVehiculoTipo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-1 ui-lg-1 Padding0">
+                            <p:commandButton title="Cargar Tipos de Vehiculos"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{atvCostoServicioBean.cargarVehiculoTipo(true)}"
+                                             update="tipoVehiculo"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         required="true"
+                                         value="#{atvCostoServicioBean.descripcion}"
+                                         maxlength="150"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="form_costo_servicio,@this"
+                             update="messages,msgs,form_costo_servicio_list:id_dt_costo_servicio,
+                             form_costo_servicio" 
+                             action="#{atvCostoServicioBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="form_costo_servicio,@this"
+                             update="messages,msgs,form_costo_servicio_list:id_dt_costo_servicio"
+                             action="#{atvCostoServicioBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-save"
+                             rendered="#{atvCostoServicioBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-save"
+                             rendered="#{atvCostoServicioBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

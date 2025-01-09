@@ -1,0 +1,290 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="novedadesPM" id="modalnovedadesPM" modal="true" closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)"
+              class="mr1024_60 mr500_90" position="center top">
+        <p:ajax event="close" listener="#{accNovedadInfraestrucBean.resetSelected()}"
+                update=":frmPrincipal:dtTipo,frmNovedadesPm"/>
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{accNovedadInfraestrucBean.selected == null }">
+                                Nueva novedad
+                            </c:if>
+                            <c:if test="#{accNovedadInfraestrucBean.selected != null }">
+                                Editar Novedad
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('novedadesPM').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNovedadesPm">
+            <div jsf:id="panel">
+                <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-fluid" jsf:id="pGrid">
+
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:staticMessage severity="warn" 
+                                             summary="AVISO" 
+                                             rendered="#{accNovedadInfraestrucBean.tamanoAccNovedadInfraestrucDocumento eq null}"
+                                             detail="Si desea agregar archivos a la novedad, DEBE crear una llave con el nombre nov_infra_doc_tam y como valor colocar limite ( en BYTES ) por archivo... En el módulo Configuración Empresa ( Configuración / Empresa ) ===> Avisar a tecnología"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Fecha Apertura" for="@next"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:calendar showOn="button" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha de apertura"
+                                            pattern="yyyy-MM-dd HH:mm"
+                                            navigator="true"
+                                            readonlyInput="true"
+                                            value="#{accNovedadInfraestrucBean.accNovedadInfraestruc.fechaHoraReporte}">
+                                </p:calendar>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Fecha Cierre" for="@next"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:calendar showOn="button" 
+                                            locale="es"
+                                            pattern="yyyy-MM-dd HH:mm"
+                                            navigator="true"
+                                            readonlyInput="true"
+                                            value="#{accNovedadInfraestrucBean.accNovedadInfraestruc.fechaHoraCierre}">
+                                </p:calendar>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="novedad_tipo" value="Tipo de novedad: *"/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                    <p:inputText placeholder="Seleccione tipo de novedad"
+                                                 id="novedad_tipo"
+                                                 value="#{accNovedadInfraestrucBean.accNovedadTipoInfrastruc.nombre}"
+                                                 readonly="true"/>
+                                    <div class="botonFloat" >
+
+                                        <p:commandButton title="Cargar tipo de novedad"
+                                                         icon="fa fa-list"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         process="@this"
+                                                         onclick="PF('dtNovedadTipos').getPaginator().setPage(0);"
+                                                         action="#{accNovedadInfraestrucBean.prepareListAccNovedadTipoInfrastruc(false)}"
+                                                         oncomplete="PF('PmNovedadTipoListDialog').show()"
+                                                         >
+                                            <p:ajax event="dialogReturn" listener="#{accNovedadInfraestrucBean.onAccNovedadTipoInfrastrucChosen}" process="@this" update="novedad_tipo"/>
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="novedad_tipo_detalle" value="Detalle de tipo novedad:*"/> 
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:inputText placeholder="Seleccione detalle tipo de novedad"
+                                                 id="novedad_tipo_detalle"
+                                                 value="#{accNovedadInfraestrucBean.accNovedadTipoDetallesInfrastruc.nombre != null? accNovedadInfraestrucBean.accNovedadTipoDetallesInfrastruc.nombre : ''}"
+                                                 readonly="true"
+                                                 onkeypress="if (event.keyCode === 13) {
+                                                             return false;
+                                                         }">
+                                    </p:inputText>
+                                    <div class="botonFloat" >
+                                        <p:commandButton title="Cargar detalle tipo de novedad"
+                                                         id="novedad_tipo_detalleBtn"
+                                                         icon="fa fa-list"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         process="@this"
+                                                         update=":frmPmNovedadTipoDetalleList"
+                                                         onclick="PF('dtNovedadTipoDetalle').getPaginator().setPage(0);"
+                                                         disabled="#{not(accNovedadInfraestrucBean.accNovedadTipoInfrastruc.idAccNovedadTipoInfrastruc gt 0) }"
+                                                         action="#{accNovedadInfraestrucBean.prepareListAccNovedadTipoInfrastrucDetalle(false)}"
+                                                         oncomplete="PF('PmNovedadTipoDetalleListDialog').show()">
+                                            <p:ajax event="dialogReturn" listener="#{accNovedadInfraestrucBean.onAccNovedadTipoInfrastrucDetalleChosen}" process="@this" update="novedad_tipo_detalle"/>
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p:separator />
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="-" 
+                                               style="visibility: hidden"/>
+                            </div>
+                            <p:commandButton value="Abrir mapa" 
+                                             icon="fa fa-map-marker"
+                                             process="@this"
+                                             oncomplete="PF('dlgMap').show();"
+                                             update=":gmapDialog"
+                                             styleClass="cssWhite"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="-" 
+                                               style="visibility: hidden"/>
+                            </div>
+                            <p:commandButton title="Anexar archivo"
+                                             icon="fa fa-upload"
+                                             disabled="#{accNovedadInfraestrucBean.tamanoAccNovedadInfraestrucDocumento eq null}"
+                                             rendered="#{accNovedadInfraestrucBean.selected eq null}"
+                                             value="Cargar Archivo(s)"
+                                             process="@this"
+                                             class="cssWhite OrangeButton"
+                                             update=":frmAddFileSeguimientos"
+                                             oncomplete="PF('AddFileSeguimientosDialog').show()">
+                            </p:commandButton>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" jsf:id="pgrid3">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Reportado por: *" for="operador"/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:inputText placeholder="Nombre completo colaborador"
+                                                 id="operador"
+                                                 value="#{accNovedadInfraestrucBean.empleado.nombres} #{accNovedadInfraestrucBean.empleado.apellidos}"
+                                                 readonly="true"
+                                                 onkeypress="if (event.keyCode === 13) {
+                                                             return false;
+                                                         }"/>
+                                    <div class="botonFloat" >
+                                        <p:commandButton title="Cargar lista de colaboradores"
+                                                         icon="fa fa-list"
+                                                         process="@this"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         update=":frmPmEmpleadoList"
+                                                         onclick="PF('wVPmEmpleadosListDialog').getPaginator().setPage(0);"
+                                                         action="#{accNovedadInfraestrucBean.prepareListEmpleados}"                                     
+                                                         oncomplete="PF('PmEmpleadosListDialog').show()">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Latitud" for="@next"/>
+                            </div>
+                            <p:inputText
+                                id="latitud"
+                                readonly="true"
+                                value="#{accNovedadInfraestrucBean.accNovedadInfraestruc.latitud}"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Longitud" for="@next"/>
+                            </div>
+                            <p:inputText 
+                                id="longitud"
+                                readonly="true"
+                                value="#{accNovedadInfraestrucBean.accNovedadInfraestruc.longitud}"/>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Estado" for="@next"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu  
+                                    filter="true"
+                                    required="true"
+                                    style="width: 99.9999%"
+                                    requiredMessage="Debe seleccionar un estado"
+                                    value="#{accNovedadInfraestrucBean.i_novedadInfrastucEstado}">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                    <f:selectItems 
+                                        var="estado"
+                                        value="#{accNovedadInfraestrucBean.lstAccNovedadInfrastucEstados}"
+                                        itemLabel="#{estado.nombre}"
+                                        itemValue="#{estado.idAccNovedadInfrastucEstado}"
+                                        />
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+
+                        <p:separator />
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100" jsf:id="pgrid2">
+                            <p:outputLabel for="observaciones" value="Descripción:" />
+                            <p:inputTextarea id="observaciones" 
+                                             value="#{accNovedadInfraestrucBean.accNovedadInfraestruc.descripcion}"
+                                             required="true" 
+                                             requiredMessage="Debe ingresar una descripción"/>
+                            <p:outputLabel value="(*) Campos obligatorios"/>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <p:remoteCommand name="rc_nov"
+                             process="frmNovedadesPm"
+                             update=":msgs,messages,frmNovedadesPm,
+                             :frmPrincipal:dtTipo"
+                             action="#{accNovedadInfraestrucBean.guardarAccNovedadInfraestrucPM()}"/>
+            <p:remoteCommand name="rc_nov_upd"
+                             process="frmNovedadesPm"
+                             update=":msgs,messages"
+                             action="#{accNovedadInfraestrucBean.actualizarAccNovedadInfraestrucPM()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             id="btnGuardarNovedadPM"
+                             icon="fa fa-check"
+                             class="cssWhite"
+                             onclick="rc_nov()"
+                             rendered="#{accNovedadInfraestrucBean.selected == null }">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro de asignar la novedad al operador: #{accNovedadInfraestrucBean.empleado.nombres} #{accNovedadInfraestrucBean.empleado.apellidos}?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-check"
+                             id="btnActualizarNovedadPM"
+                             class="cssWhite"
+                             rendered="#{accNovedadInfraestrucBean.selected != null }"
+                             onclick="rc_nov_upd()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="AddFilesSeguimiento.xhtml" />
+    <ui:include src="ListPmNovedadTipo.xhtml" />
+    <ui:include src="ListPmNovedadTipoDetalles.xhtml" />
+    <ui:include src="ListaEmpleados.xhtml" />
+    <ui:include src="../../mapa/MapaDlg.xhtml"/>
+</ui:composition>

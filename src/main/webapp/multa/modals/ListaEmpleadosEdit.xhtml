@@ -1,0 +1,40 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmEmpleadosListDlgEdit" widgetVar="PmEmpleadosListDlgEdit" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de empleados"
+              class="mr1024_50 mr500_90" closeOnEscape="true" responsive="true" position="center top">
+        <h:form id="frmPmEmpleadoListEdit">
+            <p:dataTable var="vht" value="#{multaController.lstEmpleados}"  
+                         selectionMode="single" selection="#{multaController.empleado}"
+                         paginator="true" widgetVar="wVEmpleadosEdit"
+                         rows="8"
+                         reflow="true"
+                         scrollable="true"
+                         scrollHeight="650"
+                         filterDelay="1500"
+                         rowIndexVar="nroFila"
+                         rowKey="#{vht.idEmpleado}"
+                         emptyMessage="No existen empleados registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{multaController.onRowEmpleadoClckSelect}"
+                        update=":MultaEditForm:operador"
+                        oncomplete="PF('PmEmpleadosListDlgEdit').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código_TM" filterBy="#{vht.codigoTm}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.codigoTm}" />
+                </p:column>
+                <p:column headerText="Nombre completo" filterBy="#{vht.nombres} #{vht.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.nombres} #{vht.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

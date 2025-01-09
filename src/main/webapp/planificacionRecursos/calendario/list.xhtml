@@ -1,0 +1,137 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .ui-state-disabled{
+                opacity: 1 !important;
+            }
+            .fc-day-grid-event.fc-h-event.fc-draggable{
+                border-color: black;
+            }
+            .estado-0-style {
+                background-color: green !important;
+                color: white !important;
+            }
+
+            .estado-1-style {
+                background-color: yellow !important;
+                color: black !important;
+            }
+            .estado-2-style {
+                background-color: red !important;
+                color: white !important;
+            }
+            .dialog_style {
+                top: 30% !important;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g" >
+                            <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                                <h:outputText value="Calendario de Capacitaciones"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                                <!--<p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax process="@this"
+                                            event="change"
+                                            listener="#{emplJSFMdB.listarEmpleados()}"
+                                            update="formTablaEmpl:tblED"/>
+                                </p:selectOneMenu>-->
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+
+
+                <p:schedule id="schedule"
+                            value="#{prgCalendarioCapacitacionesJSF.eventModel}"
+                            widgetVar="myschedule"
+                            timeZone="GMT-5"
+                            timeFormat="HH:mm"
+                            tooltip="false"
+                            locale="es" >
+                    <p:ajax event="eventSelect" listener="#{prgCalendarioCapacitacionesJSF.onEventSelect}" update="eventDetails"
+                            oncomplete="PF('eventDialog').show();"/>
+                </p:schedule>
+
+                <p:dialog widgetVar="eventDialog" 
+                          header="Detalle Actividad" 
+                          modal="true"
+                          draggable="false"
+                          class="dialog_style"
+                          responsive="true" >
+                    <h:panelGrid id="eventDetails" columns="2">
+                        <p:outputLabel for="title" value="Capacitación:"/>
+                        <p:inputText id="title"
+                                     size="50"
+                                     value="#{prgCalendarioCapacitacionesJSF.event.title}" 
+                                     disabled="#{prgCalendarioCapacitacionesJSF.event.title != ''}"/>
+
+                        <p:outputLabel for="from" value="Fecha Inicio:"/>
+                        <p:calendar id="from" value="#{prgCalendarioCapacitacionesJSF.event.startDate.toLocaleString()}"
+                                    disabled="#{prgCalendarioCapacitacionesJSF.event.startDate != ''}"
+                                    size="25"
+                                    locale="es"/>
+
+                        <p:outputLabel for="to" value="Fecha Fin:"/>
+                        <p:calendar id="to" value="#{prgCalendarioCapacitacionesJSF.event.endDate.toLocaleString()}"
+                                    disabled="#{prgCalendarioCapacitacionesJSF.event.endDate != ''}"
+                                    size="25"
+                                    locale="es"/>
+
+                        <p:outputLabel for="description" value="Descripción:" />
+                        <p:inputTextarea id="description" rows="3" cols="50" 
+                                         value="#{prgCalendarioCapacitacionesJSF.event.description}"
+                                         disabled="#{prgCalendarioCapacitacionesJSF.event.description != ''}"
+                                         maxlength="200"/>
+
+
+                        <p:outputLabel for="data" 
+                                       rendered="#{not empty prgCalendarioCapacitacionesJSF.event.data}"
+                                       value="Empleado/s:" />
+                        <p:inputTextarea id="data" rows="2" cols="50" 
+                                         rendered="#{not empty prgCalendarioCapacitacionesJSF.event.data}"
+                                         value="#{prgCalendarioCapacitacionesJSF.event.data}"
+                                         disabled="#{prgCalendarioCapacitacionesJSF.event.data != ''}"
+                                         maxlength="100"/>
+
+                        <p:selectOneMenu id="estadoSelect" 
+                                         value="#{prgCalendarioCapacitacionesJSF.estado}" 
+                                         style="width: 100%;" 
+                                         required="true">
+                            <f:selectItem itemLabel="Pendiente" itemValue="0" />
+                            <f:selectItem itemLabel="Aprobado" itemValue="1" />
+                            <f:selectItem itemLabel="Rechazado" itemValue="2" />
+                            <f:selectItem itemLabel="Gestion" itemValue="3" />
+                            
+                            
+                        </p:selectOneMenu>
+
+
+                    </h:panelGrid>
+                </p:dialog>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

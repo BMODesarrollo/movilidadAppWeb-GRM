@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-config-emp" 
+              closeOnEscape="true"
+              widgetVar="config_wv"
+              modal="true"
+              resizable="false" 
+              class="mr1024_30 mr500_90" 
+              appendTo="@(body)"
+              position="center top" 
+              responsive="true">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            NUEVA CONFIGURACIÓN JORNADA
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('config_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="form-config-jornada">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Nombre config" for="nombre_config"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nombre_config"
+                                         required="true"
+                                         requiredMessage="Nombre de la configuración es requerido"
+                                         value="#{configControlJornadaBean.configControlJornada.nombreConfig}"
+                                         maxlength="45"
+                                         />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Tiempo" for="inputTiempo"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="inputTiempo" 
+                                         value="#{configControlJornadaBean.configControlJornada.tiempo}"
+                                         required="true"
+                                         requiredMessage="Tiempo es requerido"
+                                         mask="99:99:99"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Estado" for="estado" rendered="false"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu value="#{configControlJornadaBean.configControlJornada.estado}" rendered="false">
+                                <f:selectItem itemLabel="Inactivo" itemValue="0" />
+                                <f:selectItem itemLabel="Activo" itemValue="1" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Restringe" for="restringe" rendered="false"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu value="#{configControlJornadaBean.configControlJornada.restringe}" rendered="false">
+                                <f:selectItem itemLabel="No" itemValue="0" />
+                                <f:selectItem itemLabel="Sí" itemValue="1" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Observación *" for="descripcion"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             value="#{configControlJornadaBean.configControlJornada.observacion}"
+                                             rows="5"
+                                             required="true"
+                                             requiredMessage="Observación es requerido"
+                                             maxlength="255"
+                                             counter="cou"
+                                             counterTemplate="Quedan {0} carácteres" 
+                                             autoResize="false"
+                                             placeholder="Observación" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" style="text-align: right; font-size: 12px">
+                            <h:outputText id="cou" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             actionListener="#{configControlJornadaBean.guardar()}"
+                             rendered="#{empty configControlJornadaBean.configControlJornada.idConfigControlJornada}"
+                             process="@this,@form"
+                             update=":config_ctrl_jornada_form,@form,:msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-guardar"
+                             value="Guardar"
+                             class="cssWhite"
+                             rendered="#{empty configControlJornadaBean.configControlJornada.idConfigControlJornada}"
+                             icon="fa fa-save"
+                             onclick="guardar()">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro que desea guardar esta información?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

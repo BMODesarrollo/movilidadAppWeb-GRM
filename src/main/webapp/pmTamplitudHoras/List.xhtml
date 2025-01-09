@@ -1,0 +1,122 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="PmTamplitudHorasListForm">
+            <p:growl id="upPmTamH" showDetail="true" showSummary="true" life="4000"/>
+            <p:panel header="Pm Tamplitud Hora">
+                <p:dataTable id="datalist" 
+                             value="#{pmTamplitudHorasController.items}" 
+                             var="item"
+                             selectionMode="single" 
+                             selection="#{pmTamplitudHorasController.selected}"
+                             paginator="true"
+                             rowKey="#{item.idPmTamplitudHoras}"
+                             rows="20"
+                             filterDelay="2000"
+                             emptyMessage="No existen registros"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             widgetVar="dtdatalist">
+                    <f:facet name="header">
+                        <f:facet name="footer">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="datalist" fileName="Pm Tamplitud Hora"/>
+                            </h:commandLink>
+                        </f:facet>
+                    </f:facet>
+
+                    <p:ajax event="rowSelect"   update="createButton,editButton"/>
+                    <p:ajax event="rowUnselect" update="createButton,editButton" listener="#{pmTamplitudHorasController.reset()}"/>
+
+                    <p:column filterBy="#{item.desde}" headerText="Desde"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:calendar id="search" 
+                                        pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" 
+                                        showTodayButton="true"
+                                        inputStyle="width: 99%;"
+                                        placeholder="Clic para filtrar fecha"
+                                        onkeyup="PF('dtdatalist').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dtdatalist').filter()" update="datalist"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.desde}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.hasta}" headerText="Hasta"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:calendar id="id-hasta" 
+                                        pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" 
+                                        showTodayButton="true"
+                                        inputStyle="width: 99%;"
+                                        placeholder="Clic para filtrar fecha"
+                                        onkeyup="PF('dtdatalist').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dtdatalist').filter()" update="datalist"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.hasta}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.nroHoras}"
+                              filterMatchMode="exact">
+                        <f:facet name="header">
+                            <h:outputText value="Número de Horas"/>
+                        </f:facet>
+                        <i class="fa fa-clock-o" />
+                        <p:spacer width="3px"/>
+                        <h:outputText value="#{item.nroHoras}"/>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton"
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             value="Nuevo" 
+                                             actionListener="#{pmTamplitudHorasController.prepareCreate}" 
+                                             update=":PmTamplitudHorasCreateForm,PmTamplitudHorasCreateDlg"
+                                             oncomplete="PF('PmTamplitudHorasCreateDialog').show()">
+                                <p:resetInput target="PmTamplitudHorasCreateForm"/>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"  
+                                             icon="fa fa-pencil"
+                                             value="Editar" 
+                                             class="cssWhite GreenButton"
+                                             update=":PmTamplitudHorasEditForm,PmTamplitudHorasEditDlg"
+                                             oncomplete="PF('PmTamplitudHorasEditDialog').show()" 
+                                             disabled="#{empty pmTamplitudHorasController.selected.idPmTamplitudHoras}"/>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+

@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="UsersEditDlg" 
+              widgetVar="UsersEditDialog" 
+              modal="true" 
+              height="auto"
+              closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              responsive="true"
+              position="center top"
+              closable="false"
+              resizable="false" 
+              appendTo="@(body)" 
+              header="">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Editar Usuario" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('UsersEditDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <p:ajax event="close" listener="#{usersController.reset()}" update=":UsersListForm:datalist"/>
+        <h:form id="UsersEditForm">
+            <p:messages id="messages" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <f:passThroughAttribute name="autocomplete" value="off"/>
+                    <p:fieldset legend="Empleado" id="pru" toggleable="true">
+                        <h:panelGrid columns="2">
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="Nombres: "/>
+                                <p:outputLabel value="#{usersController.selected.nombres}"/>
+                                <p:outputLabel value="Código: "/>
+                                <p:outputLabel value="#{usersController.selected.idEmpleado.codigoTm}" class="cssBlack"/>
+                                <p:outputLabel value="Usuario: "/>
+                                <p:outputLabel value="#{usersController.selected.username}" class="cssBlack"/>
+                                <p:outputLabel value="Identificación: "/>
+                                <p:outputLabel value="#{usersController.selected.idEmpleado.identificacion}"/>
+                                <p:outputLabel value="Correo: "/>
+                                <p:outputLabel value="#{usersController.selected.idEmpleado.emailCorporativo}"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="1">
+                                <p:graphicImage cache="false"
+                                                style="border:1px solid #106ebc;"
+                                                value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                width="170">
+                                    <f:param name="path_foto" value="#{usersController.selected.idEmpleado.pathFoto}" />
+                                </p:graphicImage>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </p:fieldset>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Estado:" for="enabled" />
+                        <p:selectOneMenu id="enabled" value="#{usersController.selected.enabled}" 
+                                         style="width: 99.9999%">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" itemDisabled="true" />
+                            <f:selectItem itemLabel="Activo" itemValue="true" />
+                            <f:selectItem itemLabel="Inactivo" itemValue="false" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="rol" value="Rol del Usuario" />
+                        <p:selectOneMenu id="rol"
+                                         style="width: 99.9999%"
+                                         filter="true"
+                                         filterMatchMode="contains"
+                                         value="#{usersController.rol}">
+                            <f:selectItem itemLabel="Seleccionar Rol" itemValue="#{null}" />
+                            <f:selectItems value="#{usersController.itemsRoles}" 
+                                           var="rol" itemLabel="#{rol.nombre}" itemValue="#{rol.nombre}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:password id="password" autocomplete="new-password"
+                                    value="#{usersController.c_aux1}" 
+                                    placeholder="Nueva contraseña"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:password id="confirPassword" 
+                                    value="#{usersController.confirContrasena}" 
+                                    placeholder="Confirmar contraseña"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Unidad Funcional" />
+                        </div>
+                        <ui:include src="../zComponent/selectUnidadFuncional.xhtml"/>
+                    </div>
+                    <p:remoteCommand action="#{usersController.update()}" 
+                                     name="rc_update_u" 
+                                     id="actualizar"
+                                     update="UsersListForm:datalist,:UsersListForm:usersGrowl,msgs,uf:uni_func"
+                                     />
+
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_update_u();"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             value="Actualizar">
+                <p:confirm header="ADVERTENCIA" 
+                           icon="fa fa-exclamation-triangle"
+                           message="Seguro quiere editar este usuario? "
+                           class="cssWhite"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+
+</ui:composition>

@@ -1,0 +1,153 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dataTable id="dtPdMaestroDetalle" var="detalle" 
+                 scrollable="true"
+                 widgetVar="wlVdtPdMaestroDetalle"
+                 scrollHeight="600"
+                 disabledTextSelection="false"
+                 reflow="true"
+                 rows="10"
+                 filterDelay="1700"
+                 paginator="true"
+                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                 rowsPerPageTemplate="10,50,100"
+                 emptyMessage="No existen registros"
+                 value="#{pdMaestroBean.lstDetalles}">
+
+        <f:facet name="header">
+            <div align="right" jsf:id="botones">
+
+                <p:commandButton
+                    icon="fa fa-plus"
+                    value="Nuevo"
+                    action="#{pdMaestroBean.prepareListadoNovedades()}"
+                    oncomplete="PF('NovedadesListDialog').show();"
+                    class="cssWhite"
+                    update=":frmNovedadesList:dtNovedades"
+                    >
+                    <p:resetInput target="frmNovedadesList:dtNovedades"/>
+                </p:commandButton>   
+            </div>
+        </f:facet>
+
+        <p:column headerText="Fecha Novedad" 
+                  filterBy="#{detalle.idNovedad.fecha}" 
+                  filterMatchMode="startsWith"
+                  styleClass="text-center">
+
+            <f:facet name="filter">
+                <p:calendar id="search1" pattern="yyyy-MM-dd" 
+                            locale="es"
+                            autocomplete="off"
+                            required="false"
+                            navigator="true" showTodayButton="true"
+                            inputStyle="width: 100%;"
+                            placeholder="Fecha"
+                            onkeyup="PF('wlVdtPdMaestroDetalle').filter()"
+                            onkeypress="if (event.keyCode === 13) {
+                                        return false;
+                                    }">
+                    <p:ajax event="dateSelect" oncomplete="PF('wlVdtPdMaestroDetalle').filter()" update="dtPdMaestroDetalle"/>
+                </p:calendar> 
+            </f:facet>
+
+            <h:outputText value="#{detalle.idNovedad.fecha}">
+                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="Tipo Novedad" filterBy="#{detalle.idNovedad.idNovedadTipo.nombreTipoNovedad}">
+            <h:outputText value="#{detalle.idNovedad.idNovedadTipo.nombreTipoNovedad}" />
+        </p:column>
+
+        <p:column id="detTipoNovedad" filterBy="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+            <f:facet name="header">
+                <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+            </f:facet>
+            <h:outputText value="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}" 
+                          title="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                          rendered="#{detalle.idNovedad.idNovedadDano eq null and detalle.idNovedad.idMulta eq null}" />
+
+            <h:outputText value="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                          title="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                          rendered="#{detalle.idNovedad.idNovedadTipoDetalle.idNovedadTipoDetalle gt 0 and detalle.idNovedad.idMulta.idMulta gt 0}" />
+
+            <h:outputText value="#{detalle.idNovedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}" 
+                          title="#{detalle.idNovedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}"
+                          rendered="#{detalle.idNovedad.idNovedadDano.idNovedadDano gt 0}"/>
+
+            <h:outputText value="#{detalle.idNovedad.idMulta.idMultaTipo.tipo}" 
+                          title="#{detalle.idNovedad.idMulta.idMultaTipo.tipo}"
+                          rendered="#{detalle.idNovedad.idMulta.idMulta gt 0 and detalle.idNovedad.idNovedadTipoDetalle eq null}"/>
+        </p:column>
+
+        <p:column exportable="false" filterBy="#{detalle.idNovedad.idEmpleado.codigoTm} #{detalle.idNovedad.idEmpleado.nombres} #{detalle.idNovedad.idEmpleado.apellidos}"
+                  filterMatchMode="contains"
+                  headerText="Operador">
+            <h:outputText value="#{detalle.idNovedad.idEmpleado.codigoTm}" class="cssBlack"/>
+            <h:outputText value=" #{detalle.idNovedad.idEmpleado.nombres.concat(' ').concat(detalle.idNovedad.idEmpleado.apellidos)}"/>
+        </p:column>
+
+        <p:column headerText="Observaciones" class="cortar">
+            <h:outputText value="#{detalle.idNovedad.observaciones}" />
+        </p:column>
+
+        <p:column headerText="Fecha Proceso" 
+                  filterBy="#{detalle.fechaProceso}" 
+                  filterMatchMode="startsWith"
+                  styleClass="text-center">
+
+            <f:facet name="filter">
+                <p:calendar id="search2" pattern="yyyy-MM-dd" 
+                            locale="es"
+                            autocomplete="off"
+                            required="false"
+                            navigator="true" showTodayButton="true"
+                            inputStyle="width: 100%;"
+                            placeholder="Fecha"
+                            onkeyup="PF('wlVdtPdMaestroDetalle').filter()"
+                            onkeypress="if (event.keyCode === 13) {
+                                        return false;
+                                    }">
+                    <p:ajax event="dateSelect" oncomplete="PF('wlVdtPdMaestroDetalle').filter()" update="dtPdMaestroDetalle"/>
+                </p:calendar> 
+            </f:facet>
+
+            <h:outputText value="#{detalle.fechaProceso}">        <p:column id="procede"
+                  styleClass="#{detalle.idNovedad.procede gt 0 ? 'cssGreen': detalle.idNovedad.procede eq 0 ? 'cssRed' : ''}">
+            <f:facet name="header">
+                <h:outputText value="Procede"/>
+            </f:facet>
+            <h:outputText value="Sí" rendered="#{detalle.idNovedad.procede == 1}"
+                          style=" color: white;"/>
+            <h:outputText value="No" rendered="#{detalle.idNovedad.procede == 0}"
+                          style=" color: white;"/>
+        </p:column>
+                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+            </h:outputText>
+        </p:column>
+
+
+        <p:column headerText="Acciones" styleClass="text-center"
+                  exportable="false">
+            <div class="ui-g Padding0">
+                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                    <p:commandButton styleClass="cssWhite RedButton"
+                                     title="Editar"
+                                     action="#{pdMaestroBean.eliminarDetalle(detalle)}"
+                                     process="@this"
+                                     update="dtPdMaestroDetalle"
+                                     icon="fa fa-times">
+                        <p:confirm header="Confirmación" message="Está seguro de eliminar éste detalle?" icon="fa fa-exclamation-triangle" />
+                    </p:commandButton>
+                </div>
+            </div>
+        </p:column>
+    </p:dataTable>
+</ui:composition>     

@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgPlaRecuNovedad"
+              widgetVar="wvPlaRecuNovedad"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              width="20%"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{plaRecuNovedadBean.b_editar ? 'Editar Novedad':'Crear Novedad'}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvPlaRecuNovedad').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-novedad">
+            <p:messages id="msgs_novedad" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g-12">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Novedad: *"/>
+                        <p:inputText id="novedad_id"
+                                     value="#{plaRecuNovedadBean.plaRecuNovedad.nombre}" 
+                                     maxlength="60"
+                                     required="true"
+                                     requiredMessage="'Novedad' es requerido"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Descripción: *"/>
+                        <p:inputTextarea  id="descripcion_id" 
+                                          maxlength="65000" 
+                                          class="cssBlack"
+                                          value="#{plaRecuNovedadBean.plaRecuNovedad.descripcion}" 
+                                          required="true" 
+                                          requiredMessage="'Descripción' es requerido"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuNovedadBean.crear()}"
+                             process="@this,@form"
+                             rendered="#{!plaRecuNovedadBean.b_editar}"  
+                             update=":form-semana-param:tabView:novedadList, @form, :msgs"
+                             oncomplete="PF('wvPlaRecuNovedad').hide()"/>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuNovedadBean.editar()}"
+                             process="@form"
+                             rendered="#{plaRecuNovedadBean.b_editar}"
+                             update=":form-semana-param:tabView:novedadList, @form, :msgs"
+                             oncomplete="PF('wvPlaRecuNovedad').hide()"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarNovedad" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

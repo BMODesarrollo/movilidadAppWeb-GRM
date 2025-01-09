@@ -1,0 +1,125 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form id="config_ctrl_jornada_form">
+            <p:panel header="Configuración Control Jornada.">
+                <p:dataTable id="config_ctrl_jornada_id" 
+                             value="#{configControlJornadaBean.list}" 
+                             var="item"
+                             rowIndexVar="rVar"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             scrollHeight="600"
+                             reflow="true"
+                             filterDelay="1000"
+                             rowKey="#{item.idConfigControlJornada}"
+                             rows="31"
+                             widgetVar="config_ctrl_jornada_dt_wv"
+                             rowsPerPageTemplate="31,100,200,500"
+                             editable="true"
+                             editMode="cell">
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             actionListener="#{configControlJornadaBean.prepareGuardar()}" 
+                                             update=":form-config-jornada" 
+                                             icon="fa fa-plus" 
+                                             oncomplete="PF('config_wv').show()"
+                                             class="cssWhite" />
+                        </div>
+                    </f:facet>
+
+
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="config_ctrl_jornada_id" fileName="Detalles de jornada"/>
+                        </h:commandLink>
+                    </f:facet>
+
+                    <p:ajax event="cellEdit" 
+                            process="@this"
+                            listener="#{configControlJornadaBean.onCellEdit}"
+                            update=":msgs" />
+
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="#" style="width: 30px" visible="false">
+                        <p:outputLabel value="#{item.idConfigControlJornada}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.nombreConfig}"
+                              style="width: 30%"
+                              filterMatchMode="contains"
+                              headerText="Nombre config">
+                        <h:outputText value="#{item.nombreConfig}"/>
+                    </p:column>
+                    <p:column headerText="Tiempo" id="columnTiempo">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.tiempo}" /></f:facet>
+                            <f:facet name="input">
+                                <p:inputMask id="inputTiempo" 
+                                             value="#{item.tiempo}"
+                                             style="width:96%" 
+                                             mask="99:99:99"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Estado" id="columnEstado" rendered="true">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.estado == 1 ? 'Activo' : 'Inactivo'}"/></f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu value="#{item.estado}" style="width:70%">
+                                    <f:selectItem itemLabel="Inactivo" itemValue="0" />
+                                    <f:selectItem itemLabel="Activo" itemValue="1" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Restringe" id="columnRestringe" rendered="false">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.restringe == 1 ? 'Sí' : 'No'}"/></f:facet>
+                            <f:facet name="input">
+                                <p:selectOneMenu value="#{item.restringe}" style="width:70%">
+                                    <f:selectItem itemLabel="No" itemValue="0" />
+                                    <f:selectItem itemLabel="Sí" itemValue="1" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column filterBy="#{item.observacion}" id="columnObservacion"
+                              filterMatchMode="contains"
+                              headerText="Descripción">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.observacion}" /></f:facet>
+                            <f:facet name="input">
+                                <p:inputTextarea rows="6" 
+                                                 value="#{item.observacion}"
+                                                 style="width:96%"  />
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column filterBy="#{item.username}"
+                              filterMatchMode="contains"
+                              headerText="Username">
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column headerText="Creado">
+                        <h:outputText  value="#{item.creado}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/administracion.xhtml" />
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="soli" closeOnEscape="true" widgetVar="soliDlg" modal="true"
+              resizable="false" appendTo="@(body)" position="center top" 
+              height="auto" width="auto" closable="false">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Solicitud De Eliminación de Caso
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('soliDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="form-solicitud">
+            <h:panelGrid columns="1" style="width: 100%" rendered="#{accidenteBorradorJSF.accidenteBorrador != null}">
+                <h:panelGrid columns="2" style="width: 100%" >
+                    <p:outputLabel value="Evento:" />
+                    <p:outputLabel value="#{accidenteBorradorJSF.accidenteBorrador.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                    <p:outputLabel value="Fecha Evento:" />
+                    <p:outputLabel value="#{accidenteBorradorJSF.accidenteBorrador.idAccidente.fechaAcc}"  >
+                        <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss" />
+                    </p:outputLabel>
+                    <p:outputLabel value="Vehículo:" />
+                    <p:outputLabel value="#{accidenteBorradorJSF.accidenteBorrador.idAccidente.idVehiculo.codigo}"  />
+                    <p:outputLabel value="Operador:" />
+                    <p:outputLabel value="#{accidenteBorradorJSF.accidenteBorrador.idAccidente.idEmpleado.codigoTm}"  />
+                </h:panelGrid>
+                <p:separator/>
+                <p:outputLabel value="Descripción Sobre Solicitud de Eliminación" />
+                <p:inputTextarea id="desc" 
+                                 value="#{accidenteBorradorJSF.accidenteBorrador.descripcionSolicitado}" 
+                                 maxlength="65000"
+                                 required="true"
+                                 style="width: 100%"
+                                 requiredMessage="Descripción es requerido"
+                                 rows="7"/>
+                <p:spacer/>
+                <p:commandButton id="guardar"
+                                 value="Guardar"
+                                 icon="fa fa-check"
+                                 class="cssWhite GreenButton"
+                                 update="accidente-form:msg"
+                                 process="@form"
+                                 actionListener="#{accidenteBorradorJSF.guardarAccSolicitado()}">
+                    <p:confirm header="Confirmación" message="Está seguro de realizar la solitud?" icon="fa fa-exclamation-triangle" />
+                </p:commandButton>
+            </h:panelGrid>
+        </h:form>
+    </p:dialog>
+</ui:composition>

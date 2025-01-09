@@ -1,0 +1,134 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="form_jornada_t">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Jornada Tipo">
+
+                <p:dataTable id="jornada_t_dt" 
+                             value="#{JornadaTMB.listJornadaT}" 
+                             var="item"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             reflow="true"
+                             scrollHeight="600"
+                             rowIndexVar="index"
+                             filterDelay="1000"
+                             rowKey="#{item.idGenericaJornadaTipo}"
+                             rows="20"
+                             widgetVar="jornada_t_wv"
+                             rowsPerPageTemplate="10,20,30">
+
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="jornada_t_dt" fileName="Liquidación Jornada"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton 
+                                value="Nuevo" 
+                                class="cssWhite"
+                                icon="fa fa-check"
+                                actionListener="#{JornadaTMB.preCreate()}"
+                                action="#{JornadaTMB.modal(true)}"
+                                update="msgs,form_jornada_t_dialog,crear_jornada_t_id_dialog">
+                            </p:commandButton>
+
+                            <p:commandButton id="toggler_id" type="button" 
+                                             title="Columnas"
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="jornada_t_dt" trigger="toggler_id" />
+
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Nombre"
+                              filterBy="#{item.descripcion}"
+                              sortBy="#{item.descripcion}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.descripcion}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.hiniT1}"
+                              sortBy="#{item.hiniT1}"
+                              filterMatchMode="contains"
+                              headerText="Hora Inicio T1">
+                        <h:outputText value="#{item.hiniT1}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.hfinT1}"
+                              sortBy="#{item.hfinT1}"
+                              filterMatchMode="contains"
+                              headerText="Hora Fin T1">
+                        <h:outputText value="#{item.hfinT1}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.tipoCalculo}" 
+                              exportable="false"
+                              headerText="Descuento Descanso"
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('jornada_t_wv').filter()" 
+                                             styleClass="custom-filter" style="width: 99.9999%">
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="A Mitad de la Jornada"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="Al Final de la Jornada"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="fontBold" value="#{item.tipoCalculo==1 ? 'A Mitad de la Jornada': 'Al Final de  la Jornada'}" />
+                    </p:column>
+                    <p:column filterBy="#{item.hiniT2}"
+                              sortBy="#{item.hiniT2}"
+                              visible="false"
+                              filterMatchMode="contains"
+                              headerText="Hora Inicio T2">
+                        <h:outputText value="#{item.hiniT2}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.hfinT2}"
+                              sortBy="#{item.hfinT2}"
+                              visible="false"
+                              filterMatchMode="contains"
+                              headerText="Hora Fin T2">
+                        <h:outputText value="#{item.hfinT2}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.hiniT3}"
+                              sortBy="#{item.hiniT3}"
+                              visible="false"
+                              filterMatchMode="contains"
+                              headerText="Hora Inicio T3">
+                        <h:outputText value="#{item.hiniT3}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.hfinT3}"
+                              sortBy="#{item.hfinT3}"
+                              visible="false"
+                              filterMatchMode="contains"
+                              headerText="Hora Fin T3">
+                        <h:outputText value="#{item.hfinT3}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.descanso}"
+                              sortBy="#{item.descanso}"
+                              filterMatchMode="contains"
+                              headerText="Hora Descanso">
+                        <h:outputText value="#{item.descanso}"/>
+                    </p:column>
+                    <p:column headerText="Opción">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         update="form_jornada_t_dialog,crear_jornada_t_id_dialog"
+                                         action="#{JornadaTMB.modal(true)}"
+                                         actionListener="#{JornadaTMB.preEditar(item)}"
+                                         title="Modificar" />
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/createJornadaTipo.xhtml"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="errores_entrega_operador"
+              widgetVar="cargar_entrega_operador_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_60 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" 
+              header="">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Carga Archivo Entrega Operador" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('cargar_entrega_operador_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="formErrores" >
+            <p:dataTable id="erroresList" 
+                         value="#{plaRecuEntregaOperadorBean.listaError}" 
+                         var="item"
+                         emptyMessage="No existen registros"
+                         paginator="true"
+                         paginatorPosition="top"
+                         rowIndexVar="index"
+                         rows="10"
+                         widgetVar="erroresList_wv"
+                         rowsPerPageTemplate="10,20,30">
+                <f:facet name="footer">
+                    <h:commandLink>
+                        <img src="../../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                        <p:dataExporter type="xlsx" target="erroresList" fileName="Listado Errores Entrega Operador"/>
+                    </h:commandLink>
+                </f:facet>
+
+                <p:column headerText="Fecha">
+                    <h:outputText  value="#{item.date}">
+                        <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Registro">
+                    <h:outputText  value="#{item.row}"/>
+                </p:column>
+                <p:column headerText="Columna">
+                    <h:outputText  value="#{item.column}"/>
+                </p:column>
+                <p:column headerText="Valor">
+                    <h:outputText  value="#{item.value}"/>
+                </p:column>
+                <p:column headerText="Error">
+                    <h:outputText  value="#{item.message}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

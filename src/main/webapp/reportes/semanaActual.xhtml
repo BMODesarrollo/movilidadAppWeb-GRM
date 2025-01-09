@@ -1,0 +1,264 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel >
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Reporte Semana"/> 
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Una unidad funcional" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax global="false"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="form_rpt_semana_actual">
+                <p:dataTable id="db_semana_actual" var="item" 
+                             scrollable="true"
+                             styleClass="verticalHeader"
+                             widgetVar="wlVdb_semana_actual"
+                             scrollWidth="99.99%"
+                             scrollHeight="600"
+                             rows="50"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="50,100,200"
+                             emptyMessage="No existen registros"
+                             value="#{semanaActualBean.listDetalle}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                            <p:calendar id="fecha_desde" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{semanaActualBean.desde}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:calendar id="fecha_hasta" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{semanaActualBean.hasta}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Consultar"
+                                actionListener="#{semanaActualBean.consultar()}"
+                                class="cssWhite"
+                                update="msgs,:form_rpt_semana_actual:db_semana_actual"
+                                oncomplete="PF('wlVdb_semana_actual').clearFilters();"/>   
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha" width="8%" styleClass="text-center"
+                              sortable="true"
+                              sortBy="#{item.fecha}">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column
+                        headerText="Servbus"
+                        filterMatchMode="contains"
+                        filterBy="#{item.servbus}">
+                        <h:outputText value="#{item.servbus}" />
+                    </p:column>
+                    <p:column headerText="Tipología"
+                              filterMatchMode="contains"
+                              filterBy="#{item.tipologia}">
+                        <h:outputText value="#{item.tipologia}" />
+                    </p:column>
+                    <p:column headerText="Operador asignado"
+                              filterMatchMode="contains"
+                              filterBy="#{item.nombre}" class="cortar">
+                        <h:outputText value="#{item.nombre}" />
+                    </p:column>
+                    <p:column headerText="Código TM"
+                              filterMatchMode="contains"
+                              filterBy="#{item.codigoTm}">
+                        <h:outputText value="#{item.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Hora inicio"
+                              filterMatchMode="contains"
+                              filterBy="#{item.timeOrigin}">
+                        <h:outputText value="#{item.timeOrigin}" />
+                    </p:column>
+                    <p:column headerText="Hora fin"
+                              filterMatchMode="contains"
+                              filterBy="#{item.timeDestiny}">
+                        <h:outputText value="#{item.timeDestiny}" />
+                    </p:column>
+                    <p:column headerText="Código bus"
+                              filterMatchMode="contains"
+                              filterBy="#{item.codigoBus}">
+                        <h:outputText value="#{item.codigoBus}" />
+                    </p:column>
+                    <p:column width="6%" class="cortar"
+                              headerText="UF"
+                              rendered="#{uniFuncSessionBean.filtradoUF}"
+                              filterMatchMode="contains"
+                              filterBy="#{item.unidadFuncional}">
+                        <h:outputText value="#{item.unidadFuncional}" />
+                    </p:column>
+                    <p:column headerText="Tipo tarea"
+                              filterMatchMode="contains"
+                              filterBy="#{item.tipoTarea}">
+                        <h:outputText value="#{item.tipoTarea}" />
+                    </p:column>
+                    <p:column headerText="Km"
+                              filterMatchMode="contains"
+                              filterBy="#{item.km/1000}">
+                        <h:outputText value="#{item.km/1000}" >
+                            <f:convertNumber type="number"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Estado"
+                              filterMatchMode="contains"
+                              filterBy="#{item.estadoOperacion}">
+                        <h:outputText value="#{item.estadoOperacion}" />
+                    </p:column>
+                    <p:column headerText="Tabla"
+                              width="3%" 
+                              filterMatchMode="contains"
+                              filterBy="#{item.tabla}">
+                        <h:outputText value="#{item.tabla}" />
+                    </p:column>
+                    <p:column headerText="Ausentismo"
+                              filterMatchMode="exact"
+                              filterBy="#{item.novedad.idNovedad.idNovedadTipoDetalle.descripcionTipoNovedad}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlVdb_semana_actual').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: auto" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{semanaActualBean.AusentismoFilter()}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.novedad.idNovedad.idNovedadTipoDetalle.descripcionTipoNovedad}" />
+                    </p:column>
+                    <p:column headerText="Recibe"
+                              filterMatchMode="contains"
+                              filterBy="#{item.novedad.username}">
+                        <h:outputText value="#{item.novedad.username}" />
+                    </p:column>
+                    <p:column headerText="Anterior"
+                              filterMatchMode="contains"
+                              filterBy="#{item.novedad.idNovedad.idEmpleado.codigoTm}">
+                        <h:outputText value="#{item.novedad.idNovedad.idEmpleado.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Responsable"
+                              filterMatchMode="contains"
+                              filterBy="#{item.motivoPrg.username}">
+                        <h:outputText value="#{item.motivoPrg.username}" />
+                    </p:column>
+                    <p:column headerText="NovedadI"
+                              rendered="false"
+                              filterMatchMode="contains"
+                              filterBy="#{item.novedad.idNovedad.idNovedad}">
+                        <h:outputText value="#{item.novedad.idNovedad.idNovedad}" />
+                    </p:column>
+                    <p:column headerText="NovedadF"
+                              rendered="false"
+                              filterMatchMode="contains"
+                              filterBy="#{item.novedadFinal.idNovedad.idNovedad}">
+                        <h:outputText value="#{item.novedadFinal.idNovedad.idNovedad}" />
+                    </p:column>
+                    <p:column headerText="Id_prg_tc"
+                              rendered="false"
+                              filterMatchMode="contains"
+                              filterBy="#{item.idPrgTc}">
+                        <h:outputText value="#{item.idPrgTc}" />
+                    </p:column>
+                    <p:column headerText="Gestión"
+                              filterMatchMode="exact"
+                              filterBy="#{semanaActualBean.gestion(item)}"
+                              styleClass="#{semanaActualBean.gestion(item) eq 'Cubierto' ? 'cssGreen': semanaActualBean.gestion(item) eq 'Cumpliendo' ? 'cssGreen' :
+                                            semanaActualBean.gestion(item) eq 'Pendiente por cubrir' ? 'cssYellow' : 
+                                            semanaActualBean.gestion(item) eq 'Eliminado' ? 'cssRed' : ''}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlVdb_semana_actual').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: auto" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{semanaActualBean.GestionFilter()}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText style=" color: white;" value="#{semanaActualBean.gestion(item)}" />
+                    </p:column>
+                    <p:column headerText="Motivo"
+                              rendered="true"
+                              filterMatchMode="contains"
+                              filterBy="#{item.idMotivo.motivo}">
+                        <h:outputText value="#{item.idMotivo.motivo}" />
+                    </p:column>
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Agregar"
+                                                 update=":id_create_dlg,:form_create_dlg"
+                                                 oncomplete="PF('wv_create_dlg').show();"
+                                                 icon="fa fa-plus">
+                                    <f:setPropertyActionListener value="#{item}" target="#{semanaActualBean.selectedDto}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{semanaActualBean.listDetalle.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="db_semana_actual" 
+                                                fileName="Reporte semana actual"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/agregarMotivo.xhtml"/>
+    </ui:define>
+</ui:composition>

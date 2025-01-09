@@ -1,0 +1,270 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml">
+
+    <ui:define name="head">
+
+        <style>
+            .ui-commandlink {
+                text-decoration: none;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Novedad Mantenimiento">
+            <h:form id="frmNovedadMtto">
+                <p:growl id="msgVehicleStatus" showDetail="true" showSummary="true" />
+                <p:tabView id="tabView" effect="fade" >
+                    <p:ajax event="tabChange" listener="#{novedadMttoMB.onTabChange}"
+                            update="msgs"/>
+                    <p:tab title="Crear" id="id_crear">
+                        <div align="center">
+                            <h:panelGrid columns="2" cellpadding="3">
+                                <p:outputLabel for="SOMPatio"  value="Patio" />
+                                <p:selectOneMenu id="SOMPatio" 
+                                                 filterMatchMode="contains" filter="true" 
+                                                 value="#{novedadMttoMB.i_idPatio}">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                    <f:selectItems value="#{novedadMttoMB.listPatios}" var="patio"
+                                                   itemLabel="#{patio.name}" 
+                                                   itemValue="#{patio.idPrgStoppoint}" />
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+                            <div class="ui-fluid " >
+                                <div class="ui-g " style="width: 80%">
+                                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding3" >
+                                        <p:commandButton title="Entradas de vehículos"
+                                                         icon="fa fa-sort-desc"
+                                                         value="ENTRADA"
+                                                         id="botonEntrada"
+                                                         process="@this,SOMPatio,console"
+                                                         class="cssWhite GreenButton"
+                                                         actionListener="#{novedadMttoMB.entrada()}"
+                                                         update="msgs,frmNovedadMtto:tabView:vehiculos">
+                                        </p:commandButton>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding3" >
+
+                                        <p:commandButton title="Revisión de vehículos"
+                                                         icon="fa fa-flag-checkered"
+                                                         id="botonRevisión"
+                                                         value="REVISIÓN"
+                                                         process="@this,SOMPatio,console"
+                                                         class="cssWhite"
+                                                         actionListener="#{novedadMttoMB.revision()}"
+                                                         update="msgs,frmNovedadMtto:tabView:vehiculos">
+                                        </p:commandButton>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding3" >
+
+                                        <p:commandButton title="Salida de vehículos"
+                                                         icon="fa fa-sort-asc"
+                                                         id="botonSalida"
+                                                         value="SALIDA"
+                                                         process="@this,SOMPatio,console"
+                                                         class="cssWhite OrangeButton"
+                                                         actionListener="#{novedadMttoMB.salida()}"
+                                                         update="msgs,frmNovedadMtto:tabView:vehiculos">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div align="right">
+                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                                <p:selectOneRadio id="console" value="#{novedadMttoMB.filtroV}" class="cssWhite" unselectable="true">
+                                    <f:selectItem itemLabel="Todo" itemValue="0"  />
+                                    <f:selectItem itemLabel="#{bundle.tipo_vehiculo_i}" itemValue="1" />
+                                    <f:selectItem itemLabel="#{bundle.tipo_vehiculo_ii}" itemValue="2" />
+                                    <p:ajax update="msgs,frmNovedadMtto:tabView:vehiculos" event="valueChange" process="console" listener="#{novedadMttoMB.filtrar()}"/>
+                                </p:selectOneRadio>
+                            </h:panelGrid>
+                        </div>
+                        <p:dataGrid var="tc" 
+                                    value="#{novedadMttoMB.listvehiculos}" 
+                                    rowIndexVar="indexV"
+                                    columns="4" layout="grid" id="vehiculos">
+                            <f:facet name="header">
+                                #{novedadMttoMB.listvehiculos.size()} Vehículos Consultados.
+                            </f:facet>
+
+                            <p:commandLink title="Click registrar novedad"  
+                                           update="msgs,dlgNovMttoID"
+                                           action="#{novedadMttoMB.createNovedad(indexV)}">
+
+                                <div class="ui-fluid cssMenuItem" style="width:100%;background-color: #0e6cba;border-radius: 3px">
+                                    <div class="ui-g ">
+                                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding3"  style="background-color: #1b262c;border-top-left-radius: 3px">
+                                            <i class="#{tc.idVehiculo.idVehiculoTipo.idVehiculoTipo==1 ? 'redCar_II fa fa-bus': 'yellowCar_II fa fa-bus' } Fs25 TexAlLeft "/>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3" style="background-color: #0e4c75">
+                                            <h:outputText value="#{tc.idVehiculo.codigo}" class="cssWhite Fs20 TexAlCenter "/>
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4 Padding3" style="background-color: #3282b8;
+                                             border-top-right-radius: 3px;">
+                                            <h:outputText value="#{tc.estadoReg==0? tc.timeDestiny : tc.timeOrigin}" class="cssWhite Fs13 TexAlRight "/>
+                                        </div>
+                                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding3" style="    background-color: #1b262c;
+                                             border-bottom-left-radius: 3px;">
+                                            <h:outputText rendered="#{tc.estadoReg!=2}"  class="cssWhite Fs20 TexAlCenter #{tc.estadoReg==0?'fa fa-arrow-down':'fa fa-arrow-up'}"/>
+                                        </div>
+                                        <div class="ui-g-5 ui-md-6 ui-lg-6 Padding3" style="background-color: #0e4c75">
+                                            <h:outputText value="#{tc.servbus}" class="cssWhite Fs15 TexAlCenter" style="font-style: italic;"/>
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4 Padding3" style="background-color: #3282b8;
+                                             border-bottom-right-radius: 3px">
+                                            <h:outputText value="#{tc.idEmpleado.codigoTm}" class="cssWhite Fs15 TexAlCenter "/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:commandLink>
+                        </p:dataGrid>
+                    </p:tab>
+                    <p:tab title="Ver Novedades" id="id_ver_novedades">
+                        <p:dataTable  id="tblNovMttoList" var="nov"
+                                      value="#{novedadMttoMB.listNovedadMttoByFechas}"
+                                      rows="20"
+                                      widgetVar="tblNovMttoListWV"
+                                      paginatorPosition="bottom"
+                                      rowIndexVar="index"
+                                      scrollable="true"
+                                      filterDelay="1500"
+                                      scrollHeight="600"
+                                      paginator="true" 
+                                      rowKey="#{nov.idMttoNovedad}"
+                                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                                      {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                      rowsPerPageTemplate="10,20,50,100,200,500">
+                            <f:facet name="footer">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                                    <p:dataExporter type="xlsx" target="tblNovMttoList" fileName="Novedades Mtto"/>
+                                </h:commandLink>
+                            </f:facet>
+                            <f:facet name="header">
+
+                                <div align="right">
+
+                                    <h:outputText value="Fechas: " title="Fecha Inicio"
+                                                  style="right: 300px"/>&nbsp;&nbsp;
+                                    <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                                value="#{novedadMttoMB.desde}"
+                                                placeholder="Fecha Ini"
+                                                maxdate="today"
+                                                pattern="dd-MM-yyyy" locale="es"
+                                                style="right: 300px">
+                                        <p:ajax event="dateSelect" update="tblNovMttoList" 
+                                                listener="#{novedadMttoMB.getNovMtto()}"/>
+                                    </p:calendar>
+                                    -
+                                    <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                                value="#{novedadMttoMB.hasta}"
+                                                placeholder="Fecha Fin"
+                                                maxdate="today+1"
+                                                pattern="dd-MM-yyyy" locale="es"
+                                                style="right: 300px">
+                                        <p:ajax event="dateSelect" update="tblNovMttoList" 
+                                                listener="#{novedadMttoMB.getNovMtto()}"/>
+                                    </p:calendar>
+                                </div>
+                            </f:facet>
+                            <p:column headerText="Fecha"
+                                      sortBy="#{nov.fecha}"
+                                      style="width: 10%">
+                                <h:outputText value="#{nov.fecha}" >
+                                    <f:convertDateTime type="date" pattern="dd-MMMM-yyyy HH:mm:ss" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Vehículo" 
+                                      filterMatchMode="contains" filterBy="#{nov.idVehiculo.codigo}">
+                                <h:outputText value="#{nov.idVehiculo.codigo}" />
+                            </p:column>
+                            <p:column exportable="false" filterBy="#{nov.idEmpleado.codigoTm} #{nov.idEmpleado.nombres} #{nov.idEmpleado.apellidos}"
+                                      filterMatchMode="contains"
+                                      headerText="Operador">
+                                <h:outputText value="#{nov.idEmpleado.codigoTm}" class="cssBlack"/>
+                                <h:outputText value=" #{nov.idEmpleado.nombres.concat(' ').concat(nov.idEmpleado.apellidos)}"/>
+                            </p:column>
+                            <p:column headerText="Componente"
+                                      filterBy="#{nov.idMttoComponente.nombre}"
+                                      filterMatchMode="contains">
+                                <h:outputText value="#{nov.idMttoComponente.nombre}" />
+                            </p:column>
+
+                            <p:column headerText="Comp. Falla"
+                                      filterBy="#{nov.idMttoComponenteFalla.falla}"
+                                      filterMatchMode="contains">
+                                <h:outputText value="#{nov.idMttoComponenteFalla.falla}"/>
+                            </p:column>
+                            <p:column headerText="Criticidad" 
+                                      sortBy="#{nov.idMttoComponenteFalla.idMttoCriticidad.criticidad}"
+                                      filterBy="#{novedadMttoMB.criticidad(nov.idMttoComponenteFalla.idMttoCriticidad)}" 
+                                      filterMatchMode="exact">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('tblNovMttoListWV').filter()" 
+                                                     styleClass="custom-filter" 
+                                                     filter="true" 
+                                                     filterMatchMode="contains" 
+                                                     style="width: auto" title="Seleccione Uno..">
+                                        <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.."/>
+                                        <f:selectItems value="#{novedadMttoMB.criticidades()}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{nov.idMttoComponenteFalla.idMttoCriticidad.descripcion}"/>
+                            </p:column>
+
+                            <p:column headerText="Estado" 
+                                      filterBy="#{novedadMttoMB.estado(nov.idMttoEstado)}" 
+                                      filterMatchMode="exact">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('tblNovMttoListWV').filter()" 
+                                                     styleClass="custom-filter" 
+                                                     filter="true" 
+                                                     filterMatchMode="contains" 
+                                                     style="width: auto" title="Seleccione Uno..">
+                                        <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.."/>
+                                        <f:selectItems value="#{novedadMttoMB.estados()}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{nov.idMttoEstado.estado}"/>
+                            </p:column>
+                            <p:column headerText="Usuario">
+                                <h:outputText value="#{nov.username}"/>
+                            </p:column>
+                            <p:column headerText="Usuario Cierra">
+                                <h:outputText value="#{nov.userCierra}"/>
+                            </p:column>
+                            <p:column headerText="Fecha Cierre"
+                                      style="width: 10%">
+                                <h:outputText value="#{nov.fechaCierre}" >
+                                    <f:convertDateTime type="date" pattern="dd-MMMM-yyyy HH:mm:ss" />
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Observación">
+                                <h:outputText title="#{nov.observaciones}" value="#{nov.observaciones}"/>
+                            </p:column>
+                            <p:column headerText="Order Trabajo">
+                                <h:outputText value="#{nov.ordenTrabajo}"/>
+                            </p:column>
+                            <p:column headerText="Cerrada?">
+                                <h:outputText class="cssBlack"  value="#{ nov.cerrado==1 ? 'Sí':'No'}" />
+                            </p:column>
+                            <f:facet name="footer">
+                                En total existen #{novedadMttoMB.listNovedadMttoByFechas.size()} novedad(es) registradas.
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/createNovMtto.xhtml"/>
+    </ui:define>
+</ui:composition>
+

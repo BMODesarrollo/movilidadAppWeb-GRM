@@ -1,0 +1,134 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="notificacionProceso" id="modalCreateNotificacionProceso" 
+              modal="true" closeOnEscape="true"
+              responsive="true" class="mr1024_60 mr500_90" fitViewport="true"
+              resizable="false" appendTo="@(body)" position="center,top">
+        <c:if test="#{notificacionProcesosBean.selected == null }">
+            <f:facet name="header">
+                Nuevo proceso
+            </f:facet>
+        </c:if>
+        <c:if test="#{notificacionProcesosBean.selected != null }">
+            <f:facet name="header">
+                Editar proceso : #{notificacionProcesosBean.selected.nombreProceso.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <h:form id="frmNuevaNotificacionProceso">
+
+            <div class="ui-fluid" jsf:id="panel">
+
+                <p:messages id="messages" showDetail="true" closable="true"/>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="codigo_proceso" value="Código proceso:" />
+                        </div>
+                        <p:inputText value="#{notificacionProcesosBean.notificacionProceso.codigoProceso}"
+                                     id="codigo_proceso"
+                                     maxlength="6"
+                                     required="true"
+                                     requiredMessage="Debe ingresar el código del proceso"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="nombre_proceso" value="Nombre proceso:" />
+                        </div>
+                        <p:inputText value="#{notificacionProcesosBean.notificacionProceso.nombreProceso}"
+                                     id="nombre_proceso"
+                                     required="true"
+                                     requiredMessage="Debe ingresar el nombre del proceso"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="pGridEmails">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Email(s):" for="emails"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="emails" value="#{notificacionProcesosBean.notificacionProceso.emails}"
+                                             rows="5" cols="10"
+                                             autoResize="false"
+                                             readonly="#{notificacionProcesosBean.selected eq null}"/>
+                            <div class="botonFloat" >
+                                <p:commandButton title="Seleccionar email(s)"
+                                                 icon="fa fa-envelope"
+                                                 class="cssWhite"
+                                                 process="@this"
+                                                 action="#{notificacionProcesosBean.cargarEmails()}"
+                                                 oncomplete="PF('CorreosListDialog').show()"
+                                                 update=":frmCorreosList:dtCorreos" 
+                                                 >
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="mensaje" value="Mensaje:" />
+                        </div>
+                        <p:inputText id="mensaje" value="#{notificacionProcesosBean.notificacionProceso.mensaje}"
+                                     required="true"
+                                     requiredMessage="Ingrese mensaje"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="otros" value="Otros correos:" />
+                        </div>
+                        <p:inputTextarea id="otros"
+                                         rows="5"
+                                         placeholder="Si va a ingresar más de un correo, debe agregarlos separados por comas y sin espacios"
+                                         value="#{notificacionProcesosBean.otrosCorreos}"
+                                         autoResize="false"/>
+                    </div>
+
+                    <ui:include src="../child/notifProcesoDetalle.xhtml"/>
+                </div>
+            </div>
+
+            <p:remoteCommand name="rc"
+                             process="@this,
+                             frmNuevaNotificacionProceso:codigo_proceso,
+                             frmNuevaNotificacionProceso:nombre_proceso,
+                             frmNuevaNotificacionProceso:emails,
+                             frmNuevaNotificacionProceso:mensaje,
+                             frmNuevaNotificacionProceso:otros"
+                             class="cssWhite"
+                             action="#{notificacionProcesosBean.guardar()}"
+                             update=":frmNotificacionProcesosList:dtNotificacionProcesos,messages,frmNuevaNotificacionProceso:panel"/>
+
+            <p:remoteCommand name="rcc" 
+                             process="@this,frmNuevaNotificacionProceso:codigo_proceso,
+                             frmNuevaNotificacionProceso:nombre_proceso,
+                             frmNuevaNotificacionProceso:emails,
+                             frmNuevaNotificacionProceso:mensaje,
+                             frmNuevaNotificacionProceso:otros"
+                             class="cssWhite"
+                             action="#{notificacionProcesosBean.actualizar()}"
+                             update=":frmNotificacionProcesosList:dtNotificacionProcesos,frmNuevaNotificacionProceso:panel,messages,:msgs"/>
+
+        </h:form>
+        <f:facet name="footer">
+
+            <p:commandButton id="btnGuardar" 
+                             icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc()" 
+                             rendered="#{notificacionProcesosBean.selected == null }" />
+
+            <p:commandButton id="btnUpdate" 
+                             icon="fa fa-save" value="Actualizar" 
+                             class="cssWhite" onclick="rcc()"
+                             rendered="#{notificacionProcesosBean.selected != null }"/>
+        </f:facet>
+    </p:dialog>  
+    <ui:include src="ListaCorreos.xhtml"/>
+    <ui:include src="../child/ListaCorreosByUf.xhtml"/>
+</ui:composition>

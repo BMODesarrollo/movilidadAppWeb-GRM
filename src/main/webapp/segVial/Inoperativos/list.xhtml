@@ -1,0 +1,234 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <style>
+            .ui-widget-content a {
+                color: #000000bd;
+            }
+            .ui-monthpicker .ui-monthpicker-month {
+                width: 45%;
+                display: inline-block;
+                text-align: center;
+                padding: 0.3em;
+                cursor: pointer;
+                border: solid 1px #fbfcfd;
+                border-radius: 3px;
+                background-color: #f1f1f1;
+            }
+            .p-datepicker {
+                min-width: auto;
+            }
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                padding: 4px 5px;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Seguimiento Inoperativos">
+            <h:form id="form_inoperativos_list">
+                <p:dataTable id="id_dt_inoperativos" var="item" 
+                             scrollable="true"
+                             widgetVar="wlVid_dt_inoperativos"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             rowStyleClass="text-center"
+                             scrollWidth="100%" 
+                             selection="#{segInoperativosBean.selected}"
+                             rowKey="#{item.idSegInoperativos}"
+                             selectionMode="single"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{segInoperativosBean.lstSegInoperativoses}">
+                    <p:ajax event="rowSelect" listener="#{segInoperativosBean.onRowSelect}" update="id_btn_editar" />
+                    <p:ajax event="rowUnselect" listener="#{segInoperativosBean.rowUnselect}" update="id_btn_editar"/>
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{segInoperativosBean.desde}"
+                                        placeholder="Fecha Ini"
+                                        readonlyInput="true"
+                                        showOtherMonths="true"
+                                        navigator="true"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es">
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{segInoperativosBean.hasta}"
+                                        readonlyInput="true"
+                                        placeholder="Fecha Fin"
+                                        showOtherMonths="true"
+                                        navigator="true"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es">
+                            </p:calendar>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                action="#{segInoperativosBean.consultar()}"
+                                class="cssWhite"
+                                update="form_inoperativos_list:id_dt_inoperativos"
+                                >
+                            </p:commandButton>    
+                            <p:commandButton styleClass="cssWhite GreenButton"
+                                             title="Editar"
+                                             id="id_btn_editar"
+                                             action="#{segInoperativosBean.editar()}"
+                                             disabled="#{segInoperativosBean.selected==null}"
+                                             value="Modificar"
+                                             process="@this"
+                                             update="id_dialog_inoperativos,form_inoperativos"
+                                             oncomplete="PF('wv_inoperativos').show();"
+                                             icon="fa fa-pencil">
+                            </p:commandButton>
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{segInoperativosBean.nuevo()}"
+                                oncomplete="PF('wv_inoperativos').show();"
+                                class="cssWhite"
+                                update="id_dialog_inoperativos,form_inoperativos"/>  
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="id_dt_inoperativos" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha evento o incumplimiento" width="100" >
+                        <h:outputText  value="#{item.fechaEvento}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha reporte a la empresa" width="100" >
+                        <h:outputText  value="#{item.fechaNotificacion}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha de sanción" width="100" >
+                        <h:outputText  value="#{item.fechaSancion}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Mes" width="100" >
+                        <h:outputText  value="#{item.mes}">
+                            <f:convertDateTime pattern="MMMM" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha de sanción Indefinida" width="100" >
+                        <h:outputText  value="#{item.fechaSancionIndefinida}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Habilitación" width="100" >
+                        <h:outputText  value="#{item.fechaHabilitacion}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Días Inoperatividad" width="100" >
+                        <h:outputText  value="#{item.diasInoperativos}"/>
+                    </p:column>
+                    <p:column exportable="false" 
+                              class="cortar"
+                              width="150"
+                              filterBy="#{item.idEmpleado.codigoTm} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Colaborador">
+                        <h:outputText value="#{item.idEmpleado.codigoTm}" class="cssBlack"/>
+                        <h:outputText value=" - #{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column headerText="Código Colaborador"  visible="false" width="100">
+                        <h:outputText  value="#{item.idEmpleado.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Nombre" visible="false" width="100">
+                        <h:outputText  value="#{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"/>
+                    </p:column>
+                    <p:column headerText="Movil" visible="false" width="100" >
+                        <h:outputText  value="#{item.idVehiculo.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Sanción" width="100" >
+                        <h:outputText  value="#{item.idSegTipoSancion.nombre}" 
+                                       title="#{item.idSegTipoSancion.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Incumplimiento" width="100" >
+                        <h:outputText  value="#{item.idSegTipoIncumplimiento.nombre}" 
+                                       title="#{item.idSegTipoIncumplimiento.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Conducta" width="100" >
+                        <h:outputText  value="#{item.idSegTipoConducta.nombre}" 
+                                       title="#{item.idSegTipoConducta.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Fecha envio de soportes a TMSA" width="100" >
+                        <h:outputText  value="#{item.primerafechaEnvioSoporteEnte}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo respuesta de TMSA" width="100" >
+                        <h:outputText  value="#{item.idSegTipoRespuestaEnte.nombre}" 
+                                       title="#{item.idSegTipoRespuestaEnte.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Fecha respuesta de TMSA" width="100" >
+                        <h:outputText  value="#{item.fechaRespuestaEnte}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Quien reporta" width="100" >
+                        <h:outputText  value="#{item.quienReporta}" 
+                                       title="#{item.quienReporta}"/>
+                    </p:column>
+                    <p:column headerText="Medio en el que reportan" width="100" >
+                        <h:outputText  value="#{item.idSegMedioReporta.nombre}"
+                                       title="#{item.idSegMedioReporta.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Quien gestiona la habilitación" width="100" >
+                        <h:outputText  value="#{item.idSegGestionaHabilitacion.nombre}"
+                                       title="#{item.idSegGestionaHabilitacion.nombre}"/>
+                    </p:column>
+                    <p:column headerText="A quien se le envio el correo" width="100" >
+                        <h:outputText  value="#{item.quienSeNotifico}"
+                                       title="#{item.quienSeNotifico}"/>
+                    </p:column>
+                    <p:column headerText="Fecha envio soportes" width="100" >
+                        <h:outputText  value="#{item.segundafechaEnvioSoporteEnte}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Cita TM" width="100" >
+                        <h:outputText  value="#{item.fechaCitaEnte}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Actividades realizadas para habilitación" class="cortar" width="100" >
+                        <h:outputText id="id" value="#{segInoperativosBean.retornarStringActividades(item)}"/>
+                    </p:column>
+                    <p:column headerText="Calificación Seguridad Vial" class="cortar" width="100">
+                        <h:outputText  value="#{item.calificaionSegVial}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{segInoperativosBean.lstSegInoperativoses.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="id_dt_inoperativos" 
+                                                fileName="Seguimiento Inoperativos"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>

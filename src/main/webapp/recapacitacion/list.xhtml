@@ -1,0 +1,333 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .texto-blanco {
+                color: white !important;
+                font-weight: bolder !important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="RECAPACITACIÓN">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <h:form id="frmPrincipal">
+                <div class="ui-g-12 ui-md-12 ui-lg-12" align="right">
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0">
+                        <p:selectOneMenu 
+                            styleClass="custom-filter" 
+                            filter="true" 
+                            value="#{uniFuncSessionBean.i_unidad_funcional}"
+                            rendered="#{uniFuncSessionBean.filtradoUF}"
+                            filterMatchMode="contains" 
+                            style="width: 99.999%" title="Seleccione Uno..">
+                            <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                          itemValue="#{0}"
+                                          itemDescription="Seleccione Uno.."/>
+                            <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                           var="uf" itemLabel="#{uf.nombre}"
+                                           itemValue="#{uf.idGopUnidadFuncional}"/>
+                            <p:ajax update="frmPrincipal:dtPdMaestro" 
+                                    oncomplete="PF('wlVdtPdMaestro').getPaginator().setPage(0);"
+                                    listener="#{recapacitacionBean.findMaestro()}"
+                                    process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <p:dataTable id="dtPdMaestro" var="recap" 
+                             scrollable="true"
+                             widgetVar="wlVdtPdMaestro"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{recapacitacionBean.lstRecapacitacion}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <h:outputText value="Fechas: " title="Fecha Inicio"
+                                          style="right: 300px"/>&nbsp;&nbsp;
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{recapacitacionBean.fechaInicio}"
+                                        placeholder="Fecha Ini"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{recapacitacionBean.fechaFin}"
+                                        readonlyInput="true"
+                                        navigator="true"
+                                        placeholder="Fecha Fin"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                            </p:calendar>
+                            <p:spacer width="10"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                class="cssWhite"
+                                actionListener="#{recapacitacionBean.findMaestro()}"
+                                update="dtPdMaestro"
+                                >
+                            </p:commandButton>    
+                            <p:spacer width="20"/>
+                            <p:commandButton id="btnDocumentos"
+                                             icon="fa fa-file-text-o" style="color: white"
+                                             value="Cargar asistencia"
+                                             class="OrangeButton cssWhite"
+                                             update="msg, CargarAsistenciaDlg"
+                                             rendered="#{recapacitacionBean.validUserGh()}"
+                                             action="#{recapacitacionBean.preCargarAsistencia()}"
+                                             />
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Nueva recapacitación" 
+                                             id="btnNuevaNovedadPM"
+                                             title="Nueva recapacitación"
+                                             class="cssWhite"
+                                             update="msg, recapMaestro"
+                                             rendered="#{recapacitacionBean.validUserGh()}"
+                                             action="#{recapacitacionBean.preCrear()}"
+                                             icon="fa fa-sticky-note">
+                            </p:commandButton>
+                                                        <p:commandButton value="Nueva recapacitación" 
+                                             id="btnNuevaNovedadPMSegop"
+                                             title="Nueva recapacitación"
+                                             class="cssWhite"
+                                             update="msg, recapMaestro"
+                                             rendered="#{recapacitacionBean.validUserSegop()}"
+                                             action="#{recapacitacionBean.preCrear()}"
+                                             icon="fa fa-sticky-note">
+                            </p:commandButton>
+                            <p:commandButton value="Asignar agenda" 
+                                             action="#{recapacitacionBean.preAgendaMasiva()}"
+                                             update="msg, listaAgendaMasivaDialog"
+                                             title="Asignar fecha recapacitación"
+                                             class="cssWhite"
+                                             rendered="#{recapacitacionBean.validUserProfPrg()}"
+                                             icon="fa fa-pencil">
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha Novedad" 
+                              filterBy="#{recap.idNovedad.fecha}" 
+                              filterMatchMode="startsWith"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:calendar id="search1" pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdtPdMaestro').filter()">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdtPdMaestro').filter()" update="dtPdMaestro"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{recap.idNovedad.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha Inoperable" 
+                              filterBy="#{recap.fechaInoperable}" 
+                              filterMatchMode="startsWith"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:calendar id="search2" pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdtPdMaestro').filter()">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdtPdMaestro').filter()" update="dtPdMaestro"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{recap.fechaInoperable}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Código" 
+                              filterBy="#{recap.idEmpleado.codigoTm}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{recap.idEmpleado.codigoTm}" />
+                    </p:column>
+
+                    <p:column headerText="Cedula" 
+                              filterBy="#{recap.idEmpleado.identificacion}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{recap.idEmpleado.identificacion}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre" 
+                              filterBy="#{recap.idEmpleado.nombres}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{recap.idEmpleado.nombres}" />
+                    </p:column>
+
+                    <p:column headerText="Apellidos" 
+                              filterBy="#{recap.idEmpleado.apellidos}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{recap.idEmpleado.apellidos}" />
+                    </p:column>
+
+                    <p:column headerText="Código infracción" 
+                              filterBy="#{recap.idNovedad.idNovedadTipoInfraccion.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{recap.idNovedad.idNovedadTipoInfraccion.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción novedad" 
+                              class="cortar"
+                              filterBy="#{recap.idNovedad.observaciones}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{recap.idNovedad.observaciones}" />
+                    </p:column>
+
+                    <p:column headerText="Fecha citación" 
+                              filterBy="#{recap.fechaCitacionDateF}" 
+                              filterMatchMode="startsWith"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:calendar id="search3" pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdtPdMaestro').filter()">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdtPdMaestro').filter()" update="dtPdMaestro"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{recap.fechaCitacion}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha ejecución" 
+                              filterBy="#{recap.fechaEjecucionDateF}" 
+                              filterMatchMode="startsWith"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:calendar id="search4" pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdtPdMaestro').filter()">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdtPdMaestro').filter()" update="dtPdMaestro"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{recap.fechaEjecucion}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Instructor" 
+                              filterBy="#{recap.idCapacitador.nombres}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{recap.idCapacitador.nombres}" />
+                    </p:column>
+                    <p:column headerText="Programado" 
+                              filterBy="#{recap.programado == true ? 'Sí' : 'No'}"
+                              filterMatchMode="contains"
+                              styleClass="#{recap.programado == true ? 'cssGreen' : recap.programado == false ? 'cssRed' : null}" >
+                        <h:outputText value="#{recap.programado == true ? 'Sí' : 'No'}" styleClass="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Asistencia" 
+                              filterBy="#{recap.asistencia == true ? 'Sí' : 'No'}"
+                              filterMatchMode="contains"
+                              styleClass="#{recap.asistencia == true ? 'cssGreen' : recap.asistencia == false ? 'cssRed' : null}" >
+                        <h:outputText value="#{recap.asistencia == true ? 'Sí' : 'No'}" styleClass="cssWhite"/>
+                    </p:column>
+
+                    <p:column headerText="Observación" 
+                              filterBy="#{recap.observacion}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{recap.observacion}" />
+                    </p:column> 
+
+                    <p:column headerText="Acciones" styleClass="text-center" exportable="false">
+                        <div class="ui-g Padding0" style="display: flex; justify-content: center; align-items: center;">
+                            <div class="icon-buttons">
+                                <p:commandButton action="#{recapacitacionBean.obtenerArchivo(recap.pathAsistencia)}"
+                                                 disabled="#{recap.pathAsistencia == null}"
+                                                 oncomplete="PF('DocumentoListDialog').show()" 
+                                                 icon="fa fa-file" update="frmDocumento,DocumentoListDlg"
+                                                 title="Ver asistencia" style="color: white; margin-right: 10px;" />
+
+                                <p:commandButton action="#{recapacitacionBean.obtenerArchivo(recap.pathEvaluacion)}"
+                                                 disabled="#{recap.pathEvaluacion == null}"
+                                                 oncomplete="PF('DocumentoListDialog').show()" 
+                                                 icon="fa fa-file" update="frmDocumento,DocumentoListDlg"
+                                                 title="Ver evaluación" style="color: white; margin-right: 10px;" />
+
+                                <p:commandButton action="#{recapacitacionBean.obtenerArchivo(recap.pathPhotos)}"
+                                                 disabled="#{recap.pathPhotos == null}"
+                                                 oncomplete="PF('DocumentoListDialog').show()" 
+                                                 icon="fa fa-photo" update="frmDocumento,DocumentoListDlg"
+                                                 title="Ver fotos" style="color: white; margin-right: 10px;" />                                
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Asignar citación"
+                                                 process="@this"
+                                                 update="frmDocumento,DocumentoListDlg"
+                                                 oncomplete="PF('AsignarAgendaDlg').show();"
+                                                 rendered="#{recapacitacionBean.validUserProfPrg()}"
+                                                 icon="fa fa-book">
+                                    <f:setPropertyActionListener value="#{recap}" target="#{recapacitacionBean.selectedRecap}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{recapacitacionBean.lstRecapacitacion.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtPdMaestro" 
+                                                fileName="Recapacitacion"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+
+        <ui:include src="modal/create.xhtml"/>
+        <ui:include src="modal/ListaAgendaMasiva.xhtml"/>
+        <ui:include src="modal/CargaAsistencia.xhtml"/>
+        <ui:include src="modal/documentos/ModalDocumento.xhtml"/>
+        <ui:include src="modal/AsignarCitacion.xhtml"/>
+    </ui:define>
+</ui:composition>

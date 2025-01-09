@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="VehiculoCteDlg" widgetVar="VehiculoCteDialog" modal="true" 
+              position="center top"
+              resizable="false" appendTo="@(body)" closable="false"
+              closeOnEscape="true" class="mr1024_50 mr500_90" responsive="true">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Componentes
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('VehiculoCteDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="frmVehiculoCteList">
+            <p:cache disabled="true"/>
+            <p:dataTable var="vcte" value="#{gestionDanoNovPuntBean.lstVehiculoComponente}"  
+                         selectionMode="single" selection="#{gestionDanoNovPuntBean.vehiculoComponente}"                       
+                         rowIndexVar="nroFila"
+                         paginator="true"
+                         rows="8"
+                         rowKey="#{vcte.idVehiculoComponente}"
+                         emptyMessage="No existen componentes registrados">
+                <p:ajax event="rowSelect"
+                        listener="#{gestionDanoNovPuntBean.onRowDblClckSelect}"
+                        update="msgs,gestion_dano_form:cte"
+                        oncomplete="PF('VehiculoCteDialog').hide()" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Grupo" filterBy="#{vcte.idVehiculoComponenteZona.idVehiculoComponenteGrupo.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vcte.idVehiculoComponenteZona.idVehiculoComponenteGrupo.nombre}" />
+                </p:column>
+                <p:column headerText="Zona" filterBy="#{vcte.idVehiculoComponenteZona.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vcte.idVehiculoComponenteZona.nombre}" />
+                </p:column>
+                <p:column headerText="Componente" filterBy="#{vcte.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vcte.nombre}" />
+                </p:column>
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{vcte.descripcion}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

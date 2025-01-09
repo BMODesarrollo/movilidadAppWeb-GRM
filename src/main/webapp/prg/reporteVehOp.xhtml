@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:growl id="messages" showDetail="true" />
+        <p:panel header="Reporte Vehículo Operador">
+            <h:form id="frmReporte">
+                <h:panelGrid columns="8" cellpadding="2">
+                    <p:outputLabel for="id_desde" value="Fechas " />
+                    <p:calendar id="id_desde" styleClass="calendarFilter" 
+                                value="#{vehiculoOPeradorSFMB.desde}"
+                                placeholder="Fecha Ini"
+                                readonlyInput="true"
+                                maxdate="today"
+                                pattern="yyyy-MMMM-dd" locale="es"
+                                style="right: 300px">
+                    </p:calendar>
+                    <p:calendar id="id_hasta" styleClass="calendarFilter" 
+                                value="#{vehiculoOPeradorSFMB.hasta}"
+                                readonlyInput="true"
+                                placeholder="Fecha Fin"
+                                maxdate="today"
+                                pattern="yyyy-MMMM-dd" locale="es"
+                                style="right: 300px">
+                    </p:calendar>
+                    <p:outputLabel for="id_vehiculo" value=" Vehículo "/>
+                    <p:inputText id="id_vehiculo" placeholder="Código"
+                                 value="#{vehiculoOPeradorSFMB.codVehiculo}"  maxlength="12" >
+                    </p:inputText>
+                    <p:outputLabel for="id_operador" value=" Empleado " />
+                    <p:inputText id="id_operador" placeholder="Código TM" 
+                                 value="#{vehiculoOPeradorSFMB.codOperador}"  maxlength="12" >
+                    </p:inputText>
+
+                    <p:commandButton id="btnConsultar" 
+                                     icon="fa fa-search" value="Consultar" 
+                                     actionListener="#{vehiculoOPeradorSFMB.consultar()}"
+                                     class="cssWhite"
+                                     process="@this,frmReporte:id_desde,
+                                     frmReporte:id_hasta,
+                                     frmReporte:id_operador,
+                                     frmReporte:id_vehiculo"
+                                     update="frmReporte:dt_info,msgs"/>
+                </h:panelGrid>
+
+                <p:dataTable id="dt_info" var="item"  
+                             value="#{vehiculoOPeradorSFMB.listInfo}" 
+                             rows="50"
+                             widgetVar="wv_info"
+                             paginator="true"
+                             scrollable="true"
+                             scrollHeight="600"
+                             filterDelay="1000"
+                             rowIndexVar="nroFila"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="50,100,200">
+                    <p:column headerText="Fecha"
+                              filterBy="#{item.fecha}" 
+                              filterMatchMode="startsWith"
+                              style="width: 15%" >
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="yyyy-MMMM-dd" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wv_info').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }">
+                                <p:ajax event="dateSelect" oncomplete="PF('wv_info').filter()" update="dt_info"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.idEmpleado.codigoTm} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Empleado">
+                        <h:outputText value="#{item.idEmpleado.codigoTm}" class="cssBlack"/>
+                        <h:outputText value=" - #{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Codigo TM" >
+                        <h:outputText value="#{item.idEmpleado.codigoTm}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Empleado" >
+                        <h:outputText value="#{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains"
+                              headerText="Vehículo" >
+                        <h:outputText value="#{item.idVehiculo.codigo}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

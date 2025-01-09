@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <div jsf:id="panel-causalidad">
+        <div class="ui-g" style="margin-top: 10px">
+            <div class="ui-g-12 cssWhite" style="background-color: #FA9536;text-align: center">
+                Seleccione la(s) causa(s) que pudiron ocasionar el accidente.<br/>
+                Nota: Describa cortamente su elección.
+            </div>
+        </div>
+        <div jsf:id="combos" class="ui-g" style="margin-top: 10px">
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                *Árbol
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                <p:selectOneMenu id="s-arbol" 
+                                 value="#{accInformeOperadorJSF.i_idAccArbol}" style="width: 99%"
+                                 filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                    <f:selectItems value="#{accArbolBean.lista}" 
+                                   var="accArb" 
+                                   itemLabel="#{accArb.arbol}" 
+                                   itemValue="#{accArb.idAccArbol}" />
+                    <p:ajax update="form-info-acc:acc-panel:combos,form-info-acc:acc-panel:pregunta" listener="#{accInformeOperadorJSF.actualizarOpcion(1)}"/>
+                </p:selectOneMenu>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                *Causa
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                <p:selectOneMenu id="s-causa" 
+                                 value="#{accInformeOperadorJSF.i_idAccCausa}" style="width: 99%"
+                                 filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                    <f:selectItems value="#{accInformeOperadorJSF.listAccCausa}" 
+                                   var="accCau" 
+                                   itemLabel="#{accCau.causa}" 
+                                   itemValue="#{accCau.idAccCausa}" />
+                    <p:ajax process="@this" update="form-info-acc:acc-panel:combos,form-info-acc:acc-panel:pregunta" listener="#{accInformeOperadorJSF.actualizarOpcion(2)}"/>
+                </p:selectOneMenu>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                *Sub Causa
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                <p:selectOneMenu id="s-sub-causa" 
+                                 value="#{accInformeOperadorJSF.i_idAccCausaSub}" style="width: 99%"
+                                 filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                    <f:selectItems value="#{accInformeOperadorJSF.listAccCausaSub}" 
+                                   var="accCauSub" 
+                                   itemLabel="#{accCauSub.subcausa}" 
+                                   itemValue="#{accCauSub.idAccSubcausa}" />
+                    <p:ajax process="@this" update="form-info-acc:acc-panel:combos,form-info-acc:acc-panel:pregunta" />
+                </p:selectOneMenu>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                *Causa Raíz
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                <p:selectOneMenu id="s-causa-raiz" 
+                                 value="#{accInformeOperadorJSF.i_idAccCausaRaiz}" style="width: 99%"
+                                 filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                    <f:selectItems value="#{accInformeOperadorJSF.listAccCausaRaiz}" 
+                                   var="accCauRaiz" 
+                                   itemLabel="#{accCauRaiz.causaRaiz}" 
+                                   itemValue="#{accCauRaiz.idAccCausaRaiz}" />
+                    <p:ajax process="@this" update="form-info-acc:acc-panel:combos,form-info-acc:acc-panel:pregunta" />
+                </p:selectOneMenu>
+            </div>
+        </div>
+        <div jsf:id="pregunta" class="ui-g" style="margin-top: 10px">
+            <div class="ui-g-1 ui-md-1 ui-gl-1"></div>
+            <div class="ui-g-10 ui-md-10 ui-gl-10 cssGray">
+                <p:outputLabel value="#{accInformeOperadorJSF.c_tituloPregunta}" 
+                               class="cssWhite"/>
+            </div>
+            <div class="ui-g-1 ui-md-1 ui-gl-1"></div>            
+        </div>
+        <div class="ui-g" style="margin-top: 10px">
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                <p:inputTextarea id="respuesta"
+                                 value="#{accInformeOperadorJSF.accInformeOpeCausalidad.respuesta}"
+                                 rows="3"
+                                 maxlength="65000"
+                                 placeholder="RESPUESTA" />
+            </div> 
+        </div>
+        <div class="ui-g" style="margin-top: 10px">
+            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                <p:commandButton id="guardar-causalidad"
+                                 icon="fa fa-save"
+                                 process="form-info-acc:acc-panel:respuesta,@this"
+                                 update="form-info-acc:acc-panel:panel-causalidad,:form-info-msg"
+                                 actionListener="#{accInformeOperadorJSF.agregarCausalidad()}"
+                                 class="cssWhite GreenButton"/>
+                <p:spacer width="2"/>
+                <p:commandButton id="cancelar-causalidad"
+                                 icon="fa fa-times"
+                                 class="cssWhite RedButton"/>
+            </div>
+        </div>
+        <div class="ui-g">
+            <p:dataTable id="tabla-causalidad"
+                         value="#{accInformeOperadorJSF.listAccInformeOpeCausalidad}"
+                         var="itemAnalisis"
+                         rowIndexVar="rowIndex"
+                         rows="3"
+                         paginator="true"
+                         reflow="true"
+                         emptyMessage="No existen registros">
+                <f:facet name="header">
+                    Árbol de Causalidad
+                </f:facet>
+                <p:column headerText="#">
+                    <h:outputText value="#{rowIndex + 1}" />
+                </p:column>
+                <p:column headerText="Respuesta">
+                    <h:outputText value="#{itemAnalisis.respuesta}" />
+                </p:column>
+                <f:facet name="footer">
+                    #{accInformeOperadorJSF.listAccInformeOpeCausalidad.size()} Causalidades agregadas a la lista
+                </f:facet>
+            </p:dataTable>
+        </div>
+    </div>
+</ui:composition>

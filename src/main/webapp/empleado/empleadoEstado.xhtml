@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel header="Estados de Empleado" style="alignment-adjust: central"> 
+            <h:form id="formTablaEmplEstado">
+                <p:dataTable id="tblEE" var="emplEstd"  editable="true" 
+                             value="#{emplEstCtrl.listEmplEstd}" rows="10"
+                             paginator="true"
+                             filterDelay="1000"
+                             rowIndexVar="nroFila"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="btnAdd" value="Nuevo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             process="@this"
+                                             action="#{emplEstCtrl.openDialog()}"
+                                             update="formEmplEstd:dlgid" 
+                                             oncomplete="PF('dlg2').show();">
+                                <p:resetInput target="dlgid" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="formTablaEmplEstado:tblEE" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column filterBy="#{emplEstd.nombre}"
+                              filterMatchMode="contains"
+                              headerText="Nombre" >
+                        <h:outputText value="#{emplEstd.nombre}"/>
+                    </p:column>
+                    <p:column 
+                        headerText="Alertar" 
+                        styleClass="#{emplEstd.alertar == 1 ? 'cssGreen' : emplEstd.alertar == 0 ? 'cssRed' : null}" >
+                        <h:outputText value="Sí" styleClass="cssWhite" rendered="#{emplEstd.alertar == 1}"/>
+                        <h:outputText value="No" styleClass="cssWhite" rendered="#{emplEstd.alertar == 0}"/>
+                    </p:column>
+
+                    <p:column filterBy="#{emplEstd.descripcion}"
+                              filterMatchMode="contains"
+                              headerText="Descripión">
+                        <h:outputText value="#{emplEstd.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Opciones" style="width:15%; text-align: center">
+                        <p:commandButton icon="fa fa-pencil" 
+                                         class="GreenButton cssWhite"
+                                         update=":formEmplEstd:dlgid"
+                                         oncomplete="PF('dlg2').show();"
+                                         action="#{emplEstCtrl.editar(emplEstd)}" 
+                                         title="Modificar" 
+                                         disabled="#{emplEstd.estadoReg==1}"/>
+
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <h:form id="formEmplEstd">
+            <p:dialog header="Estado Empleado" 
+                      position="top" resizable="false"
+                      class="mr1024_40 mr500_90"
+                      responsive="true"
+                      closeOnEscape="true" 
+                      id="dlgid" 
+                      widgetVar="dlg2" 
+                      modal="true">
+                <div class="ui-fluid ">
+                    <div class="ui-g ">
+                        <div class="ui-g-12 ui-gl-12 ui-md-12 Padding5">
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:outputLabel for="txtnombre"  value="Nombre:"/>
+                            </div>
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:inputText id="txtnombre" required="true" maxlength="45"
+                                             requiredMessage="Debe ingresar 
+                                             el nombre del estado" 
+                                             value="#{emplEstCtrl.emplEstd.nombre}">
+                                    <p:messages id="txtNombreMssg" showDetail="true"/>
+                                </p:inputText>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-gl-12 ui-md-12 Padding5">
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:outputLabel for="ISAlerta"  value="Alerta:"/>
+                            </div>
+                            <div class="ui-g-12 ui-gl-6 ui-md-6 Padding0">
+                                <p:selectBooleanButton id="ISAlerta" 
+                                                       value="#{emplEstCtrl.b_alerta}" 
+                                                       onLabel="Sí" 
+                                                       offLabel="No"
+                                                       class="cssWhite"
+                                                       offIcon="fa fa-close"
+                                                       onIcon="fa fa-check"/>
+                                <p:tooltip id="toolTipFadeISAlerta" 
+                                           for="ISAlerta" 
+                                           value="Haga click para cambiar el valor" 
+                                           position="top"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-gl-12 ui-md-12 Padding5">
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:outputLabel for="ITDescripcion"  
+                                               value="Descripción:"/>
+                            </div>
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0 Wid100">
+                                <p:inputTextarea id="ITDescripcion" 
+                                                 required="true" 
+                                                 counter="display" 
+                                                 value="#{emplEstCtrl.emplEstd.descripcion}" 
+                                                 maxlength="100"
+                                                 counterTemplate="{0} caracteres restantes." 
+                                                 autoResize="false" />
+                                <p:outputLabel id="display" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <f:facet name="footer">
+                    <p:commandButton id="btnGuardar" 
+                                     rendered="#{emplEstCtrl.emplEstd.idEmpleadoEstado==null}"
+                                     icon="fa fa-save" value="Guardar" 
+                                     actionListener="#{emplEstCtrl.guargar()}"
+                                     class="cssWhite"
+                                     update="formTablaEmplEstado:tblEE,msgs"/>
+                    <p:commandButton id="btnEditar" 
+                                     rendered="#{emplEstCtrl.emplEstd.idEmpleadoEstado!=null}"
+                                     icon="fa fa-pencil" 
+                                     class="cssWhite"
+                                     value="Actualizar"
+                                     actionListener="#{emplEstCtrl.guardarEdit()}"
+                                     update="formTablaEmplEstado:tblEE,msgs"/>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
+
+
+

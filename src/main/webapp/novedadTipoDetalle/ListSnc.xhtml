@@ -1,0 +1,61 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="SncListDlg" widgetVar="SncListDialog" modal="true" 
+              resizable="false" class="mr1024_50 mr500_90"
+              closable="false"
+              position="center top"
+              closeOnEscape="true"
+              appendTo="@(body)" 
+              header="Salidas No Conformes" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Salidas No Conformes" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('SncListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmSncList">
+            <p:dataTable id="id_snc_dt"
+                         var="snc" 
+                         value="#{novedadTipoDetBean.listaSncDetalle}"  
+                         selectionMode="single" 
+                         selection="#{novedadTipoDetBean.sncDetalle}"                       
+                         rowIndexVar="nroFila"
+                         filterDelay="1000"
+                         rowKey="#{snc.idSncDetalle}"
+                         emptyMessage="No existen tipos de novedad registrados"
+                         reflow="true" rows="5" paginator="true">
+                <p:ajax event="rowSelect" 
+                        listener="#{novedadTipoDetBean.onRowDblClckSelectSnc}"
+                        update=":NovedadTipoDetalleCreateForm:sncDetalle"
+                        global="false" />
+                <p:column headerText="#" style="width: 5%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Tipo" filterBy="#{snc.idSncTipo.descripcion}" filterMatchMode="contains"  style="width: 25%">
+                    <h:outputText value="#{snc.idSncTipo.descripcion}" />
+                </p:column>
+                <p:column headerText="Código" filterBy="#{snc.codigo}" filterMatchMode="contains"  style="width: 15%">
+                    <h:outputText value="#{snc.codigo}" />
+                </p:column>
+                <p:column headerText="Salida No Conforme" filterBy="#{snc.nombre}" filterMatchMode="contains"  style="width: 55%">
+                    <h:outputText value="#{snc.nombre}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

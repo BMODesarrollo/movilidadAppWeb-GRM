@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <p:panel header="Documentos por Tipo de Labor">
+            <h:form id="frmPrincipal">
+                <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+                <p:dataTable id="dt_docu_cargo" var="item" 
+                             scrollable="true"
+                             widgetVar="dtDocumento"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{docuPorCargoBean.list}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{docuPorCargoBean.nuevo()}"
+                                oncomplete="PF('wvdocsTipoCargo').show();"
+                                class="cssWhite"
+                                update="dt_docu_cargo,:docsTipoCargo,:frmDocsTipoCargo,frmPrincipal:cj-grow">
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Tipo Cargo">
+                        <h:outputText value="#{item.idEmpleadoTipoCargo.nombreCargo}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Documento">
+                        <h:outputText value="#{item.idEmpleadoTipoDocumento.nombreTipoDocumento}"/>
+                    </p:column>
+
+                    <p:column headerText="Acciones" style="text-align: center;"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{docuPorCargoBean.editar(item)}"
+                                                 process="@this"
+                                                 update="docsTipoCargo,frmDocsTipoCargo,frmPrincipal:cj-grow"
+                                                 oncomplete="PF('wvdocsTipoCargo').show();"
+                                                 icon="fa fa-pencil">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{docuPorCargoBean.list.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dt_docu_cargo" 
+                                                fileName="Documentos por tipo de labor"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

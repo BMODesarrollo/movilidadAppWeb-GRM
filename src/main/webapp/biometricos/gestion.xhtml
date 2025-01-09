@@ -1,0 +1,184 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <div class="ui-fluid">
+            <div class="ui-g">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" >
+                    <p:staticMessage severity="error" 
+                                     summary="ERROR!" 
+                                     detail="No tiene acceso a este modulo"  
+                                     rendered="#{!genCtrlJornadaMB.b_permiso}">
+                        <p:effect type="pulsate" 
+                                  event="load" 
+                                  delay="300" />
+                    </p:staticMessage>
+                </div>
+            </div>
+        </div>
+        <h:form id="formgestionarmarcacion"   rendered="#{genCtrlJornadaMB.b_permiso}">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Novedades Marcaciones">
+
+                <p:dataTable id="novedadeslist" 
+                             value="#{genCtrlJornadaMB.listaNovedadesMarcaciones}" 
+                             var="item"
+                             rowKey="#{item.idGenericaJornada}"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             tableStyle="table-layout:fixed"
+                             rowSelectMode="add"
+                             reflow="true"
+                             filterDelay="1000"
+                             rows="25"
+                             widgetVar="dtnovedadeslist"
+                             selection="#{genCtrlJornadaMB.listAutorizar}"
+                             rowsPerPageTemplate="25,50,100,200,500">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="novedadeslist" fileName="Novedades Marcaciones"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:outputLabel value="Fecha " class="cssWhite Fs20" for="desde" rendered="#{genCtrlJornadaMB.b_autorizaMarcaciones}"></p:outputLabel>
+                            <p:calendar id="desde"
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{calcularMasivoBean.fechaDesde}"
+                                        pattern="yyyy-MM-dd" rendered="#{genCtrlJornadaMB.b_autorizaMarcaciones}">
+                                <p:ajax event="dateSelect" listener="#{genCtrlJornadaMB.consultarNovedades()}" 
+                                        update="novedadeslist"></p:ajax>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta"
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{calcularMasivoBean.fechaHasta}"
+                                        pattern="yyyy-MM-dd" rendered="#{genCtrlJornadaMB.b_autorizaMarcaciones}">
+                                <p:ajax event="dateSelect" listener="#{genCtrlJornadaMB.consultarNovedades()}" 
+                                        update="novedadeslist"></p:ajax>
+                            </p:calendar>
+                            <p:commandButton id="crear"
+                                             icon="fa fa-plus"
+                                             value="Gestionar Novedad"
+                                             title="Gestionar Novedad"
+                                             actionListener="#{genCtrlJornadaMB.preGestionar()}"
+                                             oncomplete="PF('gestionMarcacionMBDialog').show()"
+                                             class="cssWhite OrangeButton"
+                                             update="formRegistrar"
+                                             disabled="#{empty genCtrlJornadaMB.genericaJornada.idGenericaJornada}" />
+                            <p:commandButton id="autorizar_nov"
+                                             icon="fa fa-check-square-o"
+                                             value="Autorizar Todos"
+                                             actionListener="#{genCtrlJornadaMB.autorizarMasivo()}"
+                                             class="cssWhite GreenButton"
+                                             update="novedadeslist,:formgestionarmarcacion:cj-grow"
+                                             process="@this"
+                                             disabled="#{genCtrlJornadaMB.listAutorizar.size() > 1 ? false : true}" />
+                        </div>
+                    </f:facet>
+
+                    <p:ajax event="rowSelect" listener="#{genCtrlJornadaMB.onRowSelectMarcaciones}" update="novedadeslist,crear" />
+                    <p:ajax event="rowUnselect" listener="#{genCtrlJornadaMB.onRowUnselect}" update="novedadeslist,crear" />
+                    
+                    <p:column selectionMode="multiple" style="width:5rem; text-align: center" exportable="false" />
+                    <p:ajax event="toggleSelect" 
+                        listener="#{genCtrlJornadaMB.onToggleSelect2}" 
+                        update="autorizar_nov" />
+
+                    <p:column headerText="Fecha" filterBy="#{item.fecha}" filterMatchMode="contains">
+                        <h:outputText  value="#{item.fecha}" >
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column filterBy="#{item.idEmpleado.identificacion} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Empleado">
+                        <h:outputText value="#{item.idEmpleado.identificacion}" class="cssBlack"/>
+                        <h:outputText value=" #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"/>
+                    </p:column>
+                    <p:column headerText="H. Inicio" filterBy="#{item.timeOrigin}" filterMatchMode="contains">
+                        <h:outputText value="#{item.timeOrigin}" title="Hora de inicio jornada  programada"/>
+                    </p:column>
+                    <p:column headerText="H. Fin"  filterBy="#{item.timeDestiny}" filterMatchMode="contains">
+                        <h:outputText value="#{item.timeDestiny}" title="Hora de salida jornada programada"/>
+                    </p:column>
+                    <p:column headerText="Entrada Biometrico">
+                        <h:outputText value="#{item.bioEntrada}" title="Indica la hora en que se registra entrada en el biométrico"/>
+                    </p:column>
+                    <p:column headerText="Salida Biometrico">
+                        <h:outputText value="#{item.bioSalida}" title="Indica la hora en que se registra salida en el biométrico"/>
+                    </p:column>
+                    <p:column headerText="Estado" 
+                              filterBy="#{item.estadoMarcacion  eq '1' ? 'Retardo' : item.estadoMarcacion  eq '2' ? 'Abandono' : item.estadoMarcacion eq '3' ? 'Ausencia' : item.estadoMarcacion eq '4' ? 'Salida Anticipada' : item.estadoMarcacion eq '5' ? 'H.Extra NO Autorizada' : item.estadoMarcacion eq '6' ? 'Normal' : 'NO PROCESS'}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.estadoMarcacion  eq '1' ? 'Retardo' : item.estadoMarcacion  eq '2' ? 'Abandono' : item.estadoMarcacion eq '3' ? 'Ausencia' : item.estadoMarcacion eq '4' ? 'Salida Anticipada' : item.estadoMarcacion eq '5' ? 'H.Extra NO Autorizada' : item.estadoMarcacion eq '6' ? 'Normal' : 'NO PROCESS'}"
+                                      title="Indica el tipo de novedad en la marcación">
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.marcacionAutorizada}"
+                              filterMatchMode="exact"
+                              headerText="Aprobada" styleClass="#{item.marcacionAutorizada eq 1 ? 'cssGreen' : 'cssRed'}" rendered="#{genCtrlJornadaMB.b_autorizaMarcaciones}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('dtnovedadeslist').filter()" styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Aprobada" itemValue="#{1}"  />
+                                <f:selectItem itemLabel="No Aprobada" itemValue="#{0}"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{item.marcacionAutorizada == 1}" class="cssWhite" />
+                        <h:outputText value="No" rendered="#{item.marcacionAutorizada == 0}" class="cssWhite" />
+                    </p:column>
+                    <p:column filterBy="#{item.marcacionGestionada}"
+                              filterMatchMode="exact"
+                              headerText="Gestionada" styleClass="#{item.marcacionGestionada eq 1 ? 'cssGreen' : 'cssRed'}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('dtnovedadeslist').filter()" styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Gestionada" itemValue="#{1}"  />
+                                <f:selectItem itemLabel="No Gestionada" itemValue="#{0}"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{item.marcacionGestionada == 1}" class="cssWhite" />
+                        <h:outputText value="No" rendered="#{item.marcacionGestionada == 0}" class="cssWhite" />
+                    </p:column>
+                    <p:column filterBy="#{item.marcacionAutorizada}"
+                              filterMatchMode="exact"
+                              rendered="#{genCtrlJornadaMB.b_autorizaMarcaciones}" 
+                              exportable="false" 
+                              headerText="Autorizar">
+                        <p:commandButton actionListener="#{genCtrlJornadaMB.autorizarNovedadBio(item, 1)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite RedButton"
+                                         update=":formgestionarmarcacion:novedadeslist,:formgestionarmarcacion:cj-grow"
+                                         rendered="#{item.marcacionGestionada==1 and item.marcacionAutorizada == 0}"
+                                         disabled="#{item.liquidado==1}">
+                            <p:confirm header="Confirmación" 
+                                       message="Está seguro de autorizar?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                        <p:commandButton actionListener="#{genCtrlJornadaMB.autorizarNovedadBio(item, 0)}"
+                                         icon="fa fa-thumbs-up"
+                                         class="cssWhite GreenButton"
+                                         update=":formgestionarmarcacion:novedadeslist,:formgestionarmarcacion:cj-grow"
+                                         rendered="#{item.marcacionGestionada==1 and item.marcacionAutorizada==1}"
+                                         disabled="#{item.liquidado==1}">
+                            <p:confirm header="Confirmación" 
+                                       message="Esta acción desautorizara la gestión, está seguro de continuar?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/gestionarMarcacion.xhtml"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center !important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form-reporte-liq"  enctype="multipart/form-data">
+            <p:panel header="Carga Infracciones"
+                     toggleable="true" 
+                     toggleSpeed="500" 
+                     closeSpeed="500"  
+                     collapsed="true"
+                     widgetVar="panel" 
+                     style="margin-bottom:20px">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <h:panelGrid columns="2" style="text-align: center; margin: 0 auto">
+                    <p:fileUpload fileUploadListener="#{infraccionesBean.cargarInfracciones}" mode="advanced" dragDropSupport="false"
+                                  update="messages, :frmInfracciones:dtInfracciones" sizeLimit="2000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/"
+                                  label="Buscar archivo" uploadLabel="Cargar" cancelLabel="Cancelar carga"
+                                  invalidFileMessage="Debe cargar un archivo excel válido"
+                                  invalidSizeMessage="El archivo no debe ser mayor a 2mb"
+                                  oncomplete="PF('w_Infracciones').clearFilters(); PF('w_Infracciones').filter();"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+        <h:form id="frmInfracciones">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="INFRACCIONES">
+                <p:dataTable id="dtInfracciones" var="item" 
+                             scrollable="true"
+                             widgetVar="w_Infracciones"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             rows="20"
+                             filterDelay="1700"
+                             paginator="true"
+                             selection="#{infraccionesBean.infraSelected}"
+                             rowKey="#{item.idInfraccion}"
+                             selectionMode="single"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,60,150"
+                             emptyMessage="No existen registros"
+                             value="#{infraccionesBean.listInfracciones}">
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Cambiar Puntos"
+                                             id="cambio-puntos"
+                                             update="formaplPM"
+                                             class="GreenButton cssWhite"
+                                             disabled="#{empty infraccionesBean.infraSelected}"
+                                             action="#{infraccionesBean.cambiarPuntos()}"
+                                             />
+                        </div>
+                    </f:facet>>
+                    <p:ajax event="rowSelect" listener="#{infraccionesBean.onRowSelect}" update="botones" />
+                    <p:ajax event="rowUnselect" update="botones"/>
+
+                    <p:column headerText="Id ICO"
+                              filterBy="#{item.idICO}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idICO}" />
+                    </p:column>
+
+                    <p:column headerText="Etapa"
+                              filterBy="#{item.etapa}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.etapa}" />
+                    </p:column>
+
+                    <p:column headerText="Estado"
+                              filterBy="#{item.estado}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.estado}" />
+                    </p:column>
+
+                    <p:column headerText="Fecha Inicio DP"
+                              filterBy="#{item.fechaIniDP}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.fechaIniDP}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha FIN DP"
+                              filterBy="#{item.fechaFinDP}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.fechaFinDP}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Tipo Novedad"
+                              filterBy="#{item.tipoNovedad}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.tipoNovedad}" />
+                    </p:column>
+
+                    <p:column headerText="Fecha Novedad"
+                              filterBy="#{item.fechaNovedad}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.fechaNovedad}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Área"
+                              filterBy="#{item.area}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.area}" />
+                    </p:column>
+
+                    <p:column headerText="Línea"
+                              filterBy="#{item.linea}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.linea}" />
+                    </p:column>
+
+                    <p:column headerText="Dirección"
+                              filterBy="#{item.direccion}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.direccion}" />
+                    </p:column>
+
+                    <p:column headerText="Placa"
+                              filterBy="#{item.placa}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.placa}" />
+                    </p:column>
+
+                    <p:column headerText="Móvil"
+                              filterBy="#{item.movil}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.movil}" />
+                    </p:column>
+
+                    <p:column headerText="N SAE Conductor"
+                              filterBy="#{item.nSAE}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.nSAE}" />
+                    </p:column>
+
+                    <p:column headerText="Cédula Conductor"
+                              filterBy="#{item.cedulaOperador}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.cedulaOperador}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre Conductor"
+                              filterBy="#{item.nombreOperador}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.nombreOperador}" />
+                    </p:column>
+                    
+                    <p:column headerText="Puntos ICO"
+                              filterBy="#{item.puntosICO}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.puntosICO}" />
+                    </p:column>
+                    
+                    <p:column headerText="Puntos PM Conciliados"
+                              filterBy="#{item.puntosPMConciliados}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.puntosPMConciliados}" />
+                    </p:column>
+                    
+                    <p:column headerText="Descripción"
+                              class="cortar" style="max-width: 150px !important">
+                        <h:outputText value="#{item.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="Estado2"
+                              class="cortar" style="max-width: 150px !important"
+                              filterBy="#{item.estado2}"
+                              styleClass="#{item.estado2 eq 'Cerrado' ? 'cssRed' : 'cssGreen'}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.estado2}" class="cssWhite" />
+                    </p:column>
+                    
+                    <p:column headerText="Acción" exportable="false">
+                        <p:commandButton actionListener="#{infraccionesBean.procedeCociliacion(item)}"
+                                         icon="fa fa-thumbs-up"
+                                         class="cssWhite GreenButton"
+                                         title="Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea aplicar los puntos?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                        <p:spacer width="3"/>
+                        <p:commandButton actionListener="#{infraccionesBean.noProcedeConciliacion(item)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite"
+                                         title="No Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea NO proceder con la conciliación?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                    
+                    <f:facet name="footer">
+                        En total existen #{infraccionesBean.listInfracciones.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtInfracciones" 
+                                                fileName="Listado Infracciones"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/listaErrores.xhtml"/>
+        <ui:include src="modal/cambiarPuntos.xhtml"/>
+    </ui:define>
+</ui:composition>

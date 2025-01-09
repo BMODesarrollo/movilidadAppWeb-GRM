@@ -1,0 +1,271 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            input.readonly,
+            input.readonly.ui-state-focus {
+                background: none;
+                box-shadow: none;
+                border: none;
+            }
+            .calendarFilter .ui-inputfield
+            {
+                width:90px !important;
+                margin: 0 0.2em !important;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .oneLine {
+                display: inline-block;
+            }
+            p-dialog .ui-dialog {
+                overflow: scroll;
+            }
+            .mapClass {
+                width: 100%;
+                height: 500px;
+            }
+        </style>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDX8EfDI5P5RUJkl3G1F1sBKwQCaYVfV4"></script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Bitácora de novedades">
+            <p:hotkey bind="ctrl+esc" 
+                      handler="PF('dtNovedades').clearFilters()"
+                      update="frmPrincipal:dtTipo"/>
+            <h:form id="frmPrincipal">
+                <p:dataTable var="novedad" value="#{accNovedadInfraestrucBean.lista}"
+                             id="dtTipo"
+                             scrollable="true"
+                             scrollHeight="600"
+                             widgetVar="dtNovedades"
+                             disabledTextSelection="false"
+                             filteredValue="#{accNovedadInfraestrucBean.listaFilter}"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1700"
+                             paginator="true"
+                             styleClass="fixed-size"
+                             selection="#{accNovedadInfraestrucBean.selected}"
+                             rowKey="#{novedad.idAccNovedadInfraestruc}"
+                             selectionMode="single"
+                             style="table-layout: fixed;"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen novedades registradas">
+                    <p:cache disabled="true"/>
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton id="btnSeguimiento"
+                                             icon="fa fa-book" style="color: white"
+                                             value="Seguimiento de novedad"
+                                             class="GreenButton cssWhite"
+                                             rendered="#{not(accNovedadInfraestrucBean.selected == null)}"
+                                             update="dtTipo,:frmNovedadSeguimientoList:dtNovedadSeguimiento"
+                                             oncomplete="PF('NovedadSeguimientoListDialog').show();"
+                                             >
+                            </p:commandButton>
+                            <p:spacer width="10"/>
+                            <p:commandButton id="btnDocumentos"
+                                             icon="fa fa-file-text-o" style="color: white"
+                                             value="Documentos de novedad"
+                                             class="OrangeButton cssWhite"
+                                             rendered="#{not(accNovedadInfraestrucBean.selected == null)}"
+                                             update="dtTipo,:frmNovedadDocumentosList"
+                                             oncomplete="PF('NovedadDocumentosListDialog').show();"
+                                             />
+                            <p:spacer width="10"/>
+                            <p:spacer width="10"/>
+                            <p:commandButton id="btnMapaDet"
+                                             icon="fa fa-map-marker" style="color: white"
+                                             value="Ver mapa"
+                                             action="#{accNovedadInfraestrucBean.cargarMapa()}"
+                                             class="cssWhite"
+                                             rendered="#{not(accNovedadInfraestrucBean.selected == null)}"
+                                             update="dtTipo,:gmapDialogDet"
+                                             oncomplete="PF('dlgMapDet').show();"
+                                             />
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Nueva novedad" 
+                                             id="btnNuevaNovedadPM"
+                                             title="Nueva novedad"
+                                             class="cssWhite"
+                                             icon="fa fa-sticky-note"
+                                             action="#{accNovedadInfraestrucBean.nuevo()}"
+                                             update=":frmNovedadesPm,:modalnovedadesPM,
+                                             :frmNovedadesPm:pgrid2,modalnovedadesPM"
+                                             oncomplete="PF('novedadesPM').show();">
+                                <p:resetInput target=":frmNovedadesPm:pGrid"/>
+                                <p:resetInput target=":frmNovedadesPm:pgrid2"/>
+                                <p:resetInput target=":frmNovedadesPm:pgrid3"/>
+                                <p:ajax event="click" listener="#{accNovedadInfraestrucBean.resetSelected()}"
+                                        update="dtTipo"/>
+                            </p:commandButton>
+                            <p:commandButton value="Editar novedad" 
+                                             id="btnEditNovedadPM"
+                                             title="Editar novedad programa máster"
+                                             class="cssWhite"
+                                             icon="fa fa-pencil"
+                                             rendered="#{(accNovedadInfraestrucBean.selected.username == accNovedadInfraestrucBean.user.username) and accNovedadInfraestrucBean.selected != null}"
+                                             action="#{accNovedadInfraestrucBean.editar()}"
+                                             update=":frmNovedadesPm,:modalnovedadesPM"
+                                             oncomplete="PF('novedadesPM').show();">
+                                <p:resetInput target=":frmNovedadesPm:pGrid"/>
+                                <p:resetInput target=":frmNovedadesPm:pgrid2"/>
+                                <p:resetInput target=":frmNovedadesPm:pgrid3"/>
+                            </p:commandButton>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:ajax event="rowSelect" listener="#{accNovedadInfraestrucBean.onRowSelect}" update="botones" />
+                    <p:ajax event="rowUnselect" update="botones"/>
+
+                    <p:column headerText="Fecha Reporte"
+                              filterBy="#{novedad.fechaHoraReporte}" 
+                              filterMatchMode="startsWith"
+                              style="width: 7%" >
+                        <f:facet name="filter">
+                            <p:calendar id="search1" pattern="yyyy-MM-dd HH:mm" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('dtNovedades').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dtNovedades').filter()" update="dtTipo"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{novedad.fechaHoraReporte}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Cierre"
+                              filterBy="#{novedad.fechaHoraCierre}" 
+                              filterMatchMode="startsWith"
+                              style="width: 7%" >
+                        <f:facet name="filter">
+                            <p:calendar id="search2" pattern="yyyy-MM-dd HH:mm" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('dtNovedades').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dtNovedades').filter()" update="dtTipo"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{novedad.fechaHoraCierre}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo Novedad" 
+                              filterBy="#{novedad.idAccNovedadTipoInfrastruc.nombre}">
+                        <h:outputText value="#{novedad.idAccNovedadTipoInfrastruc.nombre}" />
+                    </p:column>
+                    <p:column id="detTipoNovedad" filterBy="#{novedad.idAccNovedadTipoDetalleInfrastruc.nombre}">
+                        <f:facet name="header">
+                            <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.idAccNovedadTipoDetalleInfrastruc.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Estado" 
+                              filterBy="#{novedad.idAccNovedadInfrastucEstado.nombre}">
+                        <h:outputText value="#{novedad.idAccNovedadInfrastucEstado.nombre}" />
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{novedad.idEmpleado.codigoTm} #{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Reportado por">
+                        <h:outputText value="#{novedad.idEmpleado.identificacion}" class="cssBlack"/>
+                        <h:outputText value=" #{novedad.idEmpleado.nombres.concat(' ').concat(novedad.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Reportado por" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}" rendered="#{novedad.idEmpleado != null}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.idEmpleado eq null}"/>
+                    </p:column>
+
+                    <p:column class="cortar">
+                        <f:facet name="header">
+                            <h:outputText value="Descripción" title="Descripción"/>
+                        </f:facet>
+                        <h:outputText  value="#{novedad.descripcion}"/>
+                    </p:column>
+                    <p:column id="documento"
+                              styleClass="#{novedad.accNovedadInfraestrucDocumentosList.size() gt 0 ? 'cssGreen': 'cssRed'}">
+                        <f:facet name="header" >
+                            <h:outputText value="Documento" title="¿Tiene documentos asociados?"/>  
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.accNovedadInfraestrucDocumentosList.size() gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.accNovedadInfraestrucDocumentosList.size() eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+
+                    <p:column id="seguimiento"
+                              styleClass="#{novedad.accNovedadInfraestrucSeguimientoList.size() gt 0 ? 'cssGreen': novedad.accNovedadInfraestrucSeguimientoList.size() eq 0 ? 'cssRed':' '}">
+                        <f:facet name="header">
+                            <h:outputText value="Seguimiento" title="¿Tiene seguimiento?"/>  
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.accNovedadInfraestrucSeguimientoList.size() gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.accNovedadInfraestrucSeguimientoList.size() eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column headerText="Latitud">
+                        <h:outputText value="#{novedad.latitud}"/>
+                    </p:column>
+                    
+                    <p:column headerText="Longitud">
+                        <h:outputText value="#{novedad.longitud}"/>
+                    </p:column>
+                    
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{novedad.username}"/>
+                    </p:column>
+                    <p:column headerText="Creado">
+                        <h:outputText value="#{novedad.creado}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{accNovedadInfraestrucBean.lista.size()} novedad(es) registradas.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtTipo" fileName="bitacora #{now}"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modals/novedades/modals/Create.xhtml"/>
+        <ui:include src="modals/novedades/seguimiento/ListaNovedadSeguimiento.xhtml"/>
+        <ui:include src="modals/novedades/documentos/ListaNovedadDocumentos.xhtml"/>
+        <ui:include src="modals/mapa/MapaDetalle.xhtml"/>
+    </ui:define>
+</ui:composition>

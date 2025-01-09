@@ -1,0 +1,171 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="novedadSeguimiento" 
+              id="modal"
+              modal="true" 
+              closeOnEscape="true"
+              closable="false"
+              responsive="true"
+              fitViewport="true" 
+              resizable="false" 
+              appendTo="@(body)"
+              position="center top" 
+              class="mr1024_50 mr500_90">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{novedadBean.selectedSeguimiento == null }">
+                                <p:outputLabel value="Nuevo seguimiento" class="cssWhite"/>
+                            </c:if>
+                            <c:if test="#{novedadBean.selectedSeguimiento != null }">
+                                <p:outputLabel
+                                    value="Editar seguimiento : #{novedadBean.selectedSeguimiento.seguimiento}"
+                                    class="cssWhite"/>
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('novedadSeguimiento').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNuevoSeguimiento">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <p:fieldset legend="Novedad">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:staticMessage severity="warn" 
+                                             summary="AVISO" 
+                                             rendered="#{novedadBean.tamanoNovedadSeguimiento eq null}"
+                                             detail="Si desea agregar archivos al seguimiento, DEBE crear una llave con el nombre novedad_seguimiento_tamano y como valor colocar limite ( en BYTES ) por archivo... En el módulo Configuración Empresa ( Configuración / Empresa ) ===> Avisar a tecnología"/>
+                        </div>
+                    </div>
+                    <div class="ui-g" jsf:id="pGrid">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel for="tipo_novedad" 
+                                           value="Tipo novedad: " />
+
+                            <p:inputText value="#{novedadBean.selected.idNovedadTipo.nombreTipoNovedad}"
+                                         id="tipo_novedad" readonly="true"/>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel value="Detalle novedad: " />
+                            <p:inputText readonly="true" value="#{novedadBean.selected.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novedadBean.selected.idNovedadDano eq null and novedadBean.selected.idMulta eq null}"/>
+                            <p:inputText readonly="true" value="#{novedadBean.selected.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novedadBean.selected.idNovedadTipoDetalle.idNovedadTipoDetalle gt 0 and novedadBean.selected.idMulta.idMulta gt 0}"/>
+                            <p:inputText readonly="true" value="#{novedadBean.selected.idNovedadDano.idVehiculoDanoSeveridad.nombre}" rendered="#{novedadBean.selected.idNovedadDano.idNovedadDano gt 0}"/>
+                            <p:inputText readonly="true" value="#{novedadBean.selected.idMulta.idMultaTipo.tipo}"
+                                         rendered="#{novedadBean.selected.idMulta.idMulta gt 0 and novedadBean.selected.idNovedadTipoDetalle eq null}"/>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="observacion"
+                                               value="Observación:" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputTextarea value="#{novedadBean.selected.observaciones}"
+                                                 rows="5"
+                                                 autoResize="false"
+                                                 readonly="true"
+                                                 id="observacion"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p:fieldset>
+            <p:fieldset toggleable="true"  legend="Seguimiento">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel for="fecha" value="Fecha:" />
+                            <p:calendar id="fecha" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{novedadBean.novedadSeguimiento.fecha}" 
+                                        maxdate="today"
+                                        showOn="button" 
+                                        locale="es"
+                                        readonlyInput="true"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha"
+                                        showTodayButton="true"
+                                        navigator="true"
+                                        />
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="-" 
+                                               style="visibility: hidden"/>
+                            </div>
+                            <p:commandButton title="Anexar audio/video"
+                                             icon="fa fa-upload"
+                                             disabled="#{novedadBean.tamanoNovedadSeguimiento eq null}"
+                                             value="Cargar Archivo(s)"
+                                             class="cssWhite OrangeButton"
+                                             update="frmAddFilesSeguimientos"
+                                             oncomplete="PF('AddFilesSeguimientoDialog').show()">
+                            </p:commandButton>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                            <p:outputLabel for="seguimiento" value="Seguimiento:" />
+                            <p:inputTextarea id="seguimiento" value="#{novedadBean.novedadSeguimiento.seguimiento}"
+                                             rows="5"
+                                             autoResize="false"
+                                             required="true"
+                                             requiredMessage="Debe ingresar el seguimiento de la novedad"/>
+                        </div>
+                    </div>
+                </div>
+            </p:fieldset>
+            <p:remoteCommand name="rc_seg"
+                             action="#{novedadBean.guardarSeguimiento()}"
+                             update=":frmNovedadSeguimientoList:dtNovedadSeguimiento,
+                             messages,
+                             frmPrincipal:dtTipo
+                             @form,
+                             msgs"
+                             rendered="#{novedadBean.selectedSeguimiento == null }"
+                             />
+            <p:remoteCommand name="rc_update_seg" 
+                             action="#{novedadBean.actualizarSeguimiento()}"
+                             update=":frmNovedadSeguimientoList:dtNovedadSeguimiento,
+                             @form,
+                             messages,
+                             msgs,
+                             frmPrincipal:dtTipo"
+                             rendered="#{novedadBean.selectedSeguimiento != null }"
+                             />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_seg();"
+                             value="Guardar"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             rendered="#{novedadBean.selectedSeguimiento == null }"
+                             >
+            </p:commandButton>
+            <p:commandButton onclick="rc_update_seg();"
+                             value="Actualizar"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             rendered="#{novedadBean.selectedSeguimiento != null }"
+                             />
+        </f:facet>
+    </p:dialog>  
+</ui:composition>

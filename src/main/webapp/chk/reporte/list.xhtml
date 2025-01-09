@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="head">
+        <style>
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                padding: 2px 5px;
+            }
+            .btn-flex{
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Reporte CheckList
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0"
+                             jsf:id="ufSelect">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":form_historico_nov_mtto:dtReporteCheckList" 
+                                            oncomplete="PF('wv_dt_reporte_checklist').getPaginator().setPage(0);"
+                                            listener="#{chkDiarioBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+
+            <h:form id="form_historico_nov_mtto">
+                <p:dataTable id="dtReporteCheckList" 
+                             widgetVar="wv_dt_reporte_checklist"
+                             var="item"
+                             reflow="true"
+                             paginator="true"
+                             tableStyle="table-layout:auto"
+                             emptyMessage="No se han encontrado registros."
+                             rowStyleClass="text-center"
+                             value="#{chkDiarioBean.lstChkDiario}" 
+                             rowKey="#{item.idChkDiario}"
+                             rowIndexVar="rVar"
+                             rows="20">
+
+                    <p:ajax event="rowToggle" listener="#{chkDiarioBean.onRowToggleDetalle}" 
+                            process="@this"
+                            update="dtDetalles" />
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <h:outputText value="Fechas: " title="Fecha Inicio"
+                                          style="right: 300px"/>
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{chkDiarioBean.desde}"
+                                        placeholder="Fecha Ini"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dtReporteCheckList" 
+                                        listener="#{chkDiarioBean.consultar()}"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{chkDiarioBean.hasta}"
+                                        placeholder="Fecha Fin"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dtReporteCheckList" 
+                                        listener="#{chkDiarioBean.consultar()}"/>
+                            </p:calendar>
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Generar reporte"
+                                             icon="fa fa-download"
+                                             update=":msgs"
+                                             ajax="false"
+                                             class="cssWhite OrangeButton"
+                                             actionListener="#{chkDiarioBean.generarReporte()}"
+                                             oncomplete="location.reload();"
+                                             >
+                                <p:fileDownload value="#{chkDiarioBean.file}" />
+                            </p:commandButton>
+                            <p:spacer width="10"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtReporteCheckList" 
+                                             trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        Total Registros #{chkDiarioBean.lstChkDiario.size()}
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtReporteCheckList" 
+                                                fileName="Reporte CheckList"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                    <p:column width="2%" exportable="false">
+                        <p:rowToggler />
+                    </p:column>
+                    <p:column headerText="Fecha" class="TexAlCenter">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Código Operador"
+                              class="TexAlCenter"
+                              filterBy="#{item.idEmpleado.codigoTm}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idEmpleado.codigoTm}" rendered="#{item.idEmpleado != null}"/>
+                    </p:column>
+                    <p:column headerText="Operador" 
+                              class="TexAlCenter"
+                              filterBy="#{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}" rendered="#{item.idEmpleado != null}"/>
+                    </p:column>
+                    <p:column headerText="Cargo"
+                              class="TexAlCenter"
+                              filterBy="#{item.idEmpleado.idEmpleadoCargo.nombreCargo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idEmpleado.idEmpleadoCargo.nombreCargo}" rendered="#{item.idEmpleado != null}"/>
+                    </p:column>
+                    <p:column headerText="Vehículo"
+                              class="TexAlCenter"
+                              filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.codigo}" />
+                    </p:column>
+                    
+                    <p:column headerText="Fallas/Observación"
+                              visible="false"
+                              class="TexAlCenter"
+                              >
+                        <h:outputText value="#{chkDiarioBean.obtenerFallas(item)}" />
+                    </p:column>
+                    <p:column headerText="Usuario" class="TexAlCenter">
+                        <h:outputText value="#{item.username}" />
+                    </p:column>
+                    <p:rowExpansion>
+                        <p:dataTable var="obj" 
+                                     tableStyle="table-layout:auto"
+                                     id="dtDetalles"
+                                     value="#{chkDiarioBean.lstChkDiarioDet}">
+                            <p:column headerText="Componente"
+                                      class="TexAlCenter"
+                                      filterBy="#{obj.idChkComponente.nombre}"
+                                      filterMatchMode="contains">
+                                <h:outputText value="#{obj.idChkComponente.nombre}"/>
+                            </p:column>
+                            <p:column headerText="Falla" 
+                                      class="TexAlCenter"
+                                      filterBy="#{obj.idChkComponenteFalla.nombre}"
+                                      filterMatchMode="contains"
+                                      >
+                                <h:outputText value="#{obj.idChkComponenteFalla.nombre}"/>
+                            </p:column>
+                            <p:column headerText="Estado" 
+                                      styleClass="#{obj.estado == 1 ? 'cssGreen texto-blanco TexAlCenter' : obj.estado == 0 ? 'cssRed texto-blanco TexAlCenter' : null}">
+                                <h:outputText value="#{obj.estado==1 ?'BUENO':'FALLA'}" styleClass="cssWhite"/>
+                            </p:column>
+                            <p:column headerText="Observación">
+                                <h:outputText value="#{obj.observacion}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

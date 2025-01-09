@@ -1,0 +1,205 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <ui:define name="head">
+        <style>
+            input.readonly,
+            input.readonly.ui-state-focus {
+                background: none;
+                box-shadow: none;
+                border: none;
+            }
+            .calendarFilter .ui-inputfield
+            {
+                width:90px !important;
+                margin: 0 0.2em !important;
+            }
+            .ui-datatable .ui-datatable-header, .ui-datatable .ui-datatable-footer{
+                padding: 0px;
+            }    
+
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Liquida PM">
+            <h:form id="formLiquida">
+                <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+                <p:dataTable value="#{liquidaPM.listNovedadPm}"
+                             var="novedad"
+                             widgetVar="dtNovedades"
+                             id="datalist"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1000"
+                             paginator="true"
+                             selection="#{liquidaPM.novedad}"
+                             rowKey="#{novedad.idNovedad}"
+                             selectionMode="single"
+                             rowsPerPageTemplate="20,30,50"
+                             emptyMessage="No existen novedades registradas">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{liquidaPM.fechaInicio}"
+                                        placeholder="Fecha Inicio"
+                                        maxdate="today"
+                                        title="Fecha de Inicio"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 320px">
+                                <p:ajax event="dateSelect" update="datalist" 
+                                        listener="#{liquidaPM.getByDateRange()}"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{liquidaPM.fechaFin}"
+                                        placeholder="Fecha Fin"
+                                        maxdate="today"
+                                        title="Fecha Fin"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 320px">
+                                <p:ajax event="dateSelect" update="datalist" 
+                                        listener="#{liquidaPM.getByDateRange()}"/>
+                            </p:calendar>
+                            <p:commandButton value="Cambiar Puntos"
+                                             id="cambio-puntos"
+                                             actionListener="#{liquidaPM.modal()}"
+                                             update="formaplPM"
+                                             class="GreenButton cssWhite"
+                                             disabled="#{empty liquidaPM.novedad.idNovedad}"
+                                             />
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="datalist" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+                    <p:ajax event="rowSelect" listener="#{liquidaPM.onRowSelect}" update="cambio-puntos" />
+
+                    <p:column headerText="Fecha"
+                              filterBy="#{novedad.fecha}" 
+                              filterMatchMode="startsWith"
+                              width="200"
+                              >
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        placeholder="Seleccione fecha"
+                                        onkeyup="PF('dtNovedades').filter()"
+                                        showOn="button"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dtNovedades').filter()" update="datalist"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{novedad.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo Novedad" filterBy="#{novedad.idNovedadTipo.nombreTipoNovedad}">
+                        <h:outputText value="#{novedad.idNovedadTipo.nombreTipoNovedad}" />
+                    </p:column>
+                    <p:column headerText="Grupo PM" 
+                              filterBy="#{liquidaPM.master(novedad)}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{liquidaPM.master(novedad)}" />
+                    </p:column>
+                    <p:column id="detTipoNovedad" filterBy="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+                        <f:facet name="header">
+                            <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novedad.idNovedadDano eq null and novedad.idMulta eq null}" />
+                        <h:outputText value="#{novedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}" rendered="#{novedad.idNovedadDano.idNovedadDano gt 0}"/>
+                        <h:outputText value="#{novedad.idMulta.idMultaTipo.tipo}" rendered="#{novedad.idMulta.idMulta gt 0}"/>
+                    </p:column>
+                    <p:column filterBy="#{novedad.idEmpleado.codigoTm}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Código_operador" title="Código del operador"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.idEmpleado.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Operador" filterBy="#{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}" />
+                    </p:column>
+
+                    <p:column id="puntosPm" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Puntos PM" title="Puntos programa Máster"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.puntosPm}"  />
+                    </p:column>
+                    <p:column id="puntosPmConciliados" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Puntos PM Conciliados"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.puntosPmConciliados}"  />
+                    </p:column>
+                    <p:column id="procede"
+                              styleClass="#{novedad.procede gt 0 ? 'cssGreen': novedad.procede eq 0 ? 'cssRed' : ''}">
+                        <f:facet name="header">
+                            <h:outputText value="Procede"/>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.procede == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.procede == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column style="width: 40px" headerText="Acción" exportable="false">
+                        <p:commandButton actionListener="#{liquidaPM.procedeCociliacion(novedad)}"
+                                         icon="fa fa-thumbs-up"
+                                         class="cssWhite GreenButton"
+                                         title="Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea aplicar los puntos?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                        <p:spacer width="3"/>
+                        <p:commandButton actionListener="#{liquidaPM.noProcedeConciliacion(novedad)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite"
+                                         title="No Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea NO proceder con la conciliación?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="datalist" fileName="liquidaPM #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="datalist" fileName="liquidaPM #{now}"  />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="datalist" fileName="liquidaPM #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="aplica.xhtml"/>
+    </ui:define>
+</ui:composition>

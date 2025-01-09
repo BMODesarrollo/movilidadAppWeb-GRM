@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="PARAMETRIZACIÓN DE NOVEDADES PARA SOLICITUDES">
+            <h:form id="frmSolicitudNovedadList">
+                <p:dataTable var="solicitud"
+                             value="#{prgSolicitudNovedadParamBean.lstSolicitudNovedadParams}"
+                             id="dtSolicitudNovedadParam"
+                             scrollable="true"
+                             widgetVar="wlVDtSolicitudNovedadParam"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} autorizaciones"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No hay registros guardados">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                process="@this"
+                                disabled="#{prgSolicitudNovedadParamBean.lstSolicitudNovedadParams.size() eq 1}"
+                                actionListener="#{prgSolicitudNovedadParamBean.nuevo()}"
+                                oncomplete="PF('wlVSolicitudNovedad').show();"
+                                class="cssWhite"
+                                update=":solicitudNovedad,:frmSolicitudNovedad"
+                                >
+                                <p:resetInput target=":frmSolicitudNovedad:pGridDatos"/>
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Código Proceso" styleClass="text-center">
+                        <h:outputText 
+                            title="#{solicitud.idNotificacionProceso.nombreProceso}"
+                            value="#{solicitud.idNotificacionProceso.codigoProceso}" />
+                    </p:column>
+
+                    <p:column headerText="Novedad Cambios a generar">
+                        <h:outputText value="#{solicitud.idNovedadCambio.tituloTipoNovedad}" />
+                    </p:column>
+
+                    <p:column headerText="Novedad Permisos a generar">
+                        <h:outputText value="#{solicitud.idNovedadPermiso.tituloTipoNovedad}" />
+                    </p:column>
+
+                    <p:column headerText="Novedad Licencias a generar">
+                        <h:outputText value="#{solicitud.idNovedadLicencia.tituloTipoNovedad}" />
+                    </p:column>
+
+                    <p:column headerText="Novedad no Firma a generar">
+                        <h:outputText value="#{solicitud.idNovedadNoFirma.tituloTipoNovedad}" />
+                    </p:column>
+                    
+                    <p:column headerText="Consecutivo permisos" styleClass="text-center">
+                        <h:outputText value="#{solicitud.consecPermisos}" />
+                    </p:column>
+                    
+                    <p:column headerText="Consecutivo cambio turno" styleClass="text-center">
+                        <h:outputText value="#{solicitud.consecCambioTurno}" />
+                    </p:column>
+                    
+                    <p:column headerText="Consecutivo licencias" styleClass="text-center">
+                        <h:outputText value="#{solicitud.consecLicencia}" />
+                    </p:column>
+
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 process="@this"
+                                                 action="#{prgSolicitudNovedadParamBean.editar()}"
+                                                 update=":solicitudNovedad,:frmSolicitudNovedad"
+                                                 oncomplete="PF('wlVSolicitudNovedad').show();"
+                                                 icon="fa fa-pencil">
+                                    <p:resetInput target=":frmSolicitudNovedad:pGridDatos"/>
+                                    <f:setPropertyActionListener value="#{solicitud}" target="#{prgSolicitudNovedadParamBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+        <ui:include src="modals/ListNotificacionProcesos.xhtml"/>
+        <ui:include src="modals/ListNovedadCambios.xhtml"/>
+        <ui:include src="modals/ListNovedadPermisos.xhtml"/>
+        <ui:include src="modals/ListNovedadLicencias.xhtml"/>
+        <ui:include src="modals/ListNovedadNoFirma.xhtml"/>
+    </ui:define>
+
+</ui:composition>

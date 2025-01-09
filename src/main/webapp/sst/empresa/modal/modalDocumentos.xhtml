@@ -1,0 +1,192 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="empresaDocumentos"
+              widgetVar="wlvEmpresaDocumentos" 
+              modal="true" 
+              class="mr1024_70 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+
+        <f:facet name="header">
+            LISTADO DE DOCUMENTOS
+        </f:facet>
+
+        <h:form id="frmEmpresaDocs">
+            <p:dataTable id="dtDoc" 
+                         widgetVar="wvDtDocs"
+                         rowIndexVar="i"
+                         var="docs" 
+                         reflow="true"
+                         rows="10"
+                         rendered="#{sstEmpresaBean.selected != null}"
+                         rowKey="#{docs.idSstEmpresaDocs}"
+                         filterDelay="1700"
+                         paginator="true"
+                         rowsPerPageTemplate="10,50,100"
+                         emptyMessage="No existen documentos registros"
+                         value="#{sstEmpresaBean.cargarDocumentos()}">
+
+                <p:ajax event="rowToggle" listener="#{sstEmpresaBean.onRowToggleHistorico}" update="dtDocHistorico" />
+
+                <p:column style="width:30px">
+                    <p:rowToggler />
+                </p:column>
+
+                <p:column headerText="Nombre"
+                          sortBy="#{docs.idSstEmpresaTipoDoc.tipoDocumento}"
+                          sortable="true"
+                          filterBy="#{docs.idSstEmpresaTipoDoc.tipoDocumento}"
+                          filterMatchMode="contains"
+                          style="text-align: center;">
+                    <h:outputText value="#{docs.idSstEmpresaTipoDoc.tipoDocumento}"/>
+                </p:column>
+                <p:column headerText="Número"
+                          filterBy="#{docs.numero}"
+                          filterMatchMode="contains"
+                          style="text-align: center;">
+                    <h:outputText value="#{docs.numero}" 
+                                  rendered="#{docs.numero != null}"/>
+                    <h:outputText value="N/A" rendered="#{docs.numero == null}"/>
+                </p:column>
+                <p:column headerText="Desde"
+                          sortBy="#{docs.desde}"
+                          styleClass="#{sstEmpresaBean.validarVencimiento(docs.hasta)}"
+                          sortable="true"
+                          filterBy="#{docs.desde}" 
+                          filterMatchMode="startsWith"
+                          style="text-align: center;">
+                    <f:facet name="filter">
+                        <p:calendar id="search1" pattern="yyyy-MM-dd" locale="es"
+                                    autocomplete="off"
+                                    required="false"
+                                    navigator="true" showTodayButton="true"
+                                    maxdate="today"
+                                    inputStyle="width: 100%;"
+                                    placeholder="Desde"
+                                    onkeyup="PF('wvDtDocs').filter()"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }">
+                            <p:ajax event="dateSelect" oncomplete="PF('wvDtDocs').filter()" update="dtDoc"/>
+                        </p:calendar> 
+                    </f:facet>
+                    <h:outputText value="#{docs.desde}" 
+                                  styleClass="#{sstEmpresaBean.validarVencimiento(docs.hasta) eq 'cssRed texto-blanco' ? 'cssWhite': ''}"
+                                  rendered="#{docs.desde != null}" >
+                        <f:convertDateTime type="date" pattern="YYYY-MM-dd"/>
+                    </h:outputText>
+                    <h:outputText value="N/A" rendered="#{docs.desde == null}"/>
+                </p:column>
+                <p:column headerText="Hasta"
+                          sortBy="#{docs.hasta}"
+                          sortable="true"
+                          styleClass="#{sstEmpresaBean.validarVencimiento(docs.hasta)}"
+                          filterBy="#{docs.hasta}" 
+                          filterMatchMode="startsWith"
+                          style="text-align: center;">
+                    <f:facet name="filter">
+                        <p:calendar id="search2" pattern="yyyy-MM-dd" locale="es"
+                                    autocomplete="off"
+                                    required="false"
+                                    navigator="true" showTodayButton="true"
+                                    maxdate="today"
+                                    inputStyle="width: 100%;"
+                                    placeholder="Hasta"
+                                    onkeyup="PF('wvDtDocs').filter()"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }">
+                            <p:ajax event="dateSelect" oncomplete="PF('wvDtDocs').filter()" update="dtDoc"/>
+                        </p:calendar> 
+                    </f:facet>
+                    <h:outputText value="#{docs.hasta}" 
+                                  styleClass="#{sstEmpresaBean.validarVencimiento(docs.hasta) eq 'cssRed texto-blanco' ? 'cssWhite': ''}"
+                                  rendered="#{docs.hasta != null}">
+                        <f:convertDateTime type="date" pattern="YYYY-MM-dd"/>
+                    </h:outputText>
+                    <h:outputText value="N/A" rendered="#{docs.hasta == null}"/>
+                </p:column>
+                <p:column style="text-align: center;" styleClass="text-word-wrap">
+                    <f:facet name="header">
+                        <h:outputText value="Descripción"/>
+                    </f:facet>
+                    <h:outputText value="#{docs.idSstEmpresaTipoDoc.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Activo"
+                          width="10%"
+                          styleClass="#{docs.activo eq 1 ? 'cssGreen texto-blanco': 'cssRed texto-blanco'}">
+                    <h:outputText value="Sí" 
+                                  style="color: white; font-weight: bolder"
+                                  rendered="#{docs.activo eq 1}"/>
+                    <h:outputText value="No" 
+                                  style="color: white; font-weight: bolder"
+                                  rendered="#{docs.activo eq 0}"/>
+                </p:column>
+
+                <p:column headerText="Cargado"
+                          width="10%"
+                          styleClass="#{docs.path !=null ? 'cssGreen texto-blanco': 'cssRed texto-blanco'}">
+                    <h:outputText value="Sí" 
+                                  style="color: white; font-weight: bolder"
+                                  rendered="#{docs.path != null}"/>
+                    <h:outputText value="No" 
+                                  style="color: white; font-weight: bolder"
+                                  rendered="#{docs.path eq null}"/>
+                </p:column>
+
+                <p:column headerText="Acciones" style="text-align: center;"
+                          width="10%"
+                          exportable="false">
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                            <p:commandButton id="descargar-documento" 
+                                             update=":VistaDocumentoDlg"
+                                             title="Ver documento"
+                                             rendered="#{docs.path !=null}"
+                                             oncomplete="PF('vistaDocumentoDialog').show()"
+                                             actionListener="#{sstEmpresaBean.prepDownloadLocal(docs.path)}"
+                                             class="cssWhite OrangeButton"
+                                             icon="fa fa-eye">
+                            </p:commandButton>  
+                        </div>
+                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                            <p:commandButton styleClass="cssWhite GreenButton"
+                                             title="Agregar/Editar documento"
+                                             actionListener="#{sstEmpresaBean.setIsEditingArchivo(true)}"
+                                             process="@this"
+                                             update=":AddFilesListDlg"
+                                             oncomplete="PF('AddFilesListDialog').show();"
+                                             icon="fa fa-pencil">
+                                <f:setPropertyActionListener value="#{docs}" target="#{sstEmpresaBean.sstEmpresaDocs}"/>
+                            </p:commandButton>
+                        </div>
+
+                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                            <p:commandButton styleClass="cssWhite"
+                                             title="Nuevo documento - #{docs.idSstEmpresaTipoDoc.tipoDocumento}"
+                                             actionListener="#{sstEmpresaBean.setIsNuevoArchivoRe(true)}"
+                                             process="@this"
+                                             rendered="#{docs.idSstEmpresaTipoDoc.vigencia eq 1}"
+                                             update=":AddFilesListDlg"
+                                             oncomplete="PF('AddFilesListDialog').show();"
+                                             icon="fa fa-plus">
+                                <f:setPropertyActionListener value="#{docs}" target="#{sstEmpresaBean.sstEmpresaDocs}"/>
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </p:column>
+                <ui:include src="../child/tblHistoricoDoc.xhtml" />
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>     

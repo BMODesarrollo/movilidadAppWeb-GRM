@@ -1,0 +1,88 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="Tp-CostosListForm">
+            <p:growl id="msg-tp-costos" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Accidente Tipo de Costos">
+                <p:dataTable id="datalist" 
+                             value="#{accTipoCostosJSF.listAccTipoCostos}"
+                             var="item"
+                             selectionMode="single" 
+                             selection="#{accTipoCostosJSF.accTipoCostos}"
+                             paginator="true"
+                             rowKey="#{item.idAccTipoCostos}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             emptyMessage="No existen registros"
+                             widgetVar="listCostos"
+                             scrollable="true"
+                             scrollHeight="1000"
+                             >
+                    <p:ajax event="rowSelect" listener="#{accTipoCostosJSF.onRowSelect}" update="editButton" />
+                    <p:ajax event="rowUnselect" listener="#{accTipoCostosJSF.reset()}" update="datalist" />
+
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.tipoCostos}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Tipo de Costos"/>
+                        </f:facet>
+                        <h:outputText value="#{item.tipoCostos}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.directo}" headerText="Directo e Indirecto" filterMatchMode="exact" style="text-align: center">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('listCostos').filter()" styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Directo" itemValue="1"  />
+                                <f:selectItem itemLabel="Indirecto" itemValue="2"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.directo == 1 ? 'Directo' : 'Indirecto'}"/>
+                    </p:column>
+                    <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                        <h:outputText value="#{item.descripcion}"/>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             actionListener="#{accTipoCostosJSF.prepareGuardar()}" 
+                                             update=":form-tp-costos" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             oncomplete="PF('tp-costosDlg').show()">
+                                <p:resetInput target="form-tp-costos"/>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"   
+                                             value="Editar" 
+                                             update=":form-tp-costos-edit" 
+                                             icon="fa fa-pencil" 
+                                             disabled="#{empty accTipoCostosJSF.accTipoCostos.idAccTipoCostos}"
+                                             class="cssWhite GreenButton"
+                                             oncomplete="PF('tp-costos-editDlg').show()">
+                                <p:resetInput target="form-tp-costos-edit"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="acc tipo costos #{now}" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+    </ui:define>
+</ui:composition>

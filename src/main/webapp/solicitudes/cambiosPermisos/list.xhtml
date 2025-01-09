@@ -1,0 +1,990 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .texto-mayuscula{
+                text-transform: uppercase;
+            }
+            @media only screen and (max-width: 600px) {
+                .texto-blanco {
+                    color: white !important;
+                    font-weight: bolder !important;
+                }
+            }
+            @media print{
+                body{
+                    min-width: 1024px;
+                    font-size: 80px !important;
+                    font-family: sans-serif !important;
+                }
+                .no-print{
+                    display: none !important;
+                }
+                .noNone{
+                    display: initial !important;
+                }
+                .H100{
+                    margin-top: 0 !important;
+                }
+                .ui-gp{
+                    display: block !important;
+                }
+                img{
+                    max-height: 980px;
+                }
+                .borderLine {
+                    border: 1px solid #6EC8C8;
+                    border-radius: 15px;
+                    text-align: center;
+                }
+                .He100{
+                    height: 100%;
+                }
+                .M3{
+                    margin-top: 3% !important;
+                }
+                .FontSize{
+                    font-size: 30px !important;
+                }
+                .borderB{
+                    border-bottom: 1px solid #6EC8C8;
+                }
+                .borderR{
+                    border-right: 1px solid #6EC8C8;
+                }
+                .borderT{
+                    border-top: 1px solid #6EC8C8;
+                }
+                .borderL{
+                    border-left: 1px solid #6EC8C8;
+                }
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel styleClass="no-print">
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            SOLICITUDES DE CAMBIOS Y/O PERMISOS
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmSolicitudes:dtSolicitudes" 
+                                            oncomplete="PF('dtSolicitud').getPaginator().setPage(0);"
+                                            listener="#{prgSolicitudesBean.getByDateRange()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmSolicitudes">
+                <p:dataTable id="dtSolicitudes" var="solicitud" 
+                             scrollable="true"
+                             widgetVar="dtSolicitud"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen novedades registradas"
+                             value="#{prgSolicitudesBean.lstSolicitudes}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <h:outputText value="Fechas: " title="Fecha Inicio"
+                                          style="right: 300px"/>&nbsp;&nbsp;
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{prgSolicitudesBean.fechaInicio}"
+                                        placeholder="Fecha Ini"
+                                        readonlyInput="true"
+                                        required="true"
+                                        requiredMessage="Debe ingresar fecha de inicio"
+                                        maxdate="today"
+                                        pattern="yyyy-MM-dd" locale="es"
+                                        style="right: 300px">
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{prgSolicitudesBean.fechaFin}"
+                                        readonlyInput="true"
+                                        required="true"
+                                        requiredMessage="Debe ingresar fecha fin"
+                                        placeholder="Fecha Fin"
+                                        maxdate="today"
+                                        pattern="yyyy-MM-dd" locale="es"
+                                        style="right: 300px">
+                            </p:calendar>
+                            <p:spacer width="10"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                actionListener="#{prgSolicitudesBean.getByDateRange()}"
+                                class="cssWhite"
+                                update="dtSolicitudes,:msgs"
+                                >
+                            </p:commandButton>    
+                            <p:spacer width="20"/>
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nueva Solicitud"
+                                rendered="#{prgSolicitudesBean.validarRolMaster()}"
+                                action="#{prgSolicitudesMasterBean.nuevo()}"
+                                oncomplete="PF('solicitudDlg').show();"
+                                class="cssWhite"
+                                update=":frmSolicitud"
+                                >
+                            </p:commandButton>    
+                            <p:spacer width="20"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtSolicitudes" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column exportable="false" filterBy="#{solicitud.idPrgSercon.idEmpleado.codigoTm} #{solicitud.idPrgSercon.idEmpleado.nombres} #{solicitud.idPrgSercon.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Solicitante">
+                        <h:outputText value="#{solicitud.idPrgToken.idEmpleado.codigoTm} - " class="cssBlack"/>
+                        <h:outputText value="#{solicitud.idPrgToken.idEmpleado.nombres.concat(' ').concat(solicitud.idPrgToken.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Código Solicitante">
+                        <h:outputText value="#{solicitud.idPrgSercon.idEmpleado.codigoTm}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Nombre Solicitante" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{solicitud.idPrgSercon.idEmpleado.nombres} #{solicitud.idPrgSercon.idEmpleado.apellidos}"/>
+                    </p:column>
+
+                    <p:column headerText="Tipo solicitud" style="text-align: center;">
+                        <h:outputText value="CAMBIO" rendered="#{solicitud.prgSolicitudCambioList.size() > 0}" />
+                        <h:outputText value="PERMISO" rendered="#{solicitud.prgSolicitudPermisoList.size() > 0}" />
+                    </p:column>
+
+                    <p:column headerText="Fecha Solicitud"
+                              width="120"
+                              style="text-align: center;">
+                        <h:outputText value="#{solicitud.fechaSolicitud}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column style="text-align: center;"
+                              width="60"
+                              styleClass="#{solicitud.requiereSoporte == 1 ? 'cssGreen texto-blanco' : solicitud.requiereSoporte == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Requiere soporte"/>
+                        </f:facet>
+                        <h:outputText value="Si" style="color: white; font-weight: bolder" rendered="#{solicitud.requiereSoporte == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{solicitud.requiereSoporte == 0}"/>
+                    </p:column>
+
+                    <p:column style="text-align: center;"
+                              width="60"
+                              styleClass="#{solicitud.reponeTiempo == 1 ? 'cssGreen texto-blanco' : solicitud.reponeTiempo == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Devuelve tiempo"/>
+                        </f:facet>
+                        <h:outputText value="Si" style="color: white; font-weight: bolder" rendered="#{solicitud.reponeTiempo == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{solicitud.reponeTiempo == 0}"/>
+                    </p:column>
+
+                    <p:column style="text-align: center;" styleClass="text-word-wrap">
+                        <f:facet name="header">
+                            <h:outputText value="Motivo"/>
+                        </f:facet>
+                        <h:outputText value="#{solicitud.idPrgSolicitudMotivo.motivo}"/>
+                    </p:column>
+
+                    <p:column style="text-align: center;" styleClass="text-word-wrap">
+                        <f:facet name="header">
+                            <h:outputText value="Descipción Motivo"/>
+                        </f:facet>
+                        <h:outputText value="#{solicitud.motivo}"/>
+                    </p:column>
+
+                    <p:column headerText="Estado"
+                              styleClass="#{solicitud.idPrgToken.activo == 1 ? 'cssGray' : solicitud.idPrgToken.activo == 2 ? 'cssGreen' : 'cssRed'}"
+                              filterBy="#{solicitud.idPrgToken.activo}"
+                              filterMatchMode="exact"
+                              exportable="false">
+                        <f:facet name="filter">
+                            <p:selectOneMenu style="width: 50%"
+                                             onchange="PF('dtSolicitud').filter()"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Pendiente" itemValue="#{1}"/>
+                                <f:selectItem itemLabel="Aprobado" itemValue="#{2}"/>
+                                <f:selectItem itemLabel="Rechazado" itemValue="#{3}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{solicitud.idPrgToken.activo == 1 ? 'Pendiente' : solicitud.idPrgToken.activo == 2 ? 'Aprobado' : 'Rechazado'}" styleClass="cssWhite"/>
+                    </p:column>
+
+                    <p:column headerText="Acciones" style="text-align: center;"
+                              exportable="false"
+                              rendered="#{prgSolicitudesBean.b_rol}">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Aprobar"
+                                                 action="#{prgSolicitudesBean.aprobarSolicitud()}"
+                                                 update="dtSolicitudes,:msgs"
+                                                 disabled="#{solicitud.idPrgToken.activo == 2}"
+                                                 icon="fa fa-thumbs-up">
+                                    <f:setPropertyActionListener value="#{solicitud}" target="#{prgSolicitudesBean.prgSolicitud}"/>
+                                    <p:confirm header="Confirmación" 
+                                               message="Está seguro de aprobar ésta solicitud?" 
+                                               icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Rechazar"
+                                                 action="#{prgSolicitudesBean.rechazarSolicitud()}"
+                                                 update="dtSolicitudes,:msgs"
+                                                 disabled="#{solicitud.idPrgToken.activo == 2 or solicitud.idPrgToken.activo == 3 }"
+                                                 icon="fa fa-thumbs-down">
+                                    <f:setPropertyActionListener value="#{solicitud}" target="#{prgSolicitudesBean.prgSolicitud}"/>
+                                    <p:confirm header="Confirmación" 
+                                               message="Está seguro de rechazar ésta solicitud?" 
+                                               icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                <p:commandButton styleClass="cssWhite OrangeButton"
+                                                 title="Información adicional"
+                                                 action="#{prgSolicitudesBean.obtenerInfoAdicional()}"
+                                                 process="@this"
+                                                 update=":frmDialogo"
+                                                 style="margin-right: 10px;"
+                                                 onclick="PF('dlgInfo').show();"
+                                                 icon="fa fa-external-link">
+                                    <f:setPropertyActionListener value="#{solicitud}" target="#{prgSolicitudesBean.prgSolicitud}"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Generar Formato"
+                                                 disabled="#{solicitud.idPrgToken.activo != 2}"
+                                                 update=":panel-imprimir"
+                                                 action="#{prgSolicitudesBean.obtenerInfoAdicional()}"
+                                                 oncomplete="window.print();"
+                                                 icon="fa fa-print">
+                                    <f:setPropertyActionListener value="#{solicitud}" target="#{prgSolicitudesBean.prgSolicitud}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{prgSolicitudesBean.lstSolicitudes.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtSolicitudes" 
+                                                fileName="Listado de solicitudes"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+
+        <ui:include src="nuevaSolicitud.xhtml"/>
+        <ui:include src="modalSolicitudes.xhtml"/>
+
+        <p:dialog header="Información Adicional" 
+                  id="dlgInfoAdc"
+                  fitViewport="true"
+                  widgetVar="dlgInfo" 
+                  modal="true" 
+                  width="50%"
+                  closeOnEscape="true"
+                  resizable="false" 
+                  appendTo="@(body)" 
+                  position="center top"
+                  responsive="true">
+
+            <h:form id="frmDialogo">
+                <div align="center" jsf:id="dPermiso" class="ui-fluid">
+                    <p:fieldset legend="Información"
+                                rendered="#{prgSolicitudesBean.prgSolicitudPermiso != null}">
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="Fecha: "/>    
+                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudPermiso.fecha}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                            </h:outputText>
+
+                            <h:outputLabel value="SERCON: "/>    
+                            <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.sercon}" />
+
+                            <h:outputLabel value="Hora Inicio: "/>    
+                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudPermiso.timeOrigin}" />
+
+                            <h:outputLabel value="Hora Fin: "/>    
+                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudPermiso.timeDestiny}" />
+
+                            <h:outputLabel value="Lugar Inicio: "/>    
+                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudPermiso.lugarInicio}" />
+
+                            <h:outputLabel value="Lugar Fin: "/>    
+                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudPermiso.lugarFin}" />
+
+                            <h:outputLabel value=""/>
+                            <h:outputLabel value=""/>
+
+                            <h:outputLabel value="Requiere soporte: "  rendered="#{prgSolicitudesBean.b_rol}"/>
+                            <p:selectBooleanButton
+                                value="#{prgSolicitudesBean.b_requiere_soporte}"
+                                rendered="#{prgSolicitudesBean.b_rol}"
+                                onLabel="Sí" offLabel="No" 
+                                onIcon="fa fa-check" 
+                                offIcon="fa fa-times"
+                                styleClass="cssWhite">
+                            </p:selectBooleanButton>
+
+                            <h:outputLabel value="Devuelve tiempo: " rendered="#{prgSolicitudesBean.b_rol}"/>
+                            <p:selectBooleanButton
+                                value="#{prgSolicitudesBean.b_devuelve_tiempo}"
+                                rendered="#{prgSolicitudesBean.b_rol}"
+                                onLabel="Sí" offLabel="No" 
+                                onIcon="fa fa-check" 
+                                offIcon="fa fa-times"
+                                styleClass="cssWhite">
+                            </p:selectBooleanButton>
+                        </h:panelGrid>
+                    </p:fieldset>
+
+                    <h:panelGrid columns="1" styleClass="Wid100" rendered="#{prgSolicitudesBean.prgSolicitudPermiso != null and prgSolicitudesBean.b_rol}">
+                        <h:outputLabel value="Nota: "/>
+                        <p:inputTextarea
+                            value="#{prgSolicitudesBean.prgSolicitud.nota}" 
+                            rows="5" maxlength="255"
+                            autoResize="false"
+                            placeholder="Ingrese nota" /> 
+                    </h:panelGrid>
+
+                </div>
+                <div align="center" jsf:id="dCambios" class="ui-fluid">
+                    <div class="ui-g" jsf:rendered="#{prgSolicitudesBean.prgSolicitud.idPrgToken.activo != 2 and prgSolicitudesBean.prgSolicitudCambio != null}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <p:fieldset legend="Datos Solicitante" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null}">
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Fecha: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}" >
+                                        <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                                    </h:outputText>
+
+                                    <h:outputLabel value="Código: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.idEmpleado.codigoTm}" />
+
+                                    <h:outputLabel value="SERCON: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.sercon}" />
+
+                                    <h:outputLabel value="Hora Inicio: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.timeOriginSolicitante}" />
+
+                                    <h:outputLabel value="Hora Fin: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.timeDestinySolicitante}" />
+
+                                    <h:outputLabel value="Lugar Inicio: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarInicioSolicitante}" />
+
+                                    <h:outputLabel value="Lugar Fin: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarFinSolicitante}" />
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <p:fieldset legend="Datos Reemplazo">
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Fecha: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}" >
+                                        <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                                    </h:outputText>
+
+                                    <h:outputLabel value="Código: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.idPrgSerconReemplazo.idEmpleado.codigoTm}" />
+
+                                    <h:outputLabel value="Nombre: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.idPrgSerconReemplazo.idEmpleado.nombres.concat(' ').concat(prgSolicitudesBean.prgSolicitudCambio.idPrgSerconReemplazo.idEmpleado.apellidos)}" />
+
+                                    <h:outputLabel value="SERCON: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.idPrgSerconReemplazo.sercon}" />
+
+                                    <h:outputLabel value="Hora Inicio: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.timeOriginReemplazo}" />
+
+                                    <h:outputLabel value="Hora Fin: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.timeDestinyReemplazo}" />
+
+                                    <h:outputLabel value="Lugar Inicio: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarInicioReemplazo}" />
+
+                                    <h:outputLabel value="Lugar Fin: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarFinReemplazo}" />
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </div>
+                    </div>
+
+                    <div class="ui-g" jsf:rendered="#{prgSolicitudesBean.prgSolicitud.idPrgToken.activo eq 2 and prgSolicitudesBean.prgSolicitudCambio != null}">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <p:fieldset legend="Datos Solicitante">
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Fecha: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}" >
+                                        <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                                    </h:outputText>
+
+                                    <h:outputLabel value="Código: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.idPrgSerconReemplazo.idEmpleado.codigoTm}" />
+
+                                    <h:outputLabel value="SERCON: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.idPrgSerconReemplazo.sercon}" />
+
+                                    <h:outputLabel value="Hora Inicio: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.timeOriginReemplazo}" />
+
+                                    <h:outputLabel value="Hora Fin: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.timeDestinyReemplazo}" />
+
+                                    <h:outputLabel value="Lugar Inicio: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarInicioReemplazo}" />
+
+                                    <h:outputLabel value="Lugar Fin: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarFinReemplazo}" />
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                            <p:fieldset legend="Datos Reemplazo">
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Fecha: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}" >
+                                        <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                                    </h:outputText>
+
+                                    <h:outputLabel value="Código: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.idEmpleado.codigoTm}" />
+
+                                    <h:outputLabel value="Nombre: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.idEmpleado.nombres.concat(' ').concat(prgSolicitudesBean.prgSolicitud.idPrgSercon.idEmpleado.apellidos)}" />
+
+                                    <h:outputLabel value="SERCON: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.sercon}" />
+
+                                    <h:outputLabel value="Hora Inicio: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.timeOriginSolicitante}" />
+
+                                    <h:outputLabel value="Hora Fin: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.timeDestinySolicitante}" />
+
+                                    <h:outputLabel value="Lugar Inicio: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarInicioSolicitante}" />
+
+                                    <h:outputLabel value="Lugar Fin: "/>    
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarFinSolicitante}" />
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </div>
+                    </div>
+
+                    <div class="EmptyBox10"></div>
+
+                    <h:panelGrid columns="2" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null and prgSolicitudesBean.b_rol}">
+                        <h:outputLabel value="Requiere soporte: "/>
+                        <p:selectBooleanButton 
+                            id="b_requiere_soporte_cambio"
+                            value="#{prgSolicitudesBean.b_requiere_soporte}" 
+                            onLabel="Sí" offLabel="No" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite">
+                        </p:selectBooleanButton>
+
+                        <h:outputLabel value="Devuelve tiempo: "/>
+                        <p:selectBooleanButton 
+                            id="b_devuelve_tiempo_cambio"
+                            value="#{prgSolicitudesBean.b_devuelve_tiempo}" 
+                            onLabel="Sí" offLabel="No" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite">
+                        </p:selectBooleanButton>
+                    </h:panelGrid>
+
+                    <div class="EmptyBox5"></div>
+
+                    <h:panelGrid columns="1" styleClass="Wid100" 
+                                 rendered="#{prgSolicitudesBean.prgSolicitudCambio != null and prgSolicitudesBean.b_rol}">
+                        <h:outputLabel value="Nota: "/>
+                        <p:inputTextarea
+                            value="#{prgSolicitudesBean.prgSolicitud.nota}" 
+                            rows="5" maxlength="255"
+                            autoResize="false"
+                            placeholder="Ingrese nota" /> 
+                    </h:panelGrid>
+                </div>
+
+                <div class="EmptyBox10"></div>
+
+                <div align="center">
+                    <p:commandButton 
+                        actionListener="#{prgSolicitudesBean.actualizarDatos()}"
+                        rendered="#{prgSolicitudesBean.b_rol}"
+                        oncomplete="PF('dlgInfo').hide()"
+                        update="frmSolicitudes:dtSolicitudes,:msgs"
+                        icon="fa fa-check"
+                        styleClass="cssWhite"
+                        value="Actualizar datos"/>
+                </div>
+            </h:form>
+        </p:dialog> 
+
+        <div jsf:id="panel-imprimir" class="noNone DispNone" style="font-size: 14px">
+            <div class="ui-fluid">
+                <div class="ui-g Padding0 BorderRadio borderLine cssBlue">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0 borderR">
+                            <div style="margin-top: 1% !important">
+                                <img src="#{prgSolicitudesBean.logo}" 
+                                     alt=""
+                                     width="104"
+                                     height="80">
+                                </img>
+                            </div>
+                        </div>
+                        <div class="ui-g-8 ui-md-8 ui-lg-8 Padding0">
+                            <div class="M3 FontSize">
+                                SOLICITUD DE PERMISO O CAMBIO
+                            </div>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0 ui-g-nopad He100 borderL">
+                            <div class="ui-g Padding0 He100">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 borderB">
+                                    <div>FGO - 03</div>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <div class="M3">V01 - 05-19</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                        <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR ">
+                            <div>NOMBRE DE QUIEN SOLICITA</div>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0 borderR ">
+                            <div>CÓDIGO</div>
+                        </div>
+                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0">
+                            <div>FECHA DE SOLICITUD</div>
+                        </div>
+                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderL ">
+                            <div>No. Licencia</div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB He100">
+                        <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR He100">
+                            <div class="He100 borderB">
+                                #{prgSolicitudesBean.prgSolicitud.idPrgToken.idEmpleado.nombres.concat(' ').concat(prgSolicitudesBean.prgSolicitud.idPrgToken.idEmpleado.apellidos)}
+                            </div>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0 He100 borderR">
+                            <div class="He100 borderB">
+                                #{prgSolicitudesBean.prgSolicitud.idPrgToken.idEmpleado.codigoTm}
+                            </div>
+                        </div>
+                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 He100 borderB">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR He100">
+                                <div>
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.fechaSolicitud}">
+                                        <f:convertDateTime pattern="dd" type="date"/>
+                                    </h:outputText>
+                                </div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 He100">
+                                <div>
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.fechaSolicitud}">
+                                        <f:convertDateTime pattern="MM" type="date"/>
+                                    </h:outputText>
+                                </div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL He100">
+                                <div>
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.fechaSolicitud}">
+                                        <f:convertDateTime pattern="YYYY" type="date"/>
+                                    </h:outputText>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderL ">
+                            <div class="M3 FontSize">
+                                No. L 
+                                <span class="cssRedColor FontSize" jsf:rendered="#{prgSolicitudesBean.consecutivo != null}">
+                                    #{prgSolicitudesBean.consecutivo}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                        <div>MOTIVO</div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB" style="text-align: justify">
+                        <div class="Padding3">#{prgSolicitudesBean.prgSolicitud.motivo}</div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB He100">
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                                <div><i class="#{prgSolicitudesBean.prgSolicitudCambio != null ? 'fa fa-square borderLine':'fa fa-square-o borderLine'}" style="width: 40px;margin-right: 5px;"></i>CAMBIO</div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                                <div>NOMBRE DEL REEMPLAZO</div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                                <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                <div>
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.idEmpleado.nombres.concat(' ').concat(prgSolicitudesBean.prgSolicitud.idPrgSercon.idEmpleado.apellidos)}" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null}"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderB borderR">
+                                <div style="text-align: justify">CÓDIGO DEL REEMPLAZO</div>
+                            </div>
+                            <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0 borderB">
+                                <div>
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.idEmpleado.codigoTm}" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null}"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB borderR">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR">
+                                    <div style="text-align: justify">FECHA</div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0">
+                                    <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR">
+                                        <div>
+                                            <p:spacer width="2" 
+                                                      rendered="#{prgSolicitudesBean.prgSolicitudCambio.fecha == null}"/>
+                                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}">
+                                                <f:convertDateTime pattern="dd" type="date"/>
+                                            </h:outputText>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0">
+                                        <div>
+                                            <p:spacer width="2" 
+                                                      rendered="#{prgSolicitudesBean.prgSolicitudCambio.fecha == null}"/>
+                                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}">
+                                                <f:convertDateTime pattern="MM" type="date"/>
+                                            </h:outputText>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL">
+                                        <div>
+                                            <p:spacer width="2" 
+                                                      rendered="#{prgSolicitudesBean.prgSolicitudCambio.fecha == null}"/>
+                                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}">
+                                                <f:convertDateTime pattern="YYYY" type="date"/>
+                                            </h:outputText>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB">
+                                <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderR">
+                                    <div style="text-align: justify">SERCON</div>
+                                </div>
+                                <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0">
+                                    <div style="text-align: justify">
+                                        <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.idPrgSerconReemplazo.sercon}" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB borderR">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB borderR">
+                                    <div style="text-align: justify">HORA DE INICIO</div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <div>
+                                        #{prgSolicitudesBean.prgSolicitudCambio.timeOriginReemplazo}
+                                    </div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR">
+                                    <div style="text-align: justify">HORA FIN</div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <div>
+                                        #{prgSolicitudesBean.prgSolicitudCambio.timeDestinyReemplazo}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB">
+                                <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderB borderR">
+                                    <div style="text-align: justify">LUGAR</div>
+                                </div>
+                                <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0 borderB">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <div style="text-align: justify">
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarInicioReemplazo}" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null}"/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderR">
+                                    <div style="text-align: justify">LUGAR:</div>
+                                </div>
+                                <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <div style="text-align: justify">
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarFinReemplazo}" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null}"/>
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB borderR">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR">
+                                    <div style="text-align: justify">FECHA</div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0">
+                                    <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR">
+                                        <div>
+                                            <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}">
+                                                <f:convertDateTime pattern="dd" type="date"/>
+                                            </h:outputText>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0">
+                                        <div>
+                                            <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}">
+                                                <f:convertDateTime pattern="MM" type="date"/>
+                                            </h:outputText>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL">
+                                        <div>
+                                            <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                            <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.fecha}">
+                                                <f:convertDateTime pattern="YYYY" type="date"/>
+                                            </h:outputText>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB">
+                                <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderR">
+                                    <div style="text-align: justify">SERCON</div>
+                                </div>
+                                <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <div style="text-align: justify">
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.sercon}" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB borderR">
+                                    <div style="text-align: justify">HORA DE INICIO</div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <div>
+                                        #{prgSolicitudesBean.prgSolicitudCambio.timeOriginSolicitante}
+                                    </div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR">
+                                    <div style="text-align: justify">HORA FIN</div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <div>
+                                        #{prgSolicitudesBean.prgSolicitudCambio.timeDestinySolicitante}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0">
+                                <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderB borderR">
+                                    <div style="text-align: justify">LUGAR</div>
+                                </div>
+                                <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0 borderB">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <div style="text-align: justify">
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarInicioSolicitante}" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null}"/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderR">
+                                    <div style="text-align: justify">LUGAR:</div>
+                                </div>
+                                <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudCambio == null}"/>
+                                    <div style="text-align: justify">
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitudCambio.lugarFinSolicitante}" rendered="#{prgSolicitudesBean.prgSolicitudCambio != null}"/>
+                                    </div>
+                                </div>  
+                            </div>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                                <div><i class="#{prgSolicitudesBean.prgSolicitudPermiso != null ? 'fa fa-square borderLine':'fa fa-square-o borderLine'}" style="width: 40px;margin-right: 5px;"></i>PERMISO</div>
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderB borderR">
+                                <div style="text-align: justify">FECHA</div>
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderB borderR">
+                                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR">
+                                    <div>
+                                        <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudPermiso == null}"/>
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitudPermiso.fecha}">
+                                            <f:convertDateTime pattern="dd" type="date"/>
+                                        </h:outputText>
+                                    </div>
+                                </div>
+                                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0">
+                                    <div>
+                                        <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudPermiso == null}"/>
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitudPermiso.fecha}">
+                                            <f:convertDateTime pattern="MM" type="date"/>
+                                        </h:outputText>
+                                    </div>
+                                </div>
+                                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL">
+                                    <div>
+                                        <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudPermiso == null}"/>
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitudPermiso.fecha}">
+                                            <f:convertDateTime pattern="YYYY" type="date"/>
+                                        </h:outputText>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB">
+                                <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderR">
+                                    <div style="text-align: justify">SERCON</div>
+                                </div>
+                                <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudPermiso == null}"/>
+                                    <div style="text-align: justify">
+                                        <h:outputText value="#{prgSolicitudesBean.prgSolicitud.idPrgSercon.sercon}" rendered="#{prgSolicitudesBean.prgSolicitudPermiso != null}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB borderR">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB borderR">
+                                    <div style="text-align: justify">HORA DE INICIO</div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudPermiso == null}"/>
+                                    <div>
+                                        #{prgSolicitudesBean.prgSolicitudPermiso.timeOrigin}
+                                    </div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR">
+                                    <div style="text-align: justify">HORA FIN</div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudPermiso == null}"/>
+                                    <div>
+                                        #{prgSolicitudesBean.prgSolicitudPermiso.timeDestiny}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderB">
+                                <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderB borderR">
+                                    <div style="text-align: justify">LUGAR</div>
+                                </div>
+                                <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0 borderB">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudPermiso == null}"/>
+                                    <div style="text-align: justify">
+                                        #{prgSolicitudesBean.prgSolicitudPermiso.lugarInicio}
+                                    </div>
+                                </div>
+                                <div class="ui-g-5 ui-md-5 ui-lg-5 Padding0 borderR">
+                                    <div style="text-align: justify">LUGAR:</div>
+                                </div>
+                                <div class="ui-g-7 ui-md-7 ui-lg-7 Padding0">
+                                    <h:outputText value="R" style="visibility: hidden" rendered="#{prgSolicitudesBean.prgSolicitudPermiso == null}"/>
+                                    <div style="text-align: justify">
+                                        #{prgSolicitudesBean.prgSolicitudPermiso.lugarFin}
+                                    </div>
+                                </div>  
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                                <div>REQUIERE SOPORTE</div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" style="text-align: right">
+                                    <div>SÍ<i class="#{prgSolicitudesBean.prgSolicitud.requiereSoporte == 1 ? 'fa fa fa-square borderLine':'fa fa-square-o borderLine'}" style="width: 40px;margin-left: 5px;"></i></div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" style="text-align: left">
+                                    <div style="margin-left: 5px;">NO<i class="#{prgSolicitudesBean.prgSolicitud.requiereSoporte != 1 ? 'fa fa fa-square borderLine':'fa fa-square-o borderLine'}" style="width: 40px;margin-left: 5px"></i></div>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                                <div>DEVUELVE TIEMPO</div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" style="text-align: right">
+                                    <div>SÍ<i class="#{prgSolicitudesBean.prgSolicitud.reponeTiempo == 1 ? 'fa fa-square borderLine':'fa fa-square-o borderLine'}" style="width: 40px;margin-left: 5px;"></i></div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" style="text-align: left">
+                                    <div style="margin-left: 5px;">NO<i class="#{prgSolicitudesBean.prgSolicitud.reponeTiempo != 1 ? 'fa fa-square borderLine':'fa fa-square-o borderLine'}" style="width: 40px;margin-left: 5px"></i></div>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 He100" style="text-align: justify">
+                                <div style="margin-left: 5px;">NOTA: #{prgSolicitudesBean.prgSolicitud.nota}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" style="height: 80px;">
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR He100">
+                            <div style="text-align: justify">FIRMA Y CÉDULA OPERADOR</div>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 He100">
+                            <div style="text-align: justify">AUTORIZADO POR</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </ui:define>
+
+</ui:composition>

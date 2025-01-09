@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="MultaDocumentosEditDlg" 
+              widgetVar="MultaDocumentosEditDialog" closable="false"
+              modal="true" resizable="false" appendTo="@(body)"
+              closeOnEscape="true"
+              class="mr1024_30 mr500_90" height="auto"
+              header="Editar Multa Documentos">
+        <p:ajax event="close" listener="#{multaDocumentosController.reset}"/>
+        <h:form id="MultaDocumentosEditForm">
+            <div class="ui-fluid" jsf:id="display">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo de Documento:" for="idMultaTipoDocumento" />
+                        </div>
+                        <p:selectOneMenu id="idMultaTipoDocumento" 
+                                         value="#{multaDocumentosController.i_idMultaTipoDocumento}"
+                                         required="true" 
+                                         style="width: 99.9999%"
+                                         requiredMessage="Tipo de Documento es requerido"
+                                         filter="true"
+                                         filterMatchMode="startsWith"
+                                         >
+                            <f:selectItem itemLabel="Seleccionar Tipo Documento" itemValue="0"/>
+                            <f:selectItems value="#{multaTipoDocumentoBean.lista}"
+                                           var="idMultaTipoDocumentoItem"
+                                           itemLabel="#{idMultaTipoDocumentoItem.nombreTipoDocumento}"
+                                           itemValue="#{idMultaTipoDocumentoItem.idMultaTipoDocumento}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset legend="Documento">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="idFULOP">
+                                <p:commandButton id="btnFoto" 
+                                                 icon="fa fa-file-photo-o" value="Agregar" 
+                                                 process="@this"
+                                                 class="OrangeButton cssWhite"
+                                                 actionListener="#{multaDocumentosController.openDialogFileUpLoad()}">
+                                </p:commandButton>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <p:commandButton action="#{multaDocumentosController.update}"
+                                     value="rc_doc_edit"
+                                     icon="fa fa-save"
+                                     update="display,
+                                     :MultaDocumentosListForm:datalist,
+                                     :MultaDocumentosListForm:upMultaD"/>
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                value="Actualizar"
+                onclick="rc_doc_edit();"
+                class="cssWhite"
+                icon="fa fa-save"/>
+        </f:facet>
+    </p:dialog>
+
+</ui:composition>

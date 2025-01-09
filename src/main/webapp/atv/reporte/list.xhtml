@@ -1,0 +1,206 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <style>
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                padding: 2px 5px;
+            }
+            .btn-flex{
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+            .text-center{
+                text-align: center;
+            }
+
+            .ui_ui{
+                background-color: #9bd3ae2e;
+                padding-left: 10px;
+
+            }
+            .ui_ui_ui{
+                background-color: #e2e3e742;
+                padding-left: 10px;
+            }
+            @media(max-width:768px) {
+                .flexboxx {
+                    flex-direction: column !important;
+                }
+            }
+            .flexboxx {
+                display: flex;
+                justify-content: flex-end;
+                flex-direction: row;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            REPORTE LIQUIDACIÓN PROPIETARIO
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="form-uf">
+                                <div class="Wid100" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <ui:include src="../../zComponent/selectUnidadFuncional.xhtml" />
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="form">
+                <p:dataTable id="dtNovATV" 
+                             widgetVar="wvNovAtvdt"
+                             var="item"
+                             reflow="true"
+                             paginator="true"
+                             filterDelay="700"
+                             emptyMessage="No se han encontrado registros."
+                             tableStyle="table-layout:auto"
+                             rowStyleClass="text-center"
+                             value="#{atvReporteJSF.listNovedadATV}" 
+                             rowKey="#{item.idNovedad}"
+                             rowIndexVar="rVar"
+                             rows="20">
+                    <f:facet name="header">
+                        <div class="flexboxx" >
+                            <p:calendar id="desde"
+                                        styleClass="calendarFilter" 
+                                        value="#{atvReporteJSF.desde}"
+                                        placeholder="Desde"
+                                        title="Desde"
+                                        navigator="true"
+                                        showOn="button"
+                                        pattern="yyyy-MM-dd" 
+                                        locale="es" />
+                            <p:calendar id="hasta"
+                                        styleClass="calendarFilter" 
+                                        value="#{atvReporteJSF.hasta}"
+                                        placeholder="Hasta"
+                                        title="Hasta"
+                                        navigator="true"
+                                        showOn="button"
+                                        pattern="yyyy-MM-dd"
+                                        locale="es" />
+                            <p:selectOneMenu id="prestadores" value="#{atvReporteJSF.idAtvPrestador}" 
+                                             filter="true" 
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione Prestador" itemValue="#{null}" />
+                                <f:selectItems value="#{atvPrestadorBean.lstAtvPrestadores}" 
+                                               var="atvPres" 
+                                               itemLabel="#{atvPres.nombre}"
+                                               itemDescription="#{atvPres.descripcion}"
+                                               itemValue="#{atvPres.idAtvPrestador}"/>
+                            </p:selectOneMenu>
+                            <p:commandButton id="btn-consultar"   
+                                             value="Buscar" 
+                                             actionListener="#{atvReporteJSF.consultarNov()}" 
+                                             update="@form,:msgs" 
+                                             process="desde,hasta,prestadores,@this"
+                                             icon="fa fa-search" 
+                                             class="cssWhite" />
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtNovATV" 
+                                             trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Servicio Creado">
+                        <h:outputText value="#{item.creado}" >
+                            <f:convertDateTime type="both" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Prestador">
+                        <h:outputText value="#{item.idAtvVehiculosAtencion.idAtvPrestador.nombre}" />
+                    </p:column>
+                    <p:column headerText="Vehículo"
+                              filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Placa Vehículo"
+                              filterBy="#{item.idVehiculo.placa}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.placa}" />
+                    </p:column>
+                    <p:column headerText="Tipo Vehículo"
+                              visible="false"
+                              filterBy="#{item.idVehiculo.idVehiculoTipo.nombreTipoVehiculo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.idVehiculoTipo.nombreTipoVehiculo}" />
+                    </p:column>
+                    <p:column headerText="Aprobado para pago" 
+                              class="TexAlCenter #{item.aceptarPagoAtv == 0 ? 'cssGreen' : 'cssRed'}"
+                              filterBy="#{item.aceptarPagoAtv}"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu id="s-filter-pago"
+                                             widgetVar="selFilterPagoWV"
+                                             onchange="PF('wvNovAtvdt').filter()"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Todos"
+                                              itemValue="#{null}" />
+                                <f:selectItem itemLabel="Sí"
+                                              itemValue="#{0}" />
+                                <f:selectItem itemLabel="No"
+                                              itemValue="#{1}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.aceptarPagoAtv == 0 ? 'Si' : 'No'}" class="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Observación Pago"
+                              class="cortar" >
+                        <h:outputText value="#{item.aceptarPagoObsAtv}" />
+                    </p:column>
+                    <p:column headerText="Servicio Atendido">
+                        <h:outputText value="#{item.atvEvidenciaList.get(1).creado}" >
+                            <f:convertDateTime type="both" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Servicio" 
+                              filterBy="#{item.idAtvTipoAtencion.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idAtvTipoAtencion.nombre}" />
+                    </p:column>
+                    <p:column headerText="Vehículo Atención" 
+                              filterBy="#{item.idAtvVehiculosAtencion.placa}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idAtvVehiculosAtencion.placa}" />
+                    </p:column>
+                    <p:column headerText="Télefono">
+                        <h:outputText value="#{item.idAtvVehiculosAtencion.telefono}" />
+                    </p:column>
+                    <p:column headerText="Valor Liquidado">
+                        <h:outputText value="#{item.costoLiquidadoAtv}" >
+                            <f:convertNumber pattern="$#,###.###" currencySymbol="$" type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="footer">
+                        Total Registros #{atvReporteJSF.listNovedadATV.size()}
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtNovATV"
+                                                fileName="Reporte ATV Liquidado"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

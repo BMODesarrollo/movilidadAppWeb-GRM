@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:jsf="http://xmlns.jcp.org/jsf"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Evaluación Caso Accidentalidad </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <h:outputStylesheet name="css/font-icon-layout.css" library="sentinel-layout" />
+        <h:outputStylesheet name="css/sentinel-layout.css" library="sentinel-layout" />
+        <h:outputStylesheet name="css/core-layout.css" library="sentinel-layout" />
+        <link rel="shortcut icon" href="resources/sentinel-layout/images/logo_III.png" />
+    </h:head>
+    <h:body class="fontRegular login-back white-back">
+        <h:form id="form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000" />
+            <div class="ui-fluid">
+                <div class="ui-g Padding0" style="text-transform: uppercase">
+                    <div class="ui-g-12 ui-ml-6 ui-lg-4 Padding3 Container80 MaxWid500 white-back Fnone MarAuto">
+                        <div class="EmptyBox5" />
+                        <p:panel id="pnl-info" header="Información del Evento" widgetVar="pnlWv">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <h:outputText value="ID CASO: #{preEvaluacionAccJSF.accidente != null ? preEvaluacionAccJSF.accidente.idAccidente + 1000 : ''}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="Evento" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="#{preEvaluacionAccJSF.accidente.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="Fecha del Evento" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="#{preEvaluacionAccJSF.accidente.fechaAcc}" >
+                                        <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="Vehículo" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="#{preEvaluacionAccJSF.accidente.idVehiculo.codigo} - #{preEvaluacionAccJSF.accidente.idVehiculo.placa}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="Operador" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="#{preEvaluacionAccJSF.accidente.idEmpleado.apellidos} #{preEvaluacionAccJSF.accidente.idEmpleado.nombres} - #{preEvaluacionAccJSF.accidente.idEmpleado.codigoTm}" />
+                                </div>
+                            </div>
+                            <f:facet name="options">
+                                <p:menu>
+                                    <p:submenu>
+                                        <p:menuitem value="Finalizar" url="../page/loginAcc.jsf?faces-redirect=true&amp;pin=#{preEvaluacionAccJSF.getiPin()}" icon="fa fa-times" />
+                                    </p:submenu>
+                                </p:menu>
+                            </f:facet>
+                        </p:panel>
+                        <div class="EmptyBox5" />
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="combos">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" style="text-align: right">
+                                <p:commandButton id="nuevo"
+                                                 icon="fa fa-plus"
+                                                 class="cssWhite"
+                                                 rendered="#{preEvaluacionAccJSF.bFlag}"
+                                                 actionListener="#{preEvaluacionAccJSF.prepararNuevo()}"
+                                                 process="@this"
+                                                 update=":form:combos" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:outputLabel value="* Árbol:"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:selectOneMenu id="s-arbol" 
+                                                     value="#{preEvaluacionAccJSF.idAccArbol}"
+                                                     filter="true" filterMatchMode="contains"
+                                                     disabled="#{preEvaluacionAccJSF.bNuevo}"
+                                                     style="width: 99.999%">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                        <f:selectItems value="#{preEvaluacionAccJSF.listAccArbol}" 
+                                                       var="accArb" 
+                                                       itemLabel="#{accArb.arbol}" 
+                                                       itemDescription="#{accArb.descripcion}"
+                                                       itemValue="#{accArb.idAccArbol}" />
+                                        <p:ajax process="@this" update=":form:combos" listener="#{preEvaluacionAccJSF.actualizarOpcion(1)}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:outputLabel value="* Causa:"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:selectOneMenu id="s-causa" 
+                                                     value="#{preEvaluacionAccJSF.idAccCausa}"
+                                                     filter="true" filterMatchMode="contains"
+                                                     disabled="#{preEvaluacionAccJSF.bNuevo}"
+                                                     style="width: 99.999%">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                        <f:selectItems value="#{preEvaluacionAccJSF.listAccCausa}" 
+                                                       var="accCau" 
+                                                       itemLabel="#{accCau.causa}" 
+                                                       itemDescription="#{accCau.descripcion}"
+                                                       itemValue="#{accCau.idAccCausa}" />
+                                        <p:ajax process="@this" update=":form:combos" listener="#{preEvaluacionAccJSF.actualizarOpcion(2)}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:outputLabel value="* Sub Causa:"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:selectOneMenu id="s-sub-causa" 
+                                                     value="#{preEvaluacionAccJSF.idAccCausaSub}"
+                                                     filter="true" filterMatchMode="contains"
+                                                     disabled="#{preEvaluacionAccJSF.bNuevo}"
+                                                     style="width: 99.999%">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                        <f:selectItems value="#{preEvaluacionAccJSF.listAccCausaSub}" 
+                                                       var="accCauSub" 
+                                                       itemLabel="#{accCauSub.subcausa}" 
+                                                       itemDescription="#{accCauSub.descripcion}"
+                                                       itemValue="#{accCauSub.idAccSubcausa}" />
+                                        <p:ajax process="@this" update=":form:combos" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:outputLabel value="Causa Raíz:"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:selectOneMenu id="s-causa-raiz" 
+                                                     value="#{preEvaluacionAccJSF.idAccCausaRaiz}"
+                                                     filter="true" filterMatchMode="contains"
+                                                     disabled="#{preEvaluacionAccJSF.bNuevo}"
+                                                     style="width: 99.999%">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                        <f:selectItems value="#{preEvaluacionAccJSF.listAccCausaRaiz}" 
+                                                       var="accCauRaiz" 
+                                                       itemLabel="#{accCauRaiz.causaRaiz}" 
+                                                       itemDescription="#{accCauRaiz.descripcion}"
+                                                       itemValue="#{accCauRaiz.idAccCausaRaiz}" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="EmptyBox5" />
+                            <div class="ui-g-6 ui-md-7 ui-lg-8 Padding0" />
+                            <div class="ui-g-6 ui-md-5 ui-lg-4 Padding0" style="text-align: right">
+                                <p:commandButton id="agregar"
+                                                 value="Agregar"
+                                                 icon="fa fa-check"
+                                                 rendered="#{preEvaluacionAccJSF.bFlag}"
+                                                 class="cssWhite"
+                                                 actionListener="#{preEvaluacionAccJSF.agregarLista()}"
+                                                 process="combos"
+                                                 update=":form" />
+                            </div>
+                        </div>
+                        <div class="EmptyBox5" />
+                        <p:dataTable id="table-cau"
+                                     var="cauPre"
+                                     reflow="true"
+                                     rowIndexVar="rowIdxC"
+                                     value="#{preEvaluacionAccJSF.listAccidentePreCalificacion}">
+
+                            <f:facet name="header">
+                                Causalidades
+                            </f:facet>
+                            <p:column headerText="#" style="width: 30px;text-align: center" >
+                                <h:outputText value="#{rowIdxC + 1}" />
+                            </p:column>
+                            <p:column headerText="Árbol de Causalidad">
+                                <div class="ui-g">
+                                    <h:outputText value="Árbol: #{cauPre.idCausasub.idCausa.idAccArbol.arbol}" 
+                                                  title="desc: #{cau.idCausaSub.idCausa.idAccArbol.descripcion}" />
+                                </div>
+                                <div class="ui-g">
+                                    <h:outputText value="Causa: #{cauPre.idCausasub.idCausa.causa}" 
+                                                  title="desc: #{cauPre.idCausasub.idCausa.descripcion}" />
+                                </div>
+                                <div class="ui-g">
+                                    <h:outputText value="Sub Causa: #{cauPre.idCausasub.subcausa}" 
+                                                  title="desc: #{cauPre.idCausasub.descripcion}" />
+                                </div>
+                                <div class="ui-g">
+                                    <h:outputText value="Causa Raíz: #{cauPre.idCausaraiz.causaRaiz}"
+                                                  title="desc: #{cauPre.idCausaraiz.descripcion}"/>
+                                </div>
+                            </p:column>
+                            <p:column headerText="Acciones" style="text-align:center;width: 100px" >
+                                <p:commandButton id="btn-accion"
+                                                 title="Remover de la lista"
+                                                 class="cssWhite RedButton"
+                                                 icon="fa fa-trash"
+                                                 actionListener="#{preEvaluacionAccJSF.elimiar(cauPre)}" 
+                                                 process="@this"
+                                                 update=":form">
+                                    <p:confirm header="Confirmación" message="Seguro de remover la causalidad de la lista?" 
+                                               icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                        <div class="EmptyBox5" />
+                        <div class="ui-g-6 ui-lm-6 ui-lg-5 Padding3">
+                            <p:commandButton id="btn-sig"
+                                             action="#{preEvaluacionAccJSF.siguiente()}"
+                                             icon="fa fa-arrow-right" 
+                                             process="@this"
+                                             disabled="#{empty preEvaluacionAccJSF.listAccidentePreCalificacion}"
+                                             rendered="#{preEvaluacionAccJSF.bFlag}"
+                                             update=":form" 
+                                             class="cssWhite GreenButton"  
+                                             value="Siguiente" >
+                                <p:confirm header="Confirmación" message="Seguro de su valoración? No son reversible estos datos" 
+                                           icon="fa fa-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes cssWhite" icon="fa fa-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no cssWhite" icon="fa fa-times" />
+            </p:confirmDialog>
+        </h:form>
+        <p:ajaxStatus  onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:graphicImage name="images/preloadbmo.gif" height="50" library="sentinel-layout"/>
+        </p:dialog>
+    </h:body>
+    <!--  -->
+</html>

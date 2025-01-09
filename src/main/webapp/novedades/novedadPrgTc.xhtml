@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Novedades y servicios
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmNovPrgTc:dtNovTc" 
+                                            listener="#{novedadPrgTcJSFMB.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmNovPrgTc">
+                <p:dataTable var="novTc" value="#{novedadPrgTcJSFMB.list}"
+                             id="dtNovTc"
+                             rowIndexVar="nroFila"
+                             rows="50"
+                             scrollable="true"
+                             scrollHeight="600"
+                             filterDelay="1000"
+                             widgetVar="dt_novTc"
+                             paginator="true"
+                             paginatorPosition="top"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100,200,500"
+                             emptyMessage="No existen novedad registrados">
+
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="dtNovTc" fileName="Novedades por Servicio"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:outputLabel value="Fechas: " class="cssWhite Fs20" for="desde"/>
+                            <p:calendar id="desde" 
+                                        navigator="true"
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{novedadPrgTcJSFMB.desde}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" process="desde"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        navigator="true"
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{novedadPrgTcJSFMB.hasta}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" process="hasta"/>
+                            </p:calendar>
+                            <p:commandButton 
+                                value="Buscar"
+                                class="cssWhite"
+                                icon="fa fa-search"
+                                process="frmNovPrgTc"
+                                actionListener="#{novedadPrgTcJSFMB.consultar()}"
+                                update="frmNovPrgTc:dtNovTc,msgs">
+                            </p:commandButton>
+
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha"
+                              filterBy="#{novTc.idNovedad.fecha}" 
+                              filterMatchMode="startsWith">
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 70%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('dt_novTc').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dt_novTc').filter()" update="dtNovTc"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{novTc.idNovedad.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Detalle Tipo Novedad" filterBy="#{novTc.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+                        <h:outputText value="#{novTc.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                    </p:column>
+                    <p:column  filterBy="#{novTc.idEmpleado.codigoTm} #{novTc.idEmpleado.nombres} #{novTc.idEmpleado.apellidos}"
+                               filterMatchMode="contains"
+                               headerText="Operador Nuevo">
+                        <h:outputText value="#{novTc.idEmpleado.codigoTm}" class="cssBlack"/>
+                        <h:outputText value=" #{novTc.idEmpleado.nombres.concat(' ').concat(novTc.idEmpleado.apellidos)}"/>
+                    </p:column>
+
+                    <p:column  filterBy="#{novTc.idOldEmpleado.codigoTm} #{novTc.idOldEmpleado.nombres} #{novTc.idOldEmpleado.apellidos}"
+                               filterMatchMode="contains"
+                               headerText="Operador">
+                        <h:outputText value="#{novTc.idOldEmpleado.codigoTm}" rendered="#{!(novTc.idOldEmpleado eq null)}" class="cssBlack" />
+                        <h:outputText value=" #{novTc.idOldEmpleado.nombres.concat(' ').concat(novTc.idOldEmpleado.apellidos)}" rendered="#{!(novTc.idOldEmpleado eq null)}"/>
+                        <h:outputText value="N/A" rendered="#{novTc.idOldEmpleado eq null}"/>
+                    </p:column>
+
+                    <p:column headerText="Vehículo" filterBy="#{novTc.idOldVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novTc.idOldVehiculo.codigo}" rendered="#{novTc.idOldVehiculo != null}"/>
+                        <h:outputText value="N/A" rendered="#{novTc.idOldVehiculo eq null}"/>
+                    </p:column>
+                    <p:column headerText="Vehículo Nuevo" filterBy="#{novTc.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novTc.idVehiculo.codigo}" rendered="#{novTc.idVehiculo != null}"/>
+                        <h:outputText value="N/A" rendered="#{novTc.idVehiculo eq null}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción" class="cortar">
+                        <h:outputText value="#{novTc.observaciones}" />
+                    </p:column>
+
+                    <p:column visible="false" headerText="tipología">
+                        <h:outputText value="#{novTc.idVehiculo.idVehiculoTipo.idVehiculoTipo==1 ? bundle.tipo_vehiculo_i: novTc.idPrgTc.idVehiculo.idVehiculoTipo.idVehiculoTipo==2 ? bundle.tipo_vehiculo_ii : 'N/A'}" />
+                    </p:column>
+                    <p:column visible="false" headerText="Hora Inicio">
+                        <h:outputText value="#{novTc.timeOrigin}" />
+                    </p:column>
+                    <p:column visible="false" headerText="Hora Fin">
+                        <h:outputText value="#{novTc.timeDestiny}" />
+                    </p:column>
+                    <p:column visible="false" headerText="Punto Inicio">
+                        <h:outputText value="#{novTc.fromStop.name}" />
+                    </p:column>
+                    <p:column visible="false" headerText="Punto Fin">
+                        <h:outputText value="#{novTc.toStop.name}" />
+                    </p:column>
+                    <p:column visible="false" headerText="Servicio">
+                        <h:outputText value="#{novTc.idPrgTc.idTaskType.tarea}" />
+                    </p:column>
+                    <p:column visible="false" headerText="Tabla">
+                        <h:outputText value="#{novTc.idPrgTc.tabla}" />
+                    </p:column>
+                    <p:column headerText="Responsable">
+                        <h:outputText value="#{novTc.idPrgTc.idPrgTcResponsable.responsable}" />
+                    </p:column>
+                    <p:column  headerText="Clasificación">
+                        <h:outputText value="#{novTc.idPrgTc.idPrgClasificacionMotivo.nombre}" />
+                    </p:column>
+                    <p:column exportable="false" headerText="Servicio" width="30%" class="#{novedadPrgTcJSFMB.alarStyleClass(novTc.estadoOperacion)} ">
+                        <span class="Container10 Responsive">
+                            <span class="Wid50 TexAlLeft">
+                                <i class="Fs30 Fleft Wid100 #{novTc.idVehiculo.idVehiculoTipo.idVehiculoTipo==1 ? 'redCar fa fa-bus': novTc.idVehiculo.idVehiculoTipo.idVehiculoTipo==2 ?  'yellowCar fa fa-bus' : 'white fa fa-bus'} TexAlCenter " ></i>
+                            </span>
+                        </span>
+                        <span class="Container12 Responsive">
+                            <span class="Wid90 TexAlLeft">
+                                <span class="Fs12 DispBlock ">#{novTc.timeOrigin}<br/><span class="Fs12 ">#{novTc.timeDestiny}</span></span>
+                            </span>
+                        </span>
+                        <span class="Container40 Responsive">
+                            <span class="Wid90 TexAlLeft">
+                                <span class="Fs12 DispBlock ">#{novTc.fromStop.name}<br/><span class="Fs12 ">#{novTc.toStop.name}</span></span>
+                            </span>
+                        </span>
+                        <span class="Container25 Responsive">
+                            <span class="Wid90 TexAlLeft">
+                                <span class="Fs14 DispBlock " style="font-weight: bold;">#{novTc.idPrgTc.idTaskType.tarea}<br/><span class="Fs12 ">#{novTc.idPrgTc.tabla}</span></span>
+                            </span>
+                        </span>
+
+                    </p:column>
+                    <p:column headerText="Creado">
+                        <h:outputText value="#{novTc.idNovedad.creado}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column visible="false" headerText="Estado Operacón">
+                        <p:outputLabel value="#{novedadPrgTcJSFMB.estadoOperacion(novTc.estadoOperacion)}"/>
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <p:outputLabel value="#{novTc.username}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

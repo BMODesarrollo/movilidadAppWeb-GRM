@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="ReasignarTareaDer" id="modalReasignarTareaDer" modal="true" closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)"
+              class="mr1024_30 mr500_90" position="center top">
+        <f:facet name="header" class="fuente">
+            Reasignar tarea(s)
+        </f:facet>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             onclick="rc_rea_der();"
+                             icon="fa fa-check"
+                             class="cssWhite">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro de reasignar los servicios seleccionados?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+        </f:facet>
+        <h:form id="frmReasignarTareaDer">
+            <p:remoteCommand name="rc_rea_der" action="#{prgTcResumenBean.reasignarTareaDerecha()}" update=":tabResumen:frmDerecha:dtPrgtcDerecha,
+                             :tabResumen:frmIzquierda:paramIzquierda,
+                             :tabResumen:frmDerecha:paramDerecha" >
+
+            </p:remoteCommand>
+            <p:messages id="messagesDer" showSummary="false" showDetail="true" closable="true">
+            </p:messages>
+
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="pGrid">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Ingrese código vehículo: "/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText value="#{prgTcResumenBean.codVehiculo}"
+                                         id="codVehiculo"
+                                         title="Ingrese código de vehículo"
+                                         required="true"
+                                         requiredMessage="Debe ingresar un vehículo"
+                                         onkeypress="if (event.keyCode === 13) {
+                                                     return false;
+                                                 }"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-search" class="cssWhite"
+                                                 style="margin: 0px"
+                                                 actionListener="#{prgTcResumenBean.buscarVehiculo()}"
+                                                 update="messagesDer" title="Buscar vehículo">
+
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

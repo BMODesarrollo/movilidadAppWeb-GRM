@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="idEmpleadoListDlg" closeOnEscape="true" 
+              widgetVar="wvEmpleadoListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" 
+              fitViewport="true"
+              height="auto"
+              width="auto"
+              class="mr1024_50 mr500_90"
+              header="Empleados" position="top" >
+        <h:form id="frmPrincipalListEmpleado">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Un click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="empl" id="tabla" value="#{emplListJSFMB.listEmpls}"  
+                         selectionMode="single" selection="#{emplListJSFMB.empleado}"                       
+                         rowIndexVar="nroFila"
+                         rows="15"
+                         widgetVar="empleadosPPWV"
+                         filterDelay="500"
+                         paginatorPosition="top"
+                         paginator="true"
+                         rowKey="#{empl.idEmpleado}"
+                         emptyMessage="No existen empleados registrados"       >
+                <p:ajax event="rowSelect" 
+                        update="msgs,#{emplListJSFMB.form}"
+                        listener="#{emplListJSFMB.onRowDblClckSelect}"
+                        oncomplete="PF('wvEmpleadoListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 10%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Identificación"
+                          filterMatchMode="contains"
+                          filterBy="#{empl.identificacion}">
+                    <h:outputText value="#{empl.identificacion}" />
+                </p:column>
+                <p:column  headerText="Codigo"
+                           filterMatchMode="contains"
+                           filterBy="#{empl.codigoTm}">
+                    <h:outputText  value="#{empl.codigoTm}" />
+                    <p:tooltip  value="Hacer doble click para seleccionar" trackMouse="true"/>
+                </p:column>
+                <p:column headerText="Nombre"
+                          filterMatchMode="contains"
+                          filterBy="#{empl.nombres} #{empl.apellidos}">
+                    <h:outputText value="#{empl.nombres} #{empl.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

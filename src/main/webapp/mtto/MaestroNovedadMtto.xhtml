@@ -1,0 +1,215 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <p:panel header="Maestro Novedad Mantenimiento">
+            <h:form id="frmMaestroNovedadMtto">
+                <p:growl id="msgs_maestroNovedadMtto" showDetail="true" showSummary="true" />
+                <p:dataTable  id="tblNovMttoList" var="nov"
+                              value="#{novedadMttoMB.listNovedadMttoByFechas}"
+                              rows="20"
+                              widgetVar="tblNovMttoListWV"
+                              paginatorPosition="bottom"
+                              rowIndexVar="index"
+                              selection="#{novedadMttoMB.novedadMtto}"
+                              selectionMode="single"
+                              scrollable="true"
+                              filterDelay="1500"
+                              scrollHeight="600"
+                              paginator="true" 
+                              rowKey="#{nov.idMttoNovedad}"
+                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                              {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                              rowsPerPageTemplate="10,20,50,100,200,500">
+                    <p:ajax event="rowSelect" listener="#{novedadMttoMB.onRowSelect}" update="frmMaestroNovedadMtto:IdcontextMenu" />
+
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="tblNovMttoList" fileName="Novedades Mtto"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+
+                        <div align="right">
+
+                            <h:outputText value="Fechas: " title="Fecha Inicio"
+                                          style="right: 300px"/>&nbsp;&nbsp;
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{novedadMttoMB.desde}"
+                                        placeholder="Fecha Ini"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="tblNovMttoList" 
+                                        listener="#{novedadMttoMB.getNovMtto()}"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{novedadMttoMB.hasta}"
+                                        placeholder="Fecha Fin"
+                                        maxdate="today+1"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="tblNovMttoList" 
+                                        listener="#{novedadMttoMB.getNovMtto()}"/>
+                            </p:calendar>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha"
+                              sortBy="#{nov.fecha}">
+                        <h:outputText value="#{nov.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vehículo" 
+                              filterMatchMode="contains" filterBy="#{nov.idVehiculo.codigo}">
+                        <h:outputText value="#{nov.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{nov.idEmpleado.codigoTm} #{nov.idEmpleado.nombres} #{nov.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Operador">
+                        <h:outputText value="#{nov.idEmpleado.codigoTm}" class="cssBlack"/>
+                        <h:outputText value=" #{nov.idEmpleado.nombres.concat(' ').concat(nov.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column headerText="Componente"
+                              filterBy="#{nov.idMttoComponente.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{nov.idMttoComponente.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Comp. Falla"
+                              filterBy="#{nov.idMttoComponenteFalla.falla}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{nov.idMttoComponenteFalla.falla}"/>
+                    </p:column>
+
+                    <p:column headerText="Criticidad" 
+                              sortBy="#{nov.idMttoComponenteFalla.idMttoCriticidad.criticidad}"
+                              filterBy="#{novedadMttoMB.criticidad(nov.idMttoComponenteFalla.idMttoCriticidad)}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('tblNovMttoListWV').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: auto" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{novedadMttoMB.criticidades()}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText  value="#{nov.idMttoComponenteFalla.idMttoCriticidad.descripcion}"/>
+                    </p:column>
+
+                    <p:column headerText="Estado" 
+                              filterBy="#{novedadMttoMB.estado(nov.idMttoEstado)}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('tblNovMttoListWV').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: auto" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{novedadMttoMB.estados()}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssBlack"  value="#{nov.idMttoEstado.estado}"/>
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{nov.username}"/>
+                    </p:column>
+                    <p:column headerText="Usuario Cierra">
+                        <h:outputText value="#{nov.userCierra}"/>
+                    </p:column>
+                    <p:column filterBy="#{nov.idEmpleadoResponsable.identificacion} #{nov.idEmpleadoResponsable.nombres} #{nov.idEmpleadoResponsable.apellidos}"
+                              filterMatchMode="contains"
+                              exportable="false"
+                              headerText="Tec. Asignado">
+                        <h:outputText value="#{nov.idEmpleadoResponsable.identificacion}" class="cssBlack"/>
+                        <h:outputText value=" - #{nov.idEmpleadoResponsable.nombres.concat(' ').concat(nov.idEmpleadoResponsable.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false"
+                              headerText="Documento de Identidad Tec. Asignado">
+                        <h:outputText value="#{nov.idEmpleadoResponsable.identificacion}"/>
+                    </p:column>
+                    <p:column visible="false"
+                              headerText="Nombre Tec. Asignado">
+                        <h:outputText value="#{nov.idEmpleadoResponsable.nombres.concat(' ').concat(nov.idEmpleadoResponsable.apellidos)}"/>
+                    </p:column>
+                    <p:column headerText="Fecha Cierre">
+                        <h:outputText value="#{nov.fechaCierre}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Observación" style="word-wrap: break-word;">
+                        <h:outputText  value="#{nov.observaciones}"/>
+                    </p:column>
+                    <p:column headerText="Observación Cierre" style="word-wrap: break-word;">
+                        <h:outputText value="#{nov.observacionesCierre}"/>
+                    </p:column>
+                    <p:column headerText="Order Trabajo">
+                        <h:outputText value="#{nov.ordenTrabajo}"/>
+                    </p:column>
+                    <p:column headerText="Cerrada?">
+                        <h:outputText class="cssBlack"  value="#{ nov.cerrado==1 ? 'Sí':'No'}" />
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{novedadMttoMB.listNovedadMttoByFechas.size()} novedad(es) registradas.
+                    </f:facet>
+                </p:dataTable>
+                <p:contextMenu id="IdcontextMenu" for="tblNovMttoList" >
+                    <p:menuitem class="cssMenuItem" 
+                                value="Abierta"
+                                style="color: white; background-color: orange" 
+                                icon="fa fa-book"
+                                action="#{novedadMttoMB.onCambiarEstado(1)}"
+                                update="frmMaestroNovedadMtto:tblNovMttoList,msgs">
+                        <p:confirm header="Confirmación" escape="false" 
+                                   message="Está seguro que desea cambiar el estado de esta novedad a Abierta?)"
+                                   icon="fa fa-exclamation-triangle"
+                                   class="cssWhite"/>
+                    </p:menuitem>
+                    <p:menuitem class="cssMenuItem" 
+                                value="En Ejecución"
+                                style="color: white; background-color: blue" 
+                                icon="fa fa-ambulance"
+                                action="#{novedadMttoMB.onCambiarEstado(2)}"
+                                update="frmMaestroNovedadMtto:tblNovMttoList,msgs">
+                        <p:confirm header="Confirmación" escape="false" 
+                                   message="Está seguro que desea cambiar el estado de esta novedad a En Ejecución?)"
+                                   icon="fa fa-exclamation-triangle"
+                                   class="cssWhite"/>
+                    </p:menuitem>
+                    <p:menuitem class="cssMenuItem" 
+                                value="Pendiente"
+                                style="color: white; background-color: red" 
+                                icon="fa fa-exclamation-triangle"
+                                action="#{novedadMttoMB.onCambiarEstado(3)}"
+                                update="frmMaestroNovedadMtto:tblNovMttoList,msgs">
+                        <p:confirm header="Confirmación" escape="false" 
+                                   message="Está seguro que desea cambiar el estado de esta novedad a Pendiente?)"
+                                   icon="fa fa-exclamation-triangle"
+                                   class="cssWhite"/>
+                    </p:menuitem>
+                    <p:menuitem class="cssMenuItem" 
+                                value="Cerrada"
+                                style="color: white; background-color: green" 
+                                icon="fa fa-check"
+                                action="#{novedadMttoMB.onCambiarEstado(4)}"
+                                update="msgs,cerrar_novedad_form">
+                    </p:menuitem>
+                </p:contextMenu>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/cerrarNovedad.xhtml"/>
+        <ui:include src="modal/listaEmpleados.xhtml"/>
+    </ui:define>
+</ui:composition>
+

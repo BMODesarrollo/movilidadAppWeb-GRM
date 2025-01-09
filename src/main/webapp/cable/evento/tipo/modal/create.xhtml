@@ -1,0 +1,84 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="cableEventoTipo"
+              widgetVar="wlvCableEventoTipo" 
+              modal="true" 
+              class="mr1024_30 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{cableEventoTipoBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{cableEventoTipoBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmCableEventoTipo">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Código" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            required="true"
+                            requiredMessage="Debe ingresar un código"
+                            value="#{cableEventoTipoBean.codigo}"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            required="true"
+                            requiredMessage="Debe ingresar un nombre"
+                            value="#{cableEventoTipoBean.nombre}"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <p:inputTextarea value="#{cableEventoTipoBean.cableEventoTipo.descripcion}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmCableEventoTipo,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtCableEventoTipo" 
+                             action="#{cableEventoTipoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmCableEventoTipo,@this"
+                             update=":msgs,:frmPrincipal:dtCableEventoTipo"
+                             action="#{cableEventoTipoBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{cableEventoTipoBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{cableEventoTipoBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

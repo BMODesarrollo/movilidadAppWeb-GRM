@@ -1,0 +1,53 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <p:dialog id="list-emp-dlg" closeOnEscape="true" 
+              widgetVar="empleDlg" modal="true" 
+              resizable="false" appendTo="@(body)" 
+              header="Empleados" position="center top" 
+              responsive="true" fitViewport="true"
+              class="mr1024_40 mr500_90">
+        <h:form id="form-list-emp">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Un click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="empl" id="tabla" 
+                         value="#{usersController.listEmpleados}"  
+                         selectionMode="single" 
+                         rowIndexVar="nroFila"
+                         rows="15"
+                         filterDelay="1000"
+                         reflow="true"
+                         paginatorPosition="top"
+                         paginator="true"
+                         rowKey="#{empl.idEmpleado}"
+                         emptyMessage="No existen empleados registrados"       >
+                <p:ajax event="rowSelect" 
+                        update=":UsersCreateForm"
+                        listener="#{usersController.onRowSelectEmpleado}"
+                        global="false" />
+                <p:column headerText="#" style="width: 10%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column  headerText="Codigo"
+                           filterMatchMode="contains"
+                           filterBy="#{empl.codigoTm}">
+                    <h:outputText  value="#{empl.codigoTm}" />
+                </p:column>
+                <p:column  headerText="Cédula"
+                           filterMatchMode="contains"
+                           filterBy="#{empl.identificacion}">
+                    <h:outputText  value="#{empl.identificacion}" />
+                </p:column>
+                <p:column headerText="Nombre"
+                          filterMatchMode="contains"
+                          filterBy="#{empl.nombres}#{empl.apellidos}">
+                    <h:outputText value="#{empl.nombres} #{empl.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

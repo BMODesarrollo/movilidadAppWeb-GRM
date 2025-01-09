@@ -1,0 +1,193 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="cambioOperador" 
+              id="modalCambioOperador" 
+              header="Cambio de estado"
+              modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              class="mr1024_40 mr500_90"
+              appendTo="@(body)" 
+              position="center top">
+
+        <h:form id="frmCambioOperador">
+            <div jsf:id="panel" class="ui-fluid">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <div class="ui-fluid"  jsf:id="pGrid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-ml-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="operador" value="Cód. Operador"/>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:inputText placeholder="Operador"
+                                             id="operador"
+                                             required="true"
+                                             maxlength="6"
+                                             autocomplete="off"
+                                             requiredMessage="Debe ingresar el código del operador"
+                                             value="#{cambioOperadorBean.s_codOperador}"
+                                             >
+                                    <p:keyFilter regEx="/[0-9]+/i"/> 
+                                    <p:ajax process="@this" 
+                                        listener="#{cambioOperadorBean.buscarOperador()}"/>
+                                </p:inputText>
+                                <div class="botonFloat">
+                                    <p:commandButton process="operador,@this"
+                                                     update="nombreOperador"
+                                                     style="margin: 0px"
+                                                     actionListener="#{cambioOperadorBean.buscarOperador()}"
+                                                     icon="fa fa-search"
+                                                     class="cssWhite"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-ml-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="estado" value="Estado: " />
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu id="estado" 
+                                                 style="width: 99.9999%"
+                                                 value="#{cambioOperadorBean.i_EstadoOperador}"
+                                                 filter="true">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="" itemDisabled="true"/>
+                                    <f:selectItems value="#{cambioOperadorBean.lstEstadoEmpleados}"
+                                                   var="estado"
+                                                   itemValue="#{estado.idEmpleadoEstado}"
+                                                   itemLabel="#{estado.nombre}"
+                                                   itemDisabled="#{estado.idEmpleadoEstado == 1}"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-ml-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="desde" value="Desde:" />
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:calendar id="desde" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{cambioOperadorBean.operadorInactivo.fromDate}"
+                                            showOn="button" 
+                                            locale="es"
+                                            mindate="today"
+                                            showTodayButton="true"
+                                            readonlyInput="true"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha de inicio"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                                }"
+                                            >
+                                    <p:ajax event="dateSelect" update="hasta"/>
+                                </p:calendar>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-ml-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="hasta" value="Hasta:" />
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:calendar id="hasta" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{cambioOperadorBean.operadorInactivo.toDate}"
+                                            mindate="#{cambioOperadorBean.operadorInactivo.fromDate}"
+                                            showOn="button" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha fin"
+                                            readonlyInput="true"
+                                            showTodayButton="true"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                                }"
+                                            >
+                                </p:calendar>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="nombreOperador" value="Operador:" />
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:inputText id="nombreOperador" 
+                                         readonly="true"
+                                         value="#{cambioOperadorBean.operadorInactivo.idEmpleado.nombres} #{cambioOperadorBean.operadorInactivo.idEmpleado.apellidos}"
+                                         required="true" 
+                                         requiredMessage="Debe cargar un empleado"
+                                         onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                                }"
+                                         />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="descripcion" value="Descripción:" />
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion" 
+                                             value="#{cambioOperadorBean.operadorInactivo.descripcion}"
+                                             required="true" 
+                                             requiredMessage="Debe ingresar una descripción"
+                                             />
+                        </div>
+                    </div>
+                </div>
+                <c:if test="#{cambioOperadorBean.selected.activo == 1}">
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="observaciones" value="Observaciones:" />
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="observaciones" 
+                                             rows="4"
+                                             value="#{cambioOperadorBean.operadorInactivo.observaciones}"
+                                             required="true" 
+                                             onkeypress="if (event.keyCode === 13 { return false; })"
+                                             requiredMessage="Debe ingresar una observación"
+                                             />
+                        </div>
+                    </div>
+                </c:if>
+            </div>
+            <p:remoteCommand id="guardar"
+                             name="guardarCambEst"
+                             process=":frmCambioOperador,@this"
+                             action="#{cambioOperadorBean.guardar()}"
+                             update=":frmPrincipal,
+                             frmCambioOperador:pGrid,messages"
+                             rendered="#{cambioOperadorBean.selected == null }" />
+            <p:remoteCommand id="actualizar"
+                             name="actualizarCambEst"
+                             process=":frmCambioOperador,@this"
+                             class="cssWhite"
+                             action="#{cambioOperadorBean.actualizar()}"
+                             update=":frmPrincipal:dtOperadorInactivo,:messages"
+                             rendered="#{cambioOperadorBean.selected != null }"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{cambioOperadorBean.selected == null }"
+                             onclick="guardarCambEst()"/>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             rendered="#{cambioOperadorBean.selected != null }"
+                             onclick="actualizarCambEst()"/>
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-cargo" closeOnEscape="true" widgetVar="cargoDlg" modal="true" header="#{genericaPmGrupoParamJSF.genericaPmGrupoParam.idGenericaPmGrupoParam != null ? 'EDITAR PARAMETRIZACIÓN GENÉRICA GRUPOS PM' : 'NUEVA PARAMETRIZACIÓN GENÉRICA GRUPOS PM'}"
+              resizable="false" appendTo="@(body)" position="center top" 
+              class="mr1024_40 mr500_90"
+              responsive="true">
+        <h:form id="form-cargo">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Área " for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="t-area"
+                                         value="#{genericaPmGrupoParamJSF.genericaPmGrupoParam.idParamArea.area}"
+                                         readonly="true" />
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Cargo" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="t-cargo" 
+                                             value="#{genericaPmGrupoParamJSF.i_idEmpleadoCargo}" 
+                                             style="width: 99.999%" 
+                                             filter="true" 
+                                             filterMatchMode="contains" >
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{genericaPmGrupoParamJSF.listEmpleadoCargo}" 
+                                               var="listcargo" 
+                                               itemLabel="#{listcargo.idEmpleadoTipoCargo.nombreCargo}" 
+                                               itemDescription="#{listcargo.idEmpleadoTipoCargo.nombreCargo}"
+                                               itemValue="#{listcargo.idEmpleadoTipoCargo.idEmpleadoTipoCargo}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p:remoteCommand name="guardar"
+                             process="@form"
+                             update=":AreaCargoListForm,@form" 
+                             action="#{genericaPmGrupoParamJSF.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="@form"
+                             update=":AreaCargoListForm"
+                             action="#{genericaPmGrupoParamJSF.editar()}"/>
+
+        </h:form>
+
+        <f:facet name="footer">
+            <p:commandButton id="btn-guardar"
+                             value="Guardar"
+                             rendered="#{empty genericaPmGrupoParamJSF.genericaPmGrupoParam.idGenericaPmGrupoParam}"
+                             class="cssWhite"
+                             onclick="guardar()"
+                             icon="fa fa-check"
+                             />
+            <p:commandButton id="btn-editar"
+                             value="Actualizar"
+                             rendered="#{not empty genericaPmGrupoParamJSF.genericaPmGrupoParam.idGenericaPmGrupoParam}"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             onclick="actualizar()"
+                             />
+        </f:facet>
+    </p:dialog>
+</ui:composition>

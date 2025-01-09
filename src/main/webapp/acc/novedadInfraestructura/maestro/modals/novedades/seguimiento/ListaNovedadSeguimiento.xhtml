@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="NovedadSeguimientoListDlg" widgetVar="NovedadSeguimientoListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" closable="false"
+              fitViewport="true" class="mr1024_70 mr500_90" closeOnEscape="true" 
+              responsive="true" position="center top">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Seguimiento de novedad
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('NovedadSeguimientoListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNovedadSeguimientoList">
+
+            <p:dataTable id="dtNovedadSeguimiento" widgetVar="dtNovedadesSeguimiento" 
+                         var="novedadSeguimiento" 
+                         value="#{accNovedadInfraestrucBean.lstSeguimientos}"
+                         rowKey="#{novedadSeguimiento.idAccNovedadInfraestrucSeguimiento}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         reflow="true"
+                         rowIndexVar="nroFila"
+                         emptyMessage="No existen seguimientos registrados">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton action="#{accNovedadInfraestrucBean.nuevo()}"
+                                         oncomplete="PF('novedadSeguimiento').show();"
+                                         title="Agregar nuevo seguimento" 
+                                         icon="fa fa-plus"
+                                         class="cssWhite"
+                                         update="frmNuevoSeguimiento,modal"
+                                         value="Nuevo Seguimiento">
+                            <p:resetInput target="frmNuevoSeguimiento" />
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Fecha" filterBy="#{novedadSeguimiento.fecha}" 
+                          filterMatchMode="startsWith"
+                          width="250"
+                          >
+                    <f:facet name="filter">
+
+                        <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                    autocomplete="off"
+                                    required="false"
+                                    navigator="true" showTodayButton="true"
+                                    maxdate="today"
+                                    placeholder="Seleccione fecha"
+                                    onkeyup="PF('dtNovedadesSeguimiento').filter()"
+                                    showOn="button"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }"
+                                    >
+                            <p:ajax event="dateSelect" oncomplete="PF('dtNovedadesSeguimiento').filter()" update="dtNovedadSeguimiento"/>
+                        </p:calendar> 
+                    </f:facet>
+                    <h:outputText value="#{novedadSeguimiento.fecha}" >
+                        <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Seguimiento" filterBy="#{novedadSeguimiento.seguimiento}"
+                          filterMatchMode="contains" width="300">
+                    <h:outputText value="#{novedadSeguimiento.seguimiento}" />
+                </p:column>
+                <p:column headerText="Usuario">
+                    <h:outputText value="#{novedadSeguimiento.username}"/>
+                </p:column>
+                <p:column headerText="Acciones">
+                    <div align="center">
+                        <div class="ui-g">
+                            <div class="ui-g-6 ui-md-6 ui-lg-">
+                                <p:commandButton action="#{accNovedadInfraestrucBean.editar()}" 
+                                                 title="Editar seguimiento" icon="fa fa-pencil"
+                                                 update="frmNuevoSeguimiento,modal"
+                                                 class="cssWhite GreenButton"
+                                                 oncomplete="PF('novedadSeguimiento').show();"
+                                                 >
+                                    <f:setPropertyActionListener target="#{accNovedadInfraestrucBean.selectedSeguimiento}" value="#{novedadSeguimiento}"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <p:commandButton id="descargar-archivo"
+                                                 ajax="false"
+                                                 title="Descargar Archivo"
+                                                 rendered="#{novedadSeguimiento.path.endsWith('.mp4')}"
+                                                 actionListener="#{accNovedadInfraestrucBean.prepDownload(novedadSeguimiento.path,accNovedadInfraestrucBean.obtenerNombreDocumento(novedadSeguimiento.path))}"
+                                                 class="cssWhite OrangeButton"
+                                                 icon="fa fa-download">
+                                    <p:fileDownload value="#{accNovedadInfraestrucBean.fileDescargar}" />
+                                </p:commandButton>  
+                                <p:commandButton action="#{accNovedadInfraestrucBean.getDocumentoSeg()}"
+                                                 styleClass="cssWhite"
+                                                 oncomplete="PF('DocumentoListSegDialog').show()" 
+                                                 icon="fa fa-external-link"
+                                                 title="Ver Archivo"
+                                                 rendered="#{not(novedadSeguimiento.path.endsWith('.mp4'))}"
+                                                 update=":frmDocumentoSeg,:DocumentoListSegDlg">
+                                    <f:setPropertyActionListener value="#{novedadSeguimiento}" target="#{accNovedadInfraestrucBean.selectedSeguimiento}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+    <ui:include src="Create.xhtml"/>
+    <ui:include src="AddFiles.xhtml"/>
+    <ui:include src="vistaArchivo.xhtml"/>
+</ui:composition>

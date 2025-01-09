@@ -1,0 +1,112 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form id="OperacionKmTacografoListForm">
+            <p:growl id="upOperKmT" showDetail="true" showSummary="true" life="4000"/>
+            <p:panel header="Operacion Kilimetro Tacógrafo">
+                <p:dataTable id="datalist" value="#{operacionKmTacografoController.items}" var="item"
+                             selectionMode="single" selection="#{operacionKmTacografoController.selected}"
+                             paginator="true"
+                             rowKey="#{item.idOperacionKmTacografo}"
+                             rows="5"
+                             reflow="true" filterDelay="1000">
+
+                    <p:ajax event="rowSelect"   update="createButton,editButton,deleteButton"/>
+                    <p:ajax event="rowUnselect" update="createButton,editButton,deleteButton"/>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Fecha"/>
+                        </f:facet>
+                        <h:outputText value="#{item.fecha}">
+                            <f:convertDateTime pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Kilometraje Inicial"/>
+                        </f:facet>
+                        <h:outputText value="#{item.kmInicial}">
+                            <f:convertNumber pattern="#,###.###Km" currencySymbol="Km" type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Kilimetraje Final"/>
+                        </f:facet>
+                        <h:outputText value="#{item.kmFinal}">
+                            <f:convertNumber pattern="#,###.###Km" currencySymbol="Km" type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Vehículo"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idVehiculo.codigo}"/>
+                    </p:column>
+                    <p:column style="width: 10%" headerText="Opciones">
+                        <p:commandButton
+                            icon="fa fa-eye"
+                            class="cssWhite"
+                            update="frmVistaDocumento"
+                            actionListener="#{operacionKmTacografoController.prepDownloadLocal(item.pathTacografo)}"
+                            oncomplete="PF('VistaDocumentoDialog').show();">
+                        </p:commandButton>
+                        <p:commandButton title="Descargar Archivo" icon="fa fa-download"
+                                         ajax="false" class="OrangeButton cssWhite"
+                                         actionListener="#{operacionKmTacografoController.prepDownloadLocal(item.pathTacografo)}">
+                            <p:fileDownload value="#{viewDocuJSFMB.download}" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="header">
+                        <div>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="datalist" trigger="toggler" />
+                        </div>
+                        <div align="right">
+                            <p:commandButton id="createButton"
+                                             icon="fa fa-plus"   
+                                             class="cssWhite"
+                                             value="Nuevo" 
+                                             actionListener="#{operacionKmTacografoController.prepareCreate}"
+                                             update=":OperacionKmTacografoCreateForm" 
+                                             oncomplete="PF('OperacionKmTacografoCreateDialog').show()">
+                                <p:resetInput target=":OperacionKmTacografoCreateForm"/>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"  
+                                             icon="fa fa-pencil"
+                                             class="cssWhite GreenButton"
+                                             value="Editar"
+                                             actionListener="#{operacionKmTacografoController.prepareEditar}"
+                                             update=":OperacionKmTacografoEditForm" 
+                                             oncomplete="PF('OperacionKmTacografoEditDialog').show()" 
+                                             disabled="#{empty operacionKmTacografoController.selected.idOperacionKmTacografo}"/>
+                            <p:commandButton id="deleteButton" 
+                                             icon="fa fa-trash"  
+                                             class="cssWhite RedButton"
+                                             rendered="false"
+                                             value="Eliminar" 
+                                             actionListener="#{operacionKmTacografoController.destroy}" 
+                                             update=":OperacionKmTacografoListForm:upOperKmT,datalist"
+                                             disabled="#{empty operacionKmTacografoController.selected.idOperacionKmTacografo}">
+                                <p:confirm header="Confirmación" message="Seguro quiere eliminar?" 
+                                           icon="fa fa-exclamation-triangle"   class="cssWhite"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+        <ui:include src="../empleado/modal/vistaDocumento.xhtml"/>
+    </ui:define>
+</ui:composition>

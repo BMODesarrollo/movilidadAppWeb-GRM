@@ -1,0 +1,130 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgPlaRecuVacaciones"
+              widgetVar="wvPlaRecuVacaciones"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{plaRecuVacacionesBean.b_editar ? 'Editar Vacaciones':'Crear Vacaciones'}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvPlaRecuVacaciones').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-vacaciones">
+            <p:messages id="msgs_create_vacaciones" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Código TM *" />
+                        <p:inputText id="codigoTM_id" required="true" placeholder="Ingrese un valor numérico"
+                                     title="Código Transmilenio que identifica al colaborador (número de cédula para cargos administrativos)" 
+                                     requiredMessage="Debe ingresar 'Código TM'"
+                                     value="#{plaRecuVacacionesBean.codigo_TM}">
+                            <p:ajax update="form-registrar-vacaciones:cedula_id,form-registrar-vacaciones:nombre_id,form-registrar-vacaciones:cargo_id,btnGuardarVacaciones,msgs" 
+                                    listener="#{plaRecuVacacionesBean.cargarEmpleado()}"/>
+                        </p:inputText>
+                        <div class="botonFloat" >
+                            <p:commandButton process="codigoTM_id,@this" 
+                                             style="margin: 0px"
+                                             update="form-registrar-vacaciones:cedula_id,form-registrar-vacaciones:nombre_id,form-registrar-vacaciones:cargo_id,btnGuardarVacaciones,msgs"
+                                             action="#{plaRecuVacacionesBean.cargarEmpleado()}"
+                                             icon="fa fa-search"
+                                             class="cssWhite"/>
+                            <p:remoteCommand process="codigoTM_id,@this" 
+                                             name="cargarEmpleado"
+                                             update="form-registrar-vacaciones:cedula_id,form-registrar-vacaciones:nombre_id,form-registrar-vacaciones:cargo_id,btnGuardarVacaciones,msgs"
+                                             action="#{plaRecuVacacionesBean.cargarEmpleado()}"/>
+                        </div>    
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cédula" />
+                        <p:inputText id="cedula_id" disabled="true"
+                                     title="Número del documento de identidad del colaborador" 
+                                     value="#{plaRecuVacacionesBean.plaRecuVacaciones.empleado.identificacion}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Nombre" />
+                        <p:inputText id="nombre_id" disabled="true"
+                                     title="Nombre completo del colaborador" 
+                                     value="#{plaRecuVacacionesBean.plaRecuVacaciones.empleado.nombresApellidos}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cargo" />
+                        <p:inputText id="cargo_id" disabled="true"
+                                     title="Nombre del cargo del colaborador" 
+                                     value="#{plaRecuVacacionesBean.plaRecuVacaciones.empleado.idEmpleadoCargo.nombreCargo}"  />
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Grupo Vacaciones" for="grupoItem"/>
+                        <p:selectOneMenu  
+                            filter="true" id="grupoItem"
+                            style="width: 99.9999%"
+                            value="#{plaRecuVacacionesBean.grupoVacacionesSelectedId}"                        >
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}" />
+                            <f:selectItems 
+                                var="user"
+                                value="#{plaRecuVacacionesBean.listGrupoVacacioneses}" 
+                                itemLabel="#{user.grupo} #{user.idGopUnidadFuncional.codigo}"
+                                itemValue="#{user.idPlaRecuGrupoVacaciones}"
+                                />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Pasivo vacacional" />
+                        <p:inputText id="pasivo_id" placeholder="ingrese valor numérico"
+                                     title="Número de días que tiene el empleado como pasivo vacacional"
+                                     value="#{plaRecuVacacionesBean.plaRecuVacaciones.pasivoVacacional}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Observaciones" />
+                        <p:inputTextarea id="descripcion_id" placeholder="Nombre de la actividad"
+                                     title="Nombre descriptivo de la actividad"
+                                     value="#{plaRecuVacacionesBean.plaRecuVacaciones.observaciones}"  />
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuVacacionesBean.crearVacaciones()}"
+                             process="@form"
+                             rendered="#{!plaRecuVacacionesBean.b_editar}"
+                             update="formVacaciones,:formVacaciones:vacacionesList,:formVacaciones:cj-grow, @form,:msgs"/>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuVacacionesBean.editarVacaciones()}"
+                             process="@form"
+                             rendered="#{plaRecuVacacionesBean.b_editar}"
+                             update="formVacaciones,:formVacaciones:vacacionesList,:formVacaciones:cj-grow, @form,:msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarVacaciones" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

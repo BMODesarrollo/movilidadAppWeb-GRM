@@ -1,0 +1,241 @@
+<ui:composition template="../../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            @media screen and (max-width: 500px ) {
+                .modalResponsivo { width: 90% !important;}
+            }
+
+            @media screen and (min-width: 1024px ) {
+                .modalResponsivo { width: 50% !important; }
+            }
+        </style>
+        <script type="text/javascript">
+            var ok = true;
+            function changeClass()
+            {
+                if (ok) {
+                    var div = document.getElementById("panel-busq");
+                    div.className = "ui-g-1 ui-md-1 ui-lg-1 Padding3";
+                    div.style.display = "none";
+                    var div2 = document.getElementById("panel-tab");
+                    div2.className = "ui-g-12 ui-md-12 ui-lg-12 Padding3";
+                    ok = false;
+                } else {
+                    var div = document.getElementById("panel-busq");
+                    div.className = "ui-g-12 ui-md-12 ui-lg-3 Padding3";
+                    div.style.display = "inline";
+                    var div2 = document.getElementById("panel-tab");
+                    div2.className = "ui-g-12 ui-md-12 ui-lg-9 Padding3";
+                    ok = true;
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-fluid">
+            <div class="ui-g">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="Fleft" style="margin-right: 5px">
+                        <p:commandButton id="btn-status"
+                                         type="button"
+                                         title="Ocultar/Visualizar panel de búsqueda"
+                                         onclick="changeClass()"
+                                         icon="fa fa-arrow-circle-o-left"
+                                         class="cssWhite" />
+                    </div>
+                    <h:form id="accidente-form">
+                        <p:growl id="msg" showDetail="true" showSummary="true" life="6000" />
+                    </h:form>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3" jsf:id="panel-busq">
+                    <h:form id="list-accidente">
+                        <p:panel id="panel-busqueda" header="Búsqueda" toggleable="true">
+                            <div class="ui-g">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:calendar id="desde" 
+                                                value="#{cableAccidentalidadJSF.dDesde}" 
+                                                pattern="yyyy-MM-dd"
+                                                title="Desde"
+                                                mask="true"
+                                                locale="es"
+                                                navigator="true"
+                                                showOn="button"/>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:calendar id="hasta" 
+                                                value="#{cableAccidentalidadJSF.dHasta}" 
+                                                pattern="yyyy-MM-dd"
+                                                mask="true"
+                                                locale="es"
+                                                navigator="true"
+                                                title="Hasta"
+                                                showOn="button"/>
+                                </div>
+                                <p:separator/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:selectOneMenu id="t-even" value="#{cableAccidentalidadJSF.idCableAccTipoBq}"  
+                                                     style="width: 99.999%">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                        <f:selectItems value="#{cableAccTipoJSF.listCableAccTipo}" 
+                                                       var="catp" 
+                                                       itemLabel="#{catp.tipo}" 
+                                                       itemDescription="#{catp.descripcion}"
+                                                       itemValue="#{catp.idCableAccTipo}" />
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:inputText id="operador"
+                                                 value="#{cableAccidentalidadJSF.cIdentiEmpleado}" 
+                                                 placeholder="Identificación Operador"
+                                                 title="Código Operador"
+                                                 maxlength="10">
+                                        <p:keyFilter regEx="/[0-9]/i"/> 
+                                    </p:inputText>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" jsf:rendered="false">
+                                    <p:inputText id="cabina"
+                                                 value="#{cableAccidentalidadJSF.cCodCableCabina}" 
+                                                 placeholder="Código Cabina"
+                                                 title="Código Cabina"
+                                                 maxlength="15"/>
+                                </div>
+                                <p:separator/>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:commandButton id="buscar"
+                                                     actionListener="#{cableAccidentalidadJSF.buscarAccidente()}"
+                                                     icon="fa fa-search"
+                                                     value="Buscar"
+                                                     class="cssWhite GreenButton"
+                                                     update=":list-accidente:table-accidente,:accidente-form:msg"
+                                                     process="@form" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:commandButton id="limpiar"
+                                                     actionListener="#{cableAccidentalidadJSF.limpiar()}"
+                                                     icon="fa fa-remove"
+                                                     value="Limpiar"
+                                                     class="cssWhite"
+                                                     update=":list-accidente,:tInformacion"
+                                                     process="@this" />
+                                </div>
+                            </div>
+                        </p:panel>
+                        <p:separator/>
+                        <p:dataTable id="table-accidente" 
+                                     var="acc" 
+                                     value="#{cableAccidentalidadJSF.listCableAccidentalidad}" 
+                                     selectionMode="single" 
+                                     scrollHeight="400"
+                                     rows="5"
+                                     scrollable="true"
+                                     paginator="true"
+                                     emptyMessage="No exiten registros"
+                                     reflow="true"
+                                     selection="#{cableAccidentalidadJSF.cableAccidentalidad}" 
+                                     rowKey="#{acc.idCableAccidentalidad}">
+                            <f:facet name="header">
+                                Registros encontrados: #{cableAccidentalidadJSF.listCableAccidentalidad.size()}
+                            </f:facet>
+                            <p:ajax event="rowSelect" listener="#{cableAccidentalidadJSF.onRowSelect}" update="@form,:tInformacion" />
+                            <p:ajax event="rowUnselect" listener="#{cableAccidentalidadJSF.init()}" update="@form,:tInformacion" />
+                            <p:column>
+                                <br/>
+                                <h:outputText value="Tipo: "/>
+                                <h:outputText value="#{acc.idCableAccTipo.tipo}" class="Fs21" style="color: red;font-weight: bold"/><br/>
+                                <h:outputText value="Operador: "/> 
+                                <h:outputText value="#{acc.idOperador.identificacion} #{acc.idOperador.nombres}" 
+                                              title="#{acc.idOperador.nombres.concat(' ').concat(acc.idOperador.apellidos)}" 
+                                              style="font-weight: bold"/><br/>
+                                <h:outputText value="Fecha y Hora: "/>
+                                <h:outputText value="#{acc.fechaHora}" style="font-weight: bold">
+                                    <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form> 
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-9 Padding3" jsf:id="panel-tab">
+                    <p:tabView id="tInformacion" dynamic="true">
+                        <p:tab title="Información Básica" id="iCaso">
+                            <ui:include src="infoCaso/infoCaso.xhtml" />
+                            <!--                            <h:form id="form-info-caso">
+                                                            <ui:include src="infoCaso.xhtml" />
+                                                        </h:form>     
+                                                        <ui:include src="modals/agregarIpat.xhtml" />-->
+                        </p:tab> 
+                        <p:tab title="Siniestrado" id="siniestrado">
+                            <ui:include src="siniestrado/siniestrado.xhtml" />
+                        </p:tab>
+                        <p:tab title="Testigos" id="testigos">
+                            <ui:include src="testigos/testigo.xhtml" />
+                            <!--                            <h:form id="form-lugar-hechos">
+                                                            <ui:include src="lugarHechos.xhtml" />
+                                                        </h:form>  
+                                                        <ui:include src="modals/listaStopPoint.xhtml"/>-->
+                        </p:tab>
+                        <p:tab title="Primer Respondiente" id="pRespondiente">
+                            <ui:include src="respondiente/respondiente.xhtml" />
+                            <!--                            <h:form id="form-veh-invol">
+                                                            <ui:include src="vehiculosInvolucrados.xhtml" />
+                                                        </h:form>  -->
+                        </p:tab>
+                        <p:tab title="Plan Acción" id="pAccion">
+                            <ui:include src="planAccion/plan.xhtml" />
+                            <!--                            <h:form id="form-vic">
+                                                            <ui:include src="victimas.xhtml" />
+                                                        </h:form>  
+                                                        <ui:include src="modals/uploadFileVictima.xhtml" />
+                                                        <ui:include src="modals/vistaDocConciliacion.xhtml" />-->
+                        </p:tab>
+                        <p:tab title="Documentos" id="documentos">
+                            <ui:include src="documento/documento.xhtml" />
+                            <!--                            <h:form id="form-test">
+                                                            <ui:include src="testigos.xhtml" />
+                                                        </h:form>  -->
+                        </p:tab>
+                        <p:tab title="Informes" id="informes" rendered="false">
+                            <h:form id="formInforme">
+                                <p:commandButton id="generarInforme"
+                                                 value="Generar Documento" 
+                                                 icon="fa fa-bar-chart"
+                                                 actionListener="#{cableAccInformeJSF.generarInforme()}" 
+                                                 class="cssWhite"
+                                                 ajax="false"
+                                                 update="respuesta" 
+                                                 process="@this">
+                                    <p:fileDownload value="#{cableAccInformeJSF.file}" />
+                                </p:commandButton>
+                            </h:form>
+                            <!--                            <h:form id="form-diligencia">
+                                                            <ui:include src="diligenciaJuridica.xhtml" />
+                                                        </h:form>  -->
+                        </p:tab>
+                    </p:tabView>
+                </div>
+                <!--                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:panel id="panel-ob-acc" header="Observación de la Novedad">
+                                        <h:outputText id="observacion-acc" value="{accidenteJSF.accidente.idNovedad.observaciones}" class="cssBlack" />
+                                    </p:panel>
+                                </div>-->
+            </div>
+        </div>
+        <ui:include src="infoCaso/modal/cabinas.xhtml" />
+        <ui:include src="infoCaso/modal/estacion.xhtml" />
+        <ui:include src="infoCaso/modal/ListaEmpleados.xhtml" />
+        <ui:include src="respondiente/modal/ListaEmpleados.xhtml" />
+        <ui:include src="respondiente/modal/respuesta.xhtml" />
+    </ui:define>
+</ui:composition>

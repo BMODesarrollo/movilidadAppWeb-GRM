@@ -1,0 +1,341 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="addServicio" id="modalAddServicio" modal="true" closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)"
+              class="mr1024_60 mr500_90" position="center top">
+        <c:if test="#{prgTcResumenBean.selected == null }">
+            <f:facet name="header">
+                Nuevo servicio
+            </f:facet>
+            <f:facet name="footer">
+                <div align="center">
+                    <p:commandButton value="Guardar"
+                                     id="btnGuardar"
+                                     icon="fa fa-check"
+                                     class="cssWhite"
+                                     onclick="guardar()"
+                                     rendered="#{prgTcResumenBean.selected == null }"
+                                     onkeypress="if (event.keyCode === 13) {
+                                                 return false;
+                                             }"
+                                     >
+                        <p:confirm header="Confirmación"
+                                   message="Ésta seguro de realizar cambios al vehículo: #{prgTcResumenBean.vehiculo.codigo.toUpperCase()}?" 
+                                   icon="fa fa-exclamation-triangle"/>
+                    </p:commandButton>
+                </div>
+            </f:facet>
+        </c:if>
+        <c:if test="#{prgTcResumenBean.selected != null }">
+            <f:facet name="header">
+                Editar servicio: #{prgTcResumenBean.selected.idVehiculo.codigo.toUpperCase()}
+            </f:facet>
+            <f:facet name="footer">
+                <div align="center">
+                    <p:commandButton value="Actualizar" 
+                                     icon="fa fa-check"
+                                     id="btnActualizar"
+                                     onclick="actualizar()"
+                                     class="cssWhite"
+                                     rendered="#{prgTcResumenBean.selected != null }"
+                                     onkeypress="if (event.keyCode === 13) {
+                                                 return false;
+                                             }"
+                                     />
+                </div>
+            </f:facet>
+        </c:if>
+        <h:form id="frmAddServicio">
+            <p:remoteCommand name="guardar" 
+                             actionListener="#{prgTcResumenBean.guardar()}"
+                             update="messages,pGrid,pGrid2">
+                <p:resetInput target="pGrid,pGrid2"/>
+            </p:remoteCommand>
+            <p:remoteCommand name="actualizar" 
+                             actionListener="#{prgTcResumenBean.actualizar()}"/>
+
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                <p:effect event="load" type="pulsate" delay="200"/>
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="pGrid">
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="vehiculo" value="Vehículo: "/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputText placeholder="Código de vehículo"
+                                             title="Ingrese código del vehículo y presione el botón de búsqueda"
+                                             id="vehiculo"
+                                             autocomplete="off"
+                                             required="true"
+                                             requiredMessage="Debe ingresar código del vehículo"
+                                             value="#{prgTcResumenBean.codVehiculo}"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }">
+                                </p:inputText>
+                                <div class="botonFloat">
+                                    <p:commandButton icon="fa fa-search"
+                                                     process="@this,vehiculo"
+                                                     update="messages"
+                                                     style="margin: 0px"
+                                                     actionListener="#{prgTcResumenBean.cargarVehiculo()}"
+                                                     styleClass="cssWhite">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="servbus" value="Servbus" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputText id="servbus" value="#{prgTcResumenBean.prgTc.servbus}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }"/>
+                                <p:outputLabel value=""/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Operador:" for="operador"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputText placeholder="Nombre completo de operador"
+                                             id="operador"
+                                             readonly="true"
+                                             value="#{prgTcResumenBean.empleado.nombres} #{prgTcResumenBean.empleado.apellidos}"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }"
+                                             />
+                                <div class="botonFloat">
+                                    <p:commandButton title="Cargar lista de operadores"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     process="@this"
+                                                     update=":frmPmEmpleadoList:dtEmpleados,operador_h"
+                                                     onclick="PF('wVEmpleado').getPaginator().setPage(0);"
+                                                     action="#{prgTcResumenBean.prepareListEmpleados()}"                                     
+                                                     oncomplete="PF('PmEmpleadosListDialog').show()"
+                                                     style="margin: 0px"
+                                                     >
+                                        <p:ajax event="dialogReturn" listener="#{prgTcResumenBean.onEmpleadoChosen}" 
+                                                process="@this,operador" update="operador"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="tabla" value="Tabla" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputNumber id="tabla" 
+                                               value="#{prgTcResumenBean.prgTc.tabla}"
+                                               required="true"
+                                               requiredMessage="Debe ingresar una tabla"
+                                               decimalPlaces="0"
+                                               emptyValue="0"
+                                               autocomplete="off"
+                                               onkeypress="if (event.keyCode === 13) {
+                                                           return false;
+                                                       }"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="responsable" value="Responsable: " />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu id="responsable"
+                                                 value="#{prgTcResumenBean.i_codResponsable}"
+                                                 effect="fade" filter="true" 
+                                                 required="true"
+                                                 style="width: 99.9999%"
+                                                 requiredMessage="Debe seleccionar un responsable"
+                                                 filterMatchMode="startsWith">
+                                    <f:selectItem itemLabel="Seleccione responsable" itemValue=""  />
+                                    <f:selectItems value="#{prgTcResumenBean.lstResponsable}" 
+                                                   var="res" itemLabel="#{res.responsable}" 
+                                                   itemValue="#{res.idPrgTcResponsable}" />
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="pGrid2">
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="addServ_linea" value="Tarea"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu id="addServ_linea" value="#{prgTcResumenBean.i_idTarea}"
+                                                 filterMatchMode="contains" filter="true"
+                                                 style="width: 99.9999%"
+                                                 required="true" requiredMessage="Debe seleccionar una tarea">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                    <f:selectItems value="#{prgTcResumenBean.lstServicios}" 
+                                                   var="linea"  itemLabel="#{linea.tarea}" 
+                                                   itemValue="#{linea.idPrgTarea}" />
+                                    <p:ajax listener="#{prgTcResumenBean.onOffRuta()}" process="@this" 
+                                            update="addServ_ruta, puntoByRuta, puntoByLinea"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="addServ_ruta" value="Ruta"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu id="addServ_ruta" 
+                                                 value="#{prgTcResumenBean.i_idRuta}" 
+                                                 filterMatchMode="contains" 
+                                                 filter="true" 
+                                                 style="width: 99.9999%"
+                                                 disabled="#{prgTcResumenBean.flagRuta}"
+                                                 required="#{!prgTcResumenBean.flagRuta}"
+                                                 requiredMessage="Debe seleccionar una ruta">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+
+                                    <f:selectItems  value="#{prgTcResumenBean.lstRutas}" 
+                                                    var="ruta" itemLabel="#{ruta.name}" 
+                                                    itemValue="#{ruta.idPrgRoute}" />
+                                    <p:ajax listener="#{prgTcResumenBean.findByIdRoute()}" process="@this" 
+                                            update="addServ_pIni, addServ_pFin"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5" jsf:id="puntoByRuta">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{!prgTcResumenBean.flagRuta}">
+                                <p:outputLabel for="addServ_pIni" value="Punt-Ini" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{!prgTcResumenBean.flagRuta}">
+                                <p:selectOneMenu id="addServ_pIni"
+                                                 value="#{prgTcResumenBean.i_idPuntoIniInt}" 
+                                                 style="width: 99.9999%"
+                                                 required="#{!prgTcResumenBean.flagRuta}" requiredMessage="Debe seleccionar un punto de inicio"
+                                                 filterMatchMode="contains" filter="true" >
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+
+                                    <f:selectItems value="#{prgTcResumenBean.listPrgPattern}" 
+                                                   var="pattern" itemLabel="#{pattern.idPrgStoppoint.name}"
+                                                   itemValue="#{pattern.idPrgStoppoint.idPrgStoppoint}" />
+                                    <p:ajax listener="#{prgTcResumenBean.setObjeto(0)}" process="@this" update="addServ_pIni,addServ_pFin, messages"/>                    
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.flagRuta}">
+                                <p:outputLabel for="addServ_pIniByLinea" value="Punt-Ini" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.flagRuta}">
+                                <p:inputText id="addServ_pIniByLinea" placeholder="Punt-Ini"  autocomplete="off"
+                                             value="#{prgTcResumenBean.punto_inicioString}"  
+                                             maxlength="12" required="#{prgTcResumenBean.flagRuta}" 
+                                             requiredMessage="Debe seleccionar un punto de inicio"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }"
+                                             >
+                                </p:inputText>
+                                <div class="botonFloat">
+                                    <p:commandButton title="Consultar Destino Final"
+                                                     icon="fa fa-search"
+                                                     rendered="#{prgTcResumenBean.flagRuta}"
+                                                     onclick="PF('tablaStopPointWV').getPaginator().setPage(0);"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this,addServ_pIniByLinea"
+                                                     action="#{prgTcResumenBean.findDestino(1)}"
+                                                     update="messages,addServ_pIniByLinea">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5" jsf:id="puntoByLinea">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="addServ_pFin" value="Punt-Fin" rendered="#{!prgTcResumenBean.flagRuta}"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu id="addServ_pFin" 
+                                                 rendered="#{!prgTcResumenBean.flagRuta}"
+                                                 style="width: 99.9999%"
+                                                 value="#{prgTcResumenBean.i_idPuntoFinInt}" 
+                                                 filterMatchMode="contains" filter="true"
+                                                 required="#{!prgTcResumenBean.flagRuta}" requiredMessage="Debe seleccionar un punto fin">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+
+                                    <f:selectItems value="#{prgTcResumenBean.listPrgPattern}" 
+                                                   var="pattern" itemLabel="#{pattern.idPrgStoppoint.name}" 
+                                                   itemValue="#{pattern.idPrgStoppoint.idPrgStoppoint}" />
+                                    <p:ajax listener="#{prgTcResumenBean.setObjeto(1)}" process="@this" update="addServ_pIni,addServ_pFin, messages"/>   
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.flagRuta}">
+                                <p:outputLabel for="addServ_pFinByLinea" value="Punt-Fin" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.flagRuta}">
+                                <p:inputText id="addServ_pFinByLinea" placeholder="Punt-Fin"  autocomplete="off"
+                                             value="#{prgTcResumenBean.punto_finString}"  
+                                             required="#{prgTcResumenBean.flagRuta}" 
+                                             requiredMessage="Debe seleccionar un punto fin"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }"
+                                             >
+                                </p:inputText> 
+                                <div class="botonFloat">
+                                    <p:commandButton title="Consultar Destino Final"
+                                                     icon="fa fa-search"
+                                                     onclick="PF('tablaStopPointWV').getPaginator().setPage(0);"
+                                                     rendered="#{prgTcResumenBean.flagRuta}"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this,addServ_pFinByLinea"
+                                                     action="#{prgTcResumenBean.findDestino(2)}"
+                                                     update="messages,addServ_pFinByLinea">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5" >
+                            <p:outputLabel for="addServ_hIni" value="Hora-Ini"/>
+                            <p:inputMask id="addServ_hIni" validatorMessage="Hora inicio invalida"  value="#{prgTcResumenBean.horaInicioString}" requiredMessage="Hora invalida" mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="addServ_hIni"/>
+                                <p:ajax listener="#{prgTcResumenBean.validarHora()}" global="false" process="@this" update="addServ_hIni,addServ_hFin,messages"/>
+                            </p:inputMask>
+                        </div>
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5">
+                            <p:outputLabel for="addServ_hFin" value="Hora-fin"/>
+                            <p:inputMask id="addServ_hFin" validatorMessage="Hora fin invalida"  value="#{prgTcResumenBean.horaFinString}" requiredMessage="Hora invalida" mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="addServ_hFin"/>
+                                <p:ajax listener="#{prgTcResumenBean.validarHora()}" global="false" process="@this" update="addServ_hFin,addServ_hIni, messages"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h:inputHidden id="operador_h" required="true" requiredMessage="Debe seleccionar un operador"
+                           value="#{prgTcResumenBean.empleado.nombres}"/>
+        </h:form>
+    </p:dialog>
+    <ui:include src="modals/listaStopPoint.xhtml"/>
+    <ui:include src="modals/ListaEmpleados.xhtml" />
+</ui:composition>

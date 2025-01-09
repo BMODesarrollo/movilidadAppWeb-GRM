@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="content">
+            <h:form id="formulario">
+                <p:growl showDetail="true" showSummary="true" id="msg"></p:growl>
+                <p:panel header="Gestión opciones de usuarios">
+                    <div class="ui-fluid" jsf:id="panel">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding3">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Usuarios:"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu  value="#{managerOpciones.user}"  
+                                                      converter="usersConverter" 
+                                                      style="width: 50%;"
+                                                      filterMatchMode="contains" 
+                                                      filter="true" 
+                                                      caseSensitive="true"  
+                                                      id="usuarios"  >
+                                        <f:selectItem  itemLabel="Seleccione Uno" itemDisabled="true"/>
+                                        <f:selectItems  var="usuario" value="#{managerOpciones.usersColl}"
+                                                        itemLabel="#{usuario.username}" itemValue="#{usuario}" >
+                                        </f:selectItems>
+                                        <p:row>
+                                            <p:column style="width: 15%;" >  
+                                                <div> <i class="fa fa-list"></i></div>
+                                            </p:column>  
+                                            <p:column style="width: 85%;">  
+                                                #{usuario.username}  
+                                            </p:column>
+                                        </p:row>
+                                        <p:ajax event="itemSelect" 
+                                                listener="#{managerOpciones.selectUser(e)}"
+                                                update="pojoPickList" ></p:ajax>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                <p:fieldset legend="Opciones">
+                                    <p:pickList  converter="opcionConverter" 
+                                                 id="pojoPickList" 
+                                                 value="#{managerOpciones.opcionesList}" 
+                                                 var="opcion" 
+                                                 effect="bounce"  
+                                                 responsive="true"
+                                                 itemValue="#{opcion}" 
+                                                 itemLabel="#{opcion.descripcion}#{opcion.nameop}"   
+                                                 showSourceControls="true" 
+                                                 showTargetControls="true" 
+                                                 showCheckbox="true"  
+                                                 showSourceFilter="true" 
+                                                 showTargetFilter="true"  
+                                                 filterMatchMode="contains" >
+                                        <f:facet name="sourceCaption"><h4 style="color: #faa732; font-size: 15px;">Disponibles</h4></f:facet>  
+                                        <f:facet name="targetCaption"><h4 style="color: #faa732; font-size: 15px;">Establecidas</h4></f:facet>  
+                                        <p:column style="width:10%">  
+                                            <div> <i class="#{opcion.iconChild} Fs20"></i></div>
+                                        </p:column>  
+                                        <p:column style="width:90%; font-size: 15px;">  
+                                            #{opcion.descripcion}/#{opcion.nameop}  
+                                        </p:column>  
+                                    </p:pickList>
+                                </p:fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <f:facet name="footer">
+                        <p:commandButton title="Asignar Accesos" 
+                                         value="Guardar" 
+                                         icon="fa fa-check" 
+                                         class="cssWhite" 
+                                         id="save" 
+                                         update="formulario:msg" 
+                                         actionListener="#{managerOpciones.saveOpciones}" />
+                    </f:facet>
+                </p:panel>
+            </h:form>
+            <h:form id="formCopy"  enctype="multipart/form-data">
+                <p:panel header="Copiar perfiles" 
+                         toggleable="false" 
+                         toggleSpeed="300" 
+                         collapsed="false"
+                         closeSpeed="300"  
+                         widgetVar="panelPerfiles" >
+                    <p:messages id="messageCopy" showDetail="true" closable="true">
+                    </p:messages>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Usuario del que se copian menús:"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  value="#{managerOpciones.userSource}"  
+                                              converter="usersConverter" 
+                                              style="width: 50%;"
+                                              filterMatchMode="contains" 
+                                              filter="true" 
+                                              caseSensitive="true"  
+                                              id="usuarioSource"  >
+                                <f:selectItem  itemLabel="Seleccione" itemDisabled="true"/>
+                                <f:selectItems  var="usuarioSource" value="#{managerOpciones.usersColl}"
+                                                itemLabel="#{usuarioSource.username}" itemValue="#{usuarioSource}" >
+                                </f:selectItems>
+                                <p:row>
+                                    <p:column style="width: 15%;" >  
+                                        <div> <i class="fa fa-list"></i></div>
+                                    </p:column>  
+                                    <p:column style="width: 85%;">  
+                                        #{usuarioSource.username}  
+                                    </p:column>
+                                </p:row>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Usuario al que se asignan menús:"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  value="#{managerOpciones.userDestiny}"  
+                                              converter="usersConverter" 
+                                              style="width: 50%;"
+                                              filterMatchMode="contains" 
+                                              filter="true" 
+                                              caseSensitive="true"  
+                                              id="usuarioDestiny"  >
+                                <f:selectItem  itemLabel="Seleccione" itemDisabled="true"/>
+                                <f:selectItem  itemLabel="Seleccione" itemDisabled="true"/>
+                                <f:selectItems  var="usuarioDestiny" value="#{managerOpciones.usersColl}"
+                                                itemLabel="#{usuarioDestiny.username}" itemValue="#{usuarioDestiny}" >
+                                </f:selectItems>
+                                <p:row>
+                                    <p:column style="width: 15%;" >  
+                                        <div> <i class="fa fa-list"></i></div>
+                                    </p:column>  
+                                    <p:column style="width: 85%;">  
+                                        #{usuarioDestiny.username}  
+                                    </p:column>
+                                </p:row>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <f:facet name="footer">
+                        <p:commandButton title="Asignar Menús" 
+                                         value="Copiar Menús" 
+                                         icon="fa fa-check" 
+                                         class="cssWhite" 
+                                         id="saveMenus" 
+                                         update="formulario:msg"
+                                         actionListener="#{managerOpciones.saveMenus()}"/>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>
+

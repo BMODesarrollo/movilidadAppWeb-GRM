@@ -1,0 +1,56 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="TipoEstadoDetDlg" widgetVar="TipoEstadoDetDialog" modal="true" 
+              resizable="false" class="mr1024_50 mr500_90"
+              position="center top"
+              closable="false"
+              closeOnEscape="true"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Detalles tipos estado (Vehículos)" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('TipoEstadoDetDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmTipoEstadoDet">
+            <p:dataTable id="id_est_det_vh" 
+                         var="detalle" value="#{novedadTipoDetBean.listaVehiculoTipoEstadoDetalles}"  
+                         selectionMode="single" 
+                         widgetVar="wlvdtTipoEstadoDet"
+                         selection="#{novedadTipoDetBean.tipoEstadoDet}"                       
+                         rowIndexVar="nroFila"
+                         rowKey="#{detalle.idVehiculoTipoEstadoDet}"
+                         emptyMessage="No existen tipos de novedad registrados"
+                         reflow="true" 
+                         filterDelay="1000"
+                         rows="10" 
+                         paginator="true">
+                <p:ajax event="rowSelect" 
+                        listener="#{novedadTipoDetBean.onRowDblClckTipoEstadoDet}"
+                        update=":NovedadTipoDetalleCreateForm:tipoEstadoDet"
+                        global="false" />
+                <p:column headerText="Nombre" filterBy="#{detalle.nombre}" filterMatchMode="contains">
+                    <h:outputText value="#{detalle.nombre}" />
+                </p:column>
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{detalle.descripcion}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,108 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmTamplitudHorasEditDlg" 
+              widgetVar="PmTamplitudHorasEditDialog"  
+              closable="false"
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_30 mr500_90"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Editar Pm T Amplitud Hora" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('PmTamplitudHorasEditDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <p:ajax event="close" listener="#{pmTamplitudHorasController.reset()}" update=":PmTamplitudHorasListForm:datalist"/>
+        <h:form id="PmTamplitudHorasEditForm">
+            <div class="ui-fluid" jsf:rendered="#{pmTamplitudHorasController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desde:" for="desde" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="desde"
+                                        pattern="yyyy-MM-dd" 
+                                        value="#{pmTamplitudHorasController.selected.desde}" 
+                                        required="true"
+                                        locale="es"
+                                        readonly="#{facesContext.renderResponse}"
+                                        requiredMessage="Desde es requerido" 
+                                        showOn="button"
+                                        mindate="#{pmTamplitudHorasController.selected.desde}" 
+                                        >
+                                <p:ajax event="dateSelect" update="hasta"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Hasta:" for="hasta" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hasta" 
+                                        pattern="yyyy-MM-dd"
+                                        value="#{pmTamplitudHorasController.selected.hasta}"
+                                        required="true"
+                                        locale="es"
+                                        readonly="#{facesContext.renderResponse}"
+                                        requiredMessage="Hasta es requerido" 
+                                        showOn="button"
+                                        mindate="#{pmTamplitudHorasController.selected.desde}"
+                                        >
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Número de Horas:" for="nroHoras"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="nroHoras"
+                                         mask="99:99:99"
+                                         value="#{pmTamplitudHorasController.selected.nroHoras}"
+                                         required="true"
+                                         requiredMessage="Hora Inicial Turno 1 es requerido">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand actionListener="#{pmTamplitudHorasController.update}" 
+                             name="rc_update_pm_ta"
+                             update="@form,:PmTamplitudHorasListForm:datalist,:PmTamplitudHorasListForm:upPmTamH" 
+                             />
+            <p:staticMessage severity="warn" 
+                             summary="Tenga en cuenta" 
+                             detail="Fecha Desde no debe ser mayor a Fecha Hasta" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_update_pm_ta();"
+                             value="Actualizar"
+                             class="cssWhite" />
+        </f:facet>
+    </p:dialog>
+</ui:composition>

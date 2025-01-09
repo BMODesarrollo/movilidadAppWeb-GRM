@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <p:panel header="Zonas de componentes">
+            <h:form id="frmPrincipalVhclCompZona">
+                <p:dataTable var="vehiculoComponenteZona" value="#{vehiculoComponenteZonaBean.lista}"
+                             id="dtTipo"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1000"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15,25,50"
+                             emptyMessage="No existen grupos de componente registrados">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="dtTipo" fileName="Zonas de componentes"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header" >
+                        <div align="right">
+                            <p:commandButton actionListener="#{vehiculoComponenteZonaBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo grupo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update="frmNuevoTipo,modal"
+                                             value="Nuevo">
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre" filterBy="#{vehiculoComponenteZona.nombre}">
+                        <h:outputText value="#{vehiculoComponenteZona.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Grupo Componente">
+                        <h:outputText value="#{vehiculoComponenteZona.idVehiculoComponenteGrupo.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{vehiculoComponenteZona.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Acción" exportable="false" style="width: 10%"> 
+                        <p:commandButton icon="fa fa-pencil"
+                                         title="Editar registro"
+                                         class="GreenButton cssWhite"
+                                         action="#{vehiculoComponenteZonaBean.editar()}"
+                                         update="frmNuevoTipo,modal"
+                                         oncomplete="PF('mtipo').show();"
+                                         >
+                            <f:setPropertyActionListener target="#{vehiculoComponenteZonaBean.selected}" value="#{vehiculoComponenteZona}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh"
+                                         title="Cambiar estado"
+                                         action="#{vehiculoComponenteZonaBean.cambiarEstado()}"
+                                         update=",frmNuevoTipo,modal,:frmNuevoTipo:messages,dtTipo"
+                                         rendered="false">
+                            <f:setPropertyActionListener target="#{vehiculoComponenteZonaBean.selected}" value="#{vehiculoComponenteZona}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{vehiculoComponenteZonaBean.lista.size()} Zonas de componentes.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modals/gestionZonaComponente.xhtml"/>
+    </ui:define>
+</ui:composition>
+

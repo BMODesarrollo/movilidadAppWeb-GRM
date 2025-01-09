@@ -1,0 +1,99 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{sstMatEquiJSF.sstMatEqui.idSstMatEqui != null ? 'EDITAR SST MATERIALES EQUIPO' : 'NUEVO SST MATERIALES EQUIPO'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Nombre *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nombre"
+                                         maxlength="45"
+                                         required="true"
+                                         requiredMessage="Nombre es requerido"
+                                         value="#{sstMatEquiJSF.sstMatEqui.nombre}" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Sst Materiales Equipo Tipo *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="tipo" 
+                                             value="#{sstMatEquiJSF.idSstMatEquiTipo}"
+                                             filter="true" 
+                                             filterMatchMode="contains"
+                                             required="true"
+                                             requiredMessage="Sst Materiales Tipo es requerido"
+                                             style="width: 99.999%">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{sstMatEquiJSF.listSstMatEquiTipo}" 
+                                               var="listTipo" 
+                                               itemLabel="#{listTipo.tipo}" 
+                                               itemDescription="#{listTipo.descripcion}"
+                                               itemValue="#{listTipo.idSstMatEquiTipo}" />
+                                <p:ajax update="@this" global="false" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Sst Materiales Equipo Marca *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="marca" 
+                                             value="#{sstMatEquiJSF.idSstMatEquiMarca}"
+                                             filter="true" 
+                                             filterMatchMode="contains"
+                                             required="true"
+                                             requiredMessage="Sst Materiales Marca es requerido"
+                                             style="width: 99.999%">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{sstMatEquiMarcaJSF.listSstMatEquiMarca}" 
+                                               var="listMarca" 
+                                               itemLabel="#{listMarca.marca}" 
+                                               itemDescription="#{listMarca.descripcion}"
+                                               itemValue="#{listMarca.idSstMatEquiMarca}" />
+                                <p:ajax update="@this" global="false" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <p:remoteCommand id="btn-guardar"
+                                     name="rc_mat_equi"
+                                     rendered="#{empty sstMatEquiJSF.sstMatEqui.idSstMatEqui}"
+                                     actionListener="#{sstMatEquiJSF.guardar()}"
+                                     update=":form,@form"
+                                     process="@form" />
+                    <p:remoteCommand id="btn-editar"
+                                     name="rc_mat_equi_update"
+                                     rendered="#{not empty sstMatEquiJSF.sstMatEqui.idSstMatEqui}"
+                                     actionListener="#{sstMatEquiJSF.actualizar()}"
+                                     update=":form"/>
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton icon="fa fa-save" value="Guardar" 
+                             rendered="#{empty sstMatEquiJSF.sstMatEqui.idSstMatEqui}"
+                             class="cssWhite" onclick="rc_mat_equi()"/>
+            <p:commandButton icon="fa fa-save" value="Actualizar" 
+                             rendered="#{not empty sstMatEquiJSF.sstMatEqui.idSstMatEqui}"
+                             class="cssWhite" onclick="rc_mat_equi_update()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="AccTipoDocsDlgEdit" 
+              closeOnEscape="true" widgetVar="AccTipoDocsListDialogEdit" modal="true" 
+              resizable="false" appendTo="@(body)" closable="false"
+              width="550px" responsive="true" position="center top">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Tipos de documentos
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('AccTipoDocsListDialogEdit').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <p:cache disabled="true"/>
+        <h:form id="frmAccTipoDocsListEdit">
+            <p:dataTable var="accTipoDocs" value="#{accChecklistBean.lstAccTipoDocumentosAux}"
+                         id="dtAccTipoDocs" widgetVar="dtAccTipoDocEdit"
+                         selectionMode="single" selection="#{accChecklistBean.tipoDocs}"                       
+                         rowIndexVar="nroFila"
+                         liveScroll="true"
+                         reflow="true"
+                         filterDelay="1700"
+                         paginator="true"
+                         rows="6"
+                         rowKey="#{accTipoDocs.idAccTipoDocs}"
+                         emptyMessage="No existen tipos de documentos registrados"
+                         styleClass="ui-fluid">
+                <p:ajax event="rowSelect" 
+                        listener="#{accChecklistBean.onRowAccTipoDocsClckSelect}"
+                        update=":frmCheckListEdit:tipo_documento"
+                        oncomplete="PF('AccTipoDocsListDialogEdit').hide()" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Tipo Documento" 
+                          filterBy="#{accTipoDocs.tipoDocs}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{accTipoDocs.tipoDocs}" />
+                </p:column>
+                <p:column headerText="Descripción" filterBy="#{accTipoDocs.descripcion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{accTipoDocs.descripcion}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

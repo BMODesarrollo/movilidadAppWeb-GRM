@@ -1,0 +1,1906 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <style type="text/css">
+            .mapClass {
+                width: 100%;
+                height: 100%;
+            }
+            @media print {
+                body{
+                    min-width: 1024px;
+                    font-size: 20px !important;
+                    font-family: sans-serif !important;
+                }
+                .saltopagina{
+                    page-break-after: always !important;
+                }
+                .no-print{
+                    display: none !important;
+                }
+                .noNone{
+                    display: initial !important;
+                }
+                .H100{
+                    margin-top: 0 !important;
+                }
+                .ui-gp{
+                    display: block !important;
+                }
+                img{
+                    max-height: 980px;
+                }
+            }
+        </style>
+        <script type="text/javascript">
+            var ok = true;
+            function changeClass()
+            {
+                if (ok) {
+                    var div = document.getElementById("panel-busq");
+                    div.className = "ui-g-1 ui-md-1 ui-lg-1 Padding3";
+                    div.style.display = "none";
+                    var div2 = document.getElementById("panel-tab");
+                    div2.className = "ui-g-12 ui-md-12 ui-lg-12 Padding3";
+                    ok = false;
+                } else {
+                    var div = document.getElementById("panel-busq");
+                    div.className = "ui-g-12 ui-md-12 ui-lg-3 Padding3";
+                    div.style.display = "inline";
+                    var div2 = document.getElementById("panel-tab");
+                    div2.className = "ui-g-12 ui-md-12 ui-lg-9 Padding3";
+                    ok = true;
+                }
+            }
+        </script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDX8EfDI5P5RUJkl3G1F1sBKwQCaYVfV4"></script>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-fluid no-print">
+            <div class="ui-g">
+                <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 0 0 0 3px">
+                    <div class="Fleft" style="margin-right: 5px">
+                        <p:commandButton id="btn-status"
+                                         type="button"
+                                         title="Ocultar/Visualizar panel de búsqueda"
+                                         onclick="changeClass()"
+                                         icon="fa fa-arrow-circle-o-left"
+                                         class="cssWhite" />
+                    </div>
+                    <h:form id="accidente-form">
+                        <p:growl id="msg" showDetail="true" showSummary="true" life="6000" />
+                        <p:staticMessage severity="info" 
+                                         summary="#{accidenteJSF.accidente.idEmpleado.codigoTm}: #{accidenteJSF.accidente.idNovedadTipoDetalle.tituloTipoNovedad} / Clasificación de Acc. (#{accidenteJSF.accidente.idVehiculo.codigo} - #{accidenteJSF.accidente.idVehiculo.placa})" 
+                                         rendered="#{not empty accidenteJSF.accidente.idAccidente}" />
+                    </h:form>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3" jsf:id="panel-busq">
+                    <h:form id="list-accidente">
+                        <p:panel id="panel-busqueda" header="Búsqueda" toggleable="true">
+                            <div class="ui-g">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:calendar id="fechaIni" 
+                                                value="#{accidenteJSF.fechaIni}" 
+                                                pattern="yyyy/MM/dd"
+                                                title="Fecha de Inicio"
+                                                mask="true"
+                                                locale="es"
+                                                navigator="true"
+                                                showOn="button"/>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:calendar id="fechaFin" 
+                                                value="#{accidenteJSF.fechaFin}" 
+                                                pattern="yyyy/MM/dd"
+                                                mask="true"
+                                                locale="es"
+                                                navigator="true"
+                                                title="Fecha Fin"
+                                                showOn="button"/>
+                                </div>
+                                <p:separator/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:selectOneMenu id="t-even" value="#{accidenteJSF.i_auxNovDet}" >
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                        <f:selectItems value="#{accidenteJSF.listNovedadTipoDetalles}" 
+                                                       var="listntd" 
+                                                       itemLabel="#{listntd.tituloTipoNovedad}" 
+                                                       itemDescription="#{listntd.descripcionTipoNovedad}"
+                                                       itemValue="#{listntd.idNovedadTipoDetalle}" />
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <ui:include src="../../zComponent/selectUnidadFuncional.xhtml" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:inputText id="cod-ope"
+                                                 value="#{accidenteJSF.i_codOpe}" 
+                                                 placeholder="Código de Operador"
+                                                 title="Código Operador">
+                                        <p:keyFilter regEx="/[0-9]/i"/> 
+                                    </p:inputText>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:inputText id="cod-veh"
+                                                 value="#{accidenteJSF.c_codVeh}" 
+                                                 placeholder="Código de Vehiculo"
+                                                 title="Código Vehículo"/>
+                                </div>
+                                <p:separator/>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:commandButton id="buscar"
+                                                     actionListener="#{accidenteJSF.buscarAccidente(0)}"
+                                                     icon="fa fa-search"
+                                                     value="Buscar"
+                                                     class="cssWhite GreenButton"
+                                                     update=":list-accidente:table-accidente,accidente-form:msg"
+                                                     process="@form" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <p:commandButton id="limpiar"
+                                                     actionListener="#{accidenteJSF.limpiar()}"
+                                                     icon="fa fa-remove"
+                                                     value="Limpiar"
+                                                     class="cssWhite"
+                                                     update=":list-accidente:panel-busqueda"
+                                                     process="@this" />
+                                </div>
+                            </div>
+                        </p:panel>
+                        <p:separator/>
+                        <p:dataTable id="table-accidente" 
+                                     var="acc" 
+                                     value="#{accidenteJSF.listAccidente}" 
+                                     selectionMode="single" 
+                                     scrollHeight="400"
+                                     rows="5"
+                                     scrollable="true"
+                                     paginator="true"
+                                     emptyMessage="No exiten registros"
+                                     reflow="true"
+                                     selection="#{accidenteJSF.accidente}" 
+                                     rowKey="#{acc.idAccidente}">
+                            <f:facet name="header">
+                                Registros encontrados: #{accidenteJSF.listAccidente.size()}
+                            </f:facet>
+                            <p:ajax event="rowSelect" listener="#{accidenteJSF.onRowSelect}" update="@form,:tabView,:accidente-form,observacion-acc" />
+                            <p:ajax event="rowSelect" listener="#{accImprimirInformeJSF.resetInformes()}" update="@form,:tabView,:accidente-form,observacion-acc" />
+                            <p:ajax event="rowUnselect" listener="#{accidenteJSF.reset()}" update="@form,:tabView,:accidente-form,observacion-acc" />
+                            <p:column>
+                                <br/>
+                                <h:outputText value="Tipo Evento: "/>
+                                <h:outputText value="#{acc.idNovedadTipoDetalle.tituloTipoNovedad}"
+                                              class="Fs21"
+                                              style="color: red;font-weight: bold"/>
+                                <p:spacer width="3" />
+                                <p:commandButton id="generarInforme"
+                                                 title="Generar Documento" 
+                                                 icon="fa fa-cloud-download"
+                                                 actionListener="#{accReporteGMJSF.generarReporte(acc)}" 
+                                                 class="cssWhite"
+                                                 ajax="false"
+                                                 process="@this">
+                                    <p:fileDownload value="#{accReporteGMJSF.file}" />
+                                </p:commandButton>
+                                <br/>
+                                <h:outputText value="Vehículo: "/>
+                                <h:outputText value="#{acc.idVehiculo.codigo}" style="font-weight: bold" /><br/>
+                                <h:outputText value="Código Ope: "/> 
+                                <h:outputText value="#{acc.idEmpleado.codigoTm}" 
+                                              title="#{acc.idEmpleado.nombres.concat(' ').concat(acc.idEmpleado.apellidos)}" 
+                                              style="font-weight: bold"/><br/>
+                                <h:outputText value="Fecha y Hora: "/>
+                                <h:outputText value="#{acc.fechaAcc}" style="font-weight: bold">
+                                    <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss"/>
+                                </h:outputText>
+                                <div class="ui-g">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:commandButton id="bnt-soli"
+                                                         value="Solicitar Eliminar Caso"
+                                                         class="cssWhite GreenButton"
+                                                         icon="fa fa-check"
+                                                         actionListener="#{accidenteBorradorJSF.accidenteSolicitado(acc)}"
+                                                         process="@this"
+                                                         rendered="#{accidenteBorradorJSF.renderAccidenteSolicitud(acc)}"
+                                                         update=":form-solicitud" />
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form> 
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-9 Padding3" jsf:id="panel-tab">
+                    <p:tabView id="tabView" dynamic="true">
+                        <p:tab title="Informe de Caso" rendered="#{!accidenteJSF.isRolAbogado}">
+                            <h:form id="form-info-caso">
+                                <ui:include src="infoCaso.xhtml" />
+                            </h:form>     
+                        </p:tab>
+                        <p:tab title="Lugar de los Hechos" rendered="#{!accidenteJSF.isRolAbogado}">
+                            <h:form id="form-lugar-hechos">
+                                <ui:include src="lugarHechos.xhtml" />
+                            </h:form>  
+                            <ui:include src="modals/listaStopPoint.xhtml"/>
+                        </p:tab>
+                        <p:tab title="Vehículos Involucrados" rendered="#{!accidenteJSF.isRolAbogado}">
+                            <h:form id="form-veh-invol">
+                                <ui:include src="vehiculosInvolucrados.xhtml" />
+                            </h:form>  
+                        </p:tab>
+                        <p:tab title="Conductores Involucrados" rendered="#{!accidenteJSF.isRolAbogado}">
+                            <h:form id="form-cond-invol">
+                                <ui:include src="conductoresInvolucrados.xhtml" />
+                            </h:form>  
+                        </p:tab>
+                        <p:tab title="Víctimas" rendered="#{!accidenteJSF.isRolAbogado}">
+                            <h:form id="form-vic">
+                                <ui:include src="victimas.xhtml" />
+                            </h:form>  
+                            <ui:include src="modals/uploadFileVictima.xhtml" />
+                            <ui:include src="modals/vistaDocConciliacion.xhtml" />
+                        </p:tab>
+                        <p:tab title="Testigos" rendered="#{!accidenteJSF.isRolAbogado}">
+                            <h:form id="form-test">
+                                <ui:include src="testigos.xhtml" />
+                            </h:form>  
+                        </p:tab>
+                        <p:tab title="Diligencias Jurídicas">
+                            <h:form id="form-diligencia">
+                                <ui:include src="diligenciaJuridica.xhtml" />
+                            </h:form>  
+                        </p:tab>
+                        <p:tab title="Audiencias">
+                            <h:form id="form-audiencia">
+                                <ui:include src="audiencias.xhtml" />
+                            </h:form>  
+                        </p:tab>
+                        <p:tab title="Análisis" rendered="#{!accidenteJSF.isRolAbogado}">
+                            <h:form id="form-analisis">
+                                <ui:include src="analisis.xhtml" />
+                            </h:form>  
+                        </p:tab>
+                        <p:tab title="Costos" rendered="#{!accidenteJSF.isRolAbogado}">
+                            <h:form id="form-costos">
+                                <ui:include src="costos.xhtml" />
+                            </h:form>  
+                        </p:tab>
+                        <p:tab title="Documentos">
+                            <h:form id="form-documentos">
+                                <ui:include src="documentos.xhtml" />
+                            </h:form>
+                            <ui:include src="modals/vistaDocumento.xhtml" />
+                            <ui:include src="modals/uploadFileDocumentos.xhtml" />
+                            <ui:include src="../../galeriaFotos.xhtml" />
+                        </p:tab>
+                        <p:tab title="Plan de Acción" rendered="#{!accidenteJSF.isRolAbogado}">
+                            <h:form id="form-plan-accion">
+                                <ui:include src="planAccion.xhtml" />
+                            </h:form>
+                            <ui:include src="modals/nuevoPlanAccion.xhtml" />
+                        </p:tab>
+                        <p:tab title="Informes" rendered="false">
+                            <h:form id="form-informe">
+                                <ui:include src="informes.xhtml" />
+                            </h:form>  
+                        </p:tab>
+                    </p:tabView>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:panel id="panel-ob-acc" header="Observación de la Novedad">
+                        <h:outputText id="observacion-acc" value="#{accidenteJSF.accidente.idNovedad.observaciones}" class="cssBlack" />
+                    </p:panel>
+                </div>
+            </div>
+        </div>
+        <ui:include src="modals/NewSolicitud.xhtml" />
+        <ui:include src="modals/ListaEmpleados.xhtml" />
+        <ui:include src="../../cambiosEstado/operadores/Nuevo.xhtml" />
+        <ui:include src="../../segVial/Inoperativos/modal/create.xhtml"/> 
+        <ui:include src="modals/agregarIpat.xhtml" />
+        <h:form id="form_inoperativos_list">
+            <h:inputHidden id="id_dt_inoperativos" class="Padding0" />
+        </h:form>
+        <h:inputHidden id="frmPrincipal" />
+        <div jsf:id="containerAux" class="noNone DispNone" jsf:rendered="false">
+            <div jsf:id="container" style="text-transform: uppercase">
+                <p:panel id="info-operador" style="border: none;margin: 0;padding: 0" rendered="#{accImprimirInformeJSF.i_opcion == 1 and accImprimirInformeJSF.accInformeOpe != null}">
+                    <div class="ui-g">
+                        <div class="ui-g-4 ui-md-4 ui-lg-4" style="border: #000000 solid 1px;text-align: center">
+                            <p:graphicImage name="images/preloadbmo.gif" height="50" library="sentinel-layout"/>
+                        </div>
+                        <div class="ui-g-8 ui-md-8 ui-lg-8"
+                             style="border: #000000 solid 1px;
+                             display: flex;
+                             justify-content: center;
+                             align-items: center">
+                            <h:outputText class="cssBlack" value="INFORME OPERADOR" />
+                        </div>
+                    </div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Información del Evento" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Evento" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Fecha del Evento" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccidente.fechaAcc}" >
+                                <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss" />
+                            </h:outputText>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Vehículo" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccidente.idVehiculo.codigo}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Operador" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idOperadorPrincipal.codigoTm} - #{accImprimirInformeJSF.accInformeOpe.idOperadorPrincipal.apellidos} #{accImprimirInformeJSF.accInformeOpe.idOperadorPrincipal.nombres}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Gravedad" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText  value="CON MUERTOS" rendered="#{accImprimirInformeJSF.accInformeOpe.condicion == 0}" />
+                            <h:outputText  value="CON HERIDOS" rendered="#{accImprimirInformeJSF.accInformeOpe.condicion == 1}" />
+                            <h:outputText  value="CON MUERTOS Y CON HERIDOS" rendered="#{accImprimirInformeJSF.accInformeOpe.condicion == 2}" />
+                            <h:outputText  value="SOLO DAÑOS" rendered="#{accImprimirInformeJSF.accInformeOpe.condicion == 3}" />
+                            <h:outputText  value="NA" rendered="#{accImprimirInformeJSF.accInformeOpe.condicion == null}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Clase de Accidente" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccClase.clase}" />
+                        </div>
+                    </div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:panel id="inf-choque" rendered="#{accImprimirInformeJSF.listAccChoqueInforme.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                    <h:outputText class="cssBlack" value="Choque Con" />
+                                </div>
+                                <p:repeat value="#{accImprimirInformeJSF.listAccChoqueInforme}" var="choque">
+                                    <div class="ui-g-1 ui-md-1 ui-lg-1">
+                                        <i class="fa fa-check cssBlack" />
+                                    </div>
+                                    <div class="ui-g-11 ui-md-11 ui-lg-11">
+                                        <h:outputText value="#{choque.idAccTipoVehiculo.tipoVehiculo}" />  
+                                    </div>
+                                </p:repeat>
+                            </p:panel>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" style="margin-top: 10px">
+                            <p:panel id="inf-fijo" rendered="#{accImprimirInformeJSF.listAccObjetoFijoInforme.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                    <h:outputText class="cssBlack" value="Choque Con Objeto Fijo" />
+                                </div>
+                                <p:repeat value="#{accImprimirInformeJSF.listAccObjetoFijoInforme}" var="fijo">
+                                    <div class="ui-g-1 ui-md-1 ui-lg-1">
+                                        <i class="fa fa-check cssBlack" />
+                                    </div>
+                                    <div class="ui-g-11 ui-md-11 ui-lg-11">
+                                        <h:outputText value="#{fijo.idAccObjetoFijo.objetoFijo}" />  
+                                    </div>
+                                </p:repeat>
+                            </p:panel>
+                        </div>
+                    </div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Lugar" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Latitud" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.latitude}" />
+                        </div>                      
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Longitud" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.longitude}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Dirección" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.direccion}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Troncal" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaTroncal.viaTroncal}" />
+                        </div>
+                    </div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Fecha y Hora" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Fecha" />    
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.fecha}" >
+                                <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                            </h:outputText>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Hora de Ocurrencia" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.horaOcurrencia}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Hora de Levantamiento" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.horaLevantamiento}" />
+                        </div>
+                    </div>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Características del Lugar" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Área" />    
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="URBANA" rendered="#{accImprimirInformeJSF.accInformeOpe.area == 0}" />
+                            <h:outputText value="RURAL" rendered="#{accImprimirInformeJSF.accInformeOpe.area == 1}" />
+                            <h:outputText value="NA" rendered="#{accImprimirInformeJSF.accInformeOpe.area == null}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Sector" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaSector.viaSector}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Zona" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaZona.viaZona}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Diseño" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaDiseno.viaDiseno}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Tiempo" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaClima.viaClima}" />
+                        </div>
+                    </div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Características de la vía" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Geométrica" />    
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaGeometrica.viaGeometrica}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Utilización" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaUtilizacion.viaUtilizacion}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Calzadas" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaCalzada.viaCalzadas}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Carriles" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaCarriles.viaCarriles}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Material" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaMaterial.viaMaterial}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Estado" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaEstado.viaEstado}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Condiciones" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaCondicion.viaCondicion}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Iluminación Artificial" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaIluminacion.viaIluminacion}" />
+                        </div>
+                    </div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Controles" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Agente de Transito" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Presente" rendered="#{accImprimirInformeJSF.accInformeOpe.agente == 1}" />
+                            <h:outputText value="No Presente" rendered="#{accImprimirInformeJSF.accInformeOpe.agente == 0}" />
+                            <h:outputText value="NA" rendered="#{accImprimirInformeJSF.accInformeOpe.agente == null}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Semaforo" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idAccViaSemaforo.viaSemaforo}" />
+                        </div>
+                    </div>
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Demarcación y Señales" />
+                        </div>
+                        <p:panel id="inf-demar" rendered="#{accImprimirInformeJSF.listAccidenteLugarDemar.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                            <p:repeat value="#{accImprimirInformeJSF.listAccidenteLugarDemar}" var="demar">
+                                <div class="ui-g-1 ui-md-1 ui-lg-1">
+                                    <i class="fa fa-check cssBlack" />
+                                </div>
+                                <div class="ui-g-11 ui-md-11 ui-lg-11">
+                                    <h:outputText value="#{demar.idAccViaDemarcacion.viaDemarcacion}" />  
+                                </div>
+                            </p:repeat>
+                        </p:panel>
+                    </div>
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Visual Disminuida" />
+                        </div>
+                        <p:panel id="inf-visual" rendered="#{accImprimirInformeJSF.listAccVisualInforme.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                            <p:repeat value="#{accImprimirInformeJSF.listAccVisualInforme}" var="visual">
+                                <div class="ui-g-1 ui-md-1 ui-lg-1">
+                                    <i class="fa fa-check cssBlack" />
+                                </div>
+                                <div class="ui-g-11 ui-md-11 ui-lg-11">
+                                    <h:outputText value="#{visual.idAccViaVisual.viaVisual}" />  
+                                </div>
+                            </p:repeat>
+                        </p:panel>
+                    </div>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Conductores, Vehículos y Propietarios" />
+                        </div>
+                        <p:repeat value="#{accImprimirInformeJSF.listAccInformeVehCond}" var="veh">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Conductor" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Nombres" class="cssBlack" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.nombres}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.idTipoIdentificacion.nombre}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.nroDocumento}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Fecha de Nacimiento" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.fechaNac}" >
+                                    <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Sexo" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.sexo}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Dirección" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.direccion}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Ciudad" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.ciudad}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Teléfono(s)" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.telefono}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Condición" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.condicion != null ? (veh.condicion == 1 ? 'Herido' : 'Muerto') : 'NA'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Porta Cinturon de Seguridad" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.cinturon != null ? (veh.cinturon == 1 ? 'Sí' : 'No') : 'NA'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Porta Casco" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.casco != null ? (veh.casco == 1 ? 'Sí' : 'No') : 'NA'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Porta Licencia" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.licencia != null ? (veh.licencia == 1 ? 'Sí' : 'No') : 'NA'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Número de Licencia" />
+                            </div>    
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.nroLicencia}" />
+                            </div>    
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Categoría" />
+                            </div>    
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.categoria}" />
+                            </div>    
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Restricción" />
+                            </div>    
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.restriccion}" />
+                            </div>    
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Fecha de Expedición" />
+                            </div>    
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.fechaExp}" >
+                                    <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </div>    
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Fecha de Vencimiento" />
+                            </div>    
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.fechaVencimiento}" >
+                                    <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Se llevó a Examen de" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <div class="ui-g-3 ui-md-3 ui-lg-3"></div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="Centro de Atención:" />
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="#{veh.sitioAtencion}" />        
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="Embriaguez" />
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="#{veh.pruebaEmbriaguez != null ? (veh.pruebaEmbriaguez == 0 ? 'Positivo' : (veh.pruebaEmbriaguez == 1 ? 'Negativo' : 'No se Realizó')) : 'No Aplica'}" />
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="Resultado" />
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="#{veh.resultEmbriaguez != null ? (not empty veh.resultEmbriaguez ? veh.resultEmbriaguez : 'No Aplica') : 'No Aplica'}" />
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="Droga" />
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="#{veh.pruebaDroga != null ? (veh.pruebaDroga == 0 ? 'Positivo': (veh.pruebaDroga == 1 ? 'Negativo' : 'No se Realizó')) : 'No Aplica'}" />
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="Resultado" />
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                    <h:outputText value="#{veh.resulDroga != null ? (not empty veh.resulDroga ? veh.resulDroga : 'No Aplica') : 'No Aplica'}" />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Vehículo" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Placa" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.placa}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Marca" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.marca}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Línea" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.linea != null ? (not empty veh.linea ? (veh.linea) : 'NA') : 'NA'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Modelo" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.modelo}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Carga en Toneladas" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.cargaTonelada}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Color" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.color}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Número de Pasajeros" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.nroPasajeros}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Empresa Operadora" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.idEmpresaOperadora.empresaOperadora}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Inmovilizado en" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.inmovilizado}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="A Disposición de" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.disposicion}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Seguro Obligatorio" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.seguroObligatorio != null ? (veh.seguroObligatorio == 1 ? 'Sí' : 'No') : 'NA'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Número de Poliza" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.nroPoliza}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Compañía Aseguradora" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.companiaAseguradora}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Fecha de Vencimiento" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.fechaVencSeguro}" >
+                                    <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12"></div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12"></div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12"></div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12"></div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12"></div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12"></div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Propietario" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Nombres" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.nombresPropietario}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.idTipoIdenProp != null ? veh.idTipoIdenProp.nombre : 'Identificación'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.nroDocPropietario}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <hr/>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Clase del Vehículo" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.idAccTipoVehiculo.tipoVehiculo}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Tipo de Servicio" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.idTipoServ.tipoServ}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Seguro de Responsabilidad Civil" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.seguroRespCivil != null ? (veh.seguroRespCivil == 1 ? 'Sí' : 'No') : 'NA'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Nacionalidad" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.nacionalidad != null ? (veh.nacionalidad == 1 ? 'Colombiano' : 'Extranjero') : 'NA'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Falla En" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{veh.idAccFalla != null ? (veh.idAccFalla.falla) : 'NA'}" />
+                            </div>
+                            <div class="saltopagina" style="page-break-before: always"></div>
+                        </p:repeat>
+                    </div>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Croquis" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <p:graphicImage cache="false"
+                                            styleClass="imagen"
+                                            width="100%"
+                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}">
+                                <f:param name="path_foto" value="#{accImprimirInformeJSF.accInformeOpe.pathCroquis}" />
+                            </p:graphicImage>
+                        </div>
+                    </div>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <p:panel id="inf-vic" rendered="#{accImprimirInformeJSF.listAccInformeVic.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Víctimas" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.listAccInformeVic}" var="vic">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Nombres" class="cssBlack" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.nombres}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.idTipoIdentificacion.nombre}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.nroDoc}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Fecha de Nacimiento" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.fechaNac}" >
+                                        <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Sexo" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.sexo}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Dirección" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.direccion}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Ciudad" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.ciudad}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Teléfono(s)" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.telefono}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Condición" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.condicion != null ? (vic.condicion == 1 ? 'Peatón' : 'Pasajero') : 'NA'}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Porta Cinturon de Seguridad" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.cinturon != null ? (vic.cinturon == 1 ? 'Sí' : 'No') : 'NA'}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Porta Casco" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.casco != null ? (vic.casco == 1 ? 'Sí' : 'No') : 'NA'}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Gravedad" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vic.gravedad != null ? (vic.gravedad == 1 ? 'Herido' : 'Muerto') : 'NA'}" class="cssBlack" />
+                                </div>
+                                <div class="ui-g">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                        <h:outputText class="cssBlack" value="Se Llevó a Examen de" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <p:spacer/>
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="Centro de Atención:" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="#{vic.sitioAtencion}" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <p:spacer/>
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="Embriaguez" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="#{vic.prebaEmbriaguez != null ? (vic.prebaEmbriaguez == 1 ? 'Positivo': (vic.prebaEmbriaguez == 0 ? 'Negativo' : 'No se Realizó')) : 'No Aplica'}" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="Resultado" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="#{vic.resultEmbriaguez != null ? (not empty vic.resultEmbriaguez ? vic.resultEmbriaguez : 'No Aplica') : 'No Aplica'}" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="Droga" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="#{vic.pruebaDrogra != null ? (vic.pruebaDrogra == 1 ? 'Positivo': (vic.pruebaDrogra == 0 ? 'Negativo' : 'No se Realizó')) : 'No Aplica'}" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="Resultado" />
+                                    </div>
+                                    <div class="ui-g-3 ui-md-3 ui-lg-3">
+                                        <h:outputText value="#{vic.resultDroga != null ? (not empty vic.resultDroga ? vic.resultDroga : 'No Aplica' ) : 'No Aplica'}" />
+                                    </div>
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <p:panel id="inf-tes" rendered="#{accImprimirInformeJSF.listAccInformeTestigo.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="saltopagina" style="page-break-after: always"></div>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Testigos" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.listAccInformeTestigo}" var="tes" >
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Nombres" class="cssBlack" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{tes.nombres}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{tes.idTipoIdentificacion != null ? tes.idTipoIdentificacion.nombre : 'Identificación'}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{tes.nroDoc}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Dirección" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{tes.direccion}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Ciudad" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{tes.ciudad}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Teléfono(s)" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{tes.telefono}" />
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Observaciones" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.observaciones}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g" style="margin-top: 10px">
+                        <p:panel id="anexo-panel" rendered="#{accImprimirInformeJSF.accInformeOpe.pathAnexo != null}" style="margin: 0;border: none;padding: 0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Anexos" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="Descrión de Anexo" class="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="margin-bottom: 10px">
+                                <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.anexos}"/>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Nombres" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.anexoNombres}"/>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Placa" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.anexoPlaca}"/>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Corresponde" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.anexoCorresponde}"/>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Entidad" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.anexoEntidad}"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.anexoFirma != null ? accImprimirInformeJSF.toSvg(accImprimirInformeJSF.accInformeOpe.anexoFirma,400,100) : ''}" escape="false"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="margin-top: 0;padding-top: 0">
+                                <h:outputText value="Firma Anexo"/>
+                            </div>
+                        </p:panel>
+                    </div>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Árbol de Causalidad" />
+                        </div>
+                        <p:repeat value="#{accImprimirInformeJSF.listAccInformeOpeCausalidad}" var="cau">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="Árbol" class="cssBlack" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{cau.idCausaSub.idCausa.idAccArbol.arbol}"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="Causa" class="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{cau.idCausaSub.idCausa.causa}"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="Sub Causa" class="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{cau.idCausaSub.subcausa}"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="Causa Raiz" class="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{cau.idCausaRaiz.causaRaiz}"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                                <h:outputText value="Respuesta" class="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{cau.respuesta}" />
+                            </div>
+                        </p:repeat>
+                    </div>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Versión del Operador" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.versionOperador}" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="margin-top: 10px;text-align: center">
+                            <h:outputText class="cssBlack" value="Operador" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Nombres" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idOperadorPrincipal.apellidos} #{accImprimirInformeJSF.accInformeOpe.idOperadorPrincipal.nombres}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Código" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idOperadorPrincipal.codigoTm}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Cédula" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.idOperadorPrincipal.identificacion}" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeOpe.firma != null ? accImprimirInformeJSF.toSvg(accImprimirInformeJSF.accInformeOpe.firma,400,100) : ''}" escape="false"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="margin-top: 0;padding-top: 0">
+                            <h:outputText value="Firma Operador"/>
+                        </div>
+                    </div>
+                </p:panel>
+                <p:panel id="info-master" style="border: none;margin: 0;padding: 0" rendered="#{accImprimirInformeJSF.i_opcion == 2 and accImprimirInformeJSF.accInformeMaster != null}">
+                    <div class="ui-g">
+                        <div class="ui-g-4 ui-md-4 ui-lg-4" style="border: #000000 solid 1px;text-align: center">
+                            <p:graphicImage name="images/preloadbmo.gif" height="50" library="sentinel-layout"/>
+                        </div>
+                        <div class="ui-g-8 ui-md-8 ui-lg-8"
+                             style="border: #000000 solid 1px;
+                             display: flex;
+                             justify-content: center;
+                             align-items: center">
+                            <h:outputText class="cssBlack" value="INFORME OPERADOR MÁSTER" />
+                        </div>
+                    </div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Información del Evento" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Evento" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Fecha del Evento" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idAccidente.fechaAcc}" >
+                                <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss" />
+                            </h:outputText>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Vehículo" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idAccidente.idVehiculo.codigo}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Lugar" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.lugar}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Fecha del Informe" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.fechaInforme}" >
+                                <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                            </h:outputText>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Estación Cerca" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idPrgStoppoint.name}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Hora del evento" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.horaEvento}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Tiempo de Reacción" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.tiempoReaccion}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Hora Fin del Evento" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.horaFinEvento}" />
+                        </div>
+                    </div>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Vehículos y Conductores Involucrados" />
+                        </div>
+                        <p:repeat value="#{accImprimirInformeJSF.accInformeMasterVehCondList}" var="vehCond">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Conductor" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Nombres" class="cssBlack"/>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.nombres} " />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Código" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.codigoTm != null ? vehCond.codigoTm : 'NO APLICA'} " />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Identificación" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.identificacion} " />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Teléfono(s)" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.telefono} " />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Sexo" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.sexo} " />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Vehículo" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Placa" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.placa} " />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Color" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.color} " />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Modelo" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.modelo} " />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Inmovilizado" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.inmovilizado != null ? (vehCond.inmovilizado == 1 ? 'Sí' : 'NO') : 'NA'}" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="Codigo de Hipotesis" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <h:outputText value="#{vehCond.codigoHipotesis} " />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText class="cssBlack" value="Hipotesis" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                                <h:outputText value="#{vehCond.hipotesis} " />
+                            </div>
+                        </p:repeat>
+                    </div>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <p:panel id="inf-vict" rendered="#{accImprimirInformeJSF.accInformeMasterVicList.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Víctimas" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.accInformeMasterVicList}" var="vict">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Nombres" class="cssBlack"/>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.nombres} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.idTipoIdentificacion != null ? vict.idTipoIdentificacion.nombre : 'Identificación'} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.nroDoc} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Fecha de Nacimiento" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.fechaNac}" >
+                                        <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Sexo" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.sexo} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Dirección" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.direccion} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Ciudad" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.ciudad} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Teléfono(s)" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.telefono} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Tipo Víctima" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.idAccTipoVictima != null ? vict.idAccTipoVictima.tipo : 'NA'}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Porta Cinturon de Seguridad" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.cinturon != null ? (vict.cinturon == 1 ? 'Sí' : 'No') : 'NA'}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Porta Casco" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.casco != null ? (vict.casco == 1 ? 'Sí' : 'No') : 'NA'}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Gravedad" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.gravedad != null ? (vict.gravedad == 1 ? 'Herido' : 'Muerto') : 'NA'}" class="cssBlack" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Eps" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{vict.eps} " />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                    <h:outputText class="cssBlack" value="Diagnóstico" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                                    <h:outputText value="#{vict.diagnostico} " />
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <p:panel id="inf-poli" rendered="#{accImprimirInformeJSF.accInformeMasterAgentesList.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="saltopagina" style="page-break-after: always"></div>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Policias y Agentes de Transito" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.accInformeMasterAgentesList}" var="poli" >
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Nombres" class="cssBlack"/>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{poli.nombres} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Número de Chaleco" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{poli.chaleco} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Placa Agente" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{poli.placaChaleco} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Identificación" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{poli.identificacion} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{poli.unidadMovil} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Placa Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{poli.placaUnidadMovil} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Número Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{poli.numeroUnidadMovil} " />
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <p:panel id="inf-medi" rendered="#{accImprimirInformeJSF.accInformeMasterMedicosList.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="saltopagina" style="page-break-after: always"></div>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Médicos y/o Paramédicos" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.accInformeMasterMedicosList}" var="medi" >
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Nombres" class="cssBlack"/>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{medi.nombres} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Identificación" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{medi.identificacion} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Número de Ambulancia" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{medi.nroAmbulancia} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Placa Ambulancia" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{medi.placaAmbulancia} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Número" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{medi.numeroAmbulancia} " />
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <p:panel id="inf-bomb" rendered="#{accImprimirInformeJSF.accInformeMasterBomberosList.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="saltopagina" style="page-break-after: always"></div>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Bomberos" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.accInformeMasterBomberosList}" var="bomb" >
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Nombres" class="cssBlack" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{bomb.nombres} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Identificación" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{bomb.identificacion} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{bomb.unidadMovil} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Placa Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{bomb.placaUnidadMovil} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Número" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{bomb.numeroUnidadMovil} " />
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <p:panel id="inf-insp" rendered="#{accImprimirInformeJSF.accInformeMasterInspectoresList.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="saltopagina" style="page-break-after: always"></div>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Inspectores" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.accInformeMasterInspectoresList}" var="insp" >
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Nombres" class="cssBlack"/>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{insp.nombres} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Número de Chaleco" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{insp.chaleco} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Placa Agente" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{insp.placaChaleco} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Identificación" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{insp.identificacion} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{insp.unidadMovil} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Placa Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{insp.placaUnidadMovil} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Número Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{insp.numeroUnidadMovil} " />
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <p:panel id="inf-recomo" rendered="#{accImprimirInformeJSF.accInformeMasterRecomotosList.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="saltopagina" style="page-break-after: always"></div>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Recomotos" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.accInformeMasterRecomotosList}" var="recomo" >
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Nombres" class="cssBlack"/>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{recomo.nombres} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Número de Chaleco" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{recomo.chaleco} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Placa Agente" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{recomo.placaChaleco} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Identificación" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{recomo.identificacion} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{recomo.unidadMovil} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Placa Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{recomo.placaUnidadMovil} " />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Número Unidad Movil" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{recomo.numeroUnidadMovil} " />
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <p:panel id="inf-testigo" rendered="#{accImprimirInformeJSF.accInformeMasterTestigoList.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="saltopagina" style="page-break-after: always"></div>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Testigos" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.accInformeMasterTestigoList}" var="test" >
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Nombres" class="cssBlack"/>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{test.nombres}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Dirección" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{test.direccion}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Identificación" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{test.identificacion}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Teléfono" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{test.telefono}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Vídeo" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{test.video == 1 ? 'Sí' : 'No'}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="Hora" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <h:outputText value="#{test.horaVideo}" />
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Versión del Operador Máster" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.versionMaster}" />/
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center;margin-top: 10px">
+                            <h:outputText class="cssBlack" value="Versión del Operador" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.versionOperador}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Vídeo del Operador" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.pathVideoOpe != null ? 'Sí':'No'}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Hora" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.horaVideo}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Autoriza su Grabación" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.autorizaGrabacion == 1 ? 'Sí' : 'No'}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Colilla de Tacógrafo" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.colillaTacografo == 1 ? 'Sí' : 'No'}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Telemétria" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.telemetria == 1 ? 'Sí' : 'No'}" />
+                        </div>
+                    </div>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Máster Primer Responsable" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Nombres" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idEmpleadoMaster.apellidos} #{accImprimirInformeJSF.accInformeMaster.idEmpleadoMaster.nombres}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Identificacíon" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idEmpleadoMaster.identificacion}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Código TM" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idEmpleadoMaster.codigoTm}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="Equipo" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idEmpleadoMaster.pmGrupoList.get(0).nombreGrupo}" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.firmaMaster != null ? accImprimirInformeJSF.toSvg(accImprimirInformeJSF.accInformeMaster.firmaMaster,400,100) : ''}" escape="false"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <h:outputText value="Firma" />
+                        </div>
+                    </div>
+                    <p:panel id="inf-apoyo" rendered="#{accImprimirInformeJSF.accInformeMasterApoyoList.size() > 0}" style="padding: 0;margin: 0;border: none" >
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                <h:outputText class="cssBlack" value="Máster de Apoyo" />
+                            </div>
+                            <p:repeat value="#{accImprimirInformeJSF.accInformeMasterApoyoList}" var="apoyo" >
+                                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <h:outputText value="(Nombres) #{apoyo.idMaster.apellidos} #{apoyo.idMaster.nombres}" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <h:outputText value="(Identificación) #{apoyo.idMaster.identificacion}" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <h:outputText value="(Código Tm) #{apoyo.idMaster.codigoTm}" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <h:outputText value="(Equipo) #{apoyo.idMaster.pmGrupoList.get(0).nombreGrupo}" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <h:outputText value="#{apoyo.firma != null ? accImprimirInformeJSF.toSvg(apoyo.firma,400,100) : ''}" escape="false"/>
+                                    </div>
+                                    <hr/>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <h:outputText value="Firma" />
+                                    </div>
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </p:panel>
+                    <div class="saltopagina" style="page-break-after: always"></div>
+                    <div class="ui-g ui-gp">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Album Fotográfico" />
+                        </div>
+                        <p:repeat value="#{accImprimirInformeJSF.accInformeMasterAlbumList}" var="album">
+                            <div class="ui-g H100 Padding0 ui-gp">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                                    <p:graphicImage cache="false"
+                                                    styleClass="imagen"
+                                                    width="100%"
+                                                    value="#{uploadFotoJSFManagedBean.imagenDinamica}">
+                                        <f:param name="path_foto" value="#{album.pathFoto}" />
+                                    </p:graphicImage>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                    <h:panelGrid columns="4" style="width:100%" border="0">
+                                        <h:outputText value="Marca" class="cssBlack" />
+                                        <h:outputText value="#{album.marca} " />
+                                        <h:outputText value="Referencia" class="cssBlack" />
+                                        <h:outputText value="#{album.referencia} " />
+                                        <h:outputText value="Lente" class="cssBlack" />
+                                        <h:outputText value="#{album.lente} " />
+                                        <h:outputText value="Zoom" class="cssBlack" />
+                                        <h:outputText value="#{album.zoom} " />
+                                        <h:outputText value="Iso" class="cssBlack" />
+                                        <h:outputText value="#{album.iso} " />
+                                        <h:outputText value="Tarjeta" class="cssBlack" />
+                                        <h:outputText value="#{album.tarjeta} " />
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="2" style="width:100%" border="0">
+                                        <h:outputText value="Tecnología" class="cssBlack" />
+                                        <h:outputText value="#{album.tecnologia == 1 ? 'Digital' : 'Analoga'}" />
+                                        <h:outputText value="Instrumentos Utilizados" class="cssBlack" />
+                                        <h:outputText value="#{album.instrumentos} " />
+                                        <h:outputText value="Tipo de Fotografía" class="cssBlack"/>
+                                        <h:outputText value="#{album.tipoFoto} " />
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="1" style="width:100%" border="0">
+                                        <h:outputText value="Descripción de la Imagen" class="cssBlack"/>
+                                        <h:outputText value="#{album.descripcion} " />
+                                    </h:panelGrid>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                        </p:repeat>
+                    </div>
+                    <div class="saltopagina"></div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <h:outputText class="cssBlack" value="Bosquejo Topográfico" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                            <p:graphicImage cache="false"
+                                            styleClass="imagen"
+                                            width="100%"
+                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}">
+                                <f:param name="path_foto" value="#{accImprimirInformeJSF.accInformeMaster.pathBosquejo}" />
+                            </p:graphicImage>
+                        </div>
+                    </div>
+                </p:panel>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

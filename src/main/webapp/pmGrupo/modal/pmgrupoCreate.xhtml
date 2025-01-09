@@ -1,0 +1,218 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog closable="false" id="pmGrupoDialogId" widgetVar="pmGrupoDialog"
+              responsive="true" 
+              closeOnEscape="true"
+              class="mr1024_90 mr500_90"
+              appendTo="@(body)"
+              fitViewport="true"
+              position="top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            PM Grupo
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('pmGrupoDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <p:messages id="msgsLocal" showDetail="true" closable="true"/>
+        <h:form id="frmPmgrupoCreate" >
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:dataTable id="tblMasterDialog" var="master"  editable="true" 
+                                         paginator="true"
+                                         rows="5"
+                                         filterDelay="1000"
+                                         paginatorTemplate="{PreviousPageLink} {CurrentPageReport} {NextPageLink}"
+                                         paginatorPosition="top"
+                                         value="#{pmGrupJSFMB.listMaster}" 
+                                         widgetVar="tblMasterkMWV">
+                                <f:facet name="header">
+                                    <p:outputLabel value="Masters" class="cssWhite"/>
+                                </f:facet>
+                                <p:column filterBy="#{master.codigoTm}" filterMatchMode="contains" headerText="Código" >
+                                    <h:outputText value="#{master.codigoTm}"/>
+                                </p:column>
+                                <p:column >
+                                    <p:commandButton icon="fa fa-user-plus" 
+                                                     title="Asignar Operador" 
+                                                     process="@this"
+                                                     class="cssWhite"
+                                                     update="empleadoAddPmGrupo,
+                                                     msgs,tblMasterDialog,
+                                                     frmPmgrupoCreate:txtUF,frmPmgrupoCreate:pmGrupoDescricion"
+                                                     action="#{pmGrupJSFMB.addMaster(master)}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:dataTable id="tblOperadorDialog" var="operador" editable="true" 
+                                         value="#{pmGrupJSFMB.listOperadores}" 
+                                         paginator="true"
+                                         rows="5"
+                                         filterDelay="1000"
+                                         paginatorTemplate="{PreviousPageLink} {CurrentPageReport} {NextPageLink}"
+                                         paginatorPosition="top"
+                                         widgetVar="tblOPkMWV">
+                                <f:facet name="header">
+                                    <p:outputLabel value="Operadores" class="cssWhite"/>
+                                </f:facet>
+                                <p:column filterBy="#{operador.codigoTm}" filterMatchMode="contains" headerText="Código" >
+                                    <h:outputText value="#{operador.codigoTm}"/>
+                                </p:column>
+                                <p:column style="width: 20%">
+                                    <p:commandButton icon="fa fa-user-plus" 
+                                                     title="Asignar Operador" 
+                                                     process="@this"
+                                                     class="cssWhite"
+                                                     update="empleadoAddPmGrupo,msgs"
+                                                     actionListener="#{pmGrupJSFMB.preAddOperador(operador)}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-9 ui-lg-9 Padding3" >
+                        <p:fieldset  id="pmGrupoDescricion" toggleable="true" legend="Datos de Grupo">
+                            <div class="ui-g-12 ui-md-3 ui-lg-2 Padding0 ">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " 
+                                     jsf:rendered="#{pmGrupJSFMB.pmGrup.idEmpleado!=null}">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                        <p:graphicImage cache="false"
+                                                        class="BordRad5"
+                                                        rendered="#{uploadFotoJSFManagedBean.imagenDinamica!=null}"
+                                                        value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                        width="100%">
+                                            <f:param name="path_foto" value="#{pmGrupJSFMB.pmGrup.idEmpleado.pathFoto}" />
+                                        </p:graphicImage>
+                                        <p:graphicImage name="images/user.png" 
+                                                        width="100%" 
+                                                        rendered="#{uploadFotoJSFManagedBean.imagenDinamica==null}"
+                                                        library="sentinel-layout"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel class="cssBlack" value="#{pmGrupJSFMB.pmGrup.idEmpleado.codigoTm}"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="#{pmGrupJSFMB.pmGrup.idEmpleado.nombres} #{pmGrupJSFMB.pmGrup.idEmpleado.apellidos}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-9 ui-lg-10 Padding3" >
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel for="txtNomreGrupo" value="Nombre"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText id="txtNomreGrupo" requiredMessage="Error. Se debe agregar un nombre para el grupo"
+                                                     value="#{pmGrupJSFMB.pmGrup.nombreGrupo}" maxlength="50"  required="true"/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel for="txtUF" value="Unidad Funcional"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText id="txtUF"
+                                                     readonly="true"
+                                                     value="#{pmGrupJSFMB.pmGrup.idGopUnidadFuncional.nombre}"  />
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel for="PmGDescripcion"  
+                                                       value="Descripción:"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputTextarea id="PmGDescripcion" 
+                                                         counter="display" 
+                                                         value="#{pmGrupJSFMB.pmGrup.descripcion}" 
+                                                         maxlength="100"
+                                                         counterTemplate="{0} caracteres restantes." 
+                                                         autoResize="false" />
+                                        <p:outputLabel/>
+                                        <p:outputLabel id="display" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </p:fieldset>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+
+                            <p:dataGrid var="operador" id="idTablaPmGrupoDialog" 
+                                        value="#{pmGrupJSFMB.listPmGrupDet}"
+                                        columns="6" layout="grid"
+                                        rowIndexVar="indexgd">
+                                <p:commandLink title="Click para eliminar" 
+                                               process="@this"  
+                                               update="frmPmgrupoCreate:tblOperadorDialog,
+                                               frmPmgrupoCreate:idTablaPmGrupoDialog"
+                                               action="#{pmGrupJSFMB.delete(indexgd)}">
+                                    <p:panel>
+                                        <div class="TexAlCenter">
+                                            <div>
+                                                <p:graphicImage cache="false"
+                                                                style="border:1px solid #106ebc; border-radius: 0px;"
+                                                                value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                                width="80">
+                                                    <f:param name="path_foto" value="#{operador.idEmpleado.pathFoto}" />
+                                                </p:graphicImage>
+                                                <span class="Fs14 DispBlock hardblue">
+                                                    #{operador.idEmpleado.codigoTm}
+                                                    <span class="Fs12 softgray">
+                                                        #{operador.idEmpleado.nombres} #{operador.idEmpleado.apellidos}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </p:panel> 
+                                </p:commandLink>  
+
+                                <f:facet name="footer">
+                                    En total existen #{pmGrupJSFMB.listPmGrupDet.size()} registros.
+                                </f:facet>
+                            </p:dataGrid>
+                        </div>
+                        <p:remoteCommand name="rc"
+                                         process="frmPmgrupoCreate,
+                                         frmPmgrupoCreate:PmGDescripcion,
+                                         frmPmgrupoCreate:txtNomreGrupo"
+                                         update="formTablaPmGrupos,msgs,
+                                         frmPmgrupoCreate,formTablaPmGrupos:tblOPkM" 
+                                         action="#{pmGrupJSFMB.guardar()}" />
+                    </div>                        
+                </div>                        
+            </div> 
+        </h:form>
+
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarPm" 
+                             icon="fa fa-save" value="Guardar" 
+                             style="color: white" onclick="rc()"/>
+        </f:facet>
+
+    </p:dialog>
+    <ui:include src="../modal/modalFechaIngreso.xhtml"/>
+</ui:composition>
+
+
+

@@ -1,0 +1,134 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="novedadMttoTipoDet"
+              widgetVar="wlvNovedadMttoTipoDet" 
+              modal="true" 
+              class="modalResponsivo"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{novedadMttoTipoDetBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{novedadMttoTipoDetBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmNovedadMttoTipoDet">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding3">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                            Novedad tipo
+                        </div>
+                        <div class="ui-g-10 ui-md-11 ui-lg-11 Padding0">
+                            <p:inputText id="novedad_tipo"
+                                         readonly="true"
+                                         value="#{novedadMttoTipoDetBean.novedadTipo.nombre}"/>
+                        </div>
+                        <div class="ui-g-2 ui-md-1 ui-lg-1 Padding0">
+                            <p:commandButton icon="fa fa-list"
+                                             update="msgs,frmNovedadTipo:dtNovedadTipo_id"
+                                             action="#{novedadMttoTipoDetBean.prepareListNovedadTipo()}"
+                                             oncomplete="PF('novedadTipoDialog_wv').show();"
+                                             process="@this"
+                                             styleClass="cssWhite"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Nombre
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true" 
+                                value="#{novedadMttoTipoDetBean.nombre}"
+                                requiredMessage="Debe ingresar un nombre"
+                                />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-3 Padding0">
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-6 Padding3">
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            Notifica:
+                        </div>
+                        <p:selectBooleanButton value="#{novedadMttoTipoDetBean.b_notifica}" 
+                                               onLabel="Sí" offLabel="No" 
+                                               onIcon="fa fa-check" 
+                                               offIcon="fa fa-times"
+                                               styleClass="cssWhite">
+                            <p:ajax update="emails" listener="#{novedadMttoTipoDetBean.cargarEmails()}" />
+                        </p:selectBooleanButton>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-3 Padding0">
+                    </div>
+
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" jsf:id="emails">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{novedadMttoTipoDetBean.b_notifica}">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                                 jsf:rendered="#{novedadMttoTipoDetBean.b_notifica}">
+                                Emails ( Si va a ingresar varios emails, separelos por cómas)
+                            </div>
+                            <p:inputTextarea autoResize="false"
+                                             value="#{novedadMttoTipoDetBean.tipoDetalle.emails}"
+                                             required="true"
+                                             placeholder="Ex: example1@example.com,example2@example.com"
+                                             requiredMessage="Debe ingresar al menos un email"
+                                             rows="5"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Descripción
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         value="#{novedadMttoTipoDetBean.tipoDetalle.descripcion}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"
+                                         rows="5"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmNovedadMttoTipoDet,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtNovedadMttoTipoDet" 
+                             action="#{novedadMttoTipoDetBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmNovedadMttoTipoDet,@this"
+                             update=":msgs,:frmPrincipal:dtNovedadMttoTipoDet"
+                             action="#{novedadMttoTipoDetBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                 rendered="#{novedadMttoTipoDetBean.selected == null}"
+                                 class="cssWhite" onclick="guardar()"/>
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{novedadMttoTipoDetBean.selected != null }"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListaNovedadTipo.xhtml"/>
+</ui:composition>     

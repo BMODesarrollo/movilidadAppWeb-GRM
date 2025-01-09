@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition template="../WEB-INF/template.xhtml">
+        <ui:define name="content">
+            <h:form id="entradaListForm">
+                <p:panel>
+                    <f:facet name="header">
+                        <div class="ui-fluid">
+                            <div class="ui-g">
+                                <div class="ui-g-12 ui-md-5 ui-lg-5 Padding0">
+                                    Salidar Programadas
+                                </div>
+                                <div class="ui-g-5 ui-ml-2 ui-lg-2 Padding0">
+                                    <p:calendar id="fecha" label="Fecha de Consulta de Servicio" 
+                                                locale="es"
+                                                timeZone="America/Bogota"
+                                                pattern="dd/MM/yyyy"
+                                                value="#{entradasSalidasBean.fecha}">
+                                        <p:ajax event="dateSelect" 
+                                                listener="#{entradasSalidasBean.consultar()}" 
+                                                update="serconListForm:entradas,entradaListForm:salida,msgs"></p:ajax>
+                                    </p:calendar>
+                                </div>
+                                <div class="ui-g-6 ui-ml-4 ui-lg-4 Padding0">
+                                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                        <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                         filter="true" 
+                                                         rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                         autoWidth="true"
+                                                         filterMatchMode="contains">
+                                            <f:selectItem itemLabel="Seleccione unidad funcional" itemValue="#{null}" />
+                                            <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                           var="uniFunc" 
+                                                           itemLabel="#{uniFunc.nombre}"
+                                                           itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                            <p:ajax process="@this"
+                                                    event="change"
+                                                    listener="#{entradasSalidasBean.consultar()}"
+                                                    update="serconListForm:entradas,entradaListForm:salida,msgs"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+                                <div class="ui-g-1 ui-ml-1 ui-lg-1 Padding0">
+                                    <h:commandLink>
+                                        <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                                        <p:dataExporter type="xlsx" target="salida,serconListForm:entradas" 
+                                                        fileName="E-S Programadas #{now}"/>
+                                    </h:commandLink>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+                    <p:dataTable id="salida"
+                                 value="#{entradasSalidasBean.prgTcSalidas}"
+                                 var="item"
+                                 emptyMessage="No hay registros que mostrar!!"
+                                 paginator="true"
+                                 rowKey="#{item.idPrgTc}"
+                                 filterDelay="2000"
+                                 rows="100"
+                                 rowsPerPageTemplate="100,200,500">
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Fecha"/>
+                            </f:facet>
+                            <h:outputText  value="#{item.fecha}">
+                                <f:convertDateTime pattern="dd-MM-yyyy" type="date"></f:convertDateTime>
+                            </h:outputText>
+                        </p:column>
+                        <p:column filterBy="#{item.timeOrigin}"
+                                  sortBy="#{item.timeOrigin}"
+                                  filterMatchMode="contains" headerText="Hora Salida">
+                            <h:outputText value="#{item.timeOrigin}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.fromStop.name}"
+                                  filterMatchMode="contains" headerText="Patio Salida">
+                            <h:outputText value="#{item.fromStop.name}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.toStop.name}"
+                                  filterMatchMode="contains" headerText="Estación">
+                            <h:outputText value="#{item.toStop.name}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.sercon}"
+                                  filterMatchMode="contains" headerText="Sercon">
+                            <h:outputText value="#{item.sercon}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.sercon}"
+                                  filterMatchMode="contains" headerText="Codigo TM">
+                            <h:outputText value="#{item.idEmpleado.codigoTm}"/>
+                        </p:column>
+                        <p:column headerText="Nombres">
+                            <h:outputText value="#{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.servbus}"
+                                  filterMatchMode="contains" headerText="Servbus">
+                            <h:outputText value="#{item.servbus}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.idVehiculo.codigo}"
+                                  filterMatchMode="contains" headerText="Vehículo">
+                            <h:outputText value="#{item.idVehiculo.codigo}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.idVehiculo.placa}"
+                                  filterMatchMode="contains" headerText="Vehículo">
+                            <h:outputText value="#{item.idVehiculo.placa}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+            <p:panel visible="false" id="p-ocul">
+                <h:form id="serconListForm">
+                    <p:panel header="Entradas Programadas">
+                        <p:dataTable id="entradas" value="#{entradasSalidasBean.prgTcEntradas}" var="item"
+                                     emptyMessage="No hay registros que mostrar!!"
+                                     paginator="true"
+                                     filterDelay="2000"
+                                     rowKey="#{item.idPrgTc}"
+                                     rows="100"
+                                     rowsPerPageTemplate="100,200,500">
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Fecha"/>
+                                </f:facet>
+                                <h:outputText  value="#{item.fecha}">
+                                    <f:convertDateTime pattern="dd-MM-yyyy" type="date"></f:convertDateTime>
+                                </h:outputText>
+                            </p:column>
+                            <p:column filterBy="#{item.timeDestiny}"
+                                      sortBy="#{item.timeDestiny}"
+                                      filterMatchMode="contains" headerText="Hora Fin">
+                                <h:outputText value="#{item.timeDestiny}"/>
+                            </p:column>
+                            <p:column filterBy="#{item.fromStop.name}"
+                                      filterMatchMode="contains" headerText="Estación">
+                                <h:outputText value="#{item.fromStop.name}"/>
+                            </p:column>
+                            <p:column filterBy="#{item.toStop.name}"
+                                      filterMatchMode="contains" headerText="Patio Entrada">
+                                <h:outputText value="#{item.toStop.name}"/>
+                            </p:column>
+                            <p:column filterBy="#{item.sercon}"
+                                      filterMatchMode="contains" headerText="Sercon">
+                                <h:outputText value="#{item.sercon}"/>
+                            </p:column>
+                            <p:column filterBy="#{item.idEmpleado.codigoTm}"
+                                      filterMatchMode="contains" headerText="Codigo TM">
+                                <h:outputText value="#{item.idEmpleado.codigoTm}"/>
+                            </p:column>
+                            <p:column headerText="Nombres">
+                                <h:outputText value="#{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                            </p:column>
+                            <p:column filterBy="#{item.servbus}"
+                                      filterMatchMode="contains" headerText="Servbus">
+                                <h:outputText value="#{item.servbus}"/>
+                            </p:column>
+                            <p:column filterBy="#{item.idVehiculo.codigo}"
+                                      filterMatchMode="contains" headerText="Vehículo">
+                                <h:outputText value="#{item.idVehiculo.codigo}"/>
+                            </p:column>
+                            <p:column filterBy="#{item.idVehiculo.placa}"
+                                      filterMatchMode="contains" 
+                                      headerText="Placa Vehículo">
+                                <h:outputText value="#{item.idVehiculo.placa}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                </h:form>
+            </p:panel>
+        </ui:define>
+    </ui:composition>
+</html>
+

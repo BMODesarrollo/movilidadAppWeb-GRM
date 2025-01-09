@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+
+    <ui:define name="content">
+        <p:panel header="Tipos de Indentificaciones"> 
+            <h:form id="formEmplTipoIdent">
+
+                <p:dialog header="Tipo de Identificación" position="top" 
+                          closeOnEscape="true" id="dlgid" 
+                          widgetVar="dlg2" responsive="true" 
+                          modal="true" class="mr1024_40 mr500_90">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtnombre"  value="Nombre:"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtnombre" required="true" 
+                                                 maxlength="45"  requiredMessage="Debe ingresar 
+                                                 el nombre del tipo de identificación" 
+                                                 value="#{emplTipoIdenCtrl.emplTipoIden.nombre}">
+                                        <p:messages id="txtNombreMssg" showDetail="true"/>
+                                    </p:inputText>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <f:facet name="footer">
+                        <p:commandButton id="btnGuardar" 
+                                         rendered="#{emplTipoIdenCtrl.emplTipoIden.idEmpleadoTipoIdentificacion==null}"
+                                         icon="fa fa-check" value="Guardar" 
+                                         class="cssWhite"
+                                         actionListener="#{emplTipoIdenCtrl.guargar()}"
+                                         update="formTablaTipoIdent:tblETI,msgs"/>
+                        <p:commandButton id="btnEditar" 
+                                         class="cssWhite"
+                                         rendered="#{emplTipoIdenCtrl.emplTipoIden.idEmpleadoTipoIdentificacion!=null}"
+                                         icon="fa fa-pencil" value="Actualizar" 
+                                         actionListener="#{emplTipoIdenCtrl.guardarEdit()}"
+                                         update="formTablaTipoIdent:tblETI,msgs"/>
+                    </f:facet>
+                </p:dialog>
+
+            </h:form>
+            <h:form id="formTablaTipoIdent">
+                <p:dataTable id="tblETI" var="emplTipIdent"  
+                             editable="true"
+                             value="#{emplTipoIdenCtrl.listEmplTipoIden}" rows="10"
+                             paginator="true"
+                             filterDelay="1000"
+                             rowIndexVar="nroFila"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="btnAdd"
+                                             value="Nuevo"
+                                             class="cssWhite"
+                                             icon="fa fa-plus"
+                                             process="@this"
+                                             action="#{emplTipoIdenCtrl.openDialog()}"
+                                             update="formEmplTipoIdent:dlgid"
+                                             onclick="$('#formEmplTipoIdent').trigger(':reset')"
+                                             oncomplete="PF('dlg2').show();">
+                                <p:resetInput target="dlgid" />
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre"
+                              filterBy="#{emplTipIdent.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{emplTipIdent.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Acciones"
+                              style="width:15%; text-align: center">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         update=":formEmplTipoIdent:dlgid"
+                                         oncomplete="PF('dlg2').show();"
+                                         action="#{emplTipoIdenCtrl.editar(emplTipIdent)}"
+                                         disabled="#{emplTipIdent.estadoReg==1}"
+                                         title="Modificar" />
+
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>
+
+
+
+

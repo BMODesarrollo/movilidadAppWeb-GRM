@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgPlaRecuModalidad"
+              widgetVar="wvPlaRecuModalidad"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              width="20%"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{plaRecuModalidadBean.b_editar ? 'Editar Modalidad':'Crear Modalidad'}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvPlaRecuModalidad').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-modalidad">
+            <p:messages id="msgs_modalidad" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g-12">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Modalidad: *"/>
+                        <p:inputText id="modalidad_id"
+                                     value="#{plaRecuModalidadBean.plaRecuModalidad.modalidad}" 
+                                     maxlength="60"
+                                     required="true"
+                                     requiredMessage="'Modalidad' es requerido"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Descripción: *"/>
+                        <p:inputTextarea  id="descripcion_id" 
+                                          maxlength="65000" 
+                                          class="cssBlack"
+                                          value="#{plaRecuModalidadBean.plaRecuModalidad.descripcion}" 
+                                          required="true" 
+                                          requiredMessage="'Descripción' es requerido"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuModalidadBean.crear()}"
+                             process="@this,@form"
+                             rendered="#{!plaRecuModalidadBean.b_editar}"  
+                             update=":form-semana-param:tabView:modalidadList, @form, :msgs"
+                             oncomplete="PF('wvPlaRecuModalidad').hide()"/>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuModalidadBean.editar()}"
+                             process="@form"
+                             rendered="#{plaRecuModalidadBean.b_editar}"
+                             update=":form-semana-param:tabView:modalidadList, @form, :msgs"
+                             oncomplete="PF('wvPlaRecuModalidad').hide()"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarModalidad" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

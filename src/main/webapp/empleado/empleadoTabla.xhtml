@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="head">
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDX8EfDI5P5RUJkl3G1F1sBKwQCaYVfV4"></script>
+        <style type="text/css">
+            .mapClass {
+                width: 100%;
+                height: 100%;
+            }
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel> 
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Maestro Empleado"/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-5 ui-lg-4 Padding0">
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax process="@this"
+                                            event="change"
+                                            listener="#{emplJSFMdB.listarEmpleados()}"
+                                            update="formTablaEmpl:tblED"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="formTablaEmpl">
+                <p:dataTable id="tblED" var="emple"
+                             value="#{emplJSFMdB.listEmpls}" 
+                             rows="20"
+                             paginator="true"
+                             filterDelay="1000"
+                             scrollable="true"
+                             scrollHeight="600"
+                             rowIndexVar="nroFila"
+                             widgetVar="dtEmpleado"
+                             reflow="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="btnAdd"
+                                             value="Nuevo"
+                                             update="formEmpleado,
+                                             formFoto,formEmpleado:idPanelGrid"
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             oncomplete="PF('dlgEmpelado').show()"
+                                             action="#{emplJSFMdB.nuevo()}">
+                            </p:commandButton>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="formTablaEmpl:tblED" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 5%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Grupo PM" 
+                              filterBy="#{emplJSFMdB.master(emple)}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('dtEmpleado').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: 67%" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="Seleccione Uno..." itemDisabled="true"/>
+                                <f:selectItems value="#{emplJSFMdB.grupoPM()}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{emplJSFMdB.master(emple)}" />
+                    </p:column>
+                    <p:column headerText="Código Interno"
+                              filterBy="#{emple.codigoInterno}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{emple.codigoInterno}" />
+                    </p:column>
+                    <p:column headerText="Código TM"
+                              filterBy="#{emple.codigoTm}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{emple.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Cédula"
+                              filterBy="#{emple.identificacion}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{emple.identificacion}" />
+                    </p:column>
+
+                    <p:column filterBy="#{emple.nombres}"
+                              filterMatchMode="contains"
+                              headerText="Nombres">
+                        <h:outputText value="#{emple.nombres}"/>
+                    </p:column>
+                    <p:column filterBy="#{emple.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Apellidos">
+                        <h:outputText value="#{emple.apellidos}"/>
+                    </p:column>
+                    <p:column filterBy="#{emple.telefonoMovil}"
+                              filterMatchMode="contains"
+                              headerText="Teléfono">
+                        <h:outputText value="#{emple.telefonoMovil}"/>
+                    </p:column>
+                    <p:column filterBy="#{emple.emailCorporativo}"
+                              class="text-word-wrap"
+                              filterMatchMode="contains"
+                              headerText="E-Mail">
+                        <h:outputText value="#{emple.emailCorporativo}"/>
+                    </p:column>
+                    <p:column filterBy="#{emple.idEmpleadoCargo.nombreCargo}"
+                              filterMatchMode="contains"
+                              headerText="Cargo">
+                        <h:outputText value="#{emple.idEmpleadoCargo.nombreCargo}"/>
+                    </p:column>
+                    <p:column filterBy="#{emple.direccion}"
+                              filterMatchMode="contains"
+                              headerText="Dirección">
+                        <h:outputText value="#{emple.direccion}"/>
+                    </p:column>
+                    <p:column filterBy="#{emple.idGopUnidadFuncional.nombre}"
+                              filterMatchMode="contains"
+                              headerText="Unidad Funcional">
+                        <h:outputText value="#{emple.idGopUnidadFuncional.nombre}"/>
+                    </p:column>
+                    <p:column filterBy="#{emple.idEmpleadoEstado.nombre}"
+                              filterMatchMode="contains"
+                              headerText="Estado">
+                        <h:outputText value="#{emple.idEmpleadoEstado.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Certificar" rendered="#{emplJSFMdB.flagCertificar}" style="width:15%; text-align: center" exportable="false">
+                        <p:commandButton  value="Certificar"
+                                          class="cssWhite" 
+                                          update="tblED,msgs"
+                                          rendered="#{emple.certificado==0}"
+                                          action="#{emplJSFMdB.certificar(emple)}"
+                                          title="Certificar operador para #{bundle.tipo_vehiculo_ii}" 
+                                          disabled="#{emple.estadoReg==1}"/>
+                        <p:commandButton value="Certificar No"
+                                         class="RedButton cssWhite" 
+                                         update="tblED,msgs"
+                                         rendered="#{emple.certificado==1}"
+                                         action="#{emplJSFMdB.certificarNo(emple)}"
+                                         title="Quitar certificado de #{bundle.tipo_vehiculo_ii} para el opeador" 
+                                         disabled="#{emple.estadoReg==1}"/>
+
+                    </p:column>
+                    <p:column headerText="Opciones" style=" text-align: center" exportable="false">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite" 
+                                         update="formEmpleado,
+                                         formEmpleado:idPanelGrid"
+                                         oncomplete="PF('dlgEmpelado').show()"
+                                         action="#{emplJSFMdB.editar(emple)}"
+                                         title="Modificar" 
+                                         disabled="#{emple.estadoReg==1}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        <div align="right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="tblED" fileName="empleados #{now}"/>
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="tblED" fileName="empleados #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="tblED" fileName="empleados #{now}"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/empleado.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+
+

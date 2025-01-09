@@ -1,0 +1,318 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="idServiciosSinAsignar"  
+              widgetVar="serviciosSinAsignarWV" 
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              responsive="true" 
+              appendTo="@(body)"
+              class="mr1024_70 mr500_100"
+              closeOnEscape="true"
+              fitViewport="true"
+              position="top"
+              height="auto">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="SERVICIOS SIN ASIGNAR" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('serviciosSinAsignarWV').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <div class="ui-fluid">
+            <div class="ui-g">
+                <h:form id="form-serv-sin-asig">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-3 Padding5">
+                            <p:outputLabel for="SOMTipoNovedad1"  value="Tipo de Novedad" />
+                            <p:selectOneMenu  id="SOMTipoNovedad1" filterMatchMode="contains" filter="true"
+                                              required="true"
+                                              requiredMessage="Se debe seleccionar un tipo de novedad"
+                                              value="#{prgServiciosSinAsignarJSF.idNovedadTipo}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems  value="#{prgServiciosSinAsignarJSF.listNovedadTipo}" 
+                                                var="novSsa" 
+                                                itemValue="#{novSsa.idNovedadTipo}" 
+                                                itemLabel="#{novSsa.nombreTipoNovedad}" 
+                                                itemDescription="#{novSsa.descripcionTipoNovedad}"/>
+                                <p:ajax listener="#{prgServiciosSinAsignarJSF.cargarNovedadTipoDetalles()}"
+                                        update="SOMTipoNovedadDet1"
+                                        process="@this"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-3 Padding5">
+                            <p:outputLabel for="SOMTipoNovedadDet1"  value="Det. Tipo Novedad" />
+                            <p:selectOneMenu id="SOMTipoNovedadDet1" 
+                                             filterMatchMode="contains" 
+                                             filter="true" 
+                                             value="#{prgServiciosSinAsignarJSF.idNovedadTipoDetalle}"
+                                             requiredMessage="Se debe seleccionar un detalle de tipo de novedad."
+                                             required="true">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems  value="#{prgServiciosSinAsignarJSF.listNovedadTipoDet}"
+                                                var="novDetSsa" 
+                                                itemLabel="#{novDetSsa.tituloTipoNovedad}"
+                                                itemValue="#{novDetSsa.idNovedadTipoDetalle}" 
+                                                itemDescription="#{novDetSsa.descripcionTipoNovedad}"/>
+                                <p:ajax listener="#{prgServiciosSinAsignarJSF.resetNovedadTipoDetalles()}" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-3 Padding5">
+                            <p:outputLabel for="idResponsable" value="Responsable" />
+                            <p:selectOneMenu id="idResponsable"
+                                             value="#{prgServiciosSinAsignarJSF.idResponsable}"
+                                             effect="fade"
+                                             filter="true" 
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un responsable"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione responsable" itemValue="#{null}"  />
+                                <f:selectItems value="#{prgServiciosSinAsignarJSF.lstResponsable}" 
+                                               var="resSsa" 
+                                               itemLabel="#{resSsa.responsable}" 
+                                               itemValue="#{resSsa.idPrgTcResponsable}" />
+                                <p:ajax listener="#{prgServiciosSinAsignarJSF.cargarNovedadClasificaicon()}"
+                                        update="clasif_tipo"
+                                        process="@this"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-3 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="clasif_tipo" value="Clasificación " />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectOneMenu id="clasif_tipo"
+                                                 value="#{prgServiciosSinAsignarJSF.idClasificacion}"
+                                                 effect="fade" filter="true"
+                                                 required="true"
+                                                 requiredMessage="Clasificacion es requerido"
+                                                 title="Clasificación del tipo de evento"
+                                                 filterMatchMode="startsWith">
+                                    <f:selectItem itemLabel="Seleccione responsable" itemValue="#{null}"  />
+                                    <f:selectItems value="#{prgServiciosSinAsignarJSF.lstClasificacion}" 
+                                                   var="resSsa"
+                                                   itemDescription="#{resSsa.descripcion}"
+                                                   itemLabel="#{resSsa.nombre}" 
+                                                   itemValue="#{resSsa.idPrgClasificacionMotivo}" />
+                                    <p:ajax listener="#{prgServiciosSinAsignarJSF.resetNovedadClasificacion()}" />
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="ITDescripcionPrg" value="Observacion " />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputTextarea id="ITDescripcionPrg" 
+                                                 required="true"
+                                                 requiredMessage="Observación es requerido"
+                                                 value="#{prgServiciosSinAsignarJSF.observacion}" 
+                                                 autoResize="true" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="EmptyBox5" />
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:dataTable id="serviciosSinAsignar" 
+                                     value="#{prgServiciosSinAsignarJSF.listPrgTc}"
+                                     widgetVar="serviciosSinAsignarWVTbl"
+                                     var="itemSsa"
+                                     filterDelay="1000"
+                                     paginator="true"
+                                     rowKey="#{rVarSsa + 1}"
+                                     rowIndexVar="rVar"
+                                     rows="20"
+                                     rowsPerPageTemplate="20,50,100"
+                                     reflow="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} records"
+                                     emptyMessage="No existen registros">
+                            <f:facet name="header">
+                                Servicios sin asignar
+                            </f:facet>
+
+                            <p:column headerText="#" style="width: 30px" class="TexAlCenter" > 
+                                <p:outputLabel value="#{rVarSsa+1}"/>
+                            </p:column>
+                            <p:column headerText="Servbus"
+                                      filterBy="#{itemSsa.servbus}"
+                                      filterMatchMode="contains"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.servbus}"/>
+                            </p:column>
+                            <p:column headerText="Código"
+                                      filterBy="#{itemSsa.idEmpleado.codigoTm}"
+                                      filterMatchMode="contains"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.idEmpleado.codigoTm}"/>
+                            </p:column>
+                            <p:column headerText="Empleado"
+                                      filterBy="#{itemSsa.idEmpleado.nombres}"
+                                      filterMatchMode="contains"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.idEmpleado.nombres}"/>
+                            </p:column>
+                            <p:column headerText="Apellido"
+                                      filterBy="#{itemSsa.idEmpleado.apellidos}"
+                                      filterMatchMode="contains"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.idEmpleado.apellidos}"/>
+                            </p:column>
+                            <p:column headerText="Tipo Vehículo"
+                                      filterBy="#{itemSsa.idVehiculoTipo.nombreTipoVehiculo}"
+                                      filterMatchMode="contains"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.idVehiculoTipo.nombreTipoVehiculo}"/>
+                            </p:column>
+                            <p:column headerText="Ruta"
+                                      filterBy="#{itemSsa.idRuta.name}"
+                                      filterMatchMode="contains"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.idRuta.name}"/>
+                            </p:column>
+                            <p:column headerText="Tabla"
+                                      filterBy="#{itemSsa.tabla}"
+                                      filterMatchMode="contains"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.tabla}"/>
+                            </p:column>
+                            <p:column headerText="Hora Inicio"
+                                      sortBy="#{itemSsa.timeOrigin}"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.timeOrigin}"/>
+                            </p:column>
+                            <p:column headerText="Parada Inicio"
+                                      filterBy="#{itemSsa.fromStop.name}"
+                                      filterMatchMode="contains"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.fromStop.name}"/>
+                            </p:column>
+                            <p:column headerText="Hora Fin"
+                                      sortBy="#{itemSsa.timeDestiny}"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.timeDestiny}"/>
+                            </p:column>
+                            <p:column headerText="Parada Fin"
+                                      filterBy="#{itemSsa.toStop.name}"
+                                      filterMatchMode="contains"
+                                      class="TexAlCenter">
+                                <p:outputLabel value="#{itemSsa.toStop.name}"/>
+                            </p:column>
+                            <p:column headerText="Eliminar"
+                                      class="TexAlCenter">
+                                <p:commandButton id="btn-elmininar"   
+                                                 title="Eliminar servicio"
+                                                 update=":form-serv-sin-asig,:msgs,:prgtcForm:tblPrgTc"
+                                                 icon="fa fa-times"
+                                                 process="@form,@this"
+                                                 actionListener="#{prgServiciosSinAsignarJSF.elimianarServicio(itemSsa)}"
+                                                 class="cssWhite RedButton" >
+                                    <p:confirm header="Confirmación"
+                                               escape="true"
+                                               message="Está seguro de eliminar el servicio?"
+                                               class="cssWhite"
+                                               icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:column>
+                            <p:column headerText="Asignar"
+                                      class="TexAlCenter">
+                                <p:commandButton id="btn-asignar"   
+                                                 title="Asignar vehículo"
+                                                 update=":msgs,:form-asig-veh"
+                                                 icon="fa fa-plus"
+                                                 process="@this"
+                                                 immediate="true"
+                                                 oncomplete="PF('asignarVehiculoWV').show()"
+                                                 action="#{prgServiciosSinAsignarJSF.setPrgTc(itemSsa)}"
+                                                 actionListener="#{prgServiciosSinAsignarJSF.prepareAsignarServicio()}"
+                                                 class="cssWhite GreenButton" />
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </p:dialog>
+    <p:dialog id="asignarVehiculo"  
+              widgetVar="asignarVehiculoWV" 
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              responsive="true" 
+              appendTo="@(body)"
+              class="mr1024_20 mr500_100"
+              closeOnEscape="true"
+              fitViewport="true"
+              position="center top"
+              height="auto">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Asignar Vehículo" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('asignarVehiculoWV').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="form-asig-veh">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Código Vehículo"/>
+                        <div class="EmptyBox5" />
+                        <p:inputText id="cod-veh"
+                                     class="cssBlack"
+                                     value="#{prgServiciosSinAsignarJSF.codVehiculo}" />
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="asignarVehiculoSinServicio" 
+                             action="#{prgServiciosSinAsignarJSF.asignarVehiculo()}"
+                             process="@this,cod-veh,:prgtcForm:tblPrgTc,form-serv-sin-asig"
+                             oncomplete="PF('asignarVehiculoWV').hide()"
+                             update=":form-serv-sin-asig,:msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-procesar"
+                             value="Confirmar Asignación"
+                             class="cssWhite"
+                             rendered="#{accArbolBean.selected == null}"
+                             icon="fa fa-save"
+                             onclick="asignarVehiculoSinServicio()">
+                <p:confirm header="Confirmación"
+                           message="Está seguro de asignar el vehículo al servicio seleccionado?"
+                           class="cssWhite"
+                           icon="fa fa-exclamation-triangle" />
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+
+

@@ -1,0 +1,522 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <script type="text/javascript">
+            function eventClick() {
+                document.getElementById('pnl-casos_toggler').click();
+                document.getElementById('pnl-caso-resumen_toggler').click();
+            }
+        </script>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel id="pnl-casos" header="Seleccionar Casos a Evaluar" toggleable="true" class="Padding5">
+            <div jsf:id="panel-busq">
+                <h:form id="list-accidente">
+                    <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+                    <p:panel id="panel-busqueda" header="Panel de Búsqueda" class="Padding0" style="width: 100%">
+                        <div class="ui-fluid">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5">
+                                        <p:calendar id="fechaIni" 
+                                                    value="#{accidenteJSF.fechaIni}" 
+                                                    pattern="yyyy/MM/dd"
+                                                    title="Fecha de Inicio"
+                                                    mask="true"
+                                                    locale="es"
+                                                    navigator="true"
+                                                    showOn="button"/>
+                                    </div>
+                                    <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5">
+                                        <p:calendar id="fechaFin" 
+                                                    value="#{accidenteJSF.fechaFin}" 
+                                                    pattern="yyyy/MM/dd"
+                                                    mask="true"
+                                                    locale="es"
+                                                    navigator="true"
+                                                    title="Fecha Fin"
+                                                    showOn="button"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                        <p:selectOneMenu id="t-even" value="#{accidenteJSF.i_auxNovDet}"
+                                                         style="width: 99.9999%">
+                                            <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                            <f:selectItems value="#{accidenteJSF.listNovedadTipoDetalles}" 
+                                                           var="listntd" 
+                                                           itemLabel="#{listntd.tituloTipoNovedad}" 
+                                                           itemDescription="#{listntd.descripcionTipoNovedad}"
+                                                           itemValue="#{listntd.idNovedadTipoDetalle}" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                                        <p:inputText id="cod-ope"
+                                                     value="#{accidenteJSF.i_codOpe}" 
+                                                     placeholder="Código de Operador"
+                                                     title="Código Operador"
+                                                     maxlength="10">
+                                            <p:keyFilter regEx="/[0-9]/i"/> 
+                                        </p:inputText>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                                        <p:inputText id="cod-veh"
+                                                     value="#{accidenteJSF.c_codVeh}" 
+                                                     placeholder="Código de Vehiculo"
+                                                     title="Código Vehículo"
+                                                     maxlength="10"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <f:facet name="footer">
+                            <div align="center">
+                                <p:commandButton id="buscar"
+                                                 actionListener="#{accidenteJSF.buscarAccidente(0)}"
+                                                 icon="fa fa-search"
+                                                 value="Buscar"
+                                                 class="cssWhite GreenButton"
+                                                 update=":list-accidente:table-accidente,list-accidente:msg"
+                                                 process="@form" />
+                                <p:commandButton id="limpiar"
+                                                 actionListener="#{accidenteJSF.limpiar()}"
+                                                 icon="fa fa-remove"
+                                                 value="Limpiar"
+                                                 class="cssWhite"
+                                                 update="panel-busq"
+                                                 process="@this" />
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                <p:dataTable id="table-accidente" 
+                                             var="acc" 
+                                             value="#{accidenteJSF.listAccidente}" 
+                                             selectionMode="single" 
+                                             scrollHeight="500"
+                                             rows="5"
+                                             scrollable="true"
+                                             paginator="true"
+                                             emptyMessage="No exiten registros"
+                                             reflow="true"
+                                             selection="#{accidenteJSF.accidente}" 
+                                             rowKey="#{acc.idAccidente}">
+                                    <f:facet name="header">
+                                        Registros encontrados: #{accidenteJSF.listAccidente.size()}
+                                    </f:facet>
+                                    <p:ajax event="rowSelect" listener="#{evaluacionAccJSF.onRowSelectAcc}" update=":form-acc-cali,list-accidente:msg" />
+                                    <p:column headerText="Tipo de Evento">
+                                        <h:outputText value="#{acc.idNovedadTipoDetalle.tituloTipoNovedad}" class="Fs21" style="color: red;font-weight: bold"/>
+                                    </p:column>
+                                    <p:column headerText="Vehículo">
+                                        <h:outputText value="#{acc.idVehiculo.codigo}" style="font-weight: bold" /><br/>
+                                    </p:column>
+                                    <p:column headerText="Código Tm">
+                                        <h:outputText value="#{acc.idEmpleado.codigoTm}" 
+                                                      title="#{acc.idEmpleado.nombres.concat(' ').concat(acc.idEmpleado.apellidos)}" 
+                                                      style="font-weight: bold"/>
+                                    </p:column>
+                                    <p:column headerText="Fecha y Hora">
+                                        <h:outputText value="#{acc.fechaAcc}" style="font-weight: bold">
+                                            <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss"/>
+                                        </h:outputText>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </div>
+                    </div>
+                </h:form> 
+                <h:form id="form-acc-cali" >
+                    <div class="ui-fluid">
+                        <div class="ui-g " >
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 TexAlRight" >
+                                <p:outputLabel value="Asignar Pin a la Reunión de Calificación" for="pin" class="cssBlack" />
+                            </div>
+                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" >
+                                <p:inputText id="pin"
+                                             value="#{evaluacionAccJSF.iPin}"
+                                             maxlength="6"
+                                             required="true"
+                                             requiredMessage="Pin es requerido">
+                                    <p:keyFilter regEx="/[0-9]/i"/>
+                                </p:inputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:dataTable id="table-acc-cali" 
+                                             var="accL" 
+                                             value="#{evaluacionAccJSF.listAccidenteCalificacion}" 
+                                             scrollHeight="500"
+                                             rows="5"
+                                             rowIndexVar="rowIdx"
+                                             scrollable="true"
+                                             paginator="true"
+                                             emptyMessage="No exiten registros"
+                                             reflow="true"
+                                             rowKey="#{rowIdx + 1}">
+                                    <f:facet name="header">
+                                        Accidentes Seleccionados a Evaluar
+                                    </f:facet>
+                                    <p:column headerText="#">
+                                        <h:outputText value="#{rowIdx + 1}"/>
+                                    </p:column>
+                                    <p:column headerText="Tipo de Evento">
+                                        <h:outputText value="#{accL.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}" class="Fs21" style="color: red;font-weight: bold"/>
+                                    </p:column>
+                                    <p:column headerText="Vehículo">
+                                        <h:outputText value="#{accL.idAccidente.idVehiculo.codigo}" style="font-weight: bold" /><br/>
+                                    </p:column>
+                                    <p:column headerText="Código Tm">
+                                        <h:outputText value="#{accL.idAccidente.idEmpleado.codigoTm}" 
+                                                      title="#{accL.idAccidente.idEmpleado.nombres.concat(' ').concat(accL.idAccidente.idEmpleado.apellidos)}" 
+                                                      style="font-weight: bold"/>
+                                    </p:column>
+                                    <p:column headerText="Fecha y Hora">
+                                        <h:outputText value="#{accL.idAccidente.fechaAcc}" style="font-weight: bold">
+                                            <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="Acciones">
+                                        <p:commandButton id="btn-accion"
+                                                         title="Remover de la lista"
+                                                         class="cssWhite RedButton"
+                                                         icon="fa fa-trash"
+                                                         actionListener="#{evaluacionAccJSF.eliminar(accL)}" 
+                                                         process="@this"
+                                                         update=":list-accidente:msg,form-acc-cali">
+                                            <p:confirm header="Confirmación" message="Seguro de remover el accidente de la lista?" 
+                                                       icon="fa fa-exclamation-triangle" />
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                            <div class="EmptyBox5" />
+                            <div class="ui-g-6 ui-md-6 ui-lg-3 Padding5" >
+                                <p:commandButton id="guardar"
+                                                 value="Guardar"
+                                                 class="cssWhite"
+                                                 oncomplete="eventClick()"
+                                                 icon="fa fa-check"
+                                                 actionListener="#{evaluacionAccJSF.guardar()}" 
+                                                 process="@form"
+                                                 update=":list-accidente:msg,form-acc-cali,:form-cali-resu" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-3 Padding5" >
+                                <p:commandButton id="cancelar"
+                                                 value="Cancelar"
+                                                 class="cssWhite"
+                                                 icon="fa fa-times"
+                                                 type="button"
+                                                 onclick="location.reload()">
+                                    <p:confirm header="Confirmación" message="Seguro que desea cancelar todo el proceso?" 
+                                               icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </p:panel>
+        <div class="EmptyBox5" />
+        <p:panel id="pnl-caso-resumen" header="Resumen" toggleable="true" class="Padding5" collapsed="true">
+            <h:form id="form-cali-resu" >
+                <div class="ui-fluid">
+                    <div class="ui-g " >
+                        <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5 TexAlRight">
+                            <p:outputLabel value="Pin de la reunión" for="pin" class="cssBlack" />
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-2 Padding5">
+                            <p:calendar id="fecha" 
+                                        value="#{evaluacionAccJSF.dFecha}" 
+                                        pattern="yyyy/MM/dd" 
+                                        navigator="true"
+                                        mask="true"
+                                        locale="es"
+                                        showOn="button" />
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-2 Padding5" >
+                            <p:inputText id="pin"
+                                         value="#{evaluacionAccJSF.iPin}"
+                                         maxlength="6"
+                                         required="true"
+                                         requiredMessage="Pin es requerido">
+                                <p:keyFilter regEx="/[0-9]/i"/>
+                            </p:inputText>
+                            <div class="botonFloat" >
+                                <p:commandButton id="btn-buscar"
+                                                 class="cssWhite OrangeButton"
+                                                 icon="fa fa-search"
+                                                 style="margin: 0px"
+                                                 actionListener="#{evaluacionAccJSF.buscarCasoPorPin()}"
+                                                 process="pin,fecha,@this"
+                                                 update="@form" />
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:dataTable id="table-acc-cali" 
+                                         var="accR" 
+                                         value="#{evaluacionAccJSF.listAccidenteCalificacionResumen}" 
+                                         rowIndexVar="rowIdxR"
+                                         emptyMessage="No exiten registros"
+                                         reflow="true"
+                                         styleClass="ui-g-12 ui-md-12 ui-lg-12"
+                                         rowKey="#{rowIdxR + 1}">
+                                <f:facet name="header">
+                                    Accidentes Seleccionados a Evaluar
+                                </f:facet>
+                                <p:column style="width:30px">
+                                    <p:rowToggler class="cssBlack" />
+                                </p:column>
+                                <p:column headerText="#" style="width:30px">
+                                    <h:outputText value="#{rowIdxR + 1}"/>
+                                </p:column>
+                                <p:column headerText="Tipo de Evento">
+                                    <h:outputText value="#{accR.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}" class="Fs21" style="color: red;font-weight: bold"/>
+                                </p:column>
+                                <p:column headerText="Vehículo">
+                                    <h:outputText value="#{accR.idAccidente.idVehiculo.codigo}" style="font-weight: bold" /><br/>
+                                </p:column>
+                                <p:column headerText="Código Tm">
+                                    <h:outputText value="#{accR.idAccidente.idEmpleado.codigoTm}" 
+                                                  title="#{accR.idAccidente.idEmpleado.nombres.concat(' ').concat(accR.idAccidente.idEmpleado.apellidos)}" 
+                                                  style="font-weight: bold"/>
+                                </p:column>
+                                <p:column headerText="Fecha y Hora">
+                                    <h:outputText value="#{accR.idAccidente.fechaAcc}" style="font-weight: bold">
+                                        <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Validez">
+                                    <h:outputText value="#{accR.fechaCalificacion}" style="font-weight: bold">
+                                        <f:convertDateTime pattern="yyyy-MMMM-dd"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Calificado" styleClass="#{accR.calificado != null ? (accR.calificado == 1 ? 'cssGreen' : (accR.calificado == 0 ? 'cssRed' : 'cssGray')) : 'cssRed'}">
+                                    <h:outputText value="#{accR.calificado != null ? (accR.calificado == 1 ? 'Sí' : (accR.calificado == 0 ? 'No' : 'Pre Calificar')) : 'No'}"  class="cssWhite"/>
+                                </p:column>
+                                <p:column headerText="Acciones" style="text-align: center">
+                                    <p:commandButton id="btn-calificar"
+                                                     title="Procesar Evaluaciones"
+                                                     disabled="#{accR.calificado != 2}"
+                                                     class="cssWhite GreenButton"
+                                                     icon="fa fa-check-square-o"
+                                                     actionListener="#{evaluacionAccJSF.procesarCalificar(accR)}"
+                                                     process="@this"
+                                                     update="@form,:list-accidente:msg" >
+                                        <p:confirm header="Confirmación" message="Seguro que desea procesar las evaluaciones?" 
+                                                   icon="fa fa-exclamation-triangle" />
+                                    </p:commandButton>
+                                </p:column>
+                                <p:rowExpansion>
+                                    <p:dataTable id="table-cau-pre"
+                                                 var="cauPre"
+                                                 reflow="true"
+                                                 rendered="#{accR.calificado == 0}"
+                                                 rowIndexVar="rowIdxPre"
+                                                 value="#{evaluacionAccJSF.procesarPreCalificar(accR)}">
+                                        <f:facet name="header">
+                                            <div style="text-transform: uppercase;text-align: right">
+                                                Causalidades Seleccionadas por los votantes
+                                                <p:commandButton id="btn-pre-cali"
+                                                                 title="Procesar Causalidades"
+                                                                 class="cssWhite OrangeButton"
+                                                                 icon="fa fa-gavel"
+                                                                 actionListener="#{evaluacionAccJSF.preCalificar(accR)}" 
+                                                                 process="@this"
+                                                                 update=":form-cali-resu">
+                                                    <p:confirm header="Confirmación" message="Seguro procesar las causalidades?" 
+                                                               icon="fa fa-exclamation-triangle" />
+                                                </p:commandButton>
+                                            </div>
+                                        </f:facet>
+                                        <p:column headerText="#" style="width: 30px;text-align: center" >
+                                            <h:outputText value="#{rowIdxPre + 1}" />
+                                        </p:column>
+                                        <p:column headerText="Árbol de Causalidad">
+                                            <div class="ui-g">
+                                                <h:outputText value="Árbol: #{cauPre.idCausasub.idCausa.idAccArbol.arbol}" 
+                                                              title="desc: #{cauPre.idCausasub.idCausa.idAccArbol.descripcion}" />
+                                            </div>
+                                            <div class="ui-g">
+                                                <h:outputText value="Causa: #{cauPre.idCausasub.idCausa.causa}" 
+                                                              title="desc: #{cauPre.idCausasub.idCausa.descripcion}" />
+                                            </div>
+                                            <div class="ui-g">
+                                                <h:outputText value="Sub Causa: #{cauPre.idCausasub.subcausa}" 
+                                                              title="desc: #{cauPre.idCausasub.descripcion}" />
+                                            </div>
+                                            <div class="ui-g">
+                                                <h:outputText value="Causa Raíz: #{cauPre.idCausaraiz.causaRaiz}"
+                                                              title="desc: #{cauPre.idCausaraiz.descripcion}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column headerText="Acciones" style="width: 100px;text-align: center" >
+                                            <p:commandButton id="btn-accion"
+                                                             title="Remover de la lista"
+                                                             class="cssWhite RedButton"
+                                                             icon="fa fa-trash"
+                                                             actionListener="#{evaluacionAccJSF.eliminarAccPreClaLista(cauPre)}" 
+                                                             process="@this"
+                                                             update=":form-cali-resu">
+                                                <p:confirm header="Confirmación" message="Seguro de eliminar la causalidad?" 
+                                                           icon="fa fa-exclamation-triangle" />
+                                            </p:commandButton>
+                                        </p:column>
+                                    </p:dataTable>
+                                    <p:dataTable id="table-cau"
+                                                 var="cau"
+                                                 rendered="#{accR.calificado == 1}"
+                                                 reflow="true"
+                                                 rowIndexVar="rowIdxC"
+                                                 value="#{evaluacionAccJSF.getListCausalidad(accR)}">
+                                        <p:column headerText="#" style="width: 30px;text-align: center" >
+                                            <h:outputText value="#{rowIdxC + 1}" />
+                                        </p:column>
+                                        <p:column headerText="Árbol de Causalidad">
+                                            <div class="ui-g">
+                                                <h:outputText value="Árbol: #{cau.idCausaSub.idCausa.idAccArbol.arbol}" 
+                                                              title="desc: #{cau.idCausaSub.idCausa.idAccArbol.descripcion}" />
+                                            </div>
+                                            <div class="ui-g">
+                                                <h:outputText value="Causa: #{cau.idCausaSub.idCausa.causa}" 
+                                                              title="desc: #{cau.idCausaSub.idCausa.descripcion}" />
+                                            </div>
+                                            <div class="ui-g">
+                                                <h:outputText value="Sub Causa: #{cau.idCausaSub.subcausa}" 
+                                                              title="desc: #{cau.idCausaSub.descripcion}" />
+                                            </div>
+                                            <div class="ui-g">
+                                                <h:outputText value="Causa Raíz: #{cau.idCausaRaiz.causaRaiz}"
+                                                              title="desc: #{cau.idCausaRaiz.descripcion}"/>
+                                            </div>
+                                        </p:column>
+                                        <p:column headerText="Valoración" style="width: 100px;text-align: center" >
+                                            <h:outputText value="#{cau.valoracion}%" class="cssBlack" />
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:rowExpansion>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+            <f:facet name="footer">
+                <div class="cssBlack"
+                     style="text-align: center;width: 98%"
+                     title="Copiar y Compartir">#{evaluacionAccJSF.getUrl()} </div>
+            </f:facet>
+        </p:panel>
+        <div class="EmptyBox5" />
+        <p:panel id="pnl-plan-accion" header="Plan de Acción" toggleable="true" class="Padding5" collapsed="true">
+            <h:form id="form-plan">
+                <div class="ui-fluid">
+                    <div class="ui-g " >
+                        <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5 TexAlRight">
+                            <p:outputLabel value="Pin de la reunión" for="pin" class="cssBlack" />
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-2 Padding5">
+                            <p:calendar id="fecha" 
+                                        value="#{accidentePlanAccionJSF.dFecha}" 
+                                        pattern="yyyy/MM/dd" 
+                                        navigator="true"
+                                        mask="true"
+                                        locale="es"
+                                        showOn="button" />
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-2 Padding5" >
+                            <p:inputText id="pin"
+                                         value="#{accidentePlanAccionJSF.iPin}"
+                                         maxlength="6"
+                                         required="true"
+                                         requiredMessage="Pin es requerido">
+                                <p:keyFilter regEx="/[0-9]/i"/>
+                            </p:inputText>
+                            <div class="botonFloat" >
+                                <p:commandButton id="btn-buscar"
+                                                 class="cssWhite OrangeButton"
+                                                 icon="fa fa-search"
+                                                 style="margin: 0px"
+                                                 actionListener="#{accidentePlanAccionJSF.buscarCasoPorPin()}"
+                                                 process="pin,fecha,@this"
+                                                 update="@form" />
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:dataTable id="table-acc-cali" 
+                                         var="accP" 
+                                         value="#{accidentePlanAccionJSF.listAccidenteCalificacion}" 
+                                         rows="5"
+                                         selectionMode="single"
+                                         rowIndexVar="rowIdxP"
+                                         paginator="true"
+                                         selection="#{accidentePlanAccionJSF.accidenteCalificacion}"
+
+                                         emptyMessage="No exiten registros"
+                                         reflow="true"
+                                         rowKey="#{accP.idAccidenteCalificacion}">
+                                <f:facet name="header">
+                                    CASOS DE ACCIDENTALIDAD
+                                </f:facet>
+
+                                <p:ajax event="rowSelect" 
+                                        process="@this"
+                                        listener="#{accidentePlanAccionJSF.selectEventAccClas}" 
+                                        update=":list-accidente:msg,:form-plan:pick" />
+
+                                <p:column headerText="#">
+                                    <h:outputText value="#{rowIdxP + 1}"/>
+                                </p:column>
+                                <p:column headerText="Tipo de Evento">
+                                    <h:outputText value="#{accP.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}" class="Fs21" style="color: red;font-weight: bold"/>
+                                </p:column>
+                                <p:column headerText="Vehículo">
+                                    <h:outputText value="#{accP.idAccidente.idVehiculo.codigo}" style="font-weight: bold" /><br/>
+                                </p:column>
+                                <p:column headerText="Código Tm">
+                                    <h:outputText value="#{accP.idAccidente.idEmpleado.codigoTm}" 
+                                                  title="#{accP.idAccidente.idEmpleado.nombres.concat(' ').concat(accP.idAccidente.idEmpleado.apellidos)}" 
+                                                  style="font-weight: bold"/>
+                                </p:column>
+                                <p:column headerText="Fecha y Hora">
+                                    <h:outputText value="#{accP.idAccidente.fechaAcc}" style="font-weight: bold">
+                                        <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                        <div jsf:id="pick">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:pickList id="pickList"
+                                            responsive="true"
+                                            rendered="#{accidentePlanAccionJSF.dualListPlanAccion != null}"
+                                            value="#{accidentePlanAccionJSF.dualListPlanAccion}" 
+                                            var="plan" 
+                                            converter="planConverter"
+                                            itemLabel="#{plan.plan}"
+                                            itemValue="#{plan}" >
+                                    <f:facet name="sourceCaption">Seleccionar</f:facet>
+                                    <f:facet name="targetCaption">Seleccionados</f:facet>
+                                </p:pickList>
+                            </div>
+                            <div class="ui-g-6 ui-md-10 ui-lg-5">
+                                <p:commandButton id="btn-guardar"
+                                                 value="Guardar"
+                                                 icon="fa fa-check"
+                                                 rendered="#{accidentePlanAccionJSF.dualListPlanAccion != null}"
+                                                 class="cssWhite"
+                                                 actionListener="#{accidentePlanAccionJSF.guardar()}"
+                                                 process="pickList,@this"
+                                                 update="list-accidente:msg,:form-plan" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

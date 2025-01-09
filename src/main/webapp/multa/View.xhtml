@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="MultaViewDlg" widgetVar="MultaViewDialog" 
+              closeOnEscape="true" modal="true" closable="false"
+              class="mr1024_50 mr500_90" responsive="true"
+              position="center top"
+              resizable="false" appendTo="@(body)" header="Visualizar Multa">
+        <h:form id="MultaViewForm">
+            <h:panelGroup id="display">
+                <h:panelGrid columns="2" rendered="#{multaController.selected != null}">
+                    <h:outputText value="Fecha y hora:"/>
+                    <h:outputText value="#{multaController.selected.fechaHora}">
+                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
+                    </h:outputText>
+                    <h:outputText value="Servicio:"/>
+                    <h:outputText value="#{multaController.selected.idPrgTc.idRuta.name}"/>
+                    <h:outputText value="Linea:"/>
+                    <h:outputText value="#{multaController.selected.idPrgTc.idTaskType.tarea}" />
+                    <h:outputText value="Tabla:"/>
+                    <h:outputText value="#{multaController.selected.idPrgTc.tabla}"/>
+                    <h:outputText value="Procede:"/>
+                    <h:outputText value="Sí" rendered="#{multaController.selected.procede == 1}" />                        
+                    <h:outputText value="No" rendered="#{multaController.selected.procede == 0}" />                        
+                    <h:outputText value="Tipo multa:"/>
+                    <h:outputText value="#{multaController.selected.idMultaTipo.tipo}" />
+                    <h:outputText value="Multa clasificación:"/>
+                    <h:outputText value="#{multaController.selected.idMultaClasificacion.codigo}" />
+                    <h:outputText value="Reportado por:"/>
+                    <h:outputText value="#{multaController.selected.idMultaReportadoPor.nombres}"/>
+                    <h:outputText value="Patio:"/>
+                    <h:outputText value="#{multaController.selected.idPatio.nombrePatio}" />
+                    <h:outputText value="Vehículo:"/>
+                    <h:outputText value="#{multaController.selected.idVehiculo.codigo}"/>
+                    <h:outputText value="Empleado:"/>
+                    <h:outputText value="#{multaController.selected.idEmpleado.codigoTm}" />
+                </h:panelGrid>
+                <p:separator/>
+                <p:fieldset legend="Descripción">
+                    <h:outputText value="#{multaController.selected.descripcion}" 
+                                  style="width: 95%;height: 95%;"
+                                  />
+                </p:fieldset>
+                <p:separator/>
+                <p:commandButton value="Cerrar"
+                                 icon="fa fa-close"
+                                 process="@this" 
+                                 class="cssWhite"
+                                 update=":MultaListForm:datalist"
+                                 actionListener="#{multaController.reset}"
+                                 oncomplete="PF('MultaViewDialog').hide();"/>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>

@@ -1,0 +1,339 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <style>
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                padding: 2px 5px;
+            }
+            .btn-flex{
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+            .text-center{
+                text-align: center;
+            }
+
+            .ui_ui{
+                background-color: #9bd3ae2e;
+                padding-left: 10px;
+
+            }
+            .ui_ui_ui{
+                background-color: #e2e3e742;
+                padding-left: 10px;
+            }
+            @media(max-width:768px) {
+                .flexboxx {
+                    flex-direction: column !important;
+                }
+            }
+            .flexboxx {
+                display: flex;
+                justify-content: flex-end;
+                flex-direction: row;
+            }
+        </style>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDX8EfDI5P5RUJkl3G1F1sBKwQCaYVfV4">
+        </script>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Bitácora Novedades ATV
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="form-uf">
+                                <div class="Wid100" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <ui:include src="../../zComponent/selectUnidadFuncional.xhtml" />
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="form">
+                <p:dataTable id="dtNovATV" 
+                             widgetVar="wvNovAtvdt"
+                             var="item"
+                             reflow="true"
+                             paginator="true"
+                             filterDelay="1200"
+                             emptyMessage="No se han encontrado registros."
+                             tableStyle="table-layout:auto"
+                             rowStyleClass="text-center"
+                             value="#{atvNovedadJSF.listNovedadATV}" 
+                             rowKey="#{item.idNovedad}"
+                             rowIndexVar="rVar"
+                             rows="20">
+                    <f:facet name="header">
+                        <div class="flexboxx" >
+                            <p:calendar id="desde"
+                                        styleClass="calendarFilter" 
+                                        value="#{atvNovedadJSF.desde}"
+                                        placeholder="Desde"
+                                        title="Desde"
+                                        navigator="true"
+                                        showOn="button"
+                                        pattern="yyyy-MM-dd" 
+                                        locale="es" />
+                            <p:calendar id="hasta"
+                                        styleClass="calendarFilter" 
+                                        value="#{atvNovedadJSF.hasta}"
+                                        placeholder="Hasta"
+                                        title="Hasta"
+                                        navigator="true"
+                                        showOn="button"
+                                        pattern="yyyy-MM-dd"
+                                        locale="es" />
+                            <p:commandButton id="btn-consultar"   
+                                             value="Buscar" 
+                                             actionListener="#{atvNovedadJSF.consultarNov()}" 
+                                             update="@form,:msgs" 
+                                             process="desde,hasta,@this"
+                                             icon="fa fa-search" 
+                                             class="cssWhite" />
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtNovATV" 
+                                             trigger="toggler" />
+                            <p:commandButton id="btn-liquidar"   
+                                             value="Liquidar Novedades" 
+                                             icon="fa fa-calculator" 
+                                             update=":msgs,@form"
+                                             rendered="#{atvNovedadJSF.isUserMtto}"
+                                             actionListener="#{atvNovedadJSF.liquidarNovedadAtv()}"
+                                             class="cssWhite RedButton"
+                                             process="desde,hasta,@this">
+                                <p:confirm header="Confirmacíon"
+                                           escape="false"
+                                           message="Está seguro que desea liquidar de forma masiva? &lt;br/&gt;Recuerde que solo se puede liquidar fechas de un mismo mes, los servicios deben estar cerrado por parte del vehículo de atención y recibidos por el técnico de patio.&lt;br/&gt; No tiene reversa este proceso" 
+                                           icon="fa fa-exclamation-triangle" />                 
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        Total Registros #{atvNovedadJSF.listNovedadATV.size()}
+                    </f:facet>
+                    <p:column headerText="ID"
+                              filterBy="#{item.idNovedad}"
+                              filterMatchMode="contains"
+                              style="min-width: 80px">
+                        <h:outputText value="N-#{item.idNovedad}" />
+                    </p:column>
+                    <p:column headerText="Creado">
+                        <h:outputText value="#{item.creado}" >
+                            <f:convertDateTime type="both" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="UF"
+                              filterBy="#{item.idVehiculo.idGopUnidadFuncional.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.idGopUnidadFuncional.codigo}" />
+                    </p:column>
+                    <p:column headerText="Fecha Novedad">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo"
+                              visible="false"
+                              filterBy="#{item.idNovedadTipo.nombreTipoNovedad}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idNovedadTipo.nombreTipoNovedad}" />
+                    </p:column>
+                    <p:column headerText="Tipo Detalle" filterBy="#{item.idNovedadTipoDetalle.tituloTipoNovedad}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                    </p:column>
+                    <p:column headerText="Vehículo"
+                              filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Placa Vehículo"
+                              filterBy="#{item.idVehiculo.placa}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.placa}" />
+                    </p:column>
+                    <p:column headerText="Tipo Vehículo"
+                              visible="false"
+                              filterBy="#{item.idVehiculo.idVehiculoTipo.nombreTipoVehiculo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.idVehiculoTipo.nombreTipoVehiculo}" />
+                    </p:column>
+                    <p:column headerText="Observación" 
+                              visible="false"
+                              class="cortar" >
+                        <h:outputText value="#{item.idDispClasificacionNovedad.observacion}" />
+                    </p:column>
+                    <p:column headerText="Reporta" 
+                              filterBy="#{item.username}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.username}" />
+                    </p:column>
+                    <p:column headerText="User Recepción" 
+                              filterBy="#{item.userRecibidoAtv}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.userRecibidoAtv}" />
+                    </p:column>
+                    <p:column headerText="Fecha Recepción">
+                        <h:outputText value="#{item.fechaRecibidoAtv}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Aprobado para pago" 
+                              rendered="#{atvNovedadJSF.isUserMtto}"
+                              class="TexAlCenter #{item.aceptarPagoAtv == 0 ? 'cssGreen' : 'cssRed'}"
+                              filterBy="#{item.aceptarPagoAtv}"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu id="s-filter-pago"
+                                             widgetVar="selFilterPagoWV"
+                                             onchange="PF('wvNovAtvdt').filter()"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Todos"
+                                              itemValue="#{null}" />
+                                <f:selectItem itemLabel="Sí"
+                                              itemValue="#{0}" />
+                                <f:selectItem itemLabel="No"
+                                              itemValue="#{1}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.aceptarPagoAtv == 0 ? 'Si' : 'No'}" class="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Observación Pago"
+                              rendered="#{atvNovedadJSF.isUserMtto}"
+                              class="cortar" >
+                        <h:outputText value="#{item.aceptarPagoObsAtv}" />
+                    </p:column>
+                    <p:column headerText="Costo Servicio"
+                              rendered="#{atvNovedadJSF.isUserMtto}" >
+                        <h:outputText value="#{atvNovedadJSF.findCostoParam(item)}" >
+                            <f:convertNumber pattern="$#,###.###" currencySymbol="$" type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Servicio" 
+                              filterBy="#{item.idAtvTipoAtencion.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idAtvTipoAtencion.nombre}" />
+                    </p:column>
+                    <p:column headerText="Vehículo Atención" 
+                              filterBy="#{item.idAtvVehiculosAtencion.placa}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idAtvVehiculosAtencion.placa}" />
+                    </p:column>
+                    <p:column headerText="Télefono">
+                        <h:outputText value="#{item.idAtvVehiculosAtencion.telefono}" />
+                    </p:column>
+                    <p:column headerText="Costo Serv. Liquidado"
+                              rendered="#{atvNovedadJSF.isUserMtto}" >
+                        <h:outputText value="#{item.costoLiquidadoAtv}" >
+                            <f:convertNumber pattern="$#,###.###" currencySymbol="$" type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Estado Atención" 
+                              class="TexAlCenter #{item.cierreAppAtv == 4 ? 'cssGreen' : 'cssGray'}"
+                              filterBy="#{item.cierreAppAtv}"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu id="s-filter-estado"
+                                             widgetVar="selFilterEstadoWV"
+                                             onchange="PF('wvNovAtvdt').filter()"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Todos"
+                                              itemValue="#{null}" />
+                                <f:selectItem itemLabel="Abierta"
+                                              itemValue="#{1}" />
+                                <f:selectItem itemLabel="Aceptada"
+                                              itemValue="#{2}" />
+                                <f:selectItem itemLabel="Recogido o En Atención"
+                                              itemValue="#{3}" />
+                                <f:selectItem itemLabel="Cerrada"
+                                              itemValue="#{4}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.cierreAppAtv == 1 ? 'Abierta' : (item.cierreAppAtv == 2 ? 'Aceptado' : (item.cierreAppAtv == 3 ? 'Recogido o Atención' : 'Cerrado')) }" class="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Liquidado"
+                              rendered="#{atvNovedadJSF.isUserMtto}"
+                              class="TexAlCenter #{item.liquidadoAtv == 1 ? 'cssGreen' : 'cssGray'}"
+                              filterBy="#{item.liquidadoAtv}"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu id="s-filter-liquidado"
+                                             widgetVar="selFilterLiqWV"
+                                             onchange="PF('wvNovAtvdt').filter()"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Todos"
+                                              itemValue="#{null}" />
+                                <f:selectItem itemLabel="Sí"
+                                              itemValue="#{1}" />
+                                <f:selectItem itemLabel="No"
+                                              itemValue="#{0}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.liquidadoAtv == 1 ? 'Sí' : 'No'}" class="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Acciones" exportable="false">
+                        <div class="btn-flex">
+                            <p:commandButton id="view-map" 
+                                             title="Gestión localización"
+                                             icon="fa fa-location-arrow" 
+                                             class="GreenButton cssWhite"
+                                             update=":msgs,atvMapModal"
+                                             process="@this"
+                                             oncomplete="PF('modalMapWV').show()"
+                                             actionListener="#{atvNovedadJSF.setNovedadSelect(item)}"
+                                             />
+                            <p:commandButton id="gestion-pago" 
+                                             icon="fa fa-usd"
+                                             title="Gestionar pago"
+                                             class="PurpleButton cssWhite"
+                                             disabled="#{item.liquidadoAtv == 1}"
+                                             rendered="#{atvNovedadJSF.isUserMtto}"
+                                             update=":msgs,dial-modal,form-modal"
+                                             process="@this"
+                                             oncomplete="PF('modalDlg').show()"
+                                             actionListener="#{atvNovedadJSF.setNovedadSelect(item)}"
+                                             />
+                            <p:commandButton id="btn-doc"
+                                             icon="fa fa-file-archive-o" 
+                                             class="cssWhite OrangeButton"
+                                             rendered="#{atvNovedadJSF.isUserMtto}"
+                                             action="#{atvNovedadJSF.setNovedadSelect(item)}"
+                                             update=":form-doc"
+                                             oncomplete="PF('docModal').show()"
+                                             process="@this"
+                                             title="Documentos" />
+                            <p:commandButton id="btn-photo"
+                                             icon="fa fa-photo" 
+                                             class="cssWhite CyanButton"
+                                             actionListener="#{atvNovedadJSF.setNovedadSelect(item)}"
+                                             action="#{atvNovedadJSF.consularAtvEvidenciaPorNovedad()}"
+                                             update=":galeria_fotos_form"
+                                             oncomplete="PF('galeria_foto_dialog_wv').show()"
+                                             process="@this"
+                                             title="Evidencias" />
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="./modal/map.xhtml" />
+        <ui:include src="./modal/gestionPago.xhtml" rendered="#{atvNovedadJSF.isUserMtto}"  />
+        <ui:include src="./modal/documentos.xhtml" rendered="#{atvNovedadJSF.isUserMtto}" />
+        <ui:include src="./modal/galeriaFotos.xhtml" />
+    </ui:define>
+</ui:composition>

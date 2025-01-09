@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Solicitudes - Rigel </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <h:outputStylesheet name="css/font-icon-layout.css" library="sentinel-layout" />
+        <h:outputStylesheet name="css/sentinel-layout.css" library="sentinel-layout" />
+        <h:outputStylesheet name="css/core-layout.css" library="sentinel-layout" />
+        <link rel="shortcut icon" href="resources/sentinel-layout/images/logo_III.png" />
+    </h:head>
+    <h:body id="body-login-acc" class="fontRegular login-back white-back" >
+        <h:form id="form" >
+            <div class="Container">
+                <p:growl  life="8000" id="msg" showDetail="true" showSummary="true"></p:growl>
+                <div class="Container80 MaxWid500 Fnone MarAuto TexAlCenter PaddingTopPercent10" >
+                    <div id="login-logo" >
+                        <span class="Fs25 FontTitilliumSemiBoldItalic Fleft"><span class="hardblue">GESTIÓN DE SOLICITUDES</span></span>
+                    </div>
+                    <div class="EmptyBox10"></div>
+                </div>
+                <div class="Container80 MaxWid500 white-back Fnone MarAuto BordRad10" id="login-box">
+                    <p:panel id="panel-login" rendered="#{genericaTokenJSF.bFlag}" style="margin: 0;padding: 0;border: none">
+                        <div class="Container">
+                            <div class="Container100 TexAlCenter Animated05 BoxSizeBorder TabBtn left TabBtnActiveLeft" role="1">
+                                <div class="Container80 Fnone MarAuto FontBold">Ingrese su Número de Identificación para gestionar solicitudes</div>
+                            </div>
+                            <div class="Container90 Fnone MarAuto TexAlCenter TabContent OvHidden" id="TAB1">
+                                <div class="EmptyBox30"></div>
+                                <p:inputText id="identificacion"  
+                                             value="#{genericaTokenJSF.cIdentificacion}" 
+                                             required="true" 
+                                             placeholder="Identificación" 
+                                             requiredMessage="Identificación es requerido" 
+                                             styleClass="Container80 Fnone MarAuto Fs18"/>
+                                <div class="EmptyBox20"></div>
+                                <p:commandButton id="btn-identificacion"
+                                                 update="@form,:form-dg,:form-dg:msg" 
+                                                 actionListener="#{genericaTokenJSF.validarCodigoEnviarToken()}"
+                                                 icon="fa fa-check-circle-o" 
+                                                 process="identificacion,@this"
+                                                 class="cssWhite Fs16"  
+                                                 value="Ingresar" />
+                                <div class="EmptyBox20"></div>
+                            </div>
+                        </div>
+                    </p:panel>
+                    <p:panel id="panel-login-dir" rendered="#{!genericaTokenJSF.bFlag}" style="margin: 0;padding: 0;border: none;text-align: center">
+                        <div class="Container100 TexAlCenter Animated05 BoxSizeBorder TabBtn left TabBtnActiveLeft" role="1">
+                            <div class="Container80 Fnone MarAuto FontBold">Bienvenido #{genericaTokenJSF.empleado.nombres.toUpperCase()} #{genericaTokenJSF.empleado.apellidos.toUpperCase()}</div>
+                        </div>
+                        <div class="EmptyBox20"></div>
+                        <p:commandButton id="btn-permi-cambio"
+                                         onclick="location.href = 's_PermisoCambios.jsf?pin=#{genericaTokenJSF.genericaToken.token}&amp;id=#{genericaTokenJSF.genericaToken.idEmpleado.idEmpleado}'"
+                                         type="button"
+                                         class="cssWhite"  
+                                         value="Solicitud de Permiso o Cambio" />
+                        <div class="EmptyBox10" />
+                        <p:commandButton id="btn-licen-nremune"
+                                         onclick="location.href = 'noRemunerada.jsf?pin=#{genericaTokenJSF.genericaToken.token}&amp;id=#{genericaTokenJSF.genericaToken.idEmpleado.idEmpleado}'"
+                                         type="button"
+                                         class="cssWhite"  
+                                         value="Solicitud de Licencia No Remunerada" />
+                        <div class="EmptyBox10" />
+                        <p:commandButton id="btn-salir"
+                                         type="button"
+                                         onclick="location.href = 'solicitud.jsf?'"
+                                         icon="fa fa-arrow-circle-o-left" 
+                                         class="cssWhite RedButton"  
+                                         value="Salir" />
+                        <div class="EmptyBox20"></div>
+                        <p:graphicImage name="images/preloadbmo.gif" library="sentinel-layout" width="40px"/>
+                        <div class="EmptyBox5"></div>
+                    </p:panel> 
+                </div>
+            </div>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes cssWhite" icon="fa fa-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no cssWhite" icon="fa fa-times" />
+            </p:confirmDialog>   
+        </h:form>
+        <h:form id="form-dg" >
+            <p:dialog id="tokenDlg"
+                      header="Digitar Código de Seguridad"
+                      widgetVar="tokenDG"
+                      modal="true"
+                      responsive="true">
+                <h:panelGrid columns="1" styleClass="Wid100 TexAlCenter">
+                    <f:facet name="header">
+                        <h:outputText value="Bienvenido #{genericaTokenJSF.empleado.apellidos.toUpperCase()} #{genericaTokenJSF.empleado.nombres.toUpperCase()}" />
+                    </f:facet>
+                    <div class="EmptyBox10" />
+                    <p:inputText id="token"
+                                 class="Wid80"
+                                 value="#{genericaTokenJSF.cToken}"
+                                 placeholder="Código de Seguridad"
+                                 maxlength="6" />
+                    <p:separator/>
+                    <div class="EmptyBox10" />
+                    <p:messages id="msg" showDetail="true" showSummary="true" closable="true" />
+                    <f:facet name="footer">
+                        <p:commandButton id="btn-token"
+                                         value="Validar"
+                                         icon="fa fa-check"
+                                         class="cssWhite"  
+                                         update="form:msg,:form"
+                                         actionListener="#{genericaTokenJSF.validarToken()}"
+                                         process="@this,token"  />
+                    </f:facet>
+                </h:panelGrid>
+            </p:dialog> 
+        </h:form>
+        <p:ajaxStatus  onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:graphicImage name="images/preloadbmo.gif" height="50" library="sentinel-layout"/>
+        </p:dialog>
+    </h:body>
+</html>

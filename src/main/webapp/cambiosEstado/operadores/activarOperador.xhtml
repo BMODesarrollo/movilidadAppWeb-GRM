@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="activarOperador" 
+              id="modalActivarOperador" 
+              header="Activar operador"
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)" position="center,top">
+        <p:ajax event="close" listener="#{cambioOperadorBean.setSelected(null)}"
+                update=":frmPrincipal,frmActivarOperador:pGrid"/>
+        <h:form id="frmActivarOperador">
+            <div class="ui-fluid" jsf:id="panel">
+                <p:fieldset legend="Detalle" style="margin-bottom:20px">
+                    <div align="center">
+                        <h:panelGrid columns="2" cellpadding="5">
+                            <p:outputLabel for="cod_operador" value="Código operador: "/>
+                            <p:outputLabel id="cod_operador" value="#{cambioOperadorBean.s_codOperador}"/>
+
+                            <p:outputLabel for="operador" value="Operador: "/>
+                            <p:outputLabel id="operador" value="#{cambioOperadorBean.selected.idEmpleado.nombres.toUpperCase()} #{cambioOperadorBean.selected.idEmpleado.apellidos.toUpperCase()}"/>
+
+                            <p:outputLabel for="desde" value="Desde:" />
+                            <p:outputLabel id="desde" value="#{cambioOperadorBean.selected.fromDate}" >
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="hasta" value="Hasta:" />
+                            <p:outputLabel id="hasta" value="#{cambioOperadorBean.selected.toDate}" >
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="estado" value="Estado: " />
+                            <p:outputLabel id="estado" value="#{cambioOperadorBean.selected.idEmpleadoEstado.nombre}" />
+
+                            <p:outputLabel for="descripcion" value="Descripción:" />
+                            <p:outputLabel id="descripcion" value="#{cambioOperadorBean.selected.descripcion}" />
+                        </h:panelGrid>
+                    </div>
+                </p:fieldset>
+                <div class="ui-g Padding3" jsf:id="pGrid">
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding3">
+                        <p:outputLabel for="observaciones" value="Observaciones:" />
+                    </div>
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding3">
+                        <p:inputTextarea id="observaciones" 
+                                         rows="4"
+                                         value="#{cambioOperadorBean.selected.observaciones}"
+                                         placeholder="Ingrese observaciones acerca de la activación"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una descripción" />
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand id="activar"
+                             name="activarCambEst"
+                             process="frmActivarOperador,@this"
+                             action="#{cambioOperadorBean.activarOperador()}"
+                             update=":frmPrincipal,pGrid,:messages"
+                             rendered="#{cambioOperadorBean.selected != null }" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Activar"
+                             icon="fa fa-thumbs-up"
+                             class="cssWhite"
+                             onclick="activarCambEst()"
+                             rendered="#{cambioOperadorBean.selected != null }" />
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

@@ -1,0 +1,343 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="MultaCreateDlg" widgetVar="MultaCreateDialog" modal="true" 
+              closable="true"
+              position="center top"
+              resizable="false" 
+              responsive="true"
+              class="mr1024_60 mr500_90"
+              appendTo="@(body)" 
+              header="Crear Nueva Multa"
+              closeOnEscape="true">
+        <h:form id="MultaCreateForm">
+            <div jsf:id="display" jsf:rendered="#{multaController.selected != null}">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-6 ui-md-6 ui-lg-4 Padding5" >
+                            <p:outputLabel value="Fecha y hora:" for="fechaHora" />
+                            <p:calendar id="fechaHora" 
+                                        maxdate="#{multaController.validarFecha()}"
+                                        pattern="yyyy/MM/dd HH:mm" 
+                                        locale="es"
+                                        required="true"
+                                        timeControlType="select"
+                                        requiredMessage="Fecha y Hora es requerido"
+                                        title="año/mes/día hora:minutos"
+                                        showOn="button"
+                                        timeInput="true"
+                                        mask="true"
+                                        value="#{multaController.selected.fechaHora}" >
+                                <p:ajax event="dateSelect" listener="#{multaController.cargarDatos()}"
+                                        update=":frmPrgTcList"/>
+                                <p:ajax event="blur" listener="#{multaController.cargarDatos()}" global="false"
+                                        update=":frmPrgTcList"/>
+                            </p:calendar>
+                        </div>
+
+                        <div class="ui-g-6 ui-md-6 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Servicio:" for="idServicio"/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:inputText id="idServicio" 
+                                                 placeholder="Servicios"
+                                                 value="#{multaController.prgTc.idRuta.name == null ? 'No Tiene':multaController.prgTc.idRuta.name}"
+                                                 readonly="true"
+                                                 onkeypress="if (event.keyCode === 13) {
+                                                             return false;
+                                                         }"
+                                                 >
+                                    </p:inputText>
+                                    <div class="botonFloat" >
+                                        <p:commandButton id="servicio" 
+                                                         oncomplete="PF('PrgTcListDialog').show();"
+                                                         onclick="PF('wVPrgTcListDialog').getPaginator().setPage(0);"
+                                                         icon="fa fa-list"
+                                                         style="margin: 0px"
+                                                         title="Cargar servicios"
+                                                         actionListener="#{multaController.prepareListPrgTc()}"
+                                                         class="cssWhite"
+                                                         update="frmPrgTcList,btnGuardaMulta">
+                                            <p:ajax event="dialogReturn" listener="#{multaController.onPrgTcChosen}" 
+                                                    process="@this" update="idServicio,idLinea,tabla,idEmpleado,idVehiculo"/>
+                                        </p:commandButton> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-6 ui-md-6 ui-lg-4 Padding5" >
+                            <p:outputLabel value="Linea:" for="idLinea" />
+                            <p:inputText id="idLinea"
+                                         value="#{multaController.prgTc.idTaskType.tarea}"
+                                         readonly="true"
+                                         >
+                            </p:inputText>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-4 Padding5" >
+                            <p:outputLabel value="Tabla:" for="tabla" />
+                            <p:inputText id="tabla" 
+                                         value="#{multaController.prgTc.tabla}"
+                                         readonly="true"
+                                         maxlength="6"
+                                         >
+                                <p:keyFilter regEx="/[1234567890]/i"/> 
+                            </p:inputText>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <p:outputLabel value="Tipo multa:" for="idMultaTipo" />
+                            <p:selectOneMenu id="idMultaTipo" 
+                                             value="#{multaController.i_idMultaTipo}" 
+                                             required="true" 
+                                             style="width: 99.9999%"
+                                             requiredMessage="Seleccionar Tipo de Multa"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             >
+                                <f:selectItem itemLabel="Seleccionar uno" itemValue=""/>
+                                <f:selectItems value="#{multaController.listaMultaTipo}"
+                                               var="idMultaTipoItem"
+                                               itemLabel="#{idMultaTipoItem.tipo}"
+                                               itemValue="#{idMultaTipoItem.idMultaTipo}"/>
+                                <p:ajax update="idMultaClasificacion"
+                                        event="change"
+                                        process="@this"
+                                        listener="#{multaController.cargarCM}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <p:outputLabel value="Clasificación multa:" for="idMultaClasificacion" />
+                            <p:selectOneMenu id="idMultaClasificacion"
+                                             value="#{multaController.i_idMultaClasidicacion}"
+                                             required="true" 
+                                             style="width: 99.9999%"
+                                             requiredMessage="Seleccionar Clasificación de la Multa"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             >
+                                <f:selectItem itemLabel="Seleccionar uno" itemValue=""/>
+                                <f:selectItems value="#{multaController.listaMultaC}"
+                                               var="idMultaClasificacionItem"
+                                               itemDescription="#{idMultaClasificacionItem.descripcion}"
+                                               itemLabel="#{idMultaClasificacionItem.codigo}"
+                                               itemValue="#{idMultaClasificacionItem.idMultaClasificacion}"/>
+                                <p:ajax process="@this" event="change"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Reportado por: " for="idMultaReportadoPor" />
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="panelMRP" >
+                                    <p:inputText id="idMultaReportadoPor" 
+                                                 value="#{multaController.c_coMultaRP}" 
+                                                 placeholder="Seleccione persona reporta multa"
+                                                 readonly="true"
+                                                 required="true"
+                                                 requiredMessage="Debe seleccionar la persona que reportó la multa"
+                                                 onkeypress="if (event.keyCode === 13) {
+                                                             return false;
+                                                         }">
+                                    </p:inputText>
+                                    <div class="botonFloat" >
+                                        <p:commandButton id="busMRP" 
+                                                         oncomplete="PF('dl2').show();"
+                                                         icon="fa fa-list"
+                                                         title="Cargar lista de personas"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         update="dlMRP,frmtblMRP"
+                                                         action="#{multaController.listarMRP()}"
+                                                         process="@this"
+                                                         >
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <p:outputLabel value="Patio:" for="idPatio" />
+                            <p:selectOneMenu id="idPatio"
+                                             value="#{multaController.i_idOperacionPatio}"
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains"
+                                             >
+                                <f:selectItem itemLabel="Seleccionar uno" itemValue=""/>
+                                <f:selectItems value="#{multaController.listOperacionPatio}"
+                                               var="idPatioItem"
+                                               itemLabel="#{idPatioItem.nombrePatio}"
+                                               itemValue="#{idPatioItem.idOperacionPatios}"/>
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" 
+                             jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Unidad Funcional:" for="uf"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu 
+                                    id="uf"
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="-" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="uf" 
+                                            global="false"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="ui-fluid">
+                    <div class="ui-g" jsf:id="grid">
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Empleado:" />
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                    <p:inputText id="idEmpleado"
+                                                 value="#{multaController.prgTc.idEmpleado.nombres} #{multaController.prgTc.idEmpleado.apellidos}"
+                                                 readonly="true"
+                                                 rendered="#{multaController.prgTc.idEmpleado != null}"/>
+
+                                    <p:inputText placeholder="Nombre completo de operador"
+                                                 id="operador"
+                                                 value="#{multaController.empleado.nombres} #{multaController.empleado.apellidos}"
+                                                 readonly="true"
+                                                 rendered="#{multaController.prgTc.idEmpleado.nombres == null}"/>
+                                    <div class="botonFloat" >
+                                        <p:commandButton title="Cargar lista de operadores"
+                                                         icon="fa fa-list"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         update=":frmPmEmpleadoList,btnGuardaMulta"
+                                                         action="#{novedadBean.prepareListEmpleados}"                                     
+                                                         oncomplete="PF('PmEmpleadosListDialog').show()"
+                                                         rendered="#{multaController.prgTc.idEmpleado.nombres == null}">
+                                            <p:ajax event="dialogReturn" listener="#{novedadBean.onEmpleadoChosen}" 
+                                                    process="@this" update="operador"/>
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+
+                            <p:outputLabel value="Vehículo" />
+                            <p:inputText id="idVehiculo" 
+                                         value="#{multaController.prgTc.idVehiculo.codigo}"
+                                         readonly="true"/>
+
+
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+
+                            <p:outputLabel value="Procede:" for="procede" />      
+
+                            <p:selectBooleanButton id="procede"
+                                                   value="#{multaController.b_procede}"
+                                                   onLabel="Sí" 
+                                                   class="cssWhite"
+                                                   offLabel="No" />  
+                        </div>
+                    </div>
+                </div>
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Wid100 Padding5" jsf:id="pgrid2"  >
+                            <p:outputLabel for="descripcion" value="Descripción: " />
+                            <p:inputTextarea id="descripcion" 
+                                             value="#{multaController.selected.descripcion}" 
+                                             required="true" 
+                                             maxlength="65535"
+                                             requiredMessage="Debe ingresar una descripción"/>
+                        </div>
+                    </div>
+                </div>
+                <p:dialog header="Multas reportadas por" widgetVar="dl2" id="dlMRPSele"
+                          modal="true" showEffect="fade" position="center top" appendTo="@(body)" resizable="false" >
+                    <p:outputPanel id="dlMRP" style="text-align:center;width: 300px;">
+
+                        <h:form id="frmtblMRP">
+                            <p:dataTable id="tblMRP" var="mrp" rows="5" paginator="true" 
+                                         filterDelay="1000"
+                                         sortBy="#{mrp.creado}"
+                                         sortOrder="descending"
+                                         emptyMessage="No se encontraron registros"
+                                         value="#{multaController.listaMultaRP}" 
+                                         widgetVar="wdlMRP">
+
+                                <f:facet name="header">
+                                    <div align="right">
+                                        <p:commandButton value="Nuevo" 
+                                                         update="MultaReportadoPorCreateForm:display"
+                                                         action="#{multaController.setC_coMultaRP('')}"
+                                                         oncomplete="PF('MultaReportadoPorCreateDialog').show();">
+                                            <p:resetInput target="MultaReportadoPorCreateForm:display"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="Nombres" filterBy="#{mrp.nombres}"
+                                          filterMatchMode="contains">
+                                    <h:outputText value="#{mrp.nombres}" />
+                                </p:column>
+
+                                <p:column style="width:32px;text-align: center"
+                                          headerText="Acción">
+                                    <p:commandButton oncomplete="PF('dl2').hide();"
+                                                     icon="fa fa-check"
+                                                     class="cssWhite"
+                                                     title="Seleccionar"
+                                                     action="#{multaController.cargarMultaReportadoPor}"
+                                                     process="@this"
+                                                     update="MultaCreateForm:panelMRP,
+                                                     :MultaReportadoPorCreateForm:display"
+                                                     >
+                                        <f:setPropertyActionListener value="#{mrp}" 
+                                                                     target="#{multaController.selected.idMultaReportadoPor}" />
+                                    </p:commandButton>
+                                </p:column>
+
+                            </p:dataTable>
+                        </h:form>
+                    </p:outputPanel>
+                </p:dialog>
+                <p:remoteCommand name="rc" 
+                                 class="cssWhite"
+                                 actionListener="#{multaController.create()}"  
+                                 value="Guardar" 
+                                 update="display,msgs"  >
+
+                </p:remoteCommand>
+            </div>
+        </h:form>
+
+        <f:facet name="footer" >
+            <p:commandButton id="btnGuardaMulta" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc()">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro que desea guardar esta multa?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="modals/ListPrgTc.xhtml"/>
+    <ui:include src="modals/ListaEmpleados.xhtml"/>
+    <ui:include src="modals/Create_ReportadoPor.xhtml"/>
+</ui:composition>

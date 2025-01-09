@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{novedadMttoTpActDetJSF.novedadMttoTpActDet.idNovedadMttoTipoActividadDet != null ? 'EDITAR TIPO ACTIVIDAD DETALLE' : 'NUEVA TIPO ACTIVIDAD DETALLE'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Nombre *"/>
+                        </div>
+                        <p:inputText id="nombre"
+                                     maxlength="45"
+                                     required="true"
+                                     requiredMessage="Nombre es requerido"
+                                     value="#{novedadMttoTpActDetJSF.novedadMttoTpActDet.nombre}" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Novedad Mantenimineto Tipo Actividad *"/>
+                        </div>
+                        <p:selectOneMenu id="nvactdet" 
+                                         value="#{novedadMttoTpActDetJSF.idNovMttoTpAct}"
+                                         filter="true"
+                                         filterMatchMode="contains"
+                                         style="width: 99.999%">
+                            <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                            <f:selectItems value="#{novedadMttoTpActJSF.listNovedadMttoTpAct}" 
+                                           var="novAct" 
+                                           itemLabel="#{novAct.nombre}" 
+                                           itemDescription="#{novAct.descripcion}"
+                                           itemValue="#{novAct.idNovedadMttoTipoActividad}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <p:inputTextarea id="descripcion"
+                                         maxlength="255"
+                                         required="true"
+                                         requiredMessage="Descripción es requerido"
+                                         value="#{novedadMttoTpActDetJSF.novedadMttoTpActDet.descripcion}"/>
+                    </div>
+                    <p:remoteCommand id="btn-guardar"
+                                     name="rc_mtda"
+                                     rendered="#{empty novedadMttoTpActDetJSF.novedadMttoTpActDet.idNovedadMttoTipoActividadDet}"
+                                     action="#{novedadMttoTpActDetJSF.guardar()}"
+                                     update=":form,@form,msgs"
+                                     process="@form" />
+                    <p:remoteCommand id="btn-editar"
+                                     name="rc_update_mtda"
+                                     rendered="#{not empty novedadMttoTpActDetJSF.novedadMttoTpActDet.idNovedadMttoTipoActividadDet}"
+                                     action="#{novedadMttoTpActDetJSF.actualizar()}"
+                                     update=":form,msgs"/>
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_mtda();"
+                             icon="fa fa-save"
+                             value="Guardar"
+                             rendered="#{empty novedadMttoTpActDetJSF.novedadMttoTpActDet.idNovedadMttoTipoActividadDet}"
+                             class="cssWhite"/>
+            <p:commandButton onclick="rc_update_mtda();"
+                             icon="fa fa-save"
+                             value="Actualizar"
+                             rendered="#{not empty novedadMttoTpActDetJSF.novedadMttoTpActDet.idNovedadMttoTipoActividadDet}"
+                             class="cssWhite"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

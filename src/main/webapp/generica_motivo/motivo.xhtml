@@ -1,0 +1,67 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="form-motivo">
+            <p:growl id="growl" showDetail="true" showSummary="true" />
+            <p:panel  header="Motivo Ajuste de Jornada">
+                <p:dataTable  id="datalist"
+                              value="#{genMotJSFMB.listJornadaMotivo}"
+                              var="item"
+                              paginator="true"
+                              rowKey="#{item.idPrgSerconMotivo}"
+                              rows="20"
+                              rowsPerPageTemplate="20,50,100"
+                              filterDelay="1000"
+                              emptyMessage="No existen registros"
+                              >
+
+                    <p:column filterBy="#{item.descripcion}" filterMatchMode="contains"
+                              headerText="Motivo de Ajuste de Jornada">
+                        <h:outputText value="#{item.descripcion}"/>
+                    </p:column>
+
+                    <p:column headerText="Acciones" width="10%">
+                        <p:commandButton title="Editar"
+                                         oncomplete="PF('motivoDlg').show();"
+                                         actionListener="#{genMotJSFMB.prepareEditar(item)}"
+                                         update="datalist,form-gestionar"
+                                         class="cssWhite GreenButton"
+                                         icon="fa fa-pencil"
+                                         process="@this"
+                                         />
+                        <p:commandButton title="Eliminar"
+                                         actionListener="#{genMotJSFMB.eliminar(item)}"
+                                         update="datalist"
+                                         rendered="true"
+                                         class="cssWhite RedButton"
+                                         icon="fa fa-trash"
+                                         process="@this"
+                                         >
+                            <p:confirm header="Confirmación" message="Estas seguro de eliminar? no podrá volver a habilitar este motivo" icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton class="cssWhite" 
+                                             id="nuevo" 
+                                             icon="fa fa-plus"   
+                                             value="#{bundle.Create}" 
+                                             actionListener="#{genMotJSFMB.prepareGuardar()}" 
+                                             update="form-gestionar" 
+                                             oncomplete="PF('motivoDlg').show()">
+                                <p:resetInput target="PrgSerconGestionar"></p:resetInput>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="gestionar.xhtml"/>
+    </ui:define>
+</ui:composition>

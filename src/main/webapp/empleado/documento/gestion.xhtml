@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns = "http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="EmpledoGestionDlg" header="Empleado Documento" 
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              fitViewport="true"              
+              height="auto"
+              closeOnEscape="true" position="top"  widgetVar="EmpleadoGestionDlg_wv" modal="true"
+              resizable="false" appendTo="@(body)">
+        <h:form id="EmpleadoDocuGestionForm" enctype="multipart/form-data" >
+            <p:messages id="msgs_gestion" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="empledoId"  value="Empleado: "/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:inputText id="empledoId" value="#{emplDocJSFMB.getEmplString()}"
+                                         title="#{emplDocJSFMB.empleado.nombres} #{emplDocJSFMB.empleado.apellidos}"
+                                         required="true" requiredMessage="El Empleado obligatorio"
+                                         readonly="true"/>                        
+                            <div class="botonFloat">
+                                <p:commandButton title="Seleccione el Empleado"
+                                                 icon="fa fa-list"
+                                                 class="cssWhite"
+                                                 style="margin: 0px"
+                                                 immediate="true"
+                                                 update="frmPrincipalListEmpleado:tabla" 
+                                                 actionListener="#{emplDocJSFMB.openModalEmpleadoList}">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next"  value="Unidad Funcional "/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:inputText id="id_uf" 
+                                         value="#{emplDocJSFMB.empleado.idGopUnidadFuncional.nombre}"
+                                         required="true" requiredMessage="Se requiere unidad funcional"
+                                         readonly="true"/>                        
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12  Padding5">
+                        <p:dataTable id="dt_docu_cargo" var="item" 
+                                     scrollable="true"
+                                     widgetVar="dtDocumento"
+                                     scrollHeight="600"
+                                     disabledTextSelection="false"
+                                     reflow="true"
+                                     rows="10"
+                                     paginatorPosition="top"
+                                     filterDelay="500"
+                                     paginator="true"
+                                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="10,50,100"
+                                     emptyMessage="No existen registros"
+                                     value="#{emplDocJSFMB.listaDocs}">
+
+                            <p:column headerText="Tipo Documento">
+                                <h:outputText value="#{item.empleadoDocumentos.idEmpleadoTipoDocumento.nombreTipoDocumento}"/>
+                            </p:column>
+
+                            <p:column   headerText="Número">
+                                <h:outputText value="#{item.empleadoDocumentos.numero}"/>
+                            </p:column>
+                            <p:column  headerText="Radicado">
+                                <h:outputText value="#{item.empleadoDocumentos.radicado}"/>
+                                <h:outputText value="N/A" rendered="#{item.empleadoDocumentos.radicado == null}"/>
+                            </p:column>
+
+                            <p:column headerText="Fecha Radicado" >
+                                <h:outputText value="#{item.empleadoDocumentos.fechaRadicado}" >
+                                    <f:convertDateTime pattern="MM/dd/yyyy" />
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Vigente Desde" >
+                                <h:outputText value="#{item.empleadoDocumentos.vigenteDesde}" >
+                                    <f:convertDateTime pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Vigente Hasta" >
+                                <h:outputText value="#{item.empleadoDocumentos.vigenteHasta}" >
+                                    <f:convertDateTime pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Acciones" style="text-align: center;"
+                                      width="10%"
+                                      exportable="false">
+                                <div class="ui-g Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:commandButton styleClass="cssWhite GreenButton"
+                                                         title="Agregar"
+                                                         action="#{emplDocJSFMB.agregar(item)}"
+                                                         process="@this"
+                                                         update="EmpleadoDocuCreateForm,EmpledoCreateDlg"
+                                                         icon="fa fa-plus">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                    <p:remoteCommand name="rc_gestion"
+                                     update="formTablaDocu,msgs,msgs_gestion" 
+                                     action="#{emplDocJSFMB.guardar()}" />
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarGestion" 
+                             icon="fa fa-save" value="Guardar" 
+                             class="cssWhite"
+                             onclick="rc_gestion()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="../modal/listEmpleados.xhtml"/>
+</ui:composition>
+

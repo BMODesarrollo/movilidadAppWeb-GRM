@@ -1,0 +1,370 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel header="Liquidación Empleados">
+            <h:form id="formLiqEmplMes">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-6 ui-md-3 ui-lg-2 Padding5 ">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                <p:outputLabel for="periodo" value="seleccionar periodo: " />
+                            </div>
+                            <p:selectOneMenu id="periodo" value="#{liqEmplMesJSFMB.seleccionPeriodo}"
+                                             required="true" requiredMessage="Debe seleccionar un periodo"
+                                             filter="true">
+                                                            <f:selectItem itemLabel="Seleccione periodo" 
+                                          itemValue="#{0}"
+                                          itemDescription="Seleccione Uno.."/>
+                            <f:selectItems value="#{liqEmplMesJSFMB.list}"
+                                           var="selectPeriodo" itemLabel="#{selectPeriodo.descripcion}"
+                                           itemValue="#{selectPeriodo.idPmPeriodoLiquidacion}"/>
+                                <p:ajax listener="#{liqEmplMesJSFMB.seleccion()}" 
+                                        process="@this"  
+                                        update="msgs,formLiqEmplMes:tab_view:datalist,
+                                        formLiqEmplMes:generar_reporte_id,
+                                        formLiqEmplMes:eliminar_datos_id,
+                                        formLiqEmplMes:tab_view:datalist_resumen,
+                                        formLiqEmplMes:tab_view:datalist_grupo_mes"/>
+
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-2 Padding5 ">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                <p:outputLabel value="-" style="visibility: hidden"/>                                
+                            </div>
+                            <p:commandButton 
+                                value="Generar Reporte"
+                                rendered="true"
+                                id="generar_reporte_id"
+                                class="OrangeButton cssWhite"
+                                icon="fa fa-calculator"
+                                
+                                action="#{liqEmplMesJSFMB.generarReporte()}"
+                                update="msgs,formLiqEmplMes,formLiqEmplMes:tab_view:datalist,
+                                formLiqEmplMes:tab_view:datalist_resumen">
+                                <p:confirm header="Confirmación" 
+                                           escape="false" 
+                                           message="Esta seguro que desea generar la liquidación? &lt;br/&gt;(Sí confirma, los valores seran almacenados por Rigel)"
+                                           icon="fa fa-exclamation-triangle"
+                                           class="cssWhite"/>
+                            </p:commandButton>
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-2 Padding5 ">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                <p:outputLabel value="-" style="visibility: hidden"/>                                
+                            </div>
+                            <p:commandButton 
+                                value="Eliminar Datos"
+                                rendered="true"
+                                id="eliminar_datos_id"
+                                class="RedButton cssWhite"
+                                icon="fa fa-calculator"
+                                disabled="#{!liqEmplMesJSFMB.b_eliminarDatos}"
+                                action="#{liqEmplMesJSFMB.elimanarConsultar()}"
+                                update="msgs,formLiqEmplMes,formLiqEmplMes:tab_view:datalist,
+                                formLiqEmplMes:tab_view:datalist_resumen">
+                                <p:confirm header="Confirmación" 
+                                           escape="false" 
+                                           message="Esta seguro que desea eliminar los datos para este mes? &lt;br/&gt;(Sí confirma, los cambios seran irreversibles)"
+                                           icon="fa fa-exclamation-triangle"
+                                           class="cssWhite"/>
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </div>
+
+                <p:tabView id="tab_view">
+                    <p:tab title="Detallado" id="det">
+                        <p:dataTable value="#{liqEmplMesJSFMB.listaLiqEmplMes}"
+                                     var="liq"
+                                     widgetVar="LiqEmplMesWV"
+                                     paginator="true"
+                                     rows="50"
+                                     rowsPerPageTemplate="50,100,500,1000,2000"
+                                     id="datalist"
+                                     scrollHeight="600"
+                                     scrollable="true"
+                                     rowKey="#{novedad.idNovedad}"
+                                     emptyMessage="No existen novedades registradas">
+                            <f:facet name="header">
+                                <div align="right">
+                                    En total existen #{liqEmplMesJSFMB.listaLiqEmplMes.size()} registros.
+                                </div>
+
+                            </f:facet>
+                            <p:column headerText="Desde">
+                                <h:outputText value="#{liq.desde}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Hasta">
+                                <h:outputText value="#{liq.hasta}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Identificación">
+                                <h:outputText value="#{liq.empleado.identificacion}" />
+                            </p:column>
+                            <p:column headerText="Código">
+                                <h:outputText value="#{liq.empleado.codigoTm}" />
+                            </p:column>
+                            <p:column headerText="Empleado">
+                                <h:outputText value="#{liq.empleado.nombres} #{liq.empleado.apellidos}" />
+                            </p:column>
+                            <p:column headerText="Cargo">
+                                <h:outputText value="#{liq.empleado.idEmpleadoCargo.nombreCargo}" />
+                            </p:column>
+                            <p:column headerText="Grupo">
+                                <h:outputText value="#{liq.idGrupo.nombreGrupo}" />
+                            </p:column>
+                            <p:column headerText="Días Novedad">
+                                <h:outputText value="#{liq.diasNovedad}" />
+                            </p:column>
+                            <p:column headerText="Puntos PM Conciliados">
+                                <h:outputText value="#{liq.puntosPmConciliados}" />
+                            </p:column>
+                            <p:column headerText="Valor Bono">
+                                <h:outputText value="#{liq.vrBonoSalarial}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Vr Día">
+                                <h:outputText value="#{liq.diasVrBonoSalarial}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Vr Punto">
+                                <h:outputText value="#{liq.puntosVrBonoSalarial}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Puntos Empresa">
+                                <h:outputText value="#{liq.puntosEmpresa}"/>
+                            </p:column>
+                            <p:column headerText="Dcto Puntos">
+                                <h:outputText value="#{liq.descuentoPuntos}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Dcto Días">
+                                <h:outputText value="#{liq.descuentoDiasSalarial}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Bono Amplitud">
+                                <h:outputText value="#{liq.bonoAmplitud}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Vr Bono Alimentación">
+                                <h:outputText value="#{liq.vrBonoAlimentos}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Bono Individual">
+                                <h:outputText value="#{liq.bonoIndividual}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Ingresos">
+                                <h:outputText value="#{liq.ingresos}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Egresos">
+                                <h:outputText value="#{liq.egresos}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="A pagar">
+                                <h:outputText value="#{liq.totalPagar}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+
+                            <f:facet name="footer">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" class="iconexporter"/>
+                                    <p:dataExporter type="xlsx" target="datalist" fileName="Liquidación_Empleado_Mes #{now}" />
+                                </h:commandLink>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+                    <p:tab title="Resumen" id="res">
+                        <p:dataTable value="#{liqEmplMesJSFMB.listLiqEmplMesResumen}"
+                                     var="liq_"
+                                     widgetVar="LiqEmplMesResumenWV"
+                                     paginator="true"
+                                     rows="50"
+                                     rowsPerPageTemplate="50,100,500,1000,2000"
+                                     id="datalist_resumen"
+                                     scrollHeight="600"
+                                     scrollable="true"
+                                     rowKey="#{novedad.idNovedad}"
+                                     emptyMessage="No existen novedades registradas">
+                            <f:facet name="header">
+                                <div align="right">
+                                    En total existen #{liqEmplMesJSFMB.listLiqEmplMesResumen.size()} registros.
+                                </div>
+
+                            </f:facet>
+                            <p:column headerText="Desde">
+                                <h:outputText value="#{liq_.desde}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Hasta">
+                                <h:outputText value="#{liq_.hasta}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Grupo">
+                                <h:outputText value="#{liq_.grupo}" />
+                            </p:column>
+                            <p:column headerText="Días Novedad">
+                                <h:outputText value="#{liq_.diasNovedad}" />
+                            </p:column>
+                            <p:column headerText="Puntos PM Conciliados">
+                                <h:outputText value="#{liq_.puntosPmConciliados}" />
+                            </p:column>
+                            <p:column headerText="Valor Bono">
+                                <h:outputText value="#{liq_.vrBonoSalarial}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Vr Día">
+                                <h:outputText value="#{liq_.diasVrBonoSalarial}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Vr Punto">
+                                <h:outputText value="#{liq_.puntosVrBonoSalarial}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Puntos Empresa">
+                                <h:outputText value="#{liq_.puntosEmpresa}"/>
+                            </p:column>
+                            <p:column headerText="Dcto Puntos">
+                                <h:outputText value="#{liq_.descuentoPuntos}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Dcto Días">
+                                <h:outputText value="#{liq_.descuentoDiasSalarial}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Bono Amplitud">
+                                <h:outputText value="#{liq_.bonoAmplitud}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Vr Bono Alimentación">
+                                <h:outputText value="#{liq_.vrBonoAlimentos}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="A pagar">
+                                <h:outputText value="#{liq_.totalPagar}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+
+                            <f:facet name="footer">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" class="iconexporter"/>
+                                    <p:dataExporter type="xlsx" target="datalist_resumen" fileName="Liquidación_Empleado_Mes_resumen #{now}" />
+                                </h:commandLink>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+                    <p:tab title="Podium Grupos" id="grupo_mes">
+                        <p:dataTable value="#{liqEmplMesJSFMB.listaLiqGrupoMes}"
+                                     var="grupo"
+                                     widgetVar="listaLiqGrupoMesWV"
+                                     paginator="true"
+                                     rows="50"
+                                     rowsPerPageTemplate="50,100,500,1000,2000"
+                                     id="datalist_grupo_mes"
+                                     scrollHeight="600"
+                                     scrollable="true"
+                                     rowKey="#{novedad.idNovedad}"
+                                     emptyMessage="No existen registros">
+                            <f:facet name="header">
+                                <div align="right">
+                                    En total existen #{liqEmplMesJSFMB.listaLiqGrupoMes.size()} registros.
+                                </div>
+
+                            </f:facet>
+                            <p:column headerText="Posición" sortBy="#{grupo.posicion}" sortable="true" class="TexAlCenter">
+                                <h:outputText value="#{grupo.posicion}" />
+                            </p:column>
+                            <p:column headerText="Desde">
+                                <h:outputText value="#{grupo.desde}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Hasta">
+                                <h:outputText value="#{grupo.hasta}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MMMM-dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Grupo">
+                                <h:outputText value="#{grupo.idGrupo.nombreGrupo}" />
+                            </p:column>
+                            <p:column headerText="#Empleados">
+                                <h:outputText value="#{grupo.empleados}" />
+                            </p:column>
+                            <p:column headerText="Puntos Conciliados" sortBy="#{grupo.puntosPmConciliados}" sortable="true">
+                                <h:outputText value="#{grupo.puntosPmConciliados}" />
+                            </p:column>
+                            <p:column headerText="Puntos Trimestre" sortBy="#{grupo.puntosTrimestre}" sortable="true">
+                                <h:outputText value="#{grupo.puntosTrimestre}" />
+                            </p:column>
+                            <p:column headerText="Vr Bono Salarial">
+                                <h:outputText value="#{grupo.vrBonoSalarial}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Vr Bono Alimento">
+                                <h:outputText value="#{grupo.vrBonoAlimentos}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Porcentaje">
+                                <h:outputText value="#{grupo.porcentaje}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Total Bono Grupal">
+                                <h:outputText value="#{grupo.totalBonoGrupal}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Total Bono Individual">
+                                <h:outputText value="#{grupo.totalBonoIndividual}">
+                                    <f:convertNumber pattern="##,###" />
+                                </h:outputText>
+                            </p:column>
+                            <f:facet name="footer">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" class="iconexporter"/>
+                                    <p:dataExporter type="xlsx" target="datalist_grupo_mes" fileName="Liquidación_Grupo_Mes #{now}" />
+                                </h:commandLink>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

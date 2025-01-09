@@ -1,0 +1,314 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .text-right{
+                text-align: right;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Liquidación novedades de daño"/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-5 ui-lg-4 Padding0">
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <p:remoteCommand name="guardarLiquidacion" 
+                                 update=":msgs,dt_id,:frmPrincipal:dtNovedadDanoLiqDet" 
+                                 action="#{novedadDanoLiqBean.guardar()}"/>
+                <p:remoteCommand name="actualizarLiquidacion" 
+                                 update=":msgs,dt_id,:frmPrincipal:dtNovedadDanoLiqDet" 
+                                 action="#{novedadDanoLiqBean.actualizar()}"/>
+                <div class="ui-fluid">
+                    <p:panel header="" toggleable="true" toggleSpeed="500">
+                        <p:dataTable var="item" value="#{novedadDanoLiqBean.novedadDanoLiqList}"
+                                     id="dt_id"
+                                     widgetVar="dt_id_wv"
+                                     emptyMessage="No existen registros"
+                                     reflow="true"
+                                     scrollable="true"
+                                     scrollHeight="600"
+                                     rowsPerPageTemplate="5,10,50,100"
+                                     rows="5"
+                                     rowIndexVar="nVar"
+                                     selection="#{novedadDanoLiqBean.selected}"
+                                     rowKey="#{item.idNovedadDanoLiq==null ? nVar:item.idNovedadDanoLiq}"
+                                     selectionMode="single">
+                            <p:ajax event="rowSelect" 
+                                    listener="#{novedadDanoLiqBean.onRowSelect}" 
+                                    update="dt_id,frmPrincipal:dtNovedadDanoLiqDet" />
+
+                            <p:column styleClass="text-center" headerText="Estado">
+                                <h:outputText value="#{ novedadDanoLiqBean.novedadDanoLiq eq null ? '' 
+                                                        : novedadDanoLiqBean.novedadDanoLiq.liquidado eq 
+                                                        0 ? 'NO LIQUIDADO' : 'LIQUIDADO'}" styleClass="cssBlack"/>
+                            </p:column>
+                            <p:column styleClass="text-center"
+                                      headerText="Fecha Liquidación">
+                                <h:outputText value="#{item.fechaLiq}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column styleClass="text-center" 
+                                      headerText="Fecha Desde">
+                                <h:outputText value="#{item.desde}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column styleClass="text-center" 
+                                      headerText="Fecha Hasta">
+                                <h:outputText value="#{item.hasta}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column styleClass="text-center" 
+                                      headerText="Σ Costo Param">
+                                <h:outputText value="#{item.sumCostoParam}" >
+                                    <f:convertNumber type="number"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column styleClass="text-center"
+                                      headerText="Σ Costo Ajustado">
+                                <h:outputText value="#{item.sumCostoAjustado}">
+                                    <f:convertNumber type="number"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column styleClass="text-center" headerText="Acciones" exportable="false">
+                                <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                                 rendered="#{novedadDanoLiqBean.isSelected(item) eq 1}"
+                                                 class="cssWhite" onclick="guardarLiquidacion()">
+                                    <p:confirm header="Confirmación" message="Ésta seguro de guardar la liquidación?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                                 rendered="#{novedadDanoLiqBean.isSelected(item) gt 1}"
+                                                 class="cssWhite" onclick="actualizarLiquidacion()">
+                                    <p:confirm header="Confirmación" message="Ésta seguro de actualizar los datos de la liquidación?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:column>
+                            <f:facet name="footer">
+                                En total existen #{novedadDanoLiqBean.novedadDanoLiqList.size()} registros.
+                                <div style="float: right;padding-bottom: 5px">
+                                    <h:commandLink>
+                                        <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="dt_id" 
+                                                        fileName="LIQUIDACIÓN NOVEDADES DE DAÑO"/>
+                                    </h:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:panel>
+                </div>
+                <p:dataTable id="dtNovedadDanoLiqDet" var="detalle" 
+                             scrollable="true"
+                             widgetVar="dtNovedadDanoLiqDet_wv"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             editable="true" 
+                             editMode="cell"
+                             rowIndexVar="indexRow"
+                             rowKey="#{indexRow}"
+                             filterDelay="1700"
+                             sortMode="multiple"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{novedadDanoLiqBean.lstDetalles}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <h:outputText value="Fechas: " title="Fecha Inicio"
+                                          style="right: 300px"/>&nbsp;&nbsp;
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{novedadDanoLiqBean.desde}"
+                                        placeholder="Fecha Desde"
+                                        readonlyInput="true"
+                                        navigator="true"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{novedadDanoLiqBean.hasta}"
+                                        readonlyInput="true"
+                                        navigator="true"
+                                        placeholder="Fecha Hasta"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                            </p:calendar>
+                            <p:spacer width="10"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar Liquidaciones"
+                                action="#{novedadDanoLiqBean.consultar()}"
+                                class="cssWhite"
+                                update="dtNovedadDanoLiqDet,frmPrincipal:dt_id,:msgs"
+                                >
+                            </p:commandButton>    
+                            <p:spacer width="10"/>
+                            <p:commandButton
+                                icon="fa fa-refresh"
+                                value="Cargar Datos Liquidación"
+                                action="#{novedadDanoLiqBean.llenarDatosLiquidacion()}"
+                                class="cssWhite OrangeButton"
+                                disabled="#{novedadDanoLiqBean.lstDetalles.size() gt 0}"
+                                rendered="#{novedadDanoLiqBean.flagNoExisteLiquidacion}"
+                                update="dtNovedadDanoLiqDet,frmPrincipal:dt_id,:msgs"
+                                >
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha Novedad"
+                              filterBy="#{detalle.idNovedadDano.fecha}" 
+                              filterMatchMode="startsWith">
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        mindate="#{novedadDanoLiqBean.desde}"
+                                        maxdate="#{novedadDanoLiqBean.hasta}"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('dtNovedadDanoLiqDet_wv').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dtNovedadDanoLiqDet_wv').filter()" update="dtNovedadDanoLiqDet"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{detalle.idNovedadDano.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vehículo" 
+                              filterBy="#{detalle.idNovedadDano.idVehiculo.codigo}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{detalle.idNovedadDano.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Operador" 
+                              filterBy="#{detalle.idNovedadDano.idEmpleado.nombres} #{detalle.idNovedadDano.idEmpleado.apellidos}"
+
+                              filterMatchMode="contains">
+                        <h:outputText value="#{detalle.idNovedadDano.idEmpleado.nombres} #{detalle.idNovedadDano.idEmpleado.apellidos}" />
+                    </p:column>
+                    <p:column headerText="Código TM" 
+                              filterBy="#{detalle.idNovedadDano.idEmpleado.codigoTm}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{detalle.idNovedadDano.idEmpleado.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Componente">
+                        <h:outputText value="#{detalle.idNovedadDano.idVehiculoComponente.descripcion} (#{detalle.idNovedadDano.idVehiculoComponente.nombre})" 
+                                      rendered="#{detalle.idNovedadDano.idVehiculoComponente != null}"/>
+                        <h:outputText value="No tiene" rendered="#{detalle.idNovedadDano.idVehiculoComponente == null}"/>
+                    </p:column>
+                    <p:column headerText="Severidad Daño"
+                              filterBy="#{detalle.idNovedadDano.idVehiculoDanoSeveridad.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{detalle.idNovedadDano.idVehiculoDanoSeveridad.nombre}" />
+                    </p:column>
+
+                    <p:column styleClass="text-right" >
+                        <f:facet name="header">
+                            <h:outputText value="Costo Param"/>
+                        </f:facet>
+                        <h:outputText 
+                            value="#{detalle.costoParam}">
+                            <f:convertNumber type="currency" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Costo Ajustado" styleClass="text-right">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{detalle.costoAjustado}">
+                                    <f:convertNumber type="currency" />
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputNumber 
+                                    required="true"
+                                    requiredMessage="Debe ingresar valor"
+                                    minValue="0"
+                                    validatorMessage="Debe ingresar un valor válido"
+                                    decimalPlaces="0"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }"
+                                    value="#{detalle.costoAjustado}">
+                                </p:inputNumber>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="Descripción" class="cortar">
+                        <h:outputText value="#{detalle.idNovedadDano.descripcion}" />
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{novedadDanoLiqBean.lstDetalles.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtNovedadDanoLiqDet" 
+                                                fileName="Lista detalles liquidacion novedades daño"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                    <p:ajax event="cellEdit" 
+                            process="@this"
+                            listener="#{novedadDanoLiqBean.onCellEdit}" 
+                            update="frmPrincipal:dtNovedadDanoLiqDet,frmPrincipal:dt_id,:msgs" />
+
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

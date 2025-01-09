@@ -1,0 +1,356 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="head">
+        <style type="text/css">
+            .text-center {
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Documentos de vehículos
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmPrincipalVhclDocu:dtTipo" 
+                                            listener="#{vehiculoDocumentoBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipalVhclDocu">
+                <p:dataTable var="vehiculoDocumento" value="#{vehiculoDocumentoBean.lista}"
+                             id="dtTipo"
+                             widgetVar="wlvDtVehiculoDoc"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="20"
+                             scrollable="true"
+                             scrollHeight="600"
+                             sortBy="#{vehiculoDocumento.idVehiculo.codigo}"
+                             filterDelay="1000"
+                             paginator="true"
+                             rowStyleClass="text-center"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,100"
+                             emptyMessage="No existen documentos de vehículos registrados">
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton actionListener="#{vehiculoDocumentoBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo documento" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":modal,:frmNuevoTipo"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmNuevoTipo:pGrid" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Vehículo" 
+                              filterMatchMode="contains"
+                              filterBy="#{vehiculoDocumento.idVehiculo.codigo}">
+                        <h:outputText value="#{vehiculoDocumento.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Tipo Documento" 
+                              filterMatchMode="contains"
+                              filterBy="#{vehiculoDocumento.idVehiculoTipoDocumento.nombreTipoDocumento}">
+                        <h:outputText value="#{vehiculoDocumento.idVehiculoTipoDocumento.nombreTipoDocumento}" />
+                    </p:column>
+                    <p:column headerText="Num. Documento" 
+                              filterMatchMode="contains"
+                              filterBy="#{vehiculoDocumento.nro_Licencia}">
+                        <h:outputText value="#{vehiculoDocumento.nro_Licencia}" rendered="#{not empty(vehiculoDocumento.nro_Licencia)}"/>
+                        <h:outputText value="No tiene" 
+                                      styleClass="cssBlack text-center"
+                                      rendered="#{empty(vehiculoDocumento.nro_Licencia)}"/>
+                    </p:column>
+                    <p:column headerText="Vigencia Desde">
+                        <h:outputText value="#{vehiculoDocumento.vigenteDesde}">
+                            <f:convertDateTime pattern="dd-MM-YYYY"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vigencia Hasta">
+                        <h:outputText value="#{vehiculoDocumento.vigenteHasta}" 
+                                      rendered="#{vehiculoDocumento.vigenteHasta != null}">
+                            <f:convertDateTime pattern="dd-MM-YYYY"/>
+                        </h:outputText>
+                        <h:outputText value="No tiene" 
+                                      styleClass="cssBlack text-center"
+                                      rendered="#{vehiculoDocumento.vigenteHasta eq null}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              width="100"
+                              filterMatchMode="exact" filterBy="#{vehiculoDocumento.activo}"
+                              styleClass="#{vehiculoDocumento.activo == 1 ? 'cssGreen texto-blanco' : vehiculoDocumento.activo == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Estado"/>
+                        </f:facet>
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlvDtVehiculoDoc').filter()"
+                                             title="Seleccione Uno">
+                                <f:selectItem itemLabel="Todos" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Activo" itemValue="#{1}"/>
+                                <f:selectItem itemLabel="Inactivo" itemValue="#{0}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="Activo" style="color: white;" rendered="#{vehiculoDocumento.activo == 1}"/>
+                        <h:outputText value="Inactivo" style="color: white;" rendered="#{vehiculoDocumento.activo == 0}"/>
+                    </p:column>
+                    <p:column headerText="Documento" 
+                              width="100" 
+                              exportable="false"
+                              style="text-align: center">
+                        <p:commandButton id="btnDocumentos"
+                                         icon="fa fa-file-text-o"
+                                         title="Ver #{vehiculoDocumento.idVehiculoTipoDocumento.nombreTipoDocumento.toLowerCase()} : #{vehiculoDocumento.idVehiculo.codigo.toUpperCase()}"
+                                         class="OrangeButton cssWhite"
+                                         action="#{uploadFotoJSFManagedBean.setPath(vehiculoDocumentoBean.selected.pathDocumento)}"
+                                         update="dtTipo,:frmDocumento"
+                                         oncomplete="PF('DocumentoListDialog').show();"
+                                         rendered="#{vehiculoDocumento.pathDocumento != null}"
+                                         >
+                            <f:setPropertyActionListener target="#{vehiculoDocumentoBean.selected}" value="#{vehiculoDocumento}"/>
+                        </p:commandButton>
+                        <h:outputText value="No tiene" 
+                                      rendered="#{empty(vehiculoDocumento.pathDocumento)}" />
+                    </p:column>
+                    <p:column headerText="Acción" 
+                              exportable="false"
+                              width="10%">
+                        <p:commandButton icon="fa fa-pencil"
+                                         title="Editar registro"
+                                         class="GreenButton cssWhite"
+                                         action="#{vehiculoDocumentoBean.editar()}"
+                                         update=":frmNuevoTipo,:modal"
+                                         oncomplete="PF('mtipo').show();"
+                                         >
+                            <p:resetInput target=":frmNuevoTipo:pGrid" />
+                            <f:setPropertyActionListener target="#{vehiculoDocumentoBean.selected}" value="#{vehiculoDocumento}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh"
+                                         title="Cambiar estado"
+                                         class="cssWhite"
+                                         action="#{vehiculoDocumentoBean.cambiarEstado()}"
+                                         update="dtTipo">
+                            <f:setPropertyActionListener target="#{vehiculoDocumentoBean.selected}" value="#{vehiculoDocumento}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{vehiculoDocumentoBean.lista.size()} documentos de vehículos.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtTipo" 
+                                                fileName="Control de documentos"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+
+            <p:dialog widgetVar="mtipo" id="modal" modal="true" 
+                      closeOnEscape="true" responsive="true" position="center top"
+                      class="mr1024_50 mr500_90" resizable="false" appendTo="@(body)">
+                <c:if test="#{vehiculoDocumentoBean.selected == null }">
+                    <f:facet name="header">
+                        Nuevo documento para vehículo
+                    </f:facet>
+                </c:if>
+                <c:if test="#{vehiculoDocumentoBean.selected != null }">
+                    <f:facet name="header">
+                        Editar datos (#{vehiculoDocumentoBean.selected.idVehiculo.codigo.toUpperCase()})
+                    </f:facet>
+                </c:if>
+                <h:form id="frmNuevoTipo">
+
+                    <div class="ui-fluid" jsf:id="pGrid">
+
+                        <p:messages id="messages" showDetail="true" closable="true">
+                            <p:effect type="pulsate" event="load" delay="500" />
+                        </p:messages>
+
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Vehículo" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="vehiculo" value="#{vehiculoDocumentoBean.vehiculoDocumento.idVehiculo}"
+                                                     filter="true" filterMatchMode="startsWith"
+                                                     converter="vehiculosConverter" style="width: 99.999%"
+                                                     required="true" requiredMessage="Debe seleccionar un vehículo">
+                                        <f:selectItem itemLabel="Seleccione código de vehículo" itemValue="#{null}" />
+                                        <f:selectItems value="#{vehiculoDocumentoBean.lstVehiculo}"
+                                                       var="vcd" itemLabel="#{vcd.codigo}"  itemValue="#{vcd}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Tipo documento" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="tipoDocumento" value="#{vehiculoDocumentoBean.vehiculoDocumento.idVehiculoTipoDocumento}"
+                                                     converter="vehiculoTipoDocumentoConverter"
+                                                     style="width: 99.999%"
+                                                     filter="true" filterMatchMode="startsWith"
+                                                     required="true" requiredMessage="Debe seleccionar un tipo de documento">
+                                        <p:ajax event="change" update="pGridFechaIni,pGridFechaFin"/>
+                                        <f:selectItem itemLabel="Seleccione tipo de documento" itemValue="#{null}" />
+                                        <f:selectItems value="#{vehiculoDocumentoBean.lstvehiculoTipoDocumento}"
+                                                       var="item" itemLabel="#{item.nombreTipoDocumento}"  itemValue="#{item}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" jsf:id="pGridFechaIni">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0"
+                                     jsf:rendered="#{vehiculoDocumentoBean.validarRenderFechaDesde()}">
+                                    <p:outputLabel value="Desde" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0"
+                                     jsf:rendered="#{vehiculoDocumentoBean.validarRenderFechaDesde()}">
+                                    <p:calendar id="desde" 
+                                                pattern="dd-MM-yyyy"
+                                                value="#{vehiculoDocumentoBean.vehiculoDocumento.vigenteDesde}"
+                                                showOn="button" 
+                                                locale="es"
+                                                showTodayButton="true"
+                                                required="#{vehiculoDocumentoBean.validarRenderFechaDesde()}"
+                                                requiredMessage="Debe seleccionar fecha inicio"
+                                                readonlyInput="true"
+                                                navigator="true"
+                                                >
+                                        <p:ajax event="dateSelect" update="hasta"/>
+                                    </p:calendar>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" jsf:id="pGridFechaFin">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0"
+                                     jsf:rendered="#{vehiculoDocumentoBean.vehiculoDocumento.idVehiculoTipoDocumento.vencimiento == 1}">
+                                    <p:outputLabel value="Hasta" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0"
+                                     jsf:rendered="#{vehiculoDocumentoBean.vehiculoDocumento.idVehiculoTipoDocumento.vencimiento == 1}">
+                                    <p:calendar id="hasta" 
+                                                pattern="dd-MM-yyyy"
+                                                value="#{vehiculoDocumentoBean.vehiculoDocumento.vigenteHasta}"
+                                                mindate="#{vehiculoDocumentoBean.vehiculoDocumento.vigenteDesde}"
+                                                showOn="button" 
+                                                required="#{vehiculoDocumentoBean.vehiculoDocumento.idVehiculoTipoDocumento.vencimiento == 1}"
+                                                requiredMessage="Debe seleccionar fecha fin"
+                                                locale="es"
+                                                showTodayButton="true"
+                                                readonlyInput="true"
+                                                navigator="true"
+                                                >
+                                    </p:calendar>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="N° Documento" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText id="num"
+                                                 style="width: 99.999%"
+                                                 size="45"
+                                                 value="#{vehiculoDocumentoBean.vehiculoDocumento.nro_Licencia}"/>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="-" style="visibility: hidden" />
+                                </div>
+                                <p:commandButton title="Cargar documento"
+                                                 value="Cargar documento"
+                                                 style="width: 99.999%"
+                                                 id="documento"
+                                                 icon="fa fa-upload"
+                                                 class="cssWhite OrangeButton"
+                                                 update=":frmAddFiles"
+                                                 oncomplete="PF('AddFilesListDialog').show()"
+                                                 >
+                                </p:commandButton>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <p:remoteCommand name="guardar"
+                                     update=":frmPrincipalVhclDocu:dtTipo,pGrid,messages"
+                                     action="#{vehiculoDocumentoBean.guardar()}"/>
+                    <p:remoteCommand name="actualizar"
+                                     update=":frmPrincipalVhclDocu:dtTipo,:msgs,messages"
+                                     action="#{vehiculoDocumentoBean.actualizar()}"/>
+
+                </h:form>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar"
+                                     class="cssWhite"
+                                     onclick="guardar()"
+                                     icon="fa fa-check"
+                                     rendered="#{vehiculoDocumentoBean.selected == null }"
+                                     >
+                    </p:commandButton>
+                    <p:commandButton value="Actualizar" 
+                                     class="cssWhite"
+                                     onclick="actualizar()"
+                                     icon="fa fa-check"
+                                     rendered="#{vehiculoDocumentoBean.selected != null }"
+                                     />
+                </f:facet>
+            </p:dialog>  
+        </p:panel>
+        <ui:include src="modals/vehiculoDocumentos/AddFiles.xhtml"/>
+        <ui:include src="modals/vehiculoDocumentos/ModalDocumento.xhtml"/>
+    </ui:define>
+</ui:composition>

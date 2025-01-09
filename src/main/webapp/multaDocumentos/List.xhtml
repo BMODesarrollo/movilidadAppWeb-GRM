@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="MultaDocumentoListDialogo"
+              widgetVar="documentoMultaDig" modal="true"
+              resizable="false" appendTo="@(body)" header="Documento(s) de Multa" blockScroll="false"
+              class="mr1024_50 mr500_90" height="auto" closeOnEscape="true" responsive="true">
+        <p:ajax event="close" listener="#{multaController.reset}" update=":MultaListForm:datalist"/>
+        <p:ajax event="close" listener="#{multaDocumentosController.reset}"/>
+        <h:form id="MultaDocumentosListForm">
+            <p:growl id="upMultaD" showDetail="true" showSummary="true" life="4000"/>
+            <p:panel>
+                <p:dataTable id="datalist" value="#{multaDocumentosController.items}" var="item"
+                             selectionMode="single" selection="#{multaDocumentosController.selected}"
+                             paginator="true"
+                             rowKey="#{item.idMultaDocumento}"
+                             rows="5"
+                             reflow="true"
+                             filterDelay="1000">
+
+                    <p:ajax event="rowSelect"   update="createButton,editButton,deleteButton"/>
+                    <p:ajax event="rowUnselect" update="createButton,editButton,deleteButton"/>
+
+                    <p:column filterBy="#{item.idMultaTipoDocumento.nombreTipoDocumento}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Tipo de documento"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idMultaTipoDocumento.nombreTipoDocumento}"/>
+                    </p:column>
+                    <p:column style="width: 10%" headerText="Opciones">
+                        <p:commandButton
+                            icon="fa fa-eye"
+                            class="cssWhite"
+                            update="frmVistaDocumento"
+                            actionListener="#{multaDocumentosController.prepDownloadLocal(item.pathDocumento)}"
+                            oncomplete="PF('VistaDocumentoDialog').show();">
+                        </p:commandButton>
+                        <p:commandButton title="Descargar Archivo" icon="fa fa-download"
+                                         ajax="false" class="OrangeButton cssWhite"
+                                         actionListener="#{multaDocumentosController.prepDownloadLocal(item.pathDocumento)}">
+                            <p:fileDownload value="#{viewDocuJSFMB.download}" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton" 
+                                             icon="fa fa-plus" 
+                                             value="Nuevo"
+                                             class="cssWhite"
+                                             actionListener="#{multaDocumentosController.prepareCreate}"
+                                             update=":MultaDocumentosCreateForm,MultaDocumentosListForm:datalist" 
+                                             oncomplete="PF('MultaDocumentosCreateDialog').show()">
+                                <p:resetInput target=":MultaDocumentosCreateForm:display"/>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"  
+                                             icon="fa fa-pencil"
+                                             title="Editar"
+                                             class="cssWhite GreenButton"
+                                             actionListener="#{multaDocumentosController.cargarEditar}"
+                                             update=":MultaDocumentosEditForm"
+                                             oncomplete="PF('MultaDocumentosEditDialog').show()" 
+                                             disabled="#{empty multaDocumentosController.selected.idMultaDocumento}"/>
+                            <p:commandButton id="deleteButton"
+                                             icon="fa fa-trash" 
+                                             title="Eliminar"
+                                             class="cssWhite RedButton"
+                                             actionListener="#{multaDocumentosController.destroy}" 
+                                             update="datalist,:MultaDocumentosListForm:upMultaD" 
+                                             disabled="#{empty multaDocumentosController.selected.idMultaDocumento}">
+                                <p:confirm header="Confirmación" message="Seguro quiere eliminar?" 
+                                           icon="fa fa-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </p:dialog>
+    <ui:include src="Create.xhtml"/>
+    <ui:include src="Edit.xhtml"/>
+    <ui:include src="../empleado/modal/vistaDocumento.xhtml"/>
+</ui:composition>

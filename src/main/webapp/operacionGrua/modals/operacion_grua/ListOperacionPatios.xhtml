@@ -1,0 +1,43 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="OperacionPatioListDlg"
+              closeOnEscape="true" widgetVar="OperacionPatioListDialog" modal="true" 
+              position="center top"
+              resizable="false" appendTo="@(body)" header="Listado de patios donde se realiza la operación"
+              class="mr1024_60 mr500_90" responsive="true">
+        <h:form id="frmOperacionPatioList">
+            <p:dataTable var="operacionPatio" value="#{operacionGruaBean.lstOperacionPatios}"
+                         id="dtOperacionPatios" widgetVar="wVdtOperacionPatio"
+                         selectionMode="single" selection="#{operacionGruaBean.operacionPatios}"                       
+                         rowIndexVar="nroFila"
+                         filterDelay="1000"
+                         paginator="true"
+                         rows="8"
+                         rowKey="#{operacionPatio.idOperacionPatios}"
+                         emptyMessage="No existen operaciones registradas">
+                <p:ajax event="rowSelect" 
+                        listener="#{operacionGruaBean.onRowDblClckSelect}"
+                        update=":frmNuevaOperacionGrua:operacion_patio"
+                        oncomplete="PF('OperacionPatioListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código">
+                    <h:outputText value="#{operacionPatio.codigoPatio}" />
+                </p:column>
+                <p:column headerText="Nombre_Patio" filterBy="#{operacionPatio.nombrePatio}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{operacionPatio.nombrePatio}" />
+                </p:column>
+                <p:column headerText="Empresa_patio" filterBy="#{operacionPatio.idEmpresa.nombreCorto}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{operacionPatio.idEmpresa.nombreCorto}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="messages" showDetail="true" />
+        <h:form id="frmPrincipal">
+            <p:panel header="Cambiar estado (Operadores)">
+                <p:dataTable id="dtOperadorInactivo"
+                             paginator="true"
+                             sortBy="#{operadorInactivo.creado}"
+                             sortOrder="descending"
+                             rows="15"
+                             filterDelay="2000"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             var="operadorInactivo"
+                             rowStyleClass="text-center"
+                             value="#{cambioOperadorBean.lstOperadoresInactivos}"
+                             emptyMessage="No hay operadores registrados">
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton icon="fa fa-plus"
+                                             class="cssWhite"
+                                             value="Nuevo"
+                                             action="#{cambioOperadorBean.nuevo()}"
+                                             update=":frmCambioOperador,:modalCambioOperador"
+                                             oncomplete="PF('cambioOperador').show();"
+                                             >
+                                <p:resetInput target=":frmCambioOperador:pGrid"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Desde">
+                        <h:outputText value="#{operadorInactivo.fromDate}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Hasta">
+                        <h:outputText value="#{operadorInactivo.toDate}">
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Cod_Operador" width="90" 
+                              filterBy="#{operadorInactivo.idEmpleado.codigoTm}">
+                        <h:outputText value="#{operadorInactivo.idEmpleado.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Operador">
+                        <h:outputText value="#{operadorInactivo.idEmpleado.nombres.toUpperCase()} #{operadorInactivo.idEmpleado.apellidos.toUpperCase()}" />
+                    </p:column>
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{operadorInactivo.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Estado"
+                              styleClass="#{operadorInactivo.activo eq 1 ? 'cssGreen': operadorInactivo.activo eq 0 ? 'cssRed' : ''}">
+                        <h:outputText value="Activo" rendered="#{operadorInactivo.activo eq 1}"
+                                      style="text-transform: uppercase" class="cssWhite"/>
+                        <h:outputText value="#{operadorInactivo.idEmpleadoEstado.nombre}" rendered="#{not(operadorInactivo.activo eq 1)}"
+                                      style="text-transform: uppercase" class="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Acción" exportable="false">
+                        <p:commandButton id="activar"
+                                         class="cssWhite"
+                                         icon="fa fa-thumbs-up"
+                                         title="Activar"
+                                         action="#{cambioOperadorBean.prepareActivarOperador()}"
+                                         update=":frmActivarOperador,:modalActivarOperador"
+                                         oncomplete="PF('activarOperador').show();"
+                                         rendered="#{cambioOperadorBean.verificarEstado(operadorInactivo.toDate) and operadorInactivo.activo == 0}">
+                            <p:resetInput target=":frmActivarOperador:pGrid"/>
+                            <f:setPropertyActionListener value="#{operadorInactivo}" target="#{cambioOperadorBean.selected}"/>
+                        </p:commandButton>
+                        <p:commandButton id="editar"
+                                         title="Editar"
+                                         icon="fa fa-pencil"
+                                         class="cssWhite GreenButton"
+                                         action="#{cambioOperadorBean.editar()}"
+                                         update=":frmCambioOperador,:modalCambioOperador"
+                                         oncomplete="PF('cambioOperador').show();">
+                            <p:resetInput target=":frmCambioOperador:pGrid"/>
+                            <f:setPropertyActionListener value="#{operadorInactivo}" target="#{cambioOperadorBean.selected}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{cambioOperadorBean.lstOperadoresInactivos.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtOperadorInactivo" 
+                                                fileName="Estado Operador"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="operadores/Nuevo.xhtml"/>
+        <ui:include src="operadores/activarOperador.xhtml"/>
+    </ui:define>
+
+</ui:composition>

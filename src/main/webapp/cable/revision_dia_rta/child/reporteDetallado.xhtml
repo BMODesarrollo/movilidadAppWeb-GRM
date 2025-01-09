@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <h:form id="frmReporteDetallado">
+        <p:dataTable id="dtReporteDetallado" 
+                     var="detallado" 
+                     scrollable="true"
+                     widgetVar="wVdtReporteDetallado"
+                     scrollHeight="600"
+                     disabledTextSelection="false"
+                     reflow="true"
+                     sortBy="#{detallado.idCableRevisionEstacion.idCableRevisionEquipo.nombre}"
+                     rows="50"
+                     filterDelay="1700"
+                     paginator="true"
+                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rowsPerPageTemplate="50,100,200"
+                     emptyMessage="No existen registros"
+                     value="#{cableRevisionDiaRtaBean.lstReporteDetallado}">
+
+            <f:facet name="header">
+                <div align="right" jsf:id="botones">
+
+                    <p:outputLabel for="fecha_desde_detallado" style="color: white" value="Fecha: " />
+                    <p:calendar id="fecha_desde_detallado" 
+                                pattern="yyyy/MM/dd"
+                                value="#{cableRevisionDiaRtaBean.fechaDesdeDetallado}"
+                                locale="es"
+                                readonlyInput="true"
+                                inputStyleClass="calendar"
+                                navigator="true"
+                                onkeypress="if (event.keyCode === 13) {
+                                            return false;
+                                        }">
+                        <p:ajax event="dateSelect"
+                                process="@this" 
+                                listener="#{cableRevisionDiaRtaBean.consultarReporteDetallado()}"
+                                update="dtReporteDetallado"/>
+                    </p:calendar>
+
+                    <p:calendar id="fecha_hasta_detallado" 
+                                pattern="yyyy/MM/dd"
+                                value="#{cableRevisionDiaRtaBean.fechaHastaDetallado}"
+                                locale="es"
+                                inputStyleClass="calendar"
+                                readonlyInput="true"
+                                navigator="true"
+                                onkeypress="if (event.keyCode === 13) {
+                                            return false;
+                                        }">
+                        <p:ajax event="dateSelect"
+                                process="@this" 
+                                listener="#{cableRevisionDiaRtaBean.consultarReporteDetallado()}"
+                                update="dtReporteDetallado"/>
+                    </p:calendar>
+
+                </div>
+            </f:facet>
+            <p:column headerText="Fecha"
+                      filterBy="#{detallado.idCableRevisionDia.fecha}" 
+                      styleClass="text-center"
+                      filterMatchMode="startsWith" >
+                <f:facet name="filter">
+                    <p:calendar id="search" pattern="yyyy-MM-dd" 
+                                locale="es"
+                                autocomplete="off"
+                                required="false"
+                                navigator="true" 
+                                showTodayButton="true"
+                                maxdate="today"
+                                inputStyle="width: 100%;"
+                                placeholder="Fecha"
+                                onkeyup="PF('wVdtReporteDetallado').filter()"
+                                onkeypress="if (event.keyCode === 13) {
+                                            return false;
+                                        }">
+                        <p:ajax event="dateSelect" oncomplete="PF('wVdtReporteDetallado').filter()" update="dtReporteDetallado"/>
+                    </p:calendar> 
+                </f:facet>
+                <h:outputText value="#{detallado.idCableRevisionDia.fecha}" >
+                    <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                </h:outputText>
+            </p:column>
+            <p:column headerText="Estación"
+                      styleClass="text-center"
+                      filterBy="#{detallado.idCableRevisionEstacion.idCableEstacion.nombre}"
+                      filterMatchMode="contains"
+                      >
+                <h:outputText value="#{detallado.idCableRevisionEstacion.idCableEstacion.nombre}"/>
+            </p:column>
+
+            <p:column headerText="Horario" 
+                      styleClass="text-center">
+                <h:outputText value="#{detallado.idCableRevisionDiaHorario.hora}"/>
+            </p:column>
+
+            <p:column headerText="Equipo"
+                      styleClass="text-center"
+                      filterBy="#{detallado.idCableRevisionEstacion.idCableRevisionEquipo.nombre}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{detallado.idCableRevisionEstacion.idCableRevisionEquipo.nombre}"/>
+            </p:column>
+            <p:column headerText="Actividad"
+                      styleClass="text-center"
+                      filterBy="#{detallado.idCableRevisionEstacion.idCableRevisionActividad.nombre}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{detallado.idCableRevisionEstacion.idCableRevisionActividad.nombre}"/>
+            </p:column>
+            <p:column headerText="Respuesta" 
+                      sortBy="#{detallado.respuesta}"
+                      sortable="true"
+                      styleClass="text-center">
+                <h:outputText value="#{detallado.respuesta}"/>
+            </p:column>
+
+            <p:column exportable="false" filterBy="#{detallado.idEmpleado.identificacion} #{detallado.idEmpleado.nombres} #{detallado.idEmpleado.apellidos}"
+                      filterMatchMode="contains"
+                      styleClass="#{detallado.idEmpleado != null ? null: 'text-center'}"
+                      headerText="Colaborador">
+                <h:outputText value="#{detallado.idEmpleado.nombres.charAt(0)} #{detallado.idEmpleado.apellidos.charAt(0)}"
+                              title="#{detallado.idEmpleado.nombres} #{detallado.idEmpleado.apellidos}"
+                              rendered="#{detallado.idEmpleado != null}"/>
+            </p:column>
+
+            <p:column visible="false" headerText="Identificación">
+                <h:outputText value="#{detallado.idEmpleado.identificacion}" rendered="#{detallado.idEmpleado != null}"/>
+                <h:outputText value="N/A" rendered="#{detallado.idEmpleado eq null}"/>
+            </p:column>
+            <p:column visible="false" 
+                      headerText="Nombre Colaborador" 
+                      filterMatchMode="contains">
+                <h:outputText value="#{detallado.idEmpleado.nombres} #{detallado.idEmpleado.apellidos}" rendered="#{detallado.idEmpleado != null}"/>
+            </p:column>
+
+            <p:column headerText="Usuario" styleClass="text-center">
+                <h:outputText value="#{detallado.username}"/>
+            </p:column>
+
+            <f:facet name="footer">
+                En total existen #{cableRevisionDiaRtaBean.lstReporteDetallado.size()} registros.
+                <div style="float: right;padding-bottom: 5px">
+                    <h:commandLink>
+                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                             alt="excel" style="width: 24px;height: 24px"/>
+                        <p:dataExporter type="xlsx" target="dtReporteDetallado" 
+                                        fileName="Reporte Detallado"/>
+                    </h:commandLink>
+                </div>
+            </f:facet>
+
+        </p:dataTable>
+    </h:form>
+</ui:composition>
+
+
+

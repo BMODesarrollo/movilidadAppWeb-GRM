@@ -1,0 +1,149 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel > 
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                            Ubicación Vehículos
+                        </div>
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding5">
+                                <h:form id="frmTodosVehiculos">
+                                    <p:commandButton styleClass="cssWhite OrangeButton"
+                                                     title="Ver ubicación vehículos"
+                                                     value="Ver ubicación vehículos"
+                                                     process="@this"
+                                                     onclick="openMapGeoMtto();"
+                                                     update=":msgs"
+                                                     icon="fa fa-map">
+                                    </p:commandButton>
+                                </h:form>
+                            </div>
+                            <div class="ui-g-8 ui-md-8 ui-lg-8 Padding5">
+                                <h:form id="frmSelect">
+                                    <p:selectOneMenu 
+                                        styleClass="custom-filter" 
+                                        filter="true" 
+                                        value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                        rendered="#{uniFuncSessionBean.filtradoUF}"
+                                        filterMatchMode="contains" 
+                                        style="width: 99.999%" title="Seleccione Uno..">
+                                        <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                      itemValue="#{0}"
+                                                      itemDescription="Seleccione Uno.."/>
+                                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                       var="uf" itemLabel="#{uf.nombre}"
+                                                       itemValue="#{uf.idGopUnidadFuncional}"/>
+                                        <p:ajax update=":formVehi:tblveh" 
+                                                oncomplete="PF('wlvTblVehi').getPaginator().setPage(0);"
+                                                listener="#{gestorVehiculoController.consultarVehiculos()}"
+                                                process="@this"/>
+                                    </p:selectOneMenu>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="formVehi">
+
+                <!-- REMOTE COMMANDS -->
+
+                <p:remoteCommand action="#{mapGeoUbicacionVehiculosBean.abrirMapaTodosvehiculos()}"
+                                 update=":map_geo_all_mtto"
+                                 name="openMapGeoMtto"/>
+                <p:dataTable id="tblveh" 
+                             widgetVar="wlvTblVehi"
+                             var="veh"  
+                             filterDelay="1000"
+                             value="#{gestorVehiculoController.listvehiculos}" 
+                             rows="15"
+                             paginator="true"
+                             rowsPerPageTemplate="10,15,20">
+
+                    <p:column headerText="Placa"
+                              filterBy="#{veh.placa}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{veh.placa}" />
+                    </p:column>
+                    <p:column filterBy="#{veh.codigo}"
+                              filterMatchMode="contains"
+                              headerText="Codigo">
+                        <h:outputText value="#{veh.codigo}"/>
+                    </p:column>
+                    <p:column filterBy="#{veh.idVehiculoTipo.nombreTipoVehiculo}"
+                              filterMatchMode="contains"
+                              headerText="Tipo de Vehículo">
+                        <h:outputText value="#{veh.idVehiculoTipo.nombreTipoVehiculo}"/>
+                    </p:column>
+                    <p:column filterBy="#{alertaEntradaVehBean.obtenerEstadoVehiculo(veh.codigo)}"
+                              filterMatchMode="exact"
+                              headerText="Estado">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlvTblVehi').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: 99.999%" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="Todos" 
+                                              itemDescription="Seleccione Uno.." 
+                                              itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Apagado"  itemValue="Apagado"/>
+                                <f:selectItem itemLabel="Detenido" itemValue="Detenido"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{alertaEntradaVehBean.obtenerEstadoVehiculo(veh.codigo)}"/>
+                    </p:column>
+                    <p:column headerText="Acciones" style="text-align: center;"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <!-- Botones para operaciones del módulo -->
+                            <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Ver Ubicación"
+                                                 action="#{gestorVehiculoController.mostrarUbicacionVehiculo(veh.codigo)}"
+                                                 process="@this"
+                                                 update=":msgs,:map_geo_mtto"
+                                                 icon="fa fa-map-marker">
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Ver Recorrido"
+                                                 action="#{gestorVehiculoController.mostrarRecorrido(veh)}"
+                                                 process="@this" 
+                                                 update=":msgs,:map_geo_rec_veh_esp_mtto"
+                                                 icon="fa fa-road">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                    <f:facet name="footer">
+                        <div style="float: right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="tblveh" fileName="vehiculo #{now}" />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="geo/mapGeoAll.xhtml"/>
+        <ui:include src="geo/mapGeo.xhtml"/>
+        <ui:include src="geo/mapGeoRecVehEspe.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+
+

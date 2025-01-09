@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center
+            }
+
+            .ui-filter-column .ui-column-customfilter .custom-filter {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .calendar{
+                width: 90px !important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="REVISIÓN DIA">
+            <p:tabView id="tbPadre">
+                <p:tab title="Inspección díaria" id="dtCableRevisionDiaRtaTab">
+                    <h:form id="frmPrincipal">
+                        <p:dataTable id="dtCableRevisionDiaRta" 
+                                     var="revisionDia" 
+                                     scrollable="true"
+                                     widgetVar="wVdtCableRevisionDiaRta"
+                                     scrollHeight="600"
+                                     disabledTextSelection="false"
+                                     reflow="true"
+                                     rows="10"
+                                     filterDelay="1700"
+                                     paginator="true"
+                                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="10,50,100"
+                                     emptyMessage="No existen registros"
+                                     value="#{cableRevisionDiaRtaBean.lstCableRevisionDias}">
+
+                            <f:facet name="header">
+                                <div align="right" jsf:id="botones">
+
+                                    <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                                    <p:calendar id="fecha_desde" 
+                                                pattern="yyyy/MM/dd"
+                                                value="#{cableRevisionDiaRtaBean.fechaDesde}"
+                                                locale="es"
+                                                readonlyInput="true"
+                                                maxdate="today"
+                                                inputStyleClass="calendar"
+                                                navigator="true"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }">
+                                        <p:ajax event="dateSelect"
+                                                process="@this" 
+                                                listener="#{cableRevisionDiaRtaBean.consultar()}"
+                                                update="dtCableRevisionDiaRta"/>
+                                    </p:calendar>
+
+                                    <p:calendar id="fecha_hasta" 
+                                                pattern="yyyy/MM/dd"
+                                                value="#{cableRevisionDiaRtaBean.fechaHasta}"
+                                                locale="es"
+                                                maxdate="today"
+                                                inputStyleClass="calendar"
+                                                readonlyInput="true"
+                                                navigator="true"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }">
+                                        <p:ajax event="dateSelect"
+                                                process="@this" 
+                                                listener="#{cableRevisionDiaRtaBean.consultar()}"
+                                                update="dtCableRevisionDiaRta"/>
+                                    </p:calendar>
+
+                                    <p:spacer width="10"/>
+
+                                    <p:commandButton
+                                        icon="fa fa-plus"
+                                        value="Nuevo"
+                                        actionListener="#{cableRevisionDiaRtaBean.nuevo()}"
+                                        oncomplete="PF('wlvCableRevisionDiaRta').show();"
+                                        class="cssWhite"
+                                        update="dtCableRevisionDiaRta,:cableRevisionDiaRta,:frmCableRevisionDiaRta"
+                                        >
+                                        <p:resetInput target=":frmCableRevisionDiaRta:pGridDatos"/>
+                                    </p:commandButton>    
+                                </div>
+                            </f:facet>
+                            <p:column headerText="Fecha"
+                                      filterBy="#{revisionDia.fecha}" 
+                                      styleClass="text-center"
+                                      filterMatchMode="startsWith" >
+                                <f:facet name="filter">
+                                    <p:calendar id="search" pattern="yyyy-MM-dd" 
+                                                locale="es"
+                                                autocomplete="off"
+                                                required="false"
+                                                navigator="true" 
+                                                showTodayButton="true"
+                                                maxdate="today"
+                                                inputStyle="width: 100%;"
+                                                placeholder="Fecha"
+                                                onkeyup="PF('wVdtCableRevisionDiaRta').filter()"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }">
+                                        <p:ajax event="dateSelect" oncomplete="PF('wVdtCableRevisionDiaRta').filter()" update="dtCableRevisionDiaRta"/>
+                                    </p:calendar> 
+                                </f:facet>
+                                <h:outputText value="#{revisionDia.fecha}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Estación"
+                                      styleClass="text-center"
+                                      filterBy="#{revisionDia.idCableEstacion.nombre}"
+                                      filterMatchMode="contains"
+                                      >
+                                <h:outputText value="#{revisionDia.idCableEstacion.nombre}"/>
+                            </p:column>
+
+                            <p:column headerText="Usuario" styleClass="text-center">
+                                <h:outputText value="#{revisionDia.username}"/>
+                            </p:column>
+
+                            <p:column headerText="Creado" styleClass="text-center">
+                                <h:outputText value="#{revisionDia.creado}" >
+                                    <f:convertDateTime type="both" pattern="yyyy-MM-dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Acciones" style="text-align: center;"
+                                      width="10%"
+                                      exportable="false">
+                                <div class="ui-g Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:commandButton styleClass="cssWhite GreenButton"
+                                                         title="Editar"
+                                                         action="#{cableRevisionDiaRtaBean.editar()}"
+                                                         process="@this"
+                                                         disabled="#{revisionDia.username != cableRevisionDiaRtaBean.user.username}"
+                                                         update=":cableRevisionDiaRta,:frmCableRevisionDiaRta"
+                                                         oncomplete="PF('wlvCableRevisionDiaRta').show();"
+                                                         icon="fa fa-pencil">
+                                            <p:resetInput target=":frmCableRevisionDiaRta:pGridDatos"/>
+                                            <f:setPropertyActionListener value="#{revisionDia}" target="#{cableRevisionDiaRtaBean.selected}"/>
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </p:column>
+
+                            <f:facet name="footer">
+                                En total existen #{cableRevisionDiaRtaBean.lstCableRevisionDias.size()} registros.
+                                <div style="float: right;padding-bottom: 5px">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="dtCableRevisionDiaRta" 
+                                                        fileName="Revisión día rta"/>
+                                    </h:commandLink>
+                                </div>
+                            </f:facet>
+
+                        </p:dataTable>
+                    </h:form>
+                </p:tab>
+                <p:tab title="Informe detallado">
+                    <ui:include src="child/reporteDetallado.xhtml"/>
+                </p:tab>
+            </p:tabView>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

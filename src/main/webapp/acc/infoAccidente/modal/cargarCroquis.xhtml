@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="gialogo-croquis"
+              closable="false" 
+              widgetVar="croquisDlg" 
+              resizable="false" 
+              draggable="false" 
+              responsive="true" 
+              modal="true" >
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Cargar Croquis
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('croquisDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <div class="ui-fluid">
+            <h:form id="form-croquis">
+                <div class="ui-g"  style="background-color: #083359">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <p:messages id="messages" showDetail="true" closable="true">
+                        </p:messages>
+                        <h:panelGrid columns="2" style="text-align: center; margin: 0 auto">
+                            <p:fileUpload fileUploadListener="#{accInformeOperadorJSF.handleFileUploadCroquis}" 
+                                          mode="advanced" 
+                                          dragDropSupport="false"
+                                          update="messages,:form-info-msg:msg,:form-info-acc:acc-panel:dvCroquis" 
+                                          sizeLimit="50000000" 
+                                          fileLimit="20" 
+                                          label="Seleccionar"
+                                          cancelLabel="Cancelar"
+                                          uploadLabel="Cargar"
+                                          allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                          invalidFileMessage="Arch. No valido"
+                                          invalidSizeMessage="El archivo no debe ser mayor a 50mb"/>
+                        </h:panelGrid>
+                    </div>
+                </div>
+                <p:remoteCommand name="anex"
+                                 update=":form-info-msg:msg"
+                                 process="@this"
+                                 oncomplete="PF('croquisDlg').hide()"
+                                 actionListener="#{accInformeOperadorJSF.setFileCroquis(null)}"/>
+            </h:form>
+        </div>
+        <f:facet name="footer">
+            <p:commandButton id="btn-cancel-croquis"
+                             icon="fa fa-times"
+                             class="cssWhite RedButton"
+                             onclick="anex()"/>
+        </f:facet>
+        <p:staticMessage severity="warn" detail="Al hacer clic 'X' usted está cancelando la carga del archivo automáticamente" />
+    </p:dialog>
+</ui:composition> 

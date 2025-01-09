@@ -1,0 +1,117 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="ArmamentoDoc"
+              widgetVar="wvArmamentoDoc" 
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{registroArmamentoDocBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{registroArmamentoDocBean.selected != null}">
+            <f:facet name="header">
+                EDITAR DATOS
+            </f:facet>
+        </c:if>
+        <h:form id="frmArmamentoDoc">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Vigente desde" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una vigencia desde"
+                                        pattern="yyyy-MM-dd"
+                                        value="#{registroArmamentoDocBean.armamentoDoc.vigenteDesde}">
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Vigente hasta" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una vigencia hasta"
+                                        pattern="yyyy-MM-dd"
+                                        value="#{registroArmamentoDocBean.armamentoDoc.vigenteHasta}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Numero documento" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true" 
+                                value="#{registroArmamentoDocBean.numDoc}"
+                                requiredMessage="Debe ingresar un número de documento"
+                                />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Activo" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton value="#{registroArmamentoDocBean.b_activo}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   styleClass="cssWhite">
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <div class="ui-g-3 ui-md-3 ui-lg-3">
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <p:commandButton value="Seleccionar archivo"
+                                             update=":frmAddFilesDoc"
+                                             oncomplete="PF('AddFilesDocListDialog').show()"
+                                             icon="fa fa-upload"
+                                             styleClass="OrangeButton cssWhite"/>
+                        </div>
+                        <div class="ui-g-3 ui-md-3 ui-lg-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update=":msgs,pGridDatos,:frmSegArmamentoDoc:dtArmamentoDocs" 
+                             action="#{registroArmamentoDocBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmSegArmamentoDoc:dtArmamentoDocs"
+                             action="#{registroArmamentoDocBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{registroArmamentoDocBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{registroArmamentoDocBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="AddFiles.xhtml"/>
+</ui:composition>     

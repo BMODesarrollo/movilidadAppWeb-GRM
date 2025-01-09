@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="novedadtpv" 
+              id="novedadtp"
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_60 mr500_90"
+              closable="false"
+              responsive="true"
+              position="center top"
+              resizable="false" appendTo="@(body)">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Registrar nueva novedad" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('novedadtpv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNovedad">
+            <p:messages id="messagesNovedad" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding4">
+                <p:selectOneMenu id="tipoNovedad" value="#{tecnicoPatioController.tecnicoPatioNovedadTipo.idNovedadTipo}"
+                                 style="width: 99.999%"
+                                 required="true" requiredMessage="Debe seleccionar un tipo de novedad">
+                    <f:selectItem itemLabel="Seleccione el tipo de novedad" itemValue="#{null}" />
+                    <f:selectItems value="#{tecnicoPatioController.lstNovedadTipo}"
+                                   var="nts" itemLabel="#{nts.nombre}"  itemValue="#{nts.idNovedadTipo}"/>
+                    <p:ajax  update="frmNovedad" process="@this" />
+                </p:selectOneMenu>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                <p:commandButton value="Guardar novedad"
+                                 icon="fa fa-save"
+                                 onclick="rc_update()"
+                                 id="btnGuardarNovedad"
+                                 class="cssWhite"
+                                 update=":formTp,novedadtp"
+                                 rendered="true">
+                </p:commandButton>
+                <p:remoteCommand name="rc_update"
+                                 process="@this,frmNovedad"
+                                 update=":formTp,:msgs,novedadtp"
+                                 action="#{tecnicoPatioController.guardarNovedadSalida()}"
+                                 rendered="true"/>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

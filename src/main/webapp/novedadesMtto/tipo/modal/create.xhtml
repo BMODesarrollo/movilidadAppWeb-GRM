@@ -1,0 +1,78 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="novedadMttoTipo"
+              widgetVar="wlvNovedadMttoTipo" 
+              modal="true" 
+              class="modalResponsivo"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{novedadMttoTipoBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{novedadMttoTipoBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmNovedadMttoTipo">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-10 ui-md-12 ui-lg-12 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Nombre
+                        </div>
+                        <p:inputText 
+                            required="true"
+                            requiredMessage="Debe ingresar un nombre"
+                            value="#{novedadMttoTipoBean.nombre}"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Descripción
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         value="#{novedadMttoTipoBean.mttoTipo.descripcion}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"
+                                         rows="5"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmNovedadMttoTipo,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtNovedadMttoTipo" 
+                             action="#{novedadMttoTipoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmNovedadMttoTipo,@this"
+                             update=":msgs,:frmPrincipal:dtNovedadMttoTipo"
+                             action="#{novedadMttoTipoBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                 rendered="#{novedadMttoTipoBean.selected == null}"
+                                 class="cssWhite" onclick="guardar()"/>
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{novedadMttoTipoBean.selected != null }"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

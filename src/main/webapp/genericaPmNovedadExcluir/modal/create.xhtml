@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="id_create_dlg" 
+              class="mr1024_30 mr500_90"
+              closeOnEscape="true" 
+              resizable="false"
+              widgetVar="wv_create_dlg" modal="true" 
+              header="Generica PM Novedad Tipo Detalle Excluir"
+              position="top" >
+        <h:form id="form_create_dlg">
+            <p:messages showDetail="true" id="msgs_create_dlg">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="SOMTipoGenerica"  value="Tipo de Novedad: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectOneMenu style="width: 99.9999%"  id="SOMTipoGenerica" filterMatchMode="contains" filter="true"
+                                             value="#{genPmTipoDetExcluirJSFMB.i_tipoGenerica}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                <f:selectItems  value="#{genPmTipoDetExcluirJSFMB.listGenericaT}" var="nov" 
+                                                itemValue="#{nov.idGenericaTipo}" itemLabel="#{nov.nombreTipoNovedad}" />
+                                <p:ajax listener="#{genPmTipoDetExcluirJSFMB.findById}"  update="SOMTipoGenericaDet"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="SOMTipoGenericaDet"  value="Detalle Tipo Novedad " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectOneMenu style="width: 99.9999%" id="SOMTipoGenericaDet" filterMatchMode="contains" filter="true" 
+                                             value="#{genPmTipoDetExcluirJSFMB.i_tipoGenericaDet}"
+                                             required="true">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                <f:selectItems  value="#{genPmTipoDetExcluirJSFMB.listGenericaTDet}"
+                                                var="novDet" itemLabel="#{novDet.tituloTipoGenerica}"
+                                                itemValue="#{novDet.idGenericaTipoDetalle}" 
+                                                itemDescription="#{novDet.descripcionTipoGenerica}">
+                                </f:selectItems>
+                                <p:ajax listener="#{genPmTipoDetExcluirJSFMB.setTipoNovedadDet()}" process="@this"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <h:outputLabel for="SBBEstado"  value="Estado:" />
+                        <p:selectBooleanButton id="SBBEstado" 
+                                               offIcon="fa fa-close" 
+                                               onIcon="fa fa-check" 
+                                               onLabel="Sí" 
+                                               class="cssWhite"
+                                               offLabel="No" value="#{genPmTipoDetExcluirJSFMB.activo}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc"
+                             process="@this,form_create_dlg,"
+                             rendered="#{genPmTipoDetExcluirJSFMB.genPmNovedadExcluir.idgenericaPmNovedadExcluir==null}"
+                             update="msgs,
+                             msgs_create_dlg,
+                             frm_principal:dt_gen_pm_nov_tipo_det_excluir_id,
+                             form_create_dlg" 
+                             action="#{genPmTipoDetExcluirJSFMB.guardar()}" />
+            <p:remoteCommand name="rc"
+                             process="@this,form_create_dlg,"
+                             rendered="#{genPmTipoDetExcluirJSFMB.genPmNovedadExcluir.idgenericaPmNovedadExcluir!=null}"
+                             update="msgs,
+                             msgs_create_dlg,
+                             frm_principal:dt_gen_pm_nov_tipo_det_excluir_id" 
+                             action="#{genPmTipoDetExcluirJSFMB.editar()}" />
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarPrgTc" 
+                             icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc()">
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+
+
+

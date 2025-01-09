@@ -1,0 +1,164 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgPlaRecuMedicina"
+              widgetVar="wvPlaRecuMedicina"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Ajustar Jornada " class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvPlaRecuMedicina').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-medicina">
+            <p:messages id="msgs_create_medicina" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Num Identificación *" />
+                        <p:inputText id="codigoTM_id" required="true" placeholder="Ingrese un valor numérico"
+                                     title="Número de cédula" 
+                                     requiredMessage="Debe ingresar 'Numero Identificación'"
+                                     value="#{plaRecuMedicinaBean.medicinaLaboral.empleado.identificacion}">
+                            <p:ajax update="form-registrar-medicina:cedula_id,form-registrar-medicina:nombre_id,form-registrar-medicina:cargo_id,btnGuardar,msgs" 
+                                    listener="#{plaRecuMedicinaBean.cargarEmpleado()}"/>
+                        </p:inputText>
+                        <div class="botonFloat" >
+                            <p:commandButton process="codigoTM_id,@this" 
+                                             style="margin: 0px"
+                                             update="form-registrar-medicina:cedula_id,form-registrar-medicina:nombre_id,form-registrar-medicina:cargo_id,btnGuardar,msgs"
+                                             action="#{plaRecuMedicinaBean.cargarEmpleado()}"
+                                             icon="fa fa-search"
+                                             class="cssWhite"/>
+                            <p:remoteCommand process="codigoTM_id,@this" 
+                                             name="cargarEmpleado"
+                                             update="form-registrar-medicina:cedula_id,form-registrar-medicina:nombre_id,form-registrar-medicina:cargo_id,btnGuardar,msgs"
+                                             action="#{plaRecuMedicinaBean.cargarEmpleado()}"/>
+                        </div>    
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Código TM" />
+                        <p:inputText id="cedula_id" disabled="true"
+                                     title="Número TM del colaborador" 
+                                     value="#{plaRecuMedicinaBean.medicinaLaboral.empleado.codigoTm}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Nombre" />
+                        <p:inputText id="nombre_id" disabled="true"
+                                     title="Nombre completo del colaborador" 
+                                     value="#{plaRecuMedicinaBean.medicinaLaboral.empleado.nombresApellidos}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cargo" />
+                        <p:inputText id="cargo_id" disabled="true"
+                                     title="Nombre del cargo del colaborador" 
+                                     value="#{plaRecuMedicinaBean.medicinaLaboral.empleado.idEmpleadoCargo.nombreCargo}"  />
+                    </div>
+
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Inicio" for="fechaAct"/>
+                        <p:calendar id="fechaAct" required="true" 
+                                    requiredMessage="'Fecha' es requerido"
+                                    value="#{plaRecuMedicinaBean.medicinaLaboral.fechaInicio}"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Fin" for="fechaFinAct"/>
+                        <p:calendar id="fechaFinAct" required="true" 
+                                    requiredMessage="'Fecha' es requerido"
+                                    value="#{plaRecuMedicinaBean.medicinaLaboral.fechaFin}"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Conducción"/>
+                        <p:selectOneMenu id="turnoConduccion" 
+                                         required="true" 
+                                         requiredMessage="'Conducción' es requerido"
+                                         value="#{plaRecuMedicinaBean.medicinaLaboral.idPlaRecuConduccion.idPlaRecuConduccion}" 
+                                         filter="true"
+                                         filterMatchMode="contains">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                            <f:selectItems value="#{plaRecuMedicinaBean.listPlaRecuConduccion}" 
+                                           var="itemcon"
+                                           itemLabel="#{itemcon.descripcion}"
+                                           itemValue="#{itemcon.idPlaRecuConduccion}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Turno"/>
+                        <p:selectOneMenu id="turnoItem" 
+                                         value="#{plaRecuMedicinaBean.medicinaLaboral.idPlaRecuTurno.idPlaRecuTurno}"
+                                         required="true" 
+                                         requiredMessage="'Turno' es requerido"
+                                         filter="true"
+                                         filterMatchMode="contains">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                            <f:selectItems value="#{plaRecuMedicinaBean.listPlaRecuTurno}" 
+                                           var="items"
+                                           itemLabel="#{items.turno}"
+                                           itemValue="#{items.idPlaRecuTurno}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Wid100 Padding5 ">
+                        <p:outputLabel for="observaciones" value="Observaciones"/>
+                        <p:inputTextarea id="observaciones" 
+                                         required="true" 
+                                         maxlength="2000"
+                                         cols="5"
+                                         value="#{plaRecuMedicinaBean.medicinaLaboral.observaciones}"/>
+                    </div>
+
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuMedicinaBean.crearMedicinaLaboral()}"
+                             process="@form"
+                             rendered="#{!plaRecuMedicinaBean.b_editar}"
+                             update="frmMedicina,@form,:msgs, :frmMedicina:dtMedicina"/>
+            
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuMedicinaBean.editarMedicinaLaboral()}"
+                             process="@form"
+                             rendered="#{plaRecuMedicinaBean.b_editar}"
+                             update="frmMedicina ,@form,:msgs"/>
+
+            
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardar" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+                        
+        </f:facet>
+    </p:dialog>
+</ui:composition>

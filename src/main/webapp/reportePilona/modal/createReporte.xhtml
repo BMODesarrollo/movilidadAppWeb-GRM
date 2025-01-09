@@ -1,0 +1,225 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="create_reporte_pilona_dialog" 
+              widgetVar="create_reporte_pilona_wv" 
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)" 
+              header="Gestión Reporte Pilona"
+              class="mr1024_60 mr500_90" closeOnEscape="true" responsive="true" position="center,top">
+        <h:form id="form_create_reporte_pilona" enctype="multipart/form-data">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5">
+                        <p:outputLabel for="fecha_hora" value="Fecha Hora Actividad: " />
+                        <p:calendar id="fecha_hora" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Fecha y Hora es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{segReportePilonaJSFMB.segReportePilona.fechaHora}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-5 Padding5" >
+                        <p:outputLabel for="SOMPilona" value="Pilona: *"/>
+                        <p:selectOneMenu id="SOMPilona"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{segReportePilonaJSFMB.i_idSegPilona}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{segReportePilonaJSFMB.listPilonas}"
+                                           var="pilona" itemLabel="#{pilona.codigo} #{pilona.nombre}"
+                                           itemDescription="#{pilona.descripcion}"
+                                           itemValue="#{pilona.idSegPilona}" />
+                            <p:ajax process="@this" listener="#{segReportePilonaJSFMB.selectPilona()}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-2 ui-lg-3 Padding5">
+                        <p:outputLabel for="minMax" value="Recorrido *"/>
+                        <p:spinner id="minMax" value="#{segReportePilonaJSFMB.segReportePilona.numRecorrido}" min="1" max="5" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Fotos Reporte">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{segReportePilonaJSFMB.handleFileUpload}"
+                                              id="foto"
+                                              mode="advanced"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG"
+                                              process="@this"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="msgs,form_create_reporte_pilona:messages"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{segReportePilonaJSFMB.flag_rremove_photo}">
+                        <p:staticMessage severity="warn" summary="Informacion!" detail="Para Eliminar un archivo, hacer clic sobre el" />
+                        <p:dataGrid var="url_foto" id="id_tabla_fotos" 
+                                    value="#{segReportePilonaJSFMB.listFotosActividad}"
+                                    columns="6" layout="grid"
+                                    rowIndexVar="indexgd">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="form_create_reporte_pilona:id_tabla_fotos"
+                                           action="#{segReportePilonaJSFMB.delete(url_foto)}">
+                                <p:panel>
+                                    <div class="TexAlCenter">
+                                        <div>
+                                            <p:graphicImage cache="false"
+                                                            style="border:1px solid #106ebc; border-radius: 0px;"
+                                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                            width="80%">
+                                                <f:param name="path_foto" value="#{url_foto}" />
+                                            </p:graphicImage>
+                                        </div>
+                                    </div>
+                                </p:panel> 
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{segReportePilonaJSFMB.listFotosActividad.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Foto Minuta">
+                            <div align="center">
+
+                                <p:fileUpload fileUploadListener="#{segReportePilonaJSFMB.handleFileUploadLibro}"
+                                              id="foto_ii"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG"
+                                              process="@this"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="msgs,form_create_reporte_pilona:messages"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{segReportePilonaJSFMB.flag_rremove_photo}">
+                        <p:staticMessage severity="warn" summary="Informacion!" detail="Para Eliminar un archivo, hacer clic sobre el" />
+                        <p:dataGrid var="url_foto_I" id="id_tabla_fotos_I" 
+                                    value="#{segReportePilonaJSFMB.listFotosMinuta}"
+                                    columns="6" layout="grid"
+                                    rowIndexVar="indexgd_I">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="form_create_reporte_pilona:id_tabla_fotos_I"
+                                           action="#{segReportePilonaJSFMB.delete(url_foto_I)}">
+                                <p:panel>
+                                    <div class="TexAlCenter">
+                                        <div>
+                                            <p:graphicImage cache="false"
+                                                            style="border:1px solid #106ebc; border-radius: 0px;"
+                                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                            width="80%">
+                                                <f:param name="path_foto" value="#{url_foto_I}" />
+                                            </p:graphicImage>
+                                        </div>
+                                    </div>
+                                </p:panel> 
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{segReportePilonaJSFMB.listFotosMinuta.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="observaciones" value="Observaciones: " />
+                        <p:inputTextarea id="observaciones" 
+                                         value="#{segReportePilonaJSFMB.segReportePilona.observación}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una observación"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <div class="EmptyBox10" />
+
+            <p:dataTable id="dt_id_nov" 
+                         value="#{segReportePilonaJSFMB.listNov}" 
+                         var="novReporte"
+                         emptyMessage="No existen registros"
+                         paginator="true"
+                         paginatorPosition="top"
+                         rowIndexVar="index"
+                         rows="5"
+                         widgetVar="dt_wv"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton id="btnAgregarNov" 
+                                         icon="fa fa-plus" 
+                                         action="#{segReportePilonaJSFMB.preAgregarNov()}" 
+                                         value="Agregar Novedad" 
+                                         process="@this"
+                                         update="nov_dialog_form"
+                                         class="cssWhite RedButton" />
+                    </div>
+                </f:facet>
+                <p:column headerText="#" width="10%">
+                    <h:outputText  value="#{index+1}"/>
+                </p:column>
+                <p:column headerText="Tipo">
+                    <h:outputText value="#{novReporte.segReportePilonaNovedad.novedadInfrastruc.novedadTipoInfrastruc.nombre}"/>
+                </p:column>
+                <p:column headerText="Detalle">
+                    <h:outputText value="#{novReporte.segReportePilonaNovedad.novedadInfrastruc.novedadTipoDetallesInfrastruc.nombre}"/>
+                </p:column>
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{novReporte.segReportePilonaNovedad.novedadInfrastruc.descripcion}"/>
+                </p:column>
+                <p:column headerText="Acción" width="10%">
+                    <p:commandButton id="bnt_eliminar_nov" 
+                                     update="msgs,form_create_reporte_pilona:dt_id_nov"
+                                     process="@this"
+                                     icon="fa fa-close" title="Eliminar novedad de la lista"
+                                     action="#{segReportePilonaJSFMB.eliminarNovedad(novReporte)}"
+                                     class="cssWhite RedButton" />
+                </p:column>
+            </p:dataTable>
+            <p:remoteCommand name="rc_pilona" 
+                             class="cssWhite"
+                             actionListener="#{segReportePilonaJSFMB.guardar()}"  
+                             value="Guardar" 
+                             update="msgs,form_reporte_pilona:dt_reporte_pilona_id"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer" >
+            <p:commandButton id="btnGuardar" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc_pilona()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="createNovedad.xhtml"/>
+</ui:composition>

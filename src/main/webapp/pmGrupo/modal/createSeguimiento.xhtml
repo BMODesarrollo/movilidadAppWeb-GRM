@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog widgetVar="seguiNewWV" id="segui_id_dialog" modal="true" closeOnEscape="true"
+              responsive="true" closable="false"
+              class="mr1024_60 mr500_90"
+              resizable="false" appendTo="@(body)" position="center,top" >
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Seguimiento
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('seguiNewWV').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="frmNuevoSeguimiento">
+            <p:fieldset toggleable="true"  legend="Novedad">
+                <p:messages id="messages" showDetail="true" closable="true"/>
+                <div class="ui-fluid" >
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                            <p:outputLabel for="tipo_novedad" value="Tipo novedad: " />
+                            <p:inputText value="#{gruposNovSFMB.selectedSeguimiento.idNovedad.idNovedadTipo.nombreTipoNovedad}"
+                                         id="tipo_novedad" readonly="true"/>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                            <p:outputLabel for="detalle_novedad" value="Detalle novedad: " />
+                            <p:inputText value="#{gruposNovSFMB.selectedSeguimiento.idNovedad.idNovedadTipoDetalle.descripcionTipoNovedad}"
+                                         id="detalle_novedad" readonly="true"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5" >
+                            <p:outputLabel for="observacion" value="Observación:" />
+                            <p:inputTextarea value="#{gruposNovSFMB.selectedSeguimiento.idNovedad.observaciones}"
+                                             id="observacion"
+                                             readonly="true"/>
+                        </div>
+                    </div>
+                </div>
+            </p:fieldset>
+            <p:fieldset toggleable="true"  legend="Seguimiento">
+                <div class="ui-fluid" >
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                            <p:outputLabel for="fecha" value="Fecha:" />
+                            <p:calendar id="fecha" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{gruposNovSFMB.selectedSeguimiento.fecha}" 
+                                        mindate="#{gruposNovSFMB.selectedSeguimiento.idNovedad.fecha}" 
+                                        showOn="button" 
+                                        locale="es"
+                                        readonlyInput="true"
+                                        required="true"
+                                        requiredMessage="La fecha es requerida"
+                                        maxdate="today"
+                                        showTodayButton="true"
+                                        navigator="true">
+                                <p:ajax event="dateSelect" global="false" process="@this"></p:ajax>
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5" >
+                            <p:outputLabel for="seguimiento" value="Seguimiento:" />
+                            <p:inputTextarea id="seguimiento" value="#{gruposNovSFMB.selectedSeguimiento.seguimiento}"
+                                             autoResize="true"
+                                             required="true"
+                                             requiredMessage="Debe ingresar el seguimiento de la novedad"/>
+                        </div>
+                    </div>
+                </div>
+            </p:fieldset>
+
+            <p:remoteCommand name="g"
+                             process="frmNuevoSeguimiento,frmNuevoSeguimiento:fecha"
+                             update="frmNuevoSeguimiento,msgs,messages,frmNovedadSeguimientoLista:dtNovedadSeguimiento"
+                             action="#{gruposNovSFMB.guardarSeguimiento()}"/>
+            <p:remoteCommand name="a"
+                             process="frmNuevoSeguimiento,frmNuevoSeguimiento:fecha"
+                             update="frmNuevoSeguimiento,msgs,messages,frmNovedadSeguimientoLista:dtNovedadSeguimiento"
+                             action="#{gruposNovSFMB.actualizarSeguimiento()}"/>
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarAdd" 
+                             icon="fa fa-save" value="Guardar" 
+                             rendered="#{gruposNovSFMB.selectedSeguimiento.idNovedadSeguimiento==null}"
+                             style="color: white" onclick="g()"/>
+            <p:commandButton id="btnActualizarAdd" 
+                             rendered="#{gruposNovSFMB.selectedSeguimiento.idNovedadSeguimiento!=null}"
+                             icon="fa fa-save"  value="Actualizar" 
+                             style="color: white" onclick="a()"/>
+        </f:facet>
+    </p:dialog>  
+</ui:composition>

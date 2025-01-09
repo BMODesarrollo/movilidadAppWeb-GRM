@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog widgetVar="seguiNewWV" id="segui_id_dialog" modal="true" closeOnEscape="true"
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              header="Seguimiento"
+              resizable="false" appendTo="@(body)" position="center,top" >
+
+        <h:form id="frmNuevoSeguimiento">
+            <p:fieldset toggleable="true"  legend="Novedad">
+                <p:messages id="messages" showDetail="true" closable="true"/>
+                <div class="ui-fluid" >
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel for="tipo_novedad" value="Tipo novedad: " />
+                            <p:inputText value="#{genGruposNovMB.selectedSeguimiento.idGenerica.idGenericaTipo.nombreTipoNovedad}"
+                                         id="tipo_novedad" readonly="true"/>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel for="detalle_novedad" value="Detalle novedad: " />
+                            <p:inputText value="#{genGruposNovMB.selectedSeguimiento.idGenerica.idGenericaTipoDetalle.descripcionTipoGenerica}"
+                                         id="detalle_novedad" readonly="true"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                            <p:outputLabel for="observacion" value="Observación:" />
+                            <p:inputTextarea value="#{genGruposNovMB.selectedSeguimiento.idGenerica.observaciones}"
+                                             id="observacion"
+                                             style="width: 100%;max-height: 150px ;font-size: 16px"
+                                             readonly="true"/>
+                        </div>
+                    </div>
+                </div>
+            </p:fieldset>
+            <p:fieldset toggleable="true"  legend="Seguimiento">
+                <div class="ui-fluid" >
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel for="fecha" value="Fecha:" />
+                            <p:calendar id="fecha" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{genGruposNovMB.selectedSeguimiento.fecha}" 
+                                        mindate="#{genGruposNovMB.selectedSeguimiento.idGenerica.fecha}" 
+                                        showOn="button" 
+                                        locale="es"
+                                        readonlyInput="true"
+                                        required="true"
+                                        maxdate="today"
+                                        showTodayButton="true"
+                                        navigator="true"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                            <p:outputLabel for="seguimiento" value="Seguimiento:" />
+                            <p:inputTextarea id="seguimiento" value="#{genGruposNovMB.selectedSeguimiento.seguimiento}"
+                                             autoResize="true"
+                                             required="true"
+                                             requiredMessage="Debe ingresar el seguimiento de la novedad"/>
+                        </div>
+                    </div>
+                </div>
+            </p:fieldset>
+
+            <p:remoteCommand name="g"
+                             update="frmNuevoSeguimiento,msgs,messages,frmNovedadSeguimientoLista:dtNovedadSeguimiento"
+                             action="#{genGruposNovMB.guardarSeguimiento()}"/>
+            <p:remoteCommand name="a"
+                             update="frmNuevoSeguimiento,msgs,messages,frmNovedadSeguimientoLista:dtNovedadSeguimiento"
+                             action="#{genGruposNovMB.actualizarSeguimiento()}"/>
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarAdd" 
+                             icon="fa fa-save" value="Guardar" 
+                             rendered="#{genGruposNovMB.selectedSeguimiento.idGenericaSeguimiento==null}"
+                             style="color: white" onclick="g()"/>
+            <p:commandButton id="btnActualizarAdd" 
+                             rendered="#{genGruposNovMB.selectedSeguimiento.idGenericaSeguimiento!=null}"
+                             icon="fa fa-save"  value="Actualizar" 
+                             style="color: white" onclick="a()"/>
+        </f:facet>
+
+    </p:dialog>  
+</ui:composition>

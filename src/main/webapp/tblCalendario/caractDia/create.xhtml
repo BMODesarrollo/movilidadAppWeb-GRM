@@ -1,0 +1,113 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="caracteristicaDia"
+              widgetVar="wVCaracteristicaDia" 
+              modal="true" 
+              class="mr1024_30 mr500_90"
+              closeOnEscape="true"
+              closable="false"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{tblCaracteristicaDiaBean.selected == null}">
+                                <p:outputLabel value="NUEVO REGISTRO" class="cssWhite"/>
+                            </c:if>
+                            <c:if test="#{tblCaracteristicaDiaBean.selected != null}">
+                                <p:outputLabel value="EDITAR REGISTRO" class="cssWhite"/>
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wVCaracteristicaDia').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmCaracteristicaDia">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true" 
+                                value="#{tblCaracteristicaDiaBean.nombre}"
+                                requiredMessage="Debe ingresar nombre del tipo de documento"
+                                />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Programación" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton value="#{tblCaracteristicaDiaBean.b_afecta_prg}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   styleClass="cssWhite">
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Técnico de operaciones" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton value="#{tblCaracteristicaDiaBean.b_afecta_tec}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   styleClass="cssWhite">
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea autoResize="false"
+                                             value="#{tblCaracteristicaDiaBean.caracteristicaDia.descripcion}"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update=":msgs,pGridDatos,:frmPrincipal:dtCaracteristicaDia" 
+                             action="#{tblCaracteristicaDiaBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmPrincipal:dtCaracteristicaDia"
+                             action="#{tblCaracteristicaDiaBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{tblCaracteristicaDiaBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{tblCaracteristicaDiaBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

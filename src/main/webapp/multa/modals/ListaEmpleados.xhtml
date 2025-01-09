@@ -1,0 +1,40 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmEmpleadosListDlg" widgetVar="PmEmpleadosListDialog" modal="true"
+              class="mr1024_50 mr500_90"
+              resizable="false" appendTo="@(body)" header="Listado de empleados"
+              closeOnEscape="true" responsive="true" position="center top">
+        <h:form id="frmPmEmpleadoList">
+            <p:dataTable var="vht" value="#{multaController.lstEmpleados}"  
+                         selectionMode="single" selection="#{multaController.empleado}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1500"
+                         scrollable="true"
+                         scrollHeight="600"
+                         rowIndexVar="nroFila"
+                         rowKey="#{vht.idEmpleado}"
+                         emptyMessage="No existen empleados registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{multaController.onRowEmpleadoClckSelect}"
+                        update=":MultaCreateForm:operador"
+                        oncomplete="PF('PmEmpleadosListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código_TM" filterBy="#{vht.codigoTm}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.codigoTm}" />
+                </p:column>
+                <p:column headerText="Nombre completo" filterBy="#{vht.nombres} #{vht.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.nombres} #{vht.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

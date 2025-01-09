@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="crear_turno_id_dialog"
+              widgetVar="create_edit_dialog_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="true"
+              class="mr1024_60 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" 
+              header="Nueva Jornada">
+        <h:form id="create_edit_dialog_form">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="label_empleado" value="Empleado"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="label_empleado" 
+                                             readonly="true"
+                                             value="#{genTurnoFijoMB.nombreEmpleado}" />
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Listar Empleados"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     process="@this"
+                                                     update="msgs"
+                                                     actionListener="#{genTurnoFijoMB.findEmplActivos()}">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <h:outputLabel for="activo_id"  value="Activo: " />
+                        <p:selectBooleanButton id="activo_id" 
+                                               offIcon="fa fa-close" 
+                                               onIcon="fa fa-check" 
+                                               onLabel="Sí" 
+                                               class="cssWhite"
+                                               offLabel="No" value="#{genTurnoFijoMB.activo}"/>
+
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Motivo del registro" />
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:selectOneMenu id="tipo_jornada_id" 
+                                             value="#{genTurnoFijoMB.i_idGenericaJornadaTipo}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains"
+                                             required="true"
+                                             requiredMessage="Motivo es requerido">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{genTurnoFijoMB.listJornadaTipo}" 
+                                               var="item"
+                                               itemDescription="#{item.hiniT1}-#{item.hfinT1}"
+                                               itemLabel="#{item.descripcion}"
+                                               itemValue="#{item.idGenericaJornadaTipo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0">
+                            <p:commandButton title="Actualizar Tipo de Jornada"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{genTurnoFijoMB.cargarTiposJornada()}"
+                                             update="create_edit_dialog_form:tipo_jornada_id"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <p:outputLabel for="observacion" value="Observación"/>
+                        <p:inputTextarea id="observacion" 
+                                         required="true" 
+                                         maxlength="2000"
+                                         value="#{genTurnoFijoMB.observacion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_turn" 
+                             class="cssWhite"
+                             action="#{genTurnoFijoMB.guardar()}"
+                             rendered="#{genTurnoFijoMB.obj_genericaTurnoFijo.idGenericaTurnoFijo==null}"
+                             process="@this,create_edit_dialog_form:observacion,
+                             create_edit_dialog_form:tipo_jornada_id,
+                             create_edit_dialog_form:activo_id"
+                             update="msgs,
+                             gen_turno_fijo_form:datalist"/>
+            <p:remoteCommand name="rc_turn_update" 
+                             class="cssWhite"
+                             action="#{genTurnoFijoMB.edit()}"
+                             rendered="#{genTurnoFijoMB.obj_genericaTurnoFijo.idGenericaTurnoFijo!=null}"
+                             process="@this,create_edit_dialog_form:observacion,
+                             create_edit_dialog_form:tipo_jornada_id,
+                             create_edit_dialog_form:activo_id"
+                             update="msgs,
+                             gen_turno_fijo_form:datalist"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarL" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             rendered="#{genTurnoFijoMB.obj_genericaTurnoFijo.idGenericaTurnoFijo==null}"
+                             onclick="rc_turn()"/>
+            <p:commandButton id="btnGuardarLC" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{genTurnoFijoMB.obj_genericaTurnoFijo.idGenericaTurnoFijo!=null}"
+                             value="Actualizar" 
+                             onclick="rc_turn_update()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

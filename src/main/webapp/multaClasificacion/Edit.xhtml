@@ -1,0 +1,95 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog  id="MultaClasificacionEditDlg" 
+               widgetVar="MultaClasificacionEditDialog" 
+               closeOnEscape="true"
+               closable="true"
+               class="mr1024_30 mr500_90"
+               position="center top"
+               modal="true" resizable="false" appendTo="@(body)" 
+               header="#{bundle.EditMultaClasificacionTitle}">
+        <h:form id="MultaClasificacionEditForm">
+            <p:growl id="growl"   life="3000" /> 
+            <div class="ui-fluid" jsf:rendered="#{multaClasificacionController.selected != null}">
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="#{bundle.CreateMultaClasificacionLabel_codigo}" for="codigo" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputText  maxlength="10" 
+                                      id="codigo" 
+                                      value="#{multaClasificacionController.selected.codigo}"
+                                      title="#{bundle.CreateMultaClasificacionTitle_codigo}" 
+                                      required="true" 
+                                      requiredMessage="#{bundle.CreateMultaClasificacionRequiredMessage_codigo}"/>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="#{bundle.CreateMultaClasificacionLabel_metros}" for="metros" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputNumber minValue="1" 
+                                       decimalPlaces="0" 
+                                       maxValue="2147483647" 
+                                       id="metros" 
+                                       value="#{multaClasificacionController.selected.metros}" 
+                                       title="#{bundle.CreateMultaClasificacionTitle_metros}" 
+                                       required="true" 
+                                       requiredMessage="#{bundle.CreateMultaClasificacionRequiredMessage_metros}"/>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="#{bundle.CreateMultaClasificacionLabel_idMultaTipo}" for="idMultaTipo" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:selectOneMenu 
+                            id="idMultaTipo" value="#{multaClasificacionController.selected.idMultaTipo}"
+                            filter="true" 
+                            style="width: 99.9999%"
+                            filterMatchMode="contains"
+                            required="true"
+                            requiredMessage="Debe seleccionar Tipo de Multa"> 
+                            <f:selectItem 
+                                itemLabel="Seleccione Tipo de multa" 
+                                itemValue="#{null}" 
+                                rendered="true"/>  
+                            <f:selectItems value="#{multaTipoController.itemsAvailableSelectOne}"
+                                           var="idMultaTipoItem" 
+                                           itemLabel="#{idMultaTipoItem.tipo}" 
+                                           itemValue="#{idMultaTipoItem}"/>
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="observaciones" value="Descripción: " />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputTextarea id="observaciones" 
+                                         value="#{multaClasificacionController.selected.descripcion}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una descripción"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             actionListener="#{multaClasificacionController.update}" 
+                             update="MultaClasificacionEditForm,:MultaClasificacionListForm:datalist,@form"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnUpdate" 
+                             icon="fa fa-save" value="Actualizar" 
+                             class="cssWhite" onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+
+</ui:composition>
+

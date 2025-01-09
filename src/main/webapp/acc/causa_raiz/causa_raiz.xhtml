@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel header="CAUSA RAÍZ">
+            <h:form id="frmCausaRaiz">
+                <p:dataTable id="dtArbol" 
+                             var="causa_raiz" 
+                             value="#{accCausaRaizBean.lista}"
+                             emptyMessage="Sin registros"
+                             selectionMode="single" 
+                             selection="#{accCausaRaizBean.selected}" 
+                             paginator="true"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             rowKey="#{causa_raiz.idAccCausaRaiz}">
+                    <p:ajax event="rowSelect" listener="#{accCausaRaizBean.onRowSelect}" update="dtArbol,:form-causa_raiz" />
+                    <p:ajax event="rowUnselect" update="dtArbol" />
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton value="Nuevo"
+                                             action="#{accCausaRaizBean.nuevo()}"
+                                             oncomplete="PF('causa_raizDlg').show()"
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":form-causa_raiz,:CausaRaiz">
+                                <p:resetInput target=":form-causa_raiz"/>
+                            </p:commandButton>
+                            <p:commandButton value="Editar" 
+                                             action="#{accCausaRaizBean.editar()}"
+                                             oncomplete="PF('causa_raizDlg').show()"
+                                             icon="fa fa-pencil" 
+                                             class="cssWhite GreenButton"
+                                             update=":form-causa_raiz,:CausaRaiz"
+                                             disabled="#{accCausaRaizBean.selected == null}">
+                                <p:resetInput target=":form-causa_raiz"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Causa Raiz">
+                        <h:outputText value="#{causa_raiz.causaRaiz}" />
+                    </p:column>
+
+                    <p:column headerText="Subcausa">
+                        <h:outputText value="#{causa_raiz.idAccSubcausa.subcausa}" />
+                    </p:column>
+
+                    <p:column headerText="Causa">
+                        <h:outputText value="#{causa_raiz.idAccSubcausa.idCausa.causa}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{causa_raiz.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Usuario" >
+                        <h:outputText value="#{causa_raiz.username}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="dtArbol" fileName="acc causa raiz #{now}" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal.xhtml"/>
+    </ui:define>
+</ui:composition>

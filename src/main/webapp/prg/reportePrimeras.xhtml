@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <div class="EmptyBox5" />
+            <p:panel class="Wid100">
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Reporte Prg Primeras
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <div class="Wid100" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <ui:include src="../zComponent/selectUnidadFuncional.xhtml" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:dataTable id="primeras" 
+                             value="#{reportePrgPrimerasJSF.listPrgPrimeras}"
+                             widgetVar="datalistWV"
+                             var="item"
+                             paginator="true"
+                             filterDelay="1300"
+                             rowKey="#{rVar + 1}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} records"
+                             emptyMessage="No existen registros">
+
+                    <f:facet name="header">
+                        <div class="ui-fluid Padding0">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-7 Padding0"></div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-5 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                                        <p:commandButton id="btn-consultar"   
+                                                         value="Consultar" 
+                                                         actionListener="#{reportePrgPrimerasJSF.consultar()}" 
+                                                         update="@form,:msgs" 
+                                                         process="@this"
+                                                         icon="fa fa-search" 
+                                                         class="cssWhite" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                                        <p:commandButton id="ejecutar"   
+                                                         value="Ejecutar Procedimiento" 
+                                                         actionListener="#{reportePrgPrimerasJSF.procesar()}" 
+                                                         update="@form,:msgs" 
+                                                         process="@this"
+                                                         disabled="#{!reportePrgPrimerasJSF.isValidProcessTime}"
+                                                         icon="fa fa-check" 
+                                                         class="cssWhite OrangeButton" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#" style="width: 30px" class="TexAlCenter" > 
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="UF" rendered="#{uniFuncSessionBean.filtradoUF}" style="width: 40px" class="TexAlCenter">
+                        <p:outputLabel value="#{item.idGopUnidadFuncional.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Fecha" class="TexAlCenter">
+                        <p:outputLabel value="#{item.fecha}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Vehículo"
+                              filterBy="#{item.vehiculo}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.vehiculo}"/>
+                    </p:column>
+                    <p:column headerText="Operador"
+                              filterBy="#{item.codigoOp}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter cortar">
+                        <h:outputText value="#{item.codigoOp}"/>
+                    </p:column>
+                    <p:column headerText="Nombres"
+                              filterBy="#{item.nombres}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter cortar">
+                        <h:outputText value="#{item.nombres}"/>
+                    </p:column>
+                    <p:column headerText="Apellidos"
+                              filterBy="#{item.apellidos}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter cortar">
+                        <h:outputText value="#{item.apellidos}"/>
+                    </p:column>
+                    <p:column headerText="Tabla"
+                              filterBy="#{item.tabla}"
+                              filterMatchMode="exact"
+                              class="TexAlCenter cortar">
+                        <h:outputText value="#{item.tabla}"/>
+                    </p:column>
+                    <p:column headerText="Ruta"
+                              filterBy="#{item.ruta}"
+                              filterMatchMode="exact"
+                              class="TexAlCenter cortar">
+                        <h:outputText value="#{item.ruta}"/>
+                    </p:column>
+                    <p:column headerText="Parada"
+                              filterBy="#{item.parada}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter cortar">
+                        <h:outputText value="#{item.parada}"/>
+                    </p:column>
+                    <p:column headerText="Time Origin"
+                              sortBy="#{item.timeOrigin}"
+                              class="TexAlCenter cortar">
+                        <h:outputText value="#{item.timeOrigin}"/>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="primeras" fileName="Servicios primeras" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

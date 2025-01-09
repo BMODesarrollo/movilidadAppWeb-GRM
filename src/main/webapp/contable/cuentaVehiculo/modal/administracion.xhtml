@@ -1,0 +1,133 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{contableCtaVehiculoJSF.contableCtaVehiculo.idContableCtaVehiculo != null ? 'EDITAR CUENTA VEHÍCULO' : 'NUEVA CUENTA VEHÍCULO'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid">
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Número Cuenta *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nombre"
+                                         maxlength="45"
+                                         required="true"
+                                         requiredMessage="Número Cuenta es requerido"
+                                         value="#{contableCtaVehiculoJSF.contableCtaVehiculo.nroCta}" >
+                                <p:keyFilter regEx="/[0-9]/i"/>  
+                            </p:inputText>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Tipo Cuenta *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  id="tipoCuenta"
+                                              filter="true"
+                                              filterMatchMode="contains"
+                                              required="true"
+                                              requiredMessage="Tipo Cuenta es requierido"
+                                              value="#{contableCtaVehiculoJSF.idContableCuentaTipo}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems var="tipoC"
+                                               value="#{contableCtaTipoJSF.listContableCtaTipo}"
+                                               itemLabel="#{tipoC.tipoCuenta}"
+                                               itemDescription="#{tipoC.descripcion}"
+                                               itemValue="#{tipoC.idContableCtaTipo}"
+                                               />
+                                <p:ajax global="false" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Concepto *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="concepto"
+                                         maxlength="45"
+                                         required="true"
+                                         requiredMessage="Concepto es requerido"
+                                         value="#{contableCtaVehiculoJSF.contableCtaVehiculo.concepto}" />
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Vehículo *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="vehiculo"
+                                         readonly="true"
+                                         maxlength="45"
+                                         required="true"
+                                         requiredMessage="Concepto es requerido"
+                                         value="#{contableCtaVehiculoJSF.contableCtaVehiculo.idVehiculo.placa} - #{contableCtaVehiculoJSF.contableCtaVehiculo.idVehiculo.codigo}" />
+                            <div style="float: right;margin-top: -33px">
+                                <p:commandButton id="buttonVehs"   
+                                                 update="form-modal-veh" 
+                                                 icon="fa fa-search"
+                                                 title="Buscar Vehículo"
+                                                 oncomplete="PF('vehDlg').show()"
+                                                 process="@this"
+                                                 actionListener="#{contableCtaVehiculoJSF.cargarListVeh()}"
+                                                 class="cssWhite Padding0" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             maxlength="255"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             value="#{contableCtaVehiculoJSF.contableCtaVehiculo.descripcion}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             rendered="#{empty contableCtaVehiculoJSF.contableCtaVehiculo.idContableCtaVehiculo}"
+                             actionListener="#{contableCtaVehiculoJSF.guardar()}"
+                             update=":form,@form"
+                             process="@form" />
+            <p:remoteCommand name="editar" 
+                             rendered="#{not empty contableCtaVehiculoJSF.contableCtaVehiculo.idContableCtaVehiculo}"
+                             actionListener="#{contableCtaVehiculoJSF.actualizar()}"
+                             update=":form"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-guardar"
+                             value="Guardar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{empty contableCtaVehiculoJSF.contableCtaVehiculo.idContableCtaVehiculo}"
+                             onclick="guardar()"/>
+            <p:commandButton id="btn-editar"
+                             value="Actualizar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             onclick="editar()"
+                             rendered="#{not empty contableCtaVehiculoJSF.contableCtaVehiculo.idContableCtaVehiculo}" />
+        </f:facet>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,205 @@
+﻿<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel header="Liquidación Empleados">
+            <h:form id="liq_empleado_gen">
+                <p:outputLabel for="mes" value="Mes: " />
+                <p:selectOneMenu id="mes" value="#{liqEmplMesGenJSFMB.mes}"
+                                 required="true" requiredMessage="Debe seleccionar un mes"
+                                 filter="true">
+                    <f:selectItem itemLabel="Seleccione mes" itemValue="#{null}"/>
+                    <f:selectItem itemLabel="Enero" itemValue="01" />
+                    <f:selectItem itemLabel="Febrero" itemValue="02" />
+                    <f:selectItem itemLabel="Marzo" itemValue="03" />
+                    <f:selectItem itemLabel="Abril" itemValue="04" />
+                    <f:selectItem itemLabel="Mayo" itemValue="05" />
+                    <f:selectItem itemLabel="Junio" itemValue="06" />
+                    <f:selectItem itemLabel="Julio" itemValue="07" />
+                    <f:selectItem itemLabel="Agosto" itemValue="08" />
+                    <f:selectItem itemLabel="Septiembre" itemValue="09" />
+                    <f:selectItem itemLabel="Octubre" itemValue="10" />
+                    <f:selectItem itemLabel="Noviembre" itemValue="11" />
+                    <f:selectItem itemLabel="Diciembre" itemValue="12" />
+                    <p:ajax listener="#{liqEmplMesGenJSFMB.consultar()}" 
+                            process="@this"  
+                            update="msgs,liq_empleado_gen:datalist,
+                            liq_empleado_gen:generar_reporte_id,
+                            liq_empleado_gen:eliminar_datos_id"/>
+
+                </p:selectOneMenu>
+                <p:spacer width="15"/>
+                <p:outputLabel for="anio" value="Año: " />
+                <p:selectOneMenu id="anio" value="#{liqEmplMesGenJSFMB.anio}"
+                                 required="true" requiredMessage="Debe seleccionar un año"
+                                 filter="true">
+                    <f:selectItem itemLabel="Selecccione año" itemValue="#{null}"/>
+                    <f:selectItem itemLabel="2019" itemValue="2019" />
+                    <f:selectItem itemLabel="2020" itemValue="2020" />
+                    <f:selectItem itemLabel="2021" itemValue="2021" />
+                    <f:selectItem itemLabel="2022" itemValue="2022" />
+                    <f:selectItem itemLabel="2023" itemValue="2023" />
+                    <f:selectItem itemLabel="2024" itemValue="2024" />
+                    <f:selectItem itemLabel="2025" itemValue="2025" />
+                    <f:selectItem itemLabel="2026" itemValue="2026" />
+                    <f:selectItem itemLabel="2027" itemValue="2027" />
+                    <f:selectItem itemLabel="2028" itemValue="2028" />
+                    <f:selectItem itemLabel="2029" itemValue="2029" />
+                    <f:selectItem itemLabel="2030" itemValue="2030" />
+                    <f:selectItem itemLabel="2031" itemValue="2031" />
+                    <f:selectItem itemLabel="2032" itemValue="2032" />
+                    <f:selectItem itemLabel="2033" itemValue="2033" />
+                    <f:selectItem itemLabel="2034" itemValue="2034" />
+                    <f:selectItem itemLabel="2035" itemValue="2035" />
+                    <f:selectItem itemLabel="2036" itemValue="2036" />
+                    <f:selectItem itemLabel="2037" itemValue="2037" />
+                    <f:selectItem itemLabel="2038" itemValue="2038" />
+                    <f:selectItem itemLabel="2039" itemValue="2039" />
+                    <f:selectItem itemLabel="2040" itemValue="2040" />
+                    <f:selectItem itemLabel="2041" itemValue="2041" />
+                    <f:selectItem itemLabel="2042" itemValue="2042" />
+                    <f:selectItem itemLabel="2043" itemValue="2043" />
+                    <f:selectItem itemLabel="2044" itemValue="2044" />
+                    <f:selectItem itemLabel="2045" itemValue="2045" />
+                    <f:selectItem itemLabel="2046" itemValue="2046" />
+                    <f:selectItem itemLabel="2047" itemValue="2047" />
+                    <f:selectItem itemLabel="2048" itemValue="2048" />
+                    <f:selectItem itemLabel="2049" itemValue="2049" />
+                    <f:selectItem itemLabel="2050" itemValue="2050" />
+                    <p:ajax listener="#{liqEmplMesGenJSFMB.consultar()}"
+                            process="@this"  
+                            update="msgs,liq_empleado_gen:datalist,
+                            liq_empleado_gen:generar_reporte_id,
+                            liq_empleado_gen:eliminar_datos_id"/>
+                </p:selectOneMenu>
+                <p:commandButton 
+                    value="Generar Reporte"
+                    rendered="true"
+                    id="generar_reporte_id"
+                    class="OrangeButton cssWhite"
+                    icon="fa fa-calculator"
+                    disabled="#{!liqEmplMesGenJSFMB.b_generarResporte}"
+                    action="#{liqEmplMesGenJSFMB.generarReporte()}"
+                    update="msgs,liq_empleado_gen,liq_empleado_gen:datalist">
+                    <p:confirm header="Confirmación" 
+                               escape="false" 
+                               message="Esta seguro que desea generar la liquidación? &lt;br/&gt;(Sí confirma, los valores seran almacenados por Rigel)"
+                               icon="fa fa-exclamation-triangle"
+                               class="cssWhite"/>
+                </p:commandButton>
+                <p:commandButton 
+                    value="Eliminar Datos"
+                    rendered="true"
+                    id="eliminar_datos_id"
+                    class="RedButton cssWhite"
+                    icon="fa fa-calculator"
+                    disabled="#{!liqEmplMesGenJSFMB.b_eliminarDatos}"
+                    action="#{liqEmplMesGenJSFMB.eliminarConsultar()}"
+                    update="msgs,liq_empleado_gen,liq_empleado_gen:datalist">
+                    <p:confirm header="Confirmación" 
+                               escape="false" 
+                               message="Esta seguro que desea eliminar los datos para este mes? &lt;br/&gt;(Sí confirma, los cambios seran irreversibles)"
+                               icon="fa fa-exclamation-triangle"
+                               class="cssWhite"/>
+                </p:commandButton>
+                <p:dataTable value="#{liqEmplMesGenJSFMB.listaLiqEmplMes}"
+                             var="liq"
+                             widgetVar="LiqEmplMesGenWV"
+                             paginator="true"
+                             rows="100"
+                             rowsPerPageTemplate="50,100,500,1000,2000"
+                             id="datalist"
+                             scrollHeight="600"
+                             scrollable="true"
+                             rowKey="#{liq.empleado.idEmpleado}"
+                             emptyMessage="No existen registros de liquidación">
+                    <f:facet name="header">
+                        <div align="right">
+                            En total existen #{liqEmplMesGenJSFMB.listaLiqEmplMes.size()} registros.
+                        </div>
+
+                    </f:facet>
+                    <p:column headerText="Desde">
+                        <h:outputText value="#{liq.desde}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MMMM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Hasta">
+                        <h:outputText value="#{liq.hasta}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MMMM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Identificación" >
+                        <h:outputText value="#{liq.empleado.identificacion}" />
+                    </p:column>
+                    <p:column headerText="Empleado"> 
+                        <h:outputText value="#{liq.empleado.nombres} #{liq.empleado.apellidos}" />
+                    </p:column>
+                    <p:column headerText="Cargo">
+                        <h:outputText value="#{liq.empleado.idEmpleadoCargo.nombreCargo}" />
+                    </p:column>
+                    <p:column headerText="Grupo">
+                        <h:outputText value="#{liqEmplMesGenJSFMB.master(liq.empleado)}" />
+                    </p:column>
+                    <p:column headerText="Días Novedad">
+                        <h:outputText value="#{liq.diasNovedad}" />
+                    </p:column>
+                    <p:column headerText="Puntos PM Conciliados">
+                        <h:outputText value="#{liq.puntosPmConciliados}" />
+                    </p:column>
+                    <p:column headerText="Valor Bono">
+                        <h:outputText value="#{liq.vrBonoSalarial}">
+                            <f:convertNumber pattern="##,###" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vr Día">
+                        <h:outputText value="#{liq.diasVrBonoSalarial}">
+                            <f:convertNumber pattern="##,###" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vr Punto">
+                        <h:outputText value="#{liq.puntosVrBonoSalarial}">
+                            <f:convertNumber pattern="##,###" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Puntos Empresa">
+                        <h:outputText value="#{liq.puntosEmpresa}"/>
+                    </p:column>
+                    <p:column headerText="Días Empresa">
+                        <h:outputText value="#{liq.diasEmpresa}"/>
+                    </p:column>
+                    <p:column headerText="Dcto Puntos">
+                        <h:outputText value="#{liq.descuentoPuntos}">
+                            <f:convertNumber pattern="##,###" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Dcto Días">
+                        <h:outputText value="#{liq.descuentoDiasSalarial}">
+                            <f:convertNumber pattern="##,###" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vr Bono Alimentación">
+                        <h:outputText value="#{liq.vrBonoAlimentos}">
+                            <f:convertNumber pattern="##,###" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="A pagar">
+                        <h:outputText value="#{liq.totalPagar}">
+                            <f:convertNumber pattern="##,###" />
+                        </h:outputText>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" class="iconexporter"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="Liquidación_Empleado_Mes #{now}" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

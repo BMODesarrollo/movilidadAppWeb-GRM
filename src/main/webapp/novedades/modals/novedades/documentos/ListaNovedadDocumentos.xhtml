@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="NovedadDocumentosListDlg" widgetVar="NovedadDocumentosListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" closable="false"
+              class="mr1024_60 mr500_90"
+              closeOnEscape="true" responsive="true" position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Documentos para novedad" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('NovedadDocumentosListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNovedadDocumentosList">
+            <p:dataTable id="dtNovedadDocumentos" widgetVar="dtNovedadesDocumento" 
+                         var="novedadDocumento" value="#{novedadBean.lstDocumentos}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         rowStyleClass="text-center"
+                         reflow="true"
+                         rowIndexVar="nroFila"
+                         emptyMessage="No existen documentos anexados a la novedad">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton actionListener="#{novedadBean.nuevoDocumento()}"
+                                         oncomplete="PF('novedadDocumentos').show();"
+                                         title="Agregar nuevo documento" 
+                                         icon="fa fa-plus"
+                                         class="cssWhite"
+                                         update="frmNuevoDocumento,modalDocumentos"
+                                         value="Nuevo documento">
+                            <p:resetInput target="frmNuevoDocumento" />
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+                <p:column headerText="#" width="15%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Creado" 
+                          filterMatchMode="startsWith"
+                          width="100"
+                          >
+                    <h:outputText value="#{novedadDocumento.creado}" >
+                        <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Tipo_Documento" filterBy="#{novedadDocumento.idNovedadTipoDocumento.nombreTipoDocumento}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadDocumento.idNovedadTipoDocumento.nombreTipoDocumento}" />
+                </p:column>
+                <p:column headerText="Documento">
+                    <p:commandButton action="#{novedadBean.getDocumento()}"
+                                     value="Abrir" update="frmDocumento,DocumentoListDlg,galeria_foto_dialog_id">
+                        <f:setPropertyActionListener value="#{novedadDocumento}" target="#{novedadBean.selectedDocumento}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column headerText="Usuario">
+                    <h:outputText value="#{novedadDocumento.usuario}"/>
+                </p:column>
+                <p:column headerText="Acciones">
+                    <p:commandButton action="#{novedadBean.editar()}"
+                                     icon="fa fa-pencil"
+                                     class="cssWhite GreenButton" 
+                                     oncomplete="PF('novedadDocumentos').show();" 
+                                     title="Editar documento" 
+                                     update="frmNuevoDocumento,modalDocumentos">
+                        <f:setPropertyActionListener value="#{novedadDocumento}" target="#{novedadBean.selectedDocumento}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+    <ui:include src="Create.xhtml"/>
+    <ui:include src="ModalDocumento.xhtml"/>
+</ui:composition>

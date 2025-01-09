@@ -1,0 +1,134 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                                <h:outputText value="Usuarios"/>
+                            </div>
+                            <div class="ui-g-12 ui-ml-5 ui-lg-4 Padding0">
+                                <h:form id="uf">
+                                    <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                     filter="true" 
+                                                     rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                     autoWidth="true"
+                                                     filterMatchMode="contains">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                       var="uniFunc" 
+                                                       itemLabel="#{uniFunc.nombre}"
+                                                       itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                        <p:ajax process="@this"
+                                                event="change"
+                                                listener="#{usersController.consultarUsuarios()}"
+                                                update="UsersListForm:datalist"/>
+                                    </p:selectOneMenu>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+
+            <h:form id="UsersListForm">
+                <p:growl id="usersGrowl" showDetail="true" showSummary="true" life="6000"/>
+                <p:dataTable id="datalist" 
+                             value="#{usersController.items}"
+                             var="item"
+                             filterDelay="1000"
+                             selectionMode="single" 
+                             selection="#{usersController.selected}"
+                             paginator="true"
+                             rowKey="#{item.userId}"
+                             rowIndexVar="rVar"
+                             rows="50"
+                             rowsPerPageTemplate="50,100,150"
+                             reflow="true"
+                             widgetVar="userlist"
+                             scrollable="true"
+                             scrollHeight="1000"
+                             >
+                    <p:ajax event="rowSelect" listener="#{usersController.onRowSelect}" update="editButton" />
+                    <p:ajax event="rowUnselect" listener="#{usersController.reset()}" update="datalist" />
+
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Nombre"/>
+                        </f:facet>
+                        <h:outputText value="#{item.nombres.toUpperCase()}"/>
+                    </p:column>
+                    <p:column headerText="Identificación" style="text-align: center" filterBy="#{item.idEmpleado.identificacion}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idEmpleado.identificacion}"/>
+                    </p:column>
+                    <p:column headerText="Código TM" style="text-align: center" filterBy="#{item.idEmpleado.codigoTm}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idEmpleado.codigoTm}"/>
+                    </p:column>
+                    <p:column headerText="Teléfono" style="text-align: center" filterBy="#{item.idEmpleado.telefonoMovil}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idEmpleado.telefonoMovil}"/>
+                    </p:column>
+                    <p:column headerText="Unidad Funcional"
+                              filterBy="#{item.idGopUnidadFuncional.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idGopUnidadFuncional.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Nombre de Usuario" style="text-align: center" filterBy="#{item.username}" filterMatchMode="contains">
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.enabled}" headerText="ESTADO" filterMatchMode="exact" style="text-align: center; width: 12%">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('userlist').filter()" styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Activo" itemValue="#{true}"  />
+                                <f:selectItem itemLabel="Inactivo" itemValue="#{false}"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <i class="#{item.enabled ? 'fa fa-check' : 'fa fa-times'}" 
+                           style="font-size: 30px;color: #{item.enabled ? 'green' : 'red'}"/>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             action="#{usersController.prepareCreate()}" 
+                                             update=":UsersCreateForm" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             oncomplete="PF('UsersCreateDialog').show()">
+                                <p:resetInput target="UsersCreateForm"/>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"   
+                                             value="Editar" 
+                                             update=":UsersEditForm" 
+                                             icon="fa fa-pencil" 
+                                             action="#{usersController.prepareEdit()}" 
+                                             disabled="#{empty usersController.selected.userId}"
+                                             class="cssWhite GreenButton">
+                                <p:resetInput target="UsersEditForm"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <f:facet name="paginatorTopLeft">
+                        <i class="fa fa-check" style="color: green;font-size: 30px" />
+                        <h:outputText value="Activo" class="cssBlack"/>
+                        <p:spacer width="3"/>
+                        <i class="fa fa-times" style="color: red;font-size: 30px" />  
+                        <h:outputText value="Inactivo" class="cssBlack"/>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+        <ui:include src="EmpleadosList.xhtml"/>
+    </ui:define>
+</ui:composition>

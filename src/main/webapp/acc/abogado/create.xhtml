@@ -1,0 +1,124 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="abogado"
+              widgetVar="abogadoDlg" 
+              modal="true" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{abogadoBean.selected == null}">
+                                NUEVO ABOGADO
+                            </c:if>
+                            <c:if test="#{abogadoBean.selected != null}">
+                                EDITAR DATOS : #{abogadoBean.selected.nombreCompleto.toUpperCase()}
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('abogadoDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmAbogado">
+            <p:messages id="messages" showDetail="true" closable="true"/>
+            <div class="ui-fluid ui-g" jsf:id="pGridDatos">
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="@next" value="Cédula de ciudadanía: "/>
+                    </div>
+                    <p:inputText id="cedula" 
+                                 required="true"
+                                 requiredMessage="Debe ingresar la cédula del abogado"
+                                 value="#{abogadoBean.abogado.cedula}">
+                        <p:keyFilter regEx="/[\d]/"/>  
+                    </p:inputText>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="@next" value="Lugar expedición (C.C): "/>
+                    </div>
+                    <p:inputText id="cedulaLugar"
+                                 required="true"
+                                 requiredMessage="Debe lugar de expedición"
+                                 value="#{abogadoBean.abogado.cedulaExpedicion}"/>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="@next" value="Género:" />
+                    </div>
+                    <p:selectOneMenu id="abogado" value="#{abogadoBean.abogado.membrete}"
+                                     required="true"
+                                     style="width: 99.9999%"
+                                     requiredMessage="Debe seleccionar género">
+                        <f:selectItem itemLabel="Seleccione género" itemValue="" />
+                        <f:selectItem itemLabel="Masculino" itemValue="el Doctor" />
+                        <f:selectItem itemLabel="Femenino" itemValue="la Doctora" />
+                    </p:selectOneMenu>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="@next" value="Nombre completo: "/>
+                    </div>
+                    <p:inputText id="nombre_completo"
+                                 required="true"
+                                 requiredMessage="Debe ingresar nombre del abogado"
+                                 value="#{abogadoBean.abogado.nombreCompleto}"/>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="@next" value="N° tarjeta profesional: "/>
+                    </div>
+                    <p:inputText id="tp" 
+                                 required="true"
+                                 requiredMessage="Debe ingresar la tarjeta profesional"
+                                 value="#{abogadoBean.abogado.tarjetaProfesional}">
+                        <p:keyFilter regEx="/[\d]/"/> 
+                    </p:inputText>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="@next" value="Lugar expedición (T.P): "/>
+                    </div>
+                    <p:inputText id="tpLugar" 
+                                 required="true"
+                                 requiredMessage="Debe ingresar lugar de expedición (T.P)"
+                                 value="#{abogadoBean.abogado.tarjetaProfesionalExpedicion}">
+                    </p:inputText>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="messages,pGridDatos,:frmAbogadoList:dtAbogados" 
+                             action="#{abogadoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmAbogadoList:dtAbogados"
+                             action="#{abogadoBean.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{abogadoBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{abogadoBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

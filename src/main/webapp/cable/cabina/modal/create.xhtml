@@ -1,0 +1,139 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="cableCabina"
+              widgetVar="wlvCableCabina" 
+              modal="true" 
+              class="mr1024_50 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{cableCabinaBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{cableCabinaBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmCableCabina">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true"/>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Código" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            required="true"
+                            maxlength="6"
+                            requiredMessage="Debe ingresar un codigo"
+                            value="#{cableCabinaBean.codigo}"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            required="true"
+                            requiredMessage="Debe ingresar un nombre"
+                            value="#{cableCabinaBean.nombre}"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha Ini Op" for="@next"/>
+                        </div>
+                        <p:calendar showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar fecha inicio"
+                                    pattern="yyyy-MM-dd"
+                                    readonlyInput="true"
+                                    value="#{cableCabinaBean.cableCabina.fechaIniOp}">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha Fin Op" for="@next"/>
+                        </div>
+                        <p:calendar showOn="button" 
+                                    locale="es"
+                                    required="false"
+                                    requiredMessage="Debe seleccionar fecha fin"
+                                    pattern="yyyy-MM-dd"
+                                    readonlyInput="true"
+                                    value="#{cableCabinaBean.cableCabina.fechaFinOp}">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Horometro" for="@next"/>
+                        </div>
+                        <p:inputNumber 
+                            required="true"
+                            maxValue="99999.99"
+                            requiredMessage="Debe ingresar horometro"
+                            value="#{cableCabinaBean.cableCabina.horometro}"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:outputLabel for="pinza_pd" value="Pinza por defecto" />
+                        </div>
+                        <p:selectOneMenu id="pinza_pd" 
+                                         value="#{cableCabinaBean.i_idCablePinza}" 
+                                         filter="true"
+                                         style="width: 99.9999%"
+                                         required="true"
+                                         filterMatchMode="contains">
+                            <p:ajax global="false" process="@this"/>
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{cableCabinaBean.listCablePinza}" 
+                                           var="item"
+                                           itemDescription="#{item.descripcion}"
+                                           itemLabel="#{item.nombre}"
+                                           itemValue="#{item.idCablePinza}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         value="#{cableCabinaBean.cableCabina.descripcion}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmCableCabina,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtCableCabina" 
+                             action="#{cableCabinaBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmCableCabina,@this"
+                             update=":msgs,:frmPrincipal:dtCableCabina"
+                             action="#{cableCabinaBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{cableCabinaBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{cableCabinaBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

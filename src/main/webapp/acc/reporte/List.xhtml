@@ -1,0 +1,211 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <div class="ui-fluid">
+            <h:form id="list-accidente">
+                <p:panel id="pnl-busqueda" header="Reporte Casos de Accidentalidad" toggleable="true" class="Padding3">
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3" />
+                        <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3" jsf:id="panel-busq">
+                            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+                            <div class="ui-g">
+                                <p:panel id="panel-busqueda" header="Panel de Búsqueda" class="Padding0" style="width: 100%">
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                        <p:calendar id="fechaIni" 
+                                                    value="#{accReporteMaestroJSF.fechaIni}" 
+                                                    pattern="yyyy/MM/dd"
+                                                    title="Fecha de Inicio"
+                                                    mask="true"
+                                                    locale="es"
+                                                    navigator="true"
+                                                    showOn="button"/>
+                                    </div>
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                        <p:calendar id="fechaFin" 
+                                                    value="#{accReporteMaestroJSF.fechaFin}" 
+                                                    pattern="yyyy/MM/dd"
+                                                    mask="true"
+                                                    locale="es"
+                                                    navigator="true"
+                                                    title="Fecha Fin"
+                                                    showOn="button"/>
+                                    </div>
+                                    <p:separator/>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                        <p:selectOneMenu id="t-even" value="#{accReporteMaestroJSF.i_auxNovDet}" >
+                                            <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                            <f:selectItems value="#{accidenteJSF.listNovedadTipoDetalles}" 
+                                                           var="listntd" 
+                                                           itemLabel="#{listntd.tituloTipoNovedad}" 
+                                                           itemDescription="#{listntd.descripcionTipoNovedad}"
+                                                           itemValue="#{listntd.idNovedadTipoDetalle}" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                        <p:inputText id="cod-ope"
+                                                     value="#{accReporteMaestroJSF.i_codOpe}" 
+                                                     placeholder="Código de Operador"
+                                                     title="Código Operador"
+                                                     maxlength="10">
+                                            <p:keyFilter regEx="/[0-9]/i"/> 
+                                        </p:inputText>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                        <p:inputText id="cod-veh"
+                                                     value="#{accReporteMaestroJSF.c_codVeh}" 
+                                                     placeholder="Código de Vehiculo"
+                                                     title="Código Vehículo"
+                                                     maxlength="10"/>
+                                    </div>
+                                    <p:separator/>
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                        <p:commandButton id="buscar"
+                                                         actionListener="#{accReporteMaestroJSF.buscarAccidente()}"
+                                                         icon="fa fa-search"
+                                                         value="Buscar"
+                                                         class="cssWhite GreenButton"
+                                                         update=":form-acc-reporte,list-accidente:msg"
+                                                         process="@form" />
+                                    </div>
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                        <p:commandButton id="limpiar"
+                                                         actionListener="#{accidenteJSF.limpiar()}"
+                                                         icon="fa fa-remove"
+                                                         value="Limpiar"
+                                                         class="cssWhite"
+                                                         update="panel-busq"
+                                                         process="@this" />
+                                    </div>
+                                </p:panel>
+                            </div>
+                            <div class="EmptyBox5" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3" />
+                    </div>
+                </p:panel>
+            </h:form> 
+            <div class="EmptyBox5" />
+            <h:form id="form-acc-reporte" >
+                <p:panel id="pnl-accidentes" header="Accidentes encontrados #{accReporteMaestroJSF.listAccidente.size()}" class="Padding3">
+                    <div class="ui-g Padding0" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:dataTable id="table-accidente" 
+                                         var="accL" 
+                                         value="#{accReporteMaestroJSF.listAccidente}" 
+                                         scrollHeight="500"
+                                         rows="5"
+                                         rowIndexVar="rowIdx"
+                                         scrollable="true"
+                                         paginator="true"
+                                         emptyMessage="No exiten registros"
+                                         reflow="true"
+                                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         widgetVar="WVtableAcc"
+                                         rowKey="#{rowIdx + 1}">
+                                <f:facet name="header">
+                                    <div style="text-align: right;width: 100%">
+                                        <h:commandLink>
+                                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                            <p:dataExporter type="xlsx" target="table-accidente" fileName="Reporte Accidentalidad #{now}" />
+                                        </h:commandLink>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width:30px;">
+                                    <h:outputText value="#{rowIdx + 1}"/>
+                                </p:column>
+                                <p:column headerText="Tipo de Evento">
+                                    <h:outputText value="#{accL.idNovedadTipoDetalle.tituloTipoNovedad}"/>
+                                </p:column>
+                                <p:column headerText="Codigo Operador" filterBy="#{accL.idEmpleado.codigoTm}" filterMatchMode="contains">
+                                    <h:outputText value="#{accL.idEmpleado.codigoTm}" 
+                                                  title="#{accL.idEmpleado.nombres.concat(' ').concat(accL.idEmpleado.apellidos)}"/>
+                                </p:column>
+                                <p:column headerText="Operador" filterBy="#{accL.idEmpleado.nombres} #{accL.idEmpleado.apellidos}" filterMatchMode="contains">
+                                    <h:outputText value="#{accL.idEmpleado.nombres.concat(' ').concat(accL.idEmpleado.apellidos)}"/>
+                                </p:column>
+                                <p:column headerText="Vehículo" filterBy="#{accL.idVehiculo.codigo}" filterMatchMode="contains">
+                                    <h:outputText value="#{accL.idVehiculo.codigo}" />
+                                </p:column>
+                                <p:column headerText="Observación" style="overflow:hidden;white-space:nowrap;text-overflow: ellipsis;">
+                                    <h:outputText value="#{accL.descripcion}" title="#{accL.descripcion}" />
+                                </p:column>
+                                <p:column headerText="IPAT" filterBy="#{accL.nroIpat.length() > 0 ? 1 : 0}" filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('WVtableAcc').filter()">
+                                            <f:selectItem itemLabel="Todos" noSelectionOption="true" />
+                                            <f:selectItem itemLabel="Si" itemValue="#{1}"/>
+                                            <f:selectItem itemLabel="No" itemValue="#{0}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{accL.nroIpat}" />
+                                </p:column>
+                                <p:column headerText="Caso Tm" 
+                                          style="width:40px;"
+                                          filterBy="#{accL.casoTm == 1 ? 1 : 0}"
+                                          filterMatchMode="exact">
+                                    <f:facet name="filter">
+                                        <p:selectOneMenu onchange="PF('WVtableAcc').filter()"
+                                                         style="width: 20px" 
+                                                         title="Seleccione Uno">
+                                            <f:selectItem itemLabel="Todos" noSelectionOption="true" />
+                                            <f:selectItem itemLabel="Si" itemValue="#{1}"/>
+                                            <f:selectItem itemLabel="No" itemValue="#{0}"/>
+                                        </p:selectOneMenu>
+                                    </f:facet>
+                                    <h:outputText value="#{accL.casoTm == 1 ? 'SI' : 'NO'}" />
+                                </p:column>
+                                <p:column headerText="Inmovilizado" style="width:70px;">
+                                    <h:outputText value="#{accReporteMaestroJSF.getImovilizadoVehiculo(accL.idAccidente)}" />
+                                </p:column>
+                                <p:column headerText="Máster">
+                                    <h:outputText value="#{accL.idMaster.nombres.concat(' ').concat(accL.idMaster.apellidos)}" />
+                                </p:column>
+                                <p:column headerText="Coordenadas">
+                                    <h:outputText value="#{accReporteMaestroJSF.getCoordenadas(accL.idAccidente)}" />
+                                </p:column>
+                                <p:column headerText="Fecha del Evento">
+                                    <h:outputText value="#{accL.fechaAcc}">
+                                        <f:convertDateTime pattern="yyyy-MMMM-dd"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Hora">
+                                    <h:outputText value="#{accL.fechaAcc}">
+                                        <f:convertDateTime pattern="HH:mm:ss"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Tiempo de Reacción">
+                                    <h:outputText value="#{accReporteMaestroJSF.getTiempoReaccion(accL)}" />
+                                </p:column>
+                                <p:column headerText="Servicio" filterBy="#{accL.idPrgTc.idTaskType.tarea}" filterMatchMode="contains">
+                                    <h:outputText value="#{accL.idPrgTc.idTaskType.tarea}" />
+                                </p:column>
+                                <p:column headerText="Causalidades" style="overflow:hidden;white-space:nowrap;text-overflow: ellipsis;">
+                                    <h:outputText value="#{accReporteMaestroJSF.getAccidenteAnalisis(accL.idAccidente)}"
+                                                  title="#{accReporteMaestroJSF.getAccidenteAnalisis(accL.idAccidente)}"/>
+                                </p:column>
+                                <p:column headerText="VrConciliado">
+                                    <h:outputText value="#{accL.valorConciliado}"  >
+                                        <f:convertNumber pattern="$#,###.###" currencySymbol="$" type="currency"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Costos">
+                                    <h:outputText value="#{accReporteMaestroJSF.getAccCostos(accL.idAccidente)}" >
+                                        <f:convertNumber pattern="$#,###.###" currencySymbol="$" type="currency"/>
+                                    </h:outputText>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </p:panel>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

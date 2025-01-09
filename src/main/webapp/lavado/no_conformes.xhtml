@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+            .text-mayus{
+                text-transform: uppercase;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="LAVADOS NO CONFORMES">
+            <h:form id="frmNoConformeList">
+                <p:growl id="msg" showDetail="true" showSummary="true" life="5000"/>
+                <p:dataTable id="dtNoConforme" var="noConforme"
+                             rowIndexVar="nroFila"
+                             paginator="true"
+                             rows="20"
+                             filterDelay="1700"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             widgetVar="noConformeDlg"
+                             value="#{lavadoBean.lstLavadoNoConforme}"
+                             selectionMode="single" 
+                             selection="#{lavadoBean.selectedNoConforme}" 
+                             rowKey="#{noConforme.idLavadoNoConforme}"
+                             reflow="true"
+                             emptyMessage="No se encontraron registros!!">
+                    <p:ajax event="rowSelect" listener="#{lavadoBean.onRowSelect}" update="editButton" />
+                    <p:ajax event="rowUnselect" listener="#{lavadoBean.reset()}" update="dtNoConforme" />
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:outputLabel value="Fecha " class="cssWhite Fs20" for="desde"></p:outputLabel>
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{lavadoBean.fechaDesde}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" listener="#{lavadoBean.consultarNoConforme()}" 
+                                        update="dtNoConforme"></p:ajax>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{lavadoBean.fechaHasta}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" listener="#{lavadoBean.consultarNoConforme()}" 
+                                        update="dtNoConforme"></p:ajax>
+                            </p:calendar>
+                            <p:commandButton oncomplete="PF('noConformeDlg').show()"
+                                             action="#{lavadoBean.nuevo()}"
+                                             update="dtNoConforme :noConforme"
+                                             value="Nuevo"
+                                             icon = "fa fa-plus">
+                                <p:resetInput target="frmNoConforme"/>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"   
+                                             value="Editar" 
+                                             update=":editNoConforme, :frmEditNoConforme" 
+                                             icon="fa fa-pencil" 
+                                             action="#{lavadoBean.editarNoConforme()}"
+                                             disabled="#{empty lavadoBean.selectedNoConforme.idLavadoNoConforme}"
+                                             class="cssWhite GreenButton"
+                                             oncomplete="PF('editNoConformeDlg').show()">
+                                <p:resetInput target="frmNoConforme"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha"
+                              filterBy="#{noConforme.fechaHora}"
+                              width="100" 
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{noConforme.fechaHora}">
+                            <f:convertDateTime pattern="yyyy/MM/dd - HH:mm" timeZone="GMT"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vehículo"
+                              filterBy="#{noConforme.idVehiculoMulti}"
+                              width="100"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{lavadoBean.obtenerVehMulti(noConforme.idVehiculoMulti)}"/>
+                    </p:column>
+                    <p:column headerText="Responsable"
+                              filterBy="#{noConforme.idResponsableMulti}"
+                              width="250"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{lavadoBean.obtenerRespMulti(noConforme.idResponsableMulti)}"/>
+                    </p:column>
+                    <p:column headerText="Actividad"
+                              filterBy="#{noConforme.idActividadMulti}"
+                              width="150"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{noConforme.idActividadMulti}"/>
+                    </p:column>
+                    <p:column headerText="Observación"
+                              filterBy="#{noConforme.observacion}"
+                              filterMatchMode="contains"
+                              styleClass="text-center text-mayus">
+                        <h:outputText value="#{noConforme.observacion}"/>
+                    </p:column>
+                    <p:column headerText="Estado">
+                        <p:selectBooleanButton value="#{noConforme.solucionado}" onLabel="Solucionado" offLabel="No Solucionado">
+                            <p:ajax listener="#{lavadoBean.solucionar(noConforme)}"/>
+                        </p:selectBooleanButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{lavadoBean.lstNOLavados.size()} registro(s).
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 34px;height: 34px"/>
+                                <p:dataExporter type="xlsx" target="dtNoConforme" fileName="LISTADO DE LAVADOS"
+                                                />
+                            </h:commandLink>
+                            <h:commandLink rendered="false">
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="dtNoConforme" fileName="LISTADO DE LAVADOS"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+                <p:contextMenu for="dtNoConforme">
+                    <p:menuitem value="Editar" action="#{lavadoBean.editar()}" 
+                                update="" icon="fa fa-pencil">
+                        <p:resetInput target=""/>
+                    </p:menuitem>
+                </p:contextMenu>
+            </h:form>
+        </p:panel>
+        <ui:include src="noConforme/create.xhtml"/>
+        <ui:include src="noConforme/edit.xhtml"/>
+    </ui:define>
+
+</ui:composition>

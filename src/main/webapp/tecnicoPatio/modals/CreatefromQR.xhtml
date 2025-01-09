@@ -1,0 +1,94 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="mentradasalidaqr" 
+              id="modalEntradaSalidaqr"
+              modal="true" 
+              closeOnEscape="true"
+              closable="false"
+              responsive="true"
+              position="center top"
+              resizable="false" appendTo="@(body)">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Registro de entradas y salidas QR" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('mentradasalidaqr').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmEntradaSalidaqr">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid" jsf:id="pGrid">
+                <div class="ui-g">                        
+                    <div class="ui-g-6 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <div class="ui-g">
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0"> 
+                                            <center>
+                                                <h:outputText value="#{tecnicoPatioController.vehiculo}" style="font-size: 10px;"/>
+                                            </center>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                <center>
+                    <p:commandButton value="Entrada"
+                                     icon="fa fa-save"
+                                     onclick="rc_entrada()"
+                                     id="btnGuardarEntrada"
+                                     class="cssWhite"
+                                     update=":formTp,modalEntradaSalidaqr"
+                                     rendered="true">
+                        <p:confirm header="Confirmación"
+                                   message="Ésta seguro que desea realizar la acción sobre el vehículo: #{tecnicoPatioController.vehiculo.codigo}?" 
+                                   icon="fa fa-exclamation-triangle"/>
+                    </p:commandButton>
+                    <p:commandButton value="Salida"
+                                     icon="fa fa-save"
+                                     onclick="rc_salida()"
+                                     id="btnGuardarSalida"
+                                     class="cssWhite"
+                                     update=":formTp,modalEntradaSalidaqr"
+                                     rendered="true">
+                        <p:confirm header="Confirmación"
+                                   message="Ésta seguro que desea realizar la acción sobre el vehículo: #{tecnicoPatioController.vehiculo.codigo}?" 
+                                   icon="fa fa-exclamation-triangle"/>
+                    </p:commandButton>
+                    <p:remoteCommand name="rc_entrada"
+                                     process="@this,frmEntradaSalidaqr"
+                                     update=":formTp,:msgs,modalEntradaSalidaqr"
+                                     action="#{tecnicoPatioController.Guardar(1,0)}"
+                                     rendered="true"/>
+                    <p:remoteCommand name="rc_salida"
+                                     process="@this,frmEntradaSalidaqr"
+                                     update=":formTp,:msgs,modalEntradaSalidaqr"
+                                     action="#{tecnicoPatioController.Guardar(0,0)}"
+                                     rendered="true"/>
+                </center>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

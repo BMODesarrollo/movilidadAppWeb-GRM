@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .aTexAlRight{
+                text-align: right;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Registro valores conciliados
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmUf">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmPrincipal:dtValoresConciliados" 
+                                            listener="#{registroVrConciliadoBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtValoresConciliados" var="item" 
+                             scrollable="true"
+                             widgetVar="dtDocumento"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{registroVrConciliadoBean.lstRegistros}">
+
+                    <f:facet name="header">
+                        <div jsf:id="botones">
+                            <div class="ui-fluid">
+                                <div align="right">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-7 ui-lg-7 Padding5">
+                                        </div>
+                                        <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5">
+                                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Desde: " for="desde" class="cssWhite"/>
+                                                <p:calendar id="desde" 
+                                                            locale="es" navigator="true"
+                                                            value="#{registroVrConciliadoBean.desde}" placeholder="Fecha">
+                                                    <p:ajax event="dateSelect" listener="#{registroVrConciliadoBean.consultar()}" update="dtValoresConciliados"></p:ajax>
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Hasta: " for="hasta" class="cssWhite"/>
+                                                <p:calendar id="hasta"
+                                                            locale="es" navigator="true"
+                                                            value="#{registroVrConciliadoBean.hasta}" placeholder="Fecha">
+                                                    <p:ajax event="dateSelect" listener="#{registroVrConciliadoBean.consultar()}" update="dtValoresConciliados"></p:ajax>
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-plus"
+                                                    value="Nuevo"
+                                                    action="#{registroVrConciliadoBean.nuevo()}"
+                                                    class="cssWhite"
+                                                    update="dtValoresConciliados,:registroVrConciliado,:frmRegistroVrConciliado,msgs"
+                                                    >
+                                                </p:commandButton>       
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center"
+                              filterBy="#{item.idVehiculoTipo.nombreTipoVehiculo}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Tipo Vehículo"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idVehiculoTipo.nombreTipoVehiculo}"/>
+                    </p:column>
+                    
+                    <p:column styleClass="text-center"
+                              filterBy="#{item.idGopUnidadFuncional.codigo}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Unidad Funcional"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idGopUnidadFuncional.codigo}"/>
+                    </p:column>
+
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Kms Comerciales"/>
+                        </f:facet>
+                        <h:outputText value="#{item.kmsComercial}">
+                            <f:convertNumber type="number" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Kms Vacío"/>
+                        </f:facet>
+                        <h:outputText value="#{item.kmsVacio}">
+                            <f:convertNumber type="number" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="TexAlRight">
+                        <f:facet name="header">
+                            <h:outputText value="Vr Kms Comerciales"/>
+                        </f:facet>
+                        <h:outputText value="#{item.vrKmComercial}">
+                            <f:convertNumber type="number" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="TexAlRight">
+                        <f:facet name="header">
+                            <h:outputText value="Vr Kms Vacío"/>
+                        </f:facet>
+                        <h:outputText value="#{item.vrKmVacio}">
+                            <f:convertNumber type="number" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="TexAlRight">
+                        <f:facet name="header">
+                            <h:outputText value="Total Conciliación"/>
+                        </f:facet>
+                        <h:outputText value="#{item.totalConciliacion}">
+                            <f:convertNumber type="number" />
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Usuario"/>
+                        </f:facet>
+                        <h:outputText value="#{item.username}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Acciones" style="text-align: center;"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{registroVrConciliadoBean.editar()}"
+                                                 process="@this"
+                                                 update=":registroVrConciliado,:frmRegistroVrConciliado,msgs"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{item}" target="#{registroVrConciliadoBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{registroVrConciliadoBean.lstRegistros.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtValoresConciliados" 
+                                                fileName="Lista valores conciliados"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

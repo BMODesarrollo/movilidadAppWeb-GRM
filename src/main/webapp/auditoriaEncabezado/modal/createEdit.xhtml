@@ -1,0 +1,147 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="crear_audi_encabezado_id_dialog"
+              widgetVar="crear_audi_encabezado_dialog_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="true"
+              class="mr1024_60 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" 
+              header="Gestión Encabezado para Auditoría">
+        <h:form id="create_edit_dialog_form">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="input_nombre" value="Nombre"/>
+                        <p:inputText id="input_nombre" required="true"
+                                     disabled="#{audiEncabezadoJSFMB.b_editar}"
+                                     value="#{audiEncabezadoJSFMB.auditoriaEncabezado.titulo}" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="id_fecha_desde" value="Fecha Desde"/>
+                        <p:calendar id="id_fecha_desde" required="true"
+                                    value="#{audiEncabezadoJSFMB.auditoriaEncabezado.fechaDesde}"
+                                    navigator="true"
+                                    locale="es"
+                                    disabled="#{audiEncabezadoJSFMB.b_editar}"
+                                    pattern="yyyy/MM/dd"
+                                    mask="9999/99/99"
+                                    placeholder="AAAA/MM/DD"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="id_fecha_desde"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="id_fecha_hasta" value="Fecha Hasta"/>
+                        <p:calendar id="id_fecha_hasta" required="true"
+                                    value="#{audiEncabezadoJSFMB.auditoriaEncabezado.fechaHasta}"
+                                    navigator="true"
+                                    locale="es"
+                                    disabled="#{audiEncabezadoJSFMB.b_editar}"
+                                    pattern="yyyy/MM/dd"
+                                    mask="9999/99/99"
+                                    placeholder="AAAA/MM/DD"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="id_fecha_hasta"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <hr/>
+                        <p:outputLabel for="select_tipo_auditoria" value="Tipo Auditoría" />
+                        <p:selectOneMenu id="select_tipo_auditoria" 
+                                         value="#{audiEncabezadoJSFMB.i_tipo_auditoria}" 
+                                         filter="true"
+                                         disabled="#{audiEncabezadoJSFMB.b_editar}"
+                                         required="true"
+                                         filterMatchMode="contains">
+                            <p:ajax global="false" process="@this"/>
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{audiEncabezadoJSFMB.listTipoAuditoria}" 
+                                           var="item"
+                                           itemDescription="#{item.descripcion}"
+                                           itemLabel="#{item.nombre}"
+                                           itemValue="#{item.idAuditoriaTipo}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="select_lugar_auditoria" value="Lugar Auditoría"  />
+                        <p:selectOneMenu id="select_lugar_auditoria" 
+                                         value="#{audiEncabezadoJSFMB.i_lugar_auditoria}" 
+                                         filter="true"
+                                         disabled="#{audiEncabezadoJSFMB.b_editar}"
+                                         required="true"
+                                         filterMatchMode="contains">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}"/>
+                            <f:selectItems value="#{audiEncabezadoJSFMB.listLugarAuditoria}" 
+                                           var="item"
+                                           itemDescription="#{item.descripcion}"
+                                           itemLabel="#{item.nombre}"
+                                           itemValue="#{item.idAuditoriaLugar}"/>
+                            <p:ajax global="falso" process="@this"/>
+
+                        </p:selectOneMenu>
+                    </div>
+
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <p:outputLabel for="select_activa" value="Activa"/>
+                        <p:selectBooleanButton 
+                            id="select_activa" 
+                            value="#{audiEncabezadoJSFMB.b_activa}" 
+                            onLabel="Sí" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            offLabel="No"/>
+                        <p:tooltip id="toolTip_activa" 
+                                   for="select_activa" 
+                                   value="Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5 ">
+                        <p:outputLabel for="descripcion" value="Descripción"/>
+                        <p:inputTextarea id="descripcion" 
+                                         required="true" 
+                                         maxlength="200"
+                                         disabled="#{audiEncabezadoJSFMB.b_editar}"
+                                         value="#{audiEncabezadoJSFMB.auditoriaEncabezado.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{audiEncabezadoJSFMB.guardar()}"
+                             rendered="#{audiEncabezadoJSFMB.auditoriaEncabezado.idAuditoriaEncabezado==null}"
+                             process="@this,select_activa,input_nombre,descripcion"
+                             update="msgs,,create_edit_dialog_form,audi_encabezado_form:datalist"/>
+            <p:remoteCommand name="rcc" 
+                             class="cssWhite"
+                             action="#{audiEncabezadoJSFMB.edit()}"
+                             rendered="#{audiEncabezadoJSFMB.auditoriaEncabezado.idAuditoriaEncabezado!=null}"
+                             process="@this,select_activa,input_nombre,descripcion"
+                             update="msgs,create_edit_dialog_form,audi_encabezado_form:datalist"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarL" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             rendered="#{audiEncabezadoJSFMB.auditoriaEncabezado.idAuditoriaEncabezado==null}"
+                             onclick="rc()"/>
+            <p:commandButton id="btnGuardarLC" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{audiEncabezadoJSFMB.auditoriaEncabezado.idAuditoriaEncabezado!=null}"
+                             value="Actualizar" 
+                             onclick="rcc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

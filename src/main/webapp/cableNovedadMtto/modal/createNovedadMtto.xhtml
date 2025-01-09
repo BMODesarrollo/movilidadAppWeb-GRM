@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="nov_mtto_add_wv" id="nov_dialog_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top"
+              class="mr1024_50 mr500_90"
+              height="auto" header="Agregar Novedad">
+        <h:form id="nov_dialog_form">
+            <div class="ui-fluid">
+                <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <p:messages id="msgs_photo" showSummary="false" showDetail="true" closable="false">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:staticMessage severity="warn"
+                                         summary="AVISO" 
+                                         rendered="#{novedadMttoDiariaJSF.tamanoNovedadDocumento eq null}"
+                                         detail="Si desea agregar archivos a la novedad, DEBE crear una llave con el nombre novMtoTamano y como valor colocar limite ( en BYTES ) por archivo... En el módulo Configuración Empresa ( Configuración / Empresa ) ===> Avisar a tecnología"/>
+                    </div>
+                </div>
+
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha" value="Fecha:" />
+                        <p:calendar id="fecha" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Debe seleccionar una fecha"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{novedadMttoDiariaJSF.novedad.fechaHoraNov}">
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMNovedadMttoTipo" value="Tipo de novedad: *"/>
+                        <p:selectOneMenu id="SOMNovedadMttoTipo"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novedadMttoDiariaJSF.i_novedad_mtto_tipo}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{novedadMttoDiariaJSF.listNovMttoTipo}"
+                                           var="genTipo" itemLabel="#{genTipo.nombre}"
+                                           itemDescription="#{genTipo.descripcion}"
+                                           itemValue="#{genTipo.idNovedadMttoTipo}" />
+                            <p:ajax listener="#{novedadMttoDiariaJSF.prepareTipoDetalles(true)}" update="SOMNovedadMttoTipoDet"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMNovedadMttoTipoDet" value="Detalle de tipo novedad: *"/>
+                        <p:selectOneMenu id="SOMNovedadMttoTipoDet"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novedadMttoDiariaJSF.i_novedad_mtto_tipo_det}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{novedadMttoDiariaJSF.listNovMttoTipoDet}"
+                                           var="tipoDet" itemLabel="#{tipoDet.nombre}"
+                                           itemDescription="#{tipoDet.descripcion}"
+                                           itemValue="#{tipoDet.idNovedadMttoTipoDet}" />
+                            <p:ajax listener="#{novedadMttoDiariaJSF.prepareTipoDetalles(false)}"/>
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Fotos Novedad">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{novedadMttoDiariaJSF.handleFileUploadFotosNovedad}"
+                                              id="foto"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="#{novedadMttoDiariaJSF.tamanoNovedadDocumento}"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG|mp4|MP4)$/"
+                                              update="msgs_photo"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG, .mp4, .MP4"
+                                              process="@this"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen ó video válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de #{novedadMttoDiariaJSF.tamanoNovedadDocumento.split('0')[0]}MB"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="descripcion" value="Descripción:" />
+                        <p:inputTextarea id="descripcion" 
+                                         value="#{novedadMttoDiariaJSF.novedad.descripcion}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una descripcion"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_add" 
+                             class="cssWhite"
+                             actionListener="#{novedadMttoDiariaJSF.agregarNovedad()}"  
+                             value="Guardar" 
+                             process="nov_dialog_form"
+                             update="msgs,form-modal:dt_id_nov"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnAgregarNov" icon="fa fa-save" value="Agregar" 
+                             class="cssWhite" onclick="rc_add()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

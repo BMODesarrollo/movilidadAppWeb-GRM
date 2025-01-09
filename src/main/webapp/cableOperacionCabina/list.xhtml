@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .bgDefault {
+                background-color: green;
+                border-radius: 3px;
+                color: white;
+                font-weight: bold;
+                /*-webkit-text-stroke: 0.7px black;*/
+            }
+
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Operación Cabinas">
+            <h:form id="form_cabina_operacion">
+                <div class="ui-fluid ui-g">
+                    <p:staticMessage severity="warn"
+                                     id="msgs_cabinas_cargadas"
+                                     summary="Advertencia"
+                                     detail="No hay cabinas cargadas para la fecha." 
+                                     rendered="#{cabinaOperacionJSFMB.flag_cabinas_cargadas}"
+                                     style="width: 100%"/>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <p:selectOneRadio id="console" value="#{cabinaOperacionJSFMB.filtroV}" class="cssWhite" unselectable="true">
+                            <f:selectItem itemLabel="Todas" itemValue="0"  />
+                            <f:selectItem itemLabel="Operación" itemValue="2" />
+                            <f:selectItem itemLabel="No Operando" itemValue="1" />
+                            <p:ajax update="dg_cabina_id" 
+                                    event="valueChange" 
+                                    process="console" 
+                                    listener="#{cabinaOperacionJSFMB.filtrar()}"/>
+                        </p:selectOneRadio>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <p:dataGrid var="cabina" value="#{cabinaOperacionJSFMB.list}"
+                                    columns="12" layout="grid"
+                                    id="dg_cabina_id" >
+                            <f:facet name="header">
+                                <div class="ui-fluid">
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-4 ui-lg-2 Padding5" >
+                                            <p:calendar id="fecha_fecha" 
+                                                        pattern="yyyy/MM/dd"
+                                                        value="#{cabinaOperacionJSFMB.fecha}"
+                                                        locale="es"
+                                                        showOn="button"
+                                                        navigator="true"
+                                                        onkeypress="if (event.keyCode === 13) {
+                                                                    return false;
+                                                                }">
+                                                <p:ajax event="dateSelect"
+                                                        listener="#{cabinaOperacionJSFMB.consultar(3)}"
+                                                        process="@this" 
+                                                        update="form_cabina_operacion,msgs"/>
+                                            </p:calendar>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" >
+                                            <p:commandButton value="Cargar Cabinas" 
+                                                             class="cssWhite"
+                                                             icon="fa fa-refresh"
+                                                             rendered="#{cabinaOperacionJSFMB.flag_cabinas_cargadas}"
+                                                             update="dg_cabina_id,
+                                                             msgs,
+                                                             form_cabina_operacion"
+                                                             action="#{cabinaOperacionJSFMB.cargarCabinas()}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </f:facet>
+                            <p:commandLink id="id"
+                                           title="Click para Gestión cabina "
+                                           update="form_cabina_operacion:dg_cabina_id:#{cabinaOperacionJSFMB.list.indexOf(cabina)}:id,gestion_dialog,gestion_dialog_form"
+                                           action="#{cabinaOperacionJSFMB.registrarOperacion(cabina)}">
+                                <div class="TexAlCenter bgDefault cssMenuItem" jsf:id="cb">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 TexAlLeft" style="background-color: darkgreen;    border-radius: 3px;">
+                                            <p:outputLabel class="Fs11 cssWhite Padding5" 
+                                                           value="AM"
+                                                           id="id_am"/>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 TexAlRight" style="background-color: darkgreen;    border-radius: 3px;">
+                                            <p:outputLabel class="Fs11 cssWhite Padding5" 
+                                                           value="PM"
+                                                           id="id_pm"/>
+                                        </div>
+                                        <p:graphicImage name="images/teleferico.png" width="80%"  library="sentinel-layout"/>
+                                    </div>
+                                    <br/>
+                                    <span class="Fs20">
+                                        #{cabinaOperacionJSFMB.estado(cabina)}
+                                        #{cabina.idCableCabina.nombre }
+                                    </span>
+                                </div>
+                            </p:commandLink>  
+                        </p:dataGrid>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/gestion.xhtml"/>
+    </ui:define>
+</ui:composition>

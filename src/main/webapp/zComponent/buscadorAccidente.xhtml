@@ -1,0 +1,144 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <h:form id="form-busqu-acc">
+        <p:panel id="panel-busqueda"
+                 widgetVar="pnlBusqWV"
+                 header="Busqueda Accidente"
+                 toggleable="true" 
+                 style="width: 100%">
+            <div class="ui-fluid ui-g">
+                <div class="ui-g-6 ui-md-2 ui-lg-2">
+                    Fecha Inicio
+                    <p:calendar id="fechaIni" 
+                                value="#{buscadorAccidenteJSF.inicio}" 
+                                pattern="yyyy/MM/dd"
+                                title="Fecha de Inicio"
+                                mask="true"
+                                locale="es"
+                                navigator="true"
+                                showOn="button"/>
+                </div>
+                <div class="ui-g-6 ui-md-2 ui-lg-2">
+                    Fecha Fin
+                    <p:calendar id="fechaFin" 
+                                value="#{buscadorAccidenteJSF.fin}" 
+                                pattern="yyyy/MM/dd"
+                                mask="true"
+                                locale="es"
+                                navigator="true"
+                                title="Fecha Fin"
+                                showOn="button"/>
+                </div>
+                <div class="ui-g-12 ui-md-4 ui-lg-2">
+                    Detalle
+                    <p:selectOneMenu id="t-even" value="#{buscadorAccidenteJSF.idNovedadTipopDetalle}"
+                                     style="width: 99.9999%">
+                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                        <f:selectItems value="#{buscadorAccidenteJSF.listNovedadTipoDetalles}" 
+                                       var="listntd" 
+                                       itemLabel="#{listntd.tituloTipoNovedad}" 
+                                       itemDescription="#{listntd.descripcionTipoNovedad}"
+                                       itemValue="#{listntd.idNovedadTipoDetalle}" />
+                    </p:selectOneMenu>
+                </div>
+                <div class="ui-g-12 ui-md-4 ui-lg-2" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                    Unidad Funcional
+                    <ui:include src="../zComponent/selectUnidadFuncional.xhtml" />
+                </div>
+                <div class="ui-g-6 ui-md-2 ui-lg-2">
+                    Empleado
+                    <p:inputNumber id="cod-ope"
+                                   value="#{buscadorAccidenteJSF.codEmpleado}" 
+                                   placeholder="Código de Operador"
+                                   title="Código Operador" />
+                </div>
+                <div class="ui-g-6 ui-md-2 ui-lg-2">
+                    Vehículo
+                    <p:inputText id="cod-veh"
+                                 value="#{buscadorAccidenteJSF.codVehiculo}" 
+                                 placeholder="Código de Vehiculo"
+                                 title="Código Vehículo"
+                                 maxlength="10"/>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-8"/>
+                <div class="ui-g-6 ui-md-3 ui-lg-2">
+                    <p:commandButton id="buscar"
+                                     actionListener="#{buscadorAccidenteJSF.buscarAccidente()}"
+                                     icon="fa fa-search"
+                                     value="Buscar"
+                                     class="cssWhite GreenButton"
+                                     update="@form,msgs"
+                                     process="@form" />
+                </div>
+                <div class="ui-g-6 ui-md-3 ui-lg-2">
+                    <p:commandButton id="limpiar"
+                                     actionListener="#{buscadorAccidenteJSF.limpiar()}"
+                                     icon="fa fa-remove"
+                                     value="Limpiar"
+                                     class="cssWhite"
+                                     update="@form"
+                                     process="@this" />
+                </div>
+            </div>
+            <p:dataTable id="table-accidente" 
+                         var="acc" 
+                         value="#{buscadorAccidenteJSF.listAccidente}" 
+                         selectionMode="single" 
+                         rows="5"
+                         rowIndexVar="rowIdx"
+                         style="margin-top: 10px"
+                         paginator="true"
+                         emptyMessage="No exiten registros"
+                         reflow="true"
+                         rowKey="#{acc.idAccidente}">
+                <f:facet name="header">
+                    Registros encontrados: #{buscadorAccidenteJSF.listAccidente.size()}
+                </f:facet>
+
+                <p:column headerText="#">
+                    <h:outputText value="#{rowIdx + 1}" />
+                </p:column>
+                <p:column headerText="Tipo Evento" class="TexAlCenter">
+                    <h:outputText value="#{acc.idNovedadTipoDetalle.tituloTipoNovedad}" class="Fs21" style="color: red;font-weight: bold"/>
+                </p:column>
+                <p:column headerText="Vehículo" class="TexAlCenter">
+                    <h:outputText value="#{acc.idVehiculo.codigo}" style="font-weight: bold" />
+                </p:column>
+                <p:column headerText="Código Ope" class="TexAlCenter">
+                    <h:outputText value="#{acc.idEmpleado.codigoTm}" 
+                                  title="#{acc.idEmpleado.nombresApellidos()}" 
+                                  style="font-weight: bold"/>
+                </p:column>
+                <p:column headerText="Fecha">
+                    <h:outputText value="#{acc.fechaAcc}" style="font-weight: bold">
+                        <f:convertDateTime pattern="MMM-dd HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Mas Información" class="TexAlCenter">
+                    <p:commandButton id="btn-more-information"   
+                                     value="Gestionar" 
+                                     actionListener="#{buscadorAccidenteJSF.onSetAccidente(acc)}" 
+                                     update="@form,:tap-view" 
+                                     icon="fa fa-info" 
+                                     class="cssWhite"
+                                     oncomplete="PF('pnlBusqWV').toggle()" />
+                </p:column>
+                <p:column headerText="Asistencia" class="TexAlCenter">
+                    <p:commandButton id="btn-confirm-asistencia"   
+                                     value="Asistencia" 
+                                     disabled="#{acc.fechaAsistencia != null}"
+                                     actionListener="#{buscadorAccidenteJSF.onSetAccidenteAsistencia(acc)}" 
+                                     update="@form,:tap-view,:msgs" 
+                                     process="@this"
+                                     icon="fa fa-bell" 
+                                     class="cssWhite" />
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+    </h:form> 
+</ui:composition>

@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .cssAmbos{
+                background-color: #048ABF;
+            }
+            .cssPendiente{
+                background-color: #A7C8F2;
+            }
+
+            @media only screen and (max-width: 600px) {
+                .texto-blanco {
+                    color: white !important;
+                    font-weight: bolder !important;
+                }
+            }
+
+            @media screen and (max-width: 500px ) {
+                .modalResponsivo { width: 90% !important;} 
+                .modalResponsivoMaterial { width: 90% !important; }
+            }
+
+            @media screen and (min-width: 1024px ) {
+                .modalResponsivo { width: 70% !important; }
+                .modalResponsivoMaterial { width: 60% !important; }
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Ingreso/Salida materiales/herramientas">
+            <h:form id="frmEsMatEqui">
+                <p:dataTable id="dtMatEqui"
+                             var="registro" 
+                             value="#{sstEsMatEquiBean.lstEsMatEqui}"
+                             scrollable="true"
+                             widgetVar="wlVMatEqui"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{sstEsMatEquiBean.nuevo()}"
+                                oncomplete="PF('wlvEsMatEqui').show();"
+                                class="cssWhite"
+                                update="dtMatEqui,:EsMatEqui,:frmEsMatEqui"
+                                >
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+
+                    <p:column style="width:30px" exportable="false">
+                        <p:rowToggler />
+                    </p:column>
+
+                    <p:column style="text-align: center;"
+                              width="10%"
+                              styleClass="#{registro.tipoAcceso == 1 ? 'cssGreen texto-blanco' : registro.tipoAcceso == 0 ? 'cssRed texto-blanco' : registro.tipoAcceso == 2 ? 'cssAmbos texto-blanco':null}">
+                        <f:facet name="header">
+                            <h:outputText value="Tipo Acceso"/>
+                        </f:facet>
+                        <h:outputText value="ENTRADA" style="color: white; font-weight: bolder" rendered="#{registro.tipoAcceso == 0}"/>
+                        <h:outputText value="SALIDA" style="color: white; font-weight: bolder" rendered="#{registro.tipoAcceso == 1}"/>
+                        <h:outputText value="AMBOS" style="color: white; font-weight: bolder" rendered="#{registro.tipoAcceso == 2}"/>
+                    </p:column>
+
+                    <p:column style="text-align: center;"
+                              width="10%"
+                              styleClass="#{registro.estado == 0 ? 'cssGreen texto-blanco' : registro.estado == 1 ? 'cssRed texto-blanco' : registro.estado == null ? 'cssPendiente texto-blanco': null}">
+                        <f:facet name="header">
+                            <h:outputText value="Estado"/>
+                        </f:facet>
+                        <h:outputText value="ENTRÓ" style="color: white; font-weight: bolder" rendered="#{registro.estado == 0}"/>
+                        <h:outputText value="SALIÓ" style="color: white; font-weight: bolder" rendered="#{registro.estado == 1}"/>
+                        <h:outputText value="PENDIENTE" style="color: white; font-weight: bolder" rendered="#{registro.estado == null}"/>
+                    </p:column>
+
+                    <p:column headerText="Número Documento Visitante" visible="false">
+                        <h:outputText value="#{registro.idSstEmpresaVisitante.numeroDocumento}"/>
+                    </p:column>    
+                    <p:column headerText="Nombre Visitante" visible="false">
+                        <h:outputText value="#{registro.idSstEmpresaVisitante.nombre}"/>
+                    </p:column>    
+                    <p:column headerText="Apellidos Visitante" visible="false">
+                        <h:outputText value="#{registro.idSstEmpresaVisitante.apellidos}"/>
+                    </p:column>    
+
+                    <p:column headerText="Visitante" 
+                              exportable="false"
+                              filterBy="#{registro.idSstEmpresaVisitante.numeroDocumento} #{registro.idSstEmpresaVisitante.nombre} #{registro.idSstEmpresaVisitante.apellidos}">
+                        <h:outputText 
+                            value="#{registro.idSstEmpresaVisitante.numeroDocumento} - "
+                            styleClass="cssBlack"
+                            />
+                        <h:outputText value="#{registro.idSstEmpresaVisitante.nombre} #{registro.idSstEmpresaVisitante.apellidos}"/>
+                    </p:column>  
+
+                    <p:column style="text-align: center;"
+                              width="10%"
+                              styleClass="#{registro.entradaAprobada == 1 ? 'cssGreen texto-blanco' : registro.entradaAprobada == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Entrada Aprobada"/>
+                        </f:facet>
+                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{registro.entradaAprobada == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{registro.entradaAprobada == 0}"/>
+                    </p:column>
+
+                    <p:column style="text-align: center;"
+                              width="10%"
+                              styleClass="#{registro.salidaAprobada == 1 ? 'cssGreen texto-blanco' : registro.salidaAprobada == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Salida Aprobada"/>
+                        </f:facet>
+                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{registro.salidaAprobada == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{registro.salidaAprobada == 0}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha Aprobación Entrada">
+                        <h:outputText value="#{registro.fechaAprobacionEntrada}">
+                            <f:convertDateTime type="date" pattern="YYYY-MM-dd HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha Aprobación Salida">
+                        <h:outputText value="#{registro.fechaAprobacionSalida}">
+                            <f:convertDateTime type="date" pattern="YYYY-MM-dd HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Usuario Aprueba Entrada">
+                        <h:outputText value="#{registro.userApruebaEntrada}"/>
+                    </p:column>
+
+                    <p:column headerText="Usuario Aprueba Salida">
+                        <h:outputText value="#{registro.userApruebaSalida}"/>
+                    </p:column>
+
+                    <p:column headerText="Acciones" style="text-align: center;"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 process="@this"
+                                                 action="#{sstEsMatEquiBean.editar()}"
+                                                 update=":EsMatEqui,:frmEsMatEquiAdd:pGridDatos"
+                                                 oncomplete="PF('wlvEsMatEqui').show();"
+                                                 icon="fa fa-pencil">
+                                    <p:resetInput target=":frmEsMatEquiAdd:pGridDatos"/>
+                                    <f:setPropertyActionListener value="#{registro}" target="#{sstEsMatEquiBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Aprobar Entrada"
+                                                 disabled="#{registro.entradaAprobada == 1 || registro.tipoAcceso == 1}"
+                                                 action="#{sstEsMatEquiBean.aprobarEntrada()}"
+                                                 update="dtMatEqui,:msgs"
+                                                 icon="fa fa-sign-in">
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la entrada?" icon="fa fa-exclamation-triangle" />
+                                    <f:setPropertyActionListener value="#{registro}" target="#{sstEsMatEquiBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Aprobar Salida"
+                                                 disabled="#{registro.salidaAprobada == 1 || registro.tipoAcceso == 0}"
+                                                 action="#{sstEsMatEquiBean.aprobarSalida()}"
+                                                 update="dtMatEqui,:msgs"
+                                                 icon="fa fa-sign-out">
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la salida?" icon="fa fa-exclamation-triangle" />
+                                    <f:setPropertyActionListener value="#{registro}" target="#{sstEsMatEquiBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{sstEsMatEquiBean.lstEsMatEqui.size()} registro(s).
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtMatEqui" 
+                                                fileName="Ingreso/Salidas Materiales"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                    <p:rowExpansion>
+                        <p:dataTable id="dtMateriales" 
+                                     rowIndexVar="i"
+                                     var="mat" 
+                                     reflow="true"
+                                     rows="10"
+                                     filterDelay="1700"
+                                     paginator="true"
+                                     rowsPerPageTemplate="10,50,100"
+                                     emptyMessage="No existen documentos registros"
+                                     value="#{registro.sstEsMatEquiDetList}">
+
+                            <p:column headerText="Nombre"
+                                      style="text-align: center;">
+                                <h:outputText value="#{mat.idSstMatEqui.nombre}"/>
+                            </p:column>
+                            <p:column headerText="Serial"
+                                      style="text-align: center;">
+                                <h:outputText value="#{mat.serial}"/>
+                            </p:column>
+                            <p:column headerText="Cantidad"
+                                      style="text-align: center;">
+                                <h:outputText value="#{mat.cantidad}"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+        <ui:include src="modals/crear_material.xhtml"/>
+    </ui:define>
+
+</ui:composition>

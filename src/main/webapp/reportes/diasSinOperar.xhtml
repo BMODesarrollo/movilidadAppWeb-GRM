@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <h:form id="frmByVehiculolist">
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Dias sin Operar
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="kmByVehiculolist" 
+                                            listener="#{diasSinOperarBean.obtenerKmByVehiculo()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:panel>
+                    <f:facet name="header">
+                        <div align="center">
+                            <p:outputLabel for="@next" value="FECHA INICIO:"
+                                           styleClass="cssWhite"/>
+                            <p:spacer width="5"/>
+                            <p:calendar id="fechaIncio" label="Fecha de Consulta" 
+                                        value="#{diasSinOperarBean.fecha}"
+                                        pattern="dd-MM-yyyy"
+                                        locale="es"
+                                        maxdate="today"
+                                        readonlyInput="true"
+                                        showOn="button"
+                                        title="Fecha Inicio"
+                                        navigator="true">
+                                <p:ajax  event="dateSelect" process="@this"/>
+                            </p:calendar>
+                            <p:spacer width="20"/>
+                            <p:outputLabel value=" - " styleClass="cssWhite"/>
+                            <p:spacer width="20"/>
+                            <p:outputLabel for="fechaFin" value="FECHA FIN:"
+                                           styleClass="cssWhite"/>
+                            <p:spacer width="5"/>
+                            <p:calendar id="fechaFin" label="Fecha de Consulta" 
+                                        value="#{diasSinOperarBean.fechaFin}"
+                                        locale="es"
+                                        pattern="dd-MM-yyyy"
+                                        readonlyInput="true"
+                                        title="Fecha Fin"
+                                        maxdate="today"
+                                        showOn="button"
+                                        navigator="true">
+                                <p:ajax  event="dateSelect" process="@this"/>
+                            </p:calendar>
+                            <p:spacer width="20"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                actionListener="#{diasSinOperarBean.obtenerKmByVehiculo()}"
+                                class="cssWhite"
+                                update="kmByVehiculolist"
+                                >
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:dataTable id="kmByVehiculolist" value="#{diasSinOperarBean.lstKmsVehiculos}" 
+                                 var="item" widgetVar="dtkmByVehiculolist"
+                                 emptyMessage="No hay registros que mostrar!!"
+                                 paginator="true"
+                                 rows="100"
+                                 filterDelay="1700"
+                                 rowsPerPageTemplate="100,200,500"
+                                 >
+
+                        <f:facet name="paginatorTopRight">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="kmByVehiculolist" 
+                                                fileName="Dias sin Operar"
+                                                postProcessor="#{diasSinOperarBean.postProcessXLSVehiculo}"/>
+                            </h:commandLink>
+                        </f:facet>
+
+                        <p:column headerText="Fecha Inicio" 
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.desde}" />
+                        </p:column>
+                        
+                        <p:column headerText="Fecha Fin" 
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.hasta}" />
+                        </p:column>
+
+                        <p:column filterBy="#{item.codigo_vehiculo}"
+                                  class="TexAlCenter"
+                                  sortBy="#{item.codigo_vehiculo}"
+                                  filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Id Móvil"/>
+                            </f:facet>
+                            <h:outputText value="#{item.codigo_vehiculo}"/>
+                        </p:column>
+
+                        <p:column class="TexAlCenter"
+                                  sortBy="#{item.total_km}">
+                            <f:facet name="header">
+                                <h:outputText value="KM Ejecutados Según Operación"/>
+                            </f:facet>
+                            <h:outputText value="#{item.total_km}">
+                                <f:convertNumber type="number"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column filterBy="#{item.estado}"
+                                  class="TexAlCenter"
+                                  sortBy="#{item.estado}"
+                                  filterMatchMode="exact">
+                            <f:facet name="header">
+                                <h:outputText value="Estado Actual"/>
+                            </f:facet>
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('dtkmByVehiculolist').filter()" 
+                                                 styleClass="custom-filter" style="width: 99.9999%">
+                                    <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemValue="Inoperativo" itemLabel="Inoperativo"/>
+                                    <f:selectItem itemValue="Operativo" itemLabel="Operativo"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.estado}"/>
+                        </p:column>
+
+                        <f:facet name="footer">
+                            <div align="center">
+                                En total existen #{diasSinOperarBean.lstKmsVehiculos.size()} registro(s)
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

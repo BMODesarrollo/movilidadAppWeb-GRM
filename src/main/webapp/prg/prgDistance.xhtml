@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Carga Distancias entre paradas de toda la Red de Transporte"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="config_freeway_id" 
+                                                 value="#{selectConfigFreewayBean.idConfigFreeway}" 
+                                                 filter="true"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains"
+                                                 required="true"
+                                                 requiredMessage="unidad funcional es requerido">
+                                    <p:ajax process="@this" listener="#{selectConfigFreewayBean.findIdConfigFreeway()}"
+                                            update="frmPrgDistance:tabDistance"/>
+                                    <f:selectItem itemLabel="Seleccione Unidad Funcional" itemValue="#{0}"/>
+                                    <f:selectItems value="#{selectConfigFreewayBean.listConfigFreeway}" 
+                                                   var="items"
+                                                   itemLabel="#{items.idGopUnidadFuncional.nombre}"
+                                                   itemValue="#{items.idConfigFreeway}"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrgDistance">
+                <div align="right">
+                    <p:commandButton title="Consumir Distancias" 
+                                     icon="fa fa-plus"
+                                     style="color: white"
+                                     action="#{prgDistanceMB.consumeDistance()}" 
+                                     value="Consumir Distancias"
+                                     update ="tabDistance:dtlstDistance,msgs">
+                    </p:commandButton>
+                </div>
+
+                <p:tabView id="tabDistance" dynamic="true" cache="true" effect="fold">
+
+                    <p:tab title="Stop Points">
+                        <div aling="rigth">
+                            <p:commandButton id="toggler2" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtDistance" trigger="toggler2" />
+                        </div>
+                        <p:dataTable var="stop" value="#{prgDistanceMB.listStop}"
+                                     id="dtDistance"
+                                     rowIndexVar="nroFila"
+                                     reflow="true"
+                                     rows="5"
+                                     filterDelay="1000"
+                                     paginator="true"
+                                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15"
+                                     emptyMessage="No existen Distancias Registradas">
+                            <p:column headerText="#" style="width: 30px">
+                                <h:outputText value="#{nroFila+1}" />
+                            </p:column>
+                            <p:column headerText="Stop Point" filterBy="#{ruta.name}">
+                                <h:outputText value="#{stop.name}" />
+                            </p:column>
+                            <p:column headerText="Code" filterBy="#{ruta.line}" style="text-align: center">
+                                <h:outputText value="#{stop.code}" />
+                            </p:column>
+                            <p:column headerText="Description">
+                                <h:outputText value="#{stop.description}" />
+                            </p:column>
+                            <p:column headerText="IsActive" style="text-align: center">
+                                <h:outputText value="#{stop.isActive}" />
+                            </p:column>
+                            <p:column headerText="IsFuelAvaible" style="text-align: center">
+                                <h:outputText value="#{stop.isFuelAvaible}" />
+                            </p:column>
+                            <p:column headerText="IsRelayPossible" style="text-align: center">
+                                <h:outputText value="#{stop.isRelayPosible}" />
+                            </p:column>
+
+                            <f:facet name="footer">
+                                En total existen #{prgDistanceMB.listStop.size()} Paradas.
+                                <div align="right">
+                                    <h:commandLink>
+                                        <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="dtDistance" fileName="Paradas #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                             alt="pdf" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="pdf" target="dtDistance" fileName="Paradas #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                             alt="csv" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="csv" target="dtDistance" fileName="Paradas #{now}"  />
+                                    </h:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+
+                    <p:tab title="Distancias">
+                        <div aling="rigth">
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtlstDistance" trigger="toggler" />
+                        </div>
+                        <p:dataTable var="distance" value="#{prgDistanceMB.listDistance}"
+                                     id="dtlstDistance"
+                                     rowIndexVar="nroFila"
+                                     reflow="true"
+                                     rows="5"
+                                     filterDelay="1000"
+                                     paginator="true"
+                                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15"
+                                     emptyMessage="No existen Distancias Registradas">
+                            <p:column headerText="#" style="width: 30px">
+                                <h:outputText value="#{nroFila+1}" />
+                            </p:column>
+                            <p:column headerText="From Stop Point" filterBy="#{distance.idPrgFromStop.code}">
+                                <h:outputText value="#{distance.idPrgFromStop.code}" />
+                            </p:column>
+                            <p:column headerText="To Stop Point" filterBy="#{distance.idPrgToStop.code}" style="text-align: center">
+                                <h:outputText value="#{distance.idPrgToStop.code}" />
+                            </p:column>
+                            <p:column headerText="Distance">
+                                <h:outputText value="#{distance.distance}" />
+                            </p:column>
+                            <p:column headerText="Username" style="text-align: center">
+                                <h:outputText value="#{distance.username}" />
+                            </p:column>
+
+                            <f:facet name="footer">
+                                En total existen #{prgDistanceMB.listDistance.size()} Paradas.
+                                <div align="right">
+                                    <h:commandLink>
+                                        <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="dtlstDistance" fileName="Paradas #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                             alt="pdf" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="pdf" target="dtlstDistance" fileName="Paradas #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                             alt="csv" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="csv" target="dtlstDistance" fileName="Paradas #{now}"  />
+                                    </h:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+
+                </p:tabView>
+
+
+            </h:form>
+
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

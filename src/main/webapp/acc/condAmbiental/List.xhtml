@@ -1,0 +1,77 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="Cond-AmbientalListForm">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Acc Condición Ambiental">
+                <p:dataTable id="datalist" 
+                             value="#{accCondAmbientalJSF.listAccCondAmbiental}"
+                             var="item"
+                             selectionMode="single" 
+                             selection="#{accCondAmbientalJSF.accCondAmbiental}"
+                             paginator="true"
+                             rowKey="#{item.idAccCondAmbiental}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             emptyMessage="No existen registros"
+                             scrollable="true"
+                             scrollHeight="1000"
+                             >
+                    <p:ajax event="rowSelect" listener="#{accCondAmbientalJSF.onRowSelect}" update="editButton" />
+                    <p:ajax event="rowUnselect" listener="#{accCondAmbientalJSF.reset()}" update="datalist" />
+
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.condAmbiental}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Condición Ambiental"/>
+                        </f:facet>
+                        <h:outputText value="#{item.condAmbiental}"/>
+                    </p:column>
+                    <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                        <h:outputText value="#{item.descripcion}"/>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             actionListener="#{accCondAmbientalJSF.prepareGuardar()}" 
+                                             update=":form-cond-ambiental" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             oncomplete="PF('cond-ambientalDlg').show()">
+                                <p:resetInput target="form-cond-ambiental"/>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"   
+                                             value="Editar" 
+                                             update=":form-cond-ambiental-edit" 
+                                             icon="fa fa-pencil" 
+                                             disabled="#{empty accCondAmbientalJSF.accCondAmbiental.idAccCondAmbiental}"
+                                             class="cssWhite GreenButton"
+                                             oncomplete="PF('cond-ambiental-editDlg').show()">
+                                <p:resetInput target="form-cond-ambiental-edit"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="acc condicion ambiental #{now}" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+    </ui:define>
+</ui:composition>

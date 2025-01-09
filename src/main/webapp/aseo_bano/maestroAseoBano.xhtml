@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <style>
+            video {
+                border-radius: 2pc;
+                border: dashed #a99d9e 7px;
+                width: 100%;height: auto;
+            }
+        </style>
+        <h:outputScript name="js/leerQr.js" library="sentinel-layout" />
+        <h:outputScript name="js/gestionQr.js" library="sentinel-layout" />
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Aseos Baños">
+            <h:form id="form_aseo_bano">
+                <div class="ui-g">
+                    <p:dataTable id="dt_aseo_bano_id" var="aseoBano" 
+                                 scrollable="true"
+                                 widgetVar="wlVdt_aseo_bano_id"
+                                 scrollHeight="600"
+                                 disabledTextSelection="false"
+                                 reflow="true"
+                                 rows="10"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,50,100"
+                                 emptyMessage="No existen registros"
+                                 value="#{aseoBanoJSFMB.listAseoBano}">
+
+                        <f:facet name="header">
+                            <div align="right" jsf:id="botones">
+                                <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                                <p:calendar id="fecha_desde" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{aseoBanoJSFMB.fechaDesde}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{aseoBanoJSFMB.consultar()}"
+                                            update="dt_aseo_bano_id"/>
+                                </p:calendar>
+                                <p:calendar id="fecha_hasta" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{aseoBanoJSFMB.fechaHasta}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{aseoBanoJSFMB.consultar()}"
+                                            update="dt_aseo_bano_id"/>
+                                </p:calendar>
+                                <p:commandButton
+                                    icon="fa fa-plus"
+                                    value="Nuevo"
+                                    actionListener="#{aseoBanoJSFMB.nuevo()}"
+                                    class="cssWhite"
+                                    update="aseo_bano_dialog_form,aseo_bano_dialog_id"/>   
+                            </div>
+                        </f:facet>
+
+
+                        <p:column headerText="Fecha Ini" styleClass="text-center">
+                            <h:outputText value="#{aseoBano.fechaHoraIni}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha Fin" styleClass="text-center">
+                            <h:outputText value="#{aseoBano.fechaHoraFin}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Identificación Responsable"
+                                  filterBy="#{aseoBano.sstEmpresaVisitante.numeroDocumento}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{aseoBano.sstEmpresaVisitante.numeroDocumento}" />
+                        </p:column>
+                        <p:column headerText="Nombre Responsable"
+                                  filterBy="#{aseoBano.sstEmpresaVisitante.nombre} #{aseoBano.sstEmpresaVisitante.apellidos}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{aseoBano.sstEmpresaVisitante.nombre} #{aseoBano.sstEmpresaVisitante.apellidos}" />
+                        </p:column>
+
+                        <p:column headerText="Area de actividad"
+                                  filterBy="#{aseoBano.aseoParamArea.nombre}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-word-wrap">
+                            <h:outputText value="#{aseoBano.aseoParamArea.nombre}" />
+                        </p:column>
+
+                        <p:column headerText="Código"
+                                  filterBy="#{aseoBano.codigoPlanilla}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-word-wrap">
+                            <h:outputText value="#{aseoBano.codigoPlanilla}" />
+                        </p:column>
+                        <p:column filterBy="#{aseoBano.autorizado}" 
+                                  exportable="false"
+                                  headerText="Autorizado"
+                                  styleClass="#{aseoBano.autorizado eq 1 ? 'cssGreen' : aseoBano.autorizado eq -1 ? 'cssGray' : aseoBano.autorizado eq 0 ? 'cssRed' : ''}" 
+                                  filterMatchMode="exact">
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('wlVdt_aseo_bano_id').filter()" 
+                                                 styleClass="custom-filter" style="width: 10%">
+                                    <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemValue="#{-1}" itemLabel="Por Autorizar" />
+                                    <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                    <f:selectItem itemValue="#{0}" itemLabel="No"/>
+
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="Si" rendered="#{aseoBano.autorizado == 1}" class="cssWhite" />
+                            <h:outputText value="No" rendered="#{aseoBano.autorizado == 0}" class="cssWhite" />
+                            <h:outputText value="Por Autorizar" rendered="#{aseoBano.autorizado == -1}" class="cssWhite" />
+                        </p:column>
+                        <p:column headerText="Fecha Autoriza" >
+                            <h:outputText value="#{aseoBano.fechaAutoriza}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="usuario Autoriza"
+                                  filterBy="#{aseoBano.userAutoriza}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-word-wrap">
+                            <h:outputText value="#{aseoBano.userAutoriza}" />
+                        </p:column>
+                        <p:column headerText="usuario"      
+                                  filterBy="#{aseoBano.username}"
+                                  filterMatchMode="contains" styleClass="text-word-wrap">
+                            <h:outputText value="#{aseoBano.username}" />
+                        </p:column>
+                        <p:column headerText="Creado" styleClass="text-word-wrap">
+                            <h:outputText value="#{aseoBano.creado}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Acciones" styleClass="text-center"
+                                  width="10%"
+                                  exportable="false">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                    <p:commandButton styleClass="cssWhite GreenButton"
+                                                     title="Editar"
+                                                     action="#{aseoBanoJSFMB.editar(aseoBano)}"
+                                                     process="@this"
+                                                     update="aseo_bano_dialog_form,aseo_bano_dialog_id"
+                                                     icon="fa fa-pencil">
+                                    </p:commandButton>
+                                    <p:commandButton title="Ver fotos"
+                                                     icon="fa fa-photo"
+                                                     class="cssWhite OrangeButton"
+                                                     update="galeria_foto_dialog_id"  
+                                                     rendered="#{!empty(aseoBano.pathFoto)}"
+                                                     action="#{aseoBanoJSFMB.obtenerFotos()}"
+                                                     oncomplete="PF('galeria_foto_dialog_wv').show()" >
+                                        <f:setPropertyActionListener target="#{aseoBanoJSFMB.aseoBano}" value="#{aseoBano}"/>
+                                    </p:commandButton>
+                                    <p:commandButton actionListener="#{aseoBanoJSFMB.autorizar(aseoBano, 1)}"
+                                                     icon="fa fa-thumbs-up"
+                                                     class="cssWhite GreenButton"
+                                                     update="dt_aseo_bano_id"
+                                                     rendered="#{aseoBano.autorizado== -1 or aseoBano.autorizado == 0}"
+                                                     title="Autorizar">
+                                        <p:confirm header="Confirmación" 
+                                                   message="Está seguro de autorizar?"
+                                                   icon="fa fa-exclamation-triangle"
+                                                   class="cssWhite"/>
+                                    </p:commandButton>
+                                    <p:commandButton actionListener="#{aseoBanoJSFMB.autorizar(aseoBano, 0)}"
+                                                     icon="fa fa-thumbs-down"
+                                                     class="cssWhite RedButton"
+                                                     update="dt_aseo_bano_id"
+                                                     rendered="#{aseoBano.autorizado== -1 or aseoBano.autorizado == 1 }"
+                                                     title="No Autorizar">
+                                        <p:confirm header="Confirmación" 
+                                                   message="Está seguro de NO autorizar?"
+                                                   icon="fa fa-exclamation-triangle"
+                                                   class="cssWhite"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </p:column>
+
+
+                        <f:facet name="footer">
+                            En total existen #{aseoBanoJSFMB.listAseoBano.size()} registros.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="dt_aseo_bano_id" 
+                                                    fileName="Aseos Baños"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/crearAseoBano.xhtml"/>
+        <ui:include src="modal/galeriaFotos.xhtml"/>
+    </ui:define>
+</ui:composition>

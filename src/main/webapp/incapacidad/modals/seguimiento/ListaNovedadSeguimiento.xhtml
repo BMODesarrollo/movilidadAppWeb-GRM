@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="NovedadIncapacidadListDlg" widgetVar="NovedadIncapacidadListDialog" modal="true" 
+              resizable="false" appendTo="@(body)"
+              closeOnEscape="true" responsive="true"
+              class="mr1024_50 mr500_90" closable="false"
+              position="center top">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Seguimiento de incapacidad" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('NovedadIncapacidadListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="frmNovedadIncapacidadList">
+            <p:dataTable id="dtNovedadSeguimientoIncapacidad" widgetVar="dtNovedadesSeguimientoIncapacidad" 
+                         var="incapacidad" value="#{ausentismosBean.lstNovedadIncapacidades}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         reflow="true"
+                         rowStyleClass="text-center"
+                         rowIndexVar="nroFila"
+                         emptyMessage="No existen seguimientos registrados">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton actionListener="#{ausentismosBean.nuevo()}"
+                                         oncomplete="PF('incapacidadDlg').show();"
+                                         title="Agregar nuevo seguimento" 
+                                         icon="fa fa-plus"
+                                         style="color: white"
+                                         update=":frmIncapacidad,:modalIncapacidad"
+                                         value="Nuevo Seguimiento">
+                            <p:resetInput target=":frmIncapacidad" />
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+                <p:column headerText="#" style="width: 30px" exportable="false">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Fecha">
+                    <h:outputText value="#{incapacidad.fecha}" styleClass="oneLine">
+                        <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Tipo_Incapacidad" filterBy="#{incapacidad.idIncapacidadTipo.descripcion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{incapacidad.idIncapacidadTipo.descripcion}" />
+                </p:column>
+                <p:column headerText="Ordena" filterBy="#{incapacidad.idIncapacidadOrdena.ordena}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{incapacidad.idIncapacidadOrdena.ordena}" />
+                </p:column>
+                <p:column headerText="Inicio">
+                    <h:outputText value="#{ausentismosBean.selected.desde}" styleClass="oneLine">
+                        <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Fin">
+                    <h:outputText value="#{ausentismosBean.selected.hasta}" styleClass="oneLine">
+                        <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Días">
+                    <h:outputText value="#{ausentismosBean.calcularDias()}" />
+                </p:column>
+                <p:column headerText="Diagnóstico"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{incapacidad.idIncapacidadDx.codigo} - #{incapacidad.idIncapacidadDx.descripcion}" />
+                </p:column>
+                <p:column headerText="Acciones" width="50" exportable="false">
+                    <p:commandButton action="#{ausentismosBean.editarSeguimientoIncapacidad()}" 
+                                     title="Editar seguimiento" icon="fa fa-pencil"
+                                     update=":frmIncapacidad,:modalIncapacidad"
+                                     class="cssWhite GreenButton"
+                                     oncomplete="PF('incapacidadDlg').show();"
+                                     >
+                        <f:setPropertyActionListener target="#{ausentismosBean.selectedIncapacidad}" value="#{incapacidad}"/>
+                        <p:resetInput target=":frmIncapacidad" />
+                    </p:commandButton>
+
+                </p:column>
+                <f:facet name="footer">
+                    En total existen #{ausentismosBean.lstNovedadIncapacidades.size()} seguimientos registrados.
+                    <div style="float: right;padding-bottom: 5px">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="dtNovedadSeguimientoIncapacidad" 
+                                            postProcessor="#{ausentismosBean.postProcessXLSSeguimiento}"
+                                            fileName="seguimientos incapacidades #{now}"
+                                            />
+                        </h:commandLink>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+    <ui:include src="Create.xhtml"/>
+</ui:composition>

@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="INOPERATIVOS">
+            <h:form id="frmInoperativos">
+                <p:dataTable var="operador" value="#{inoperativosBean.lstInoperativos}"
+                             id="dtInoperativos"
+                             widgetVar="dtInoperativo"
+                             scrollable="true"
+                             scrollWidth="100%"
+                             scrollHeight="750"
+                             paginator="true"
+                             rows="150"
+                             filterDelay="2000"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="150,300,400"
+                             rowStyleClass="text-center"
+                             emptyMessage="No existen registros, por favor seleccione rango de fechas">
+                    <f:facet name="header">
+                        <p:outputLabel value="Fecha Inicio: " for="fecha_inicio"
+                                       class="cssWhite"/>&nbsp;
+                        <p:calendar placeholder="Fecha inicio" id="fecha_inicio"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd"
+                                    maxdate="today"
+                                    value="#{inoperativosBean.fechaInicio}"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar fecha inicio">
+                            <p:ajax event="dateSelect" update="fecha_fin"/>
+                        </p:calendar>
+                        <p:spacer width="10"/>
+                        <p:spacer width="1"/>
+
+                        <p:outputLabel value="Fecha Fin: " for="fecha_fin"
+                                       class="cssWhite"/>&nbsp;
+                        <p:calendar placeholder="Fecha fin" id="fecha_fin"
+                                    locale="es" pattern="yyyy-MM-dd"
+                                    mindate="#{inoperativosBean.fechaInicio}"
+                                    maxdate="today"
+                                    value="#{inoperativosBean.fechaFin}"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar fecha fin">
+                        </p:calendar>
+
+                        <p:spacer width="10" />
+                        <p:commandButton title="Buscar" 
+                                         icon="fa fa-search"
+                                         class="cssWhite"
+                                         update="dtInoperativos,:msgs"
+                                         actionListener="#{inoperativosBean.obtenerInoperativos()}"/>
+                    </f:facet>
+
+                    <p:column headerText="Fecha"
+                              filterBy="#{operador.fecha}" 
+                              filterMatchMode="startsWith">
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="yyyy-MM-dd" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        mindate="#{inoperativosBean.fechaInicio}"
+                                        maxdate="#{inoperativosBean.fechaFin}"
+                                        inputStyle="width: 75%;"
+                                        placeholder="Click aquí para seleccionar fecha"
+                                        rendered="#{inoperativosBean.lstInoperativos.size() gt 0}"
+                                        onkeyup="PF('dtInoperativo').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dtInoperativo').filter()" update="dtInoperativos"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{operador.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Código" filterBy="#{operador.idEmpleado.codigoTm}">
+                        <h:outputText value="#{operador.idEmpleado.codigoTm}" />
+                    </p:column>
+
+                    <p:column headerText="Nombres"
+                              filterBy="#{operador.idEmpleado.nombres.concat(' ').concat(operador.idEmpleado.apellidos)}">
+                        <h:outputText value="#{operador.idEmpleado.nombres.concat(' ').concat(operador.idEmpleado.apellidos)}" />
+                    </p:column>
+
+                    <p:column headerText="Sercon">
+                        <h:outputText value="#{operador.sercon}" />
+                    </p:column>
+
+                    <p:column>
+                        <p:commandButton value="Habilitar"
+                                         class="cssWhite"
+                                         action="#{inoperativosBean.habilitarOperador()}"
+                                         update="dtInoperativos,:msgs">
+                            <f:setPropertyActionListener target="#{inoperativosBean.prgTc}"
+                                                         value="#{operador}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Está seguro de habilitar éste operador?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

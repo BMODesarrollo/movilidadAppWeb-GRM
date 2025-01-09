@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel header="INFORME DE ACCIDENTES">
+            <div class="ui-fluid">
+                <h:form id="frmInformeAccidente">
+                    <p:growl id="messages" showDetail="true">
+                        <p:effect type="pulsate" event="load" delay="500"/>
+                    </p:growl>
+                    <div class="ui-g Padding0" >
+                        <div class="ui-g-6 ui-md-3 ui-lg-3 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="fechaIni" value="Fecha Inicio: " />
+                            </div>
+                            <p:calendar id="fechaIni" value="#{informeAccidenteBean.fechaIni}"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar la fecha de inicio"
+                                        maxdate="today"
+                                        placeholder="Seleccione fecha inicio"
+                                        locale="es">
+                                <p:ajax event="dateSelect" 
+                                        update="frmInformeAccidente:fechaFin,@this"/>
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-3 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="fechaFin" value="Fecha Fin: " />
+                            </div>
+                            <p:calendar id="fechaFin" value="#{informeAccidenteBean.fechaFin}"
+                                        pattern="yyyy-MM-dd"
+                                        required="true"
+                                        navigator="true"
+                                        requiredMessage="Debe seleccionar una fecha fin"
+                                        mindate="#{informeAccidenteBean.fechaIni}"
+                                        placeholder="Seleccione fecha fin"
+                                        locale="es">
+                                <p:ajax event="dateSelect" 
+                                        update="@this"/>
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-3 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="UF" value="Unidad funcional " />
+                            </div>
+                            <p:selectOneMenu 
+                                id="UF"
+                                styleClass="custom-filter" 
+                                filter="true" 
+                                rendered="#{uniFuncSessionBean.filtradoUF}"
+                                value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                filterMatchMode="contains" 
+                                style="width: 99.999%" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                              itemValue="#{0}"
+                                              itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                               var="uf" itemLabel="#{uf.nombre}"
+                                               itemValue="#{uf.idGopUnidadFuncional}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-3 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="-" style="visibility: hidden"/>
+                            </div>
+                            <p:commandButton value="Generar reporte" icon="fa fa-download"
+                                             class="cssWhite"
+                                             ajax="false"
+                                             actionListener="#{informeAccidenteBean.generarReporte()}">
+                                <p:fileDownload value="#{informeAccidenteBean.file}" />
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

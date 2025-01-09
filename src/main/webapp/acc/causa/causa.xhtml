@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel header="CAUSA">
+            <h:form id="frmCausa">
+                <p:dataTable id="dtArbol" 
+                             var="causa" 
+                             value="#{accCausaBean.lista}"
+                             emptyMessage="Sin registros"
+                             selectionMode="single" 
+                             selection="#{accCausaBean.selected}" 
+                             paginator="true"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             rowKey="#{causa.idAccCausa}">
+                    <p:ajax event="rowSelect" listener="#{accCausaBean.onRowSelect}" update="dtArbol,:form-causa" />
+                    <p:ajax event="rowUnselect" update="dtArbol" />
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton value="Nuevo" action="#{accCausaBean.nuevo()}"
+                                             oncomplete="PF('causaDlg').show()"
+                                             icon="fa fa-plus" class="cssWhite"
+                                             update=":form-causa,:Causa">
+                                <p:resetInput target=":form-causa"/>
+                            </p:commandButton>
+                            <p:commandButton value="Editar" 
+                                             action="#{accCausaBean.editar()}"
+                                             oncomplete="PF('causaDlg').show()"
+                                             icon="fa fa-pencil"
+                                             class="cssWhite GreenButton"
+                                             update=":form-causa,:Causa"
+                                             disabled="#{accCausaBean.selected == null}">
+                                <p:resetInput target=":form-causa"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Causa">
+                        <h:outputText value="#{causa.causa}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{causa.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="Árbol">
+                        <h:outputText value="#{causa.idAccArbol.arbol}" />
+                    </p:column>
+
+                    <p:column headerText="Usuario" >
+                        <h:outputText value="#{causa.username}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="dtArbol" fileName="acc causa #{now}" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal.xhtml"/>
+    </ui:define>
+</ui:composition>

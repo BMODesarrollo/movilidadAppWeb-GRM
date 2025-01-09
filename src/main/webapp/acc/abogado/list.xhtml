@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+            .texto-mayuscula{
+                text-transform: uppercase;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="LISTADO DE ABOGADOS">
+            <h:form id="frmAbogadoList">
+                <p:dataTable id="dtAbogados" value="#{abogadoBean.lstAbogados}"
+                             var="abogado"
+                             reflow="true"
+                             rows="20"
+                             selectionMode="single" 
+                             selection="#{abogadoBean.selected}" 
+                             rowKey="#{abogado.idAccAbogado}"
+                             rowStyleClass="text-center"
+                             emptyMessage="No existen registros!!">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton oncomplete="PF('abogadoDlg').show()"
+                                             action="#{abogadoBean.nuevo()}"
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":abogado,:frmAbogado,dtAbogados"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmAbogado:pGridDatos"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="CÉDULA">
+                        <h:outputText value="#{abogado.cedula}"/>
+                    </p:column>
+
+                    <p:column headerText="LUGAR EXP CC">
+                        <h:outputText value="#{abogado.cedulaExpedicion}"/>
+                    </p:column>
+
+                    <p:column headerText="NOMBRE COMPLETO">
+                        <h:outputText value="#{abogado.nombreCompleto}"
+                                      styleClass="texto-mayuscula"/>
+                    </p:column>
+
+                    <p:column headerText="TARJETA PROFESIONAL">
+                        <h:outputText value="#{abogado.tarjetaProfesional}"/>
+                    </p:column>
+
+                    <p:column headerText="LUGAR EXP TP">
+                        <h:outputText value="#{abogado.tarjetaProfesionalExpedicion}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:contextMenu for="dtAbogados">
+                    <p:menuitem value="Editar" action="#{abogadoBean.editar()}" 
+                                update=":frmAbogado,:abogado" icon="fa fa-pencil">
+                        <p:resetInput target=":frmAbogado:pGridDatos"/>
+                    </p:menuitem>
+                </p:contextMenu>
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

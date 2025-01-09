@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgPlaRecuProceso"
+              widgetVar="wvPlaRecuProceso"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              width="20%"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{plaRecuProcesoBean.b_editar ? 'Editar Proceso':'Crear Proceso'}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvPlaRecuProceso').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-proceso">
+            <p:messages id="msgs_proceso" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g-12">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Proceso: *"/>
+                        <p:inputText id="proceso_id"
+                                     value="#{plaRecuProcesoBean.plaRecuProceso.proceso}" 
+                                     maxlength="60"
+                                     required="true"
+                                     requiredMessage="'Proceso' es requerido"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel value="Descripción: *"/>
+                        <p:inputTextarea  id="descripcion_id" 
+                                          maxlength="65000" 
+                                          class="cssBlack"
+                                          value="#{plaRecuProcesoBean.plaRecuProceso.descripcion}" 
+                                          required="true" 
+                                          requiredMessage="'Descripción' es requerido"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuProcesoBean.crear()}"
+                             process="@this,@form"
+                             rendered="#{!plaRecuProcesoBean.b_editar}"  
+                             update=":form-semana-param:tabView:procesoList, @form, :msgs"
+                             oncomplete="PF('wvPlaRecuProceso').hide()"/>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuProcesoBean.editar()}"
+                             process="@form"
+                             rendered="#{plaRecuProcesoBean.b_editar}"
+                             update=":form-semana-param:tabView:procesoList, @form, :msgs"
+                             oncomplete="PF('wvPlaRecuProceso').hide()"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarProceso" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

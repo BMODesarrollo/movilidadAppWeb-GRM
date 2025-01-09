@@ -1,0 +1,80 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="docsTipoCargo"
+              widgetVar="wvdocsTipoCargo" 
+              modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              class="mr1024_40 mr500_90"
+              resizable="false" 
+              header="Gestión Documento Por Tipo Cargo"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <h:form id="frmDocsTipoCargo">
+            
+            <div class="ui-fluid" >
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Empleado Tipo Cargo
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu value="#{docuPorCargoBean.i_idTipoCargo}"
+                                             style="width: 99.999%"
+                                             filter="true" 
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un tipo de cargo"
+                                             filterMatchMode="contains" >
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{docuPorCargoBean.listTipoCargo}" 
+                                               var="tipoCargo" 
+                                               itemLabel="#{tipoCargo.nombreCargo}" 
+                                               itemValue="#{tipoCargo.idEmpleadoTipoCargo}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Empleado Tipo Documento
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu value="#{docuPorCargoBean.i_idTipoDocumento}"
+                                             style="width: 99.999%"
+                                             filter="true" 
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un tipo de documento"
+                                             filterMatchMode="contains" >
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{docuPorCargoBean.listTipoDocu}" 
+                                               var="tipoDocu" 
+                                               itemLabel="#{tipoDocu.nombreTipoDocumento}" 
+                                               itemDescription="#{tipoDocu.descripcionTipoDocumento}"
+                                               itemValue="#{tipoDocu.idEmpleadoTipoDocumento}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="msgs,frmDocsTipoCargo,frmPrincipal:dt_docu_cargo,:frmPrincipal:cj-grow" 
+                             action="#{docuPorCargoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update="msgs,frmPrincipal:dt_docu_cargo,:frmPrincipal:cj-grow"
+                             action="#{docuPorCargoBean.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{docuPorCargoBean.selected.idDocumentoPorCargo == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{docuPorCargoBean.selected.idDocumentoPorCargo != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

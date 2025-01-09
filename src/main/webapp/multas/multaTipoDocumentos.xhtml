@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <p:panel header="Tipos de documentos (Multas)">
+            <h:form id="frmPrincipalMultiTipoDocu">
+
+                <p:dataTable var="multaTipoDocumento" value="#{multaTipoDocumentoBean.lista}"
+                             id="dtTipo"
+                             rowIndexVar="nroFila"
+                             rows="5"
+                             paginator="true"
+                             filterDelay="1000"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                             emptyMessage="No existen tipos de documento registrados">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton action="#{multaTipoDocumentoBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo tipo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":frmNuevoTipo"
+                                             value="Nuevo">
+                                <p:resetInput target="frmNuevoTipo" />
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre" filterBy="#{multaTipoDocumento.nombreTipoDocumento}">
+                        <h:outputText value="#{multaTipoDocumento.nombreTipoDocumento}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="No tiene" rendered="#{empty(multaTipoDocumento.descripcionTipoDocumento)}" />
+                        <h:outputText value="#{multaTipoDocumento.descripcionTipoDocumento}" rendered="#{multaTipoDocumento.descripcionTipoDocumento!=null}" />
+                    </p:column>
+                    <p:column headerText="Obligatorio"
+                              styleClass="#{multaTipoDocumento.obligatorio gt 0 ? 'cssGreen': multaTipoDocumento.obligatorio eq 0 ? 'cssRed' : ''}">
+                        <h:outputText value="Sí" rendered="#{multaTipoDocumento.obligatorio == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{multaTipoDocumento.obligatorio == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column headerText="Acción" style="width: 10%">
+                        <p:commandButton icon="fa fa-pencil"
+                                         title="Editar registro"
+                                         class="GreenButton cssWhite"
+                                         action="#{multaTipoDocumentoBean.editar()}"
+                                         update=":frmNuevoTipo:modal,:frmNuevoTipo:pGrid"
+                                         oncomplete="PF('mtipo').show();"
+                                         >
+                            <f:setPropertyActionListener target="#{multaTipoDocumentoBean.selected}" value="#{multaTipoDocumento}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh"
+                                         title="Cambiar estado"
+                                         rendered="false"
+                                         action="#{multaTipoDocumentoBean.cambiarEstado()}"
+                                         update=":frmNuevoTipo:modal,:frmNuevoTipo:messages,dtTipo"
+                                         disabled="true">
+                            <f:setPropertyActionListener target="#{multaTipoDocumentoBean.selected}" value="#{multaTipoDocumento}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{multaTipoDocumentoBean.lista.size()} tipos.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <h:form id="frmNuevoTipo">
+                <p:dialog widgetVar="mtipo" 
+                          id="modal" 
+                          resizable="false"
+                          class="mr1024_30 mr500_90"
+                          modal="true" 
+                          responsive="true"
+                          position="center top"
+                          closeOnEscape="true">
+                    <c:if test="#{multaTipoDocumentoBean.selected == null }">
+                        <f:facet name="header">
+                            Nuevo tipo de documento
+                        </f:facet>
+                    </c:if>
+                    <c:if test="#{multaTipoDocumentoBean.selected != null }">
+                        <f:facet name="header">
+                            Editar tipo de documento: #{multaTipoDocumentoBean.selected.nombreTipoDocumento.toUpperCase()}
+                        </f:facet>
+                    </c:if>
+                    <p:messages id="messages" showDetail="true" closable="true">
+                    </p:messages>
+                    <p:focus context="frmNuevoTipo"/>
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar"
+                                         class="cssWhite"
+                                         icon="fa fa-save"
+                                         actionListener="#{multaTipoDocumentoBean.guardar()}"
+                                         update=":frmPrincipalMultiTipoDocu:dtTipo,messages,msgs"
+                                         rendered="#{multaTipoDocumentoBean.selected == null }"
+                                         >
+                        </p:commandButton>
+                        <p:commandButton value="Actualizar" 
+                                         class="cssWhite"
+                                         icon="fa fa-save"
+                                         actionListener="#{multaTipoDocumentoBean.actualizar()}"
+                                         update=":frmPrincipalMultiTipoDocu:dtTipo,messages,msgs"
+                                         rendered="#{multaTipoDocumentoBean.selected != null }"
+                                         />
+                    </f:facet>
+
+                    <div class="ui-fluid" jsf:id="pGrid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:outputLabel value="Nombre:" for="nombre"/>
+                                </div> 
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:inputText id="nombre" value="#{multaTipoDocumentoBean.multaTipoDocumento.nombreTipoDocumento}"
+                                                 required="true" requiredMessage="El nombre del tipo es obligatorio"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:outputLabel value="Obligatorio:" for="obligatorio"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:selectBooleanButton id="obligatorio" 
+                                                           value="#{multaTipoDocumentoBean.obligatorio}" 
+                                                           onLabel="Si" offLabel="No"
+                                                           required="true"
+                                                           offIcon="fa fa-close"
+                                                           onIcon="fa fa-check"
+                                                           class="cssWhite"
+                                                           requiredMessage="Campo obligatiorio"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:outputLabel value="Descripción:" for="descripcion"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:inputTextarea id="descripcion" value="#{multaTipoDocumentoBean.multaTipoDocumento.descripcionTipoDocumento}"
+                                                     />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p:dialog>  
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

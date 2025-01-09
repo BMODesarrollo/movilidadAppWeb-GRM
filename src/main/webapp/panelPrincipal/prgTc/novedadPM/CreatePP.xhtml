@@ -1,0 +1,393 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="novedadesPM" 
+              id="modalnovedadesPM" 
+              closable="false"
+              modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              class="mr1024_60 mr500_90"
+              resizable="false" appendTo="@(body)" position="center top">
+        <p:ajax event="close" 
+                listener="#{novedadBean.setCreateNovedadPP(false)}"
+                global="false" 
+                process="@this"/>
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Nueva novedad programa máster" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('novedadesPM').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNovedadesPm">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+            </p:messages>
+            <p:messages showDetail="true"  id="msgsVehiculo2" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-fluid" jsf:rendered="#{novedadBean.createNovedadPP}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-4 Padding5">
+                        <p:outputLabel for="fecha" value="Fecha:" />
+                        <p:calendar id="fecha" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{novedadBean.novedad.fecha}"
+                                    showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    maxdate="today"
+                                    requiredMessage="Debe seleccionar una fecha"
+                                    showTodayButton="true"
+                                    navigator="true"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }"
+                                    >
+                            <p:ajax listener="#{novedadBean.validarOperacionCerrada()}"
+                                    event="dateSelect"
+                                    process="@this"
+                                    update="fecha,msgs"/>
+                        </p:calendar>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="novedad_tipo" value="Tipo de novedad: *"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione tipo de novedad"
+                                             id="novedad_tipo"
+                                             value="#{novTipoAndDetBean.novedadTipo.nombreTipoNovedad}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar tipo de novedad"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     update="dialog_nov_tipo"
+                                                     process="@this"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipo()}"
+                                                     oncomplete="PF('dialog_nov_tipo_wv').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="novedad_tipo_detalle" value="Detalle de tipo novedad:*"/> 
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione detalle tipo de novedad"
+                                             id="novedad_tipo_detalle"
+                                             value="#{novTipoAndDetBean.novedadTipoDet != null? novTipoAndDetBean.novedadTipoDet.tituloTipoNovedad : ''}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }">
+                                </p:inputText>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar detalle tipo de novedad"
+                                                     id="novedad_tipo_detalleBtn"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipoDetalle()}"
+                                                     disabled="#{not(novTipoAndDetBean.novedadTipo.idNovedadTipo gt 0) or novTipoAndDetBean.novedadTipo.nombreTipoNovedad eq 'Daño' }"
+                                                     oncomplete="PF('dialog_nov_tipo_det_wv').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-4 Padding5" jsf:id="desde_grp">
+                        <p:outputLabel for="desde" value="Desde:" />
+                        <p:calendar id="desde" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{novedadBean.novedad.desde}"
+                                    showOn="button" 
+                                    locale="es"
+                                    showTodayButton="true"
+                                    readonlyInput="true"
+                                    required="#{novTipoAndDetBean.novedadTipoDet.fechas == 1}"
+                                    requiredMessage="Fecha desde es requerida"
+                                    disabled="#{not(novTipoAndDetBean.novedadTipoDet.fechas == 1)}"
+                                    navigator="true"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }"
+                                    >
+                            <p:ajax event="dateSelect" update="hasta"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-4 Padding5" jsf:id="hasta_grp">
+                        <p:outputLabel for="hasta" value="Hasta:" />
+                        <p:calendar id="hasta" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{novedadBean.novedad.hasta}"
+                                    mindate="#{novedadBean.novedad.desde}"
+                                    showOn="button" 
+                                    locale="es"
+                                    disabled="#{not(novTipoAndDetBean.novedadTipoDet.fechas == 1)}"
+                                    readonlyInput="true"
+                                    required="#{novTipoAndDetBean.novedadTipoDet.fechas == 1}"
+                                    requiredMessage="Fecha hasta es requerida"
+                                    showTodayButton="true"
+                                    navigator="true"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }">
+                            <p:ajax process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="vehiculo_grp">
+                            <p:outputLabel value="Vehículo"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Vehículo:"
+                                             id="vehiculo"
+                                             required="#{novTipoAndDetBean.novedadTipoDet.reqVehiculo eq 1}"
+                                             requiredMessage="Debe asighnar un vehículo a la novedad"
+                                             value="#{novedadBean.c_vehiculo}"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         findVehiculoByCodPPNov();
+                                                         return false;
+                                                     }">
+                                    <p:ajax listener="#{novedadBean.cargarVehiculo()}"/>
+                                </p:inputText>
+                                <p:remoteCommand name="findVehiculoByCodPPNov"
+                                                 process="vehiculo,@this"
+                                                 action="#{novedadBean.cargarVehiculo()}"
+                                                 update="frmNovedadesPm:vehiculo,msgs"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton process="vehiculo,@this" 
+                                                     style="margin: 0px"
+                                                     action="#{novedadBean.cargarVehiculo()}"
+                                                     icon="fa fa-search"
+                                                     class="cssWhite"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Operador:" for="operador"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Nombre completo de operador"
+                                             id="operador"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un operador"
+                                             value="#{novedadBean.empleado.codigoTm} - #{novedadBean.empleado.nombres} #{novedadBean.empleado.apellidos}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar lista de operadores"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     update="frmPmEmpleadoListPP:dtEmpleados"
+                                                     action="#{novedadBean.prepareListEmpleados}"                                     
+                                                     oncomplete="PF('PmEmpleadosListDialogPP').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="hora_inicio_grp">
+                            <p:outputLabel for="hora_inicio" value="Hora-Ini"/>
+                            <p:inputMask id="hora_inicio" validatorMessage="Hora inicio invalida"  
+                                         value="#{novedadBean.novedad.horaInicio}" 
+                                         required="#{novTipoAndDetBean.novedadTipoDet.reqHoras == 1}"
+                                         disabled="#{not(novTipoAndDetBean.novedadTipoDet.reqHoras == 1)}"
+                                         requiredMessage="Hora invalida" mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="hora_inicio"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="hora_fin_grp">
+                            <p:outputLabel for="hora_fin" value="Hora-fin"/>
+                            <p:inputMask id="hora_fin" validatorMessage="Hora fin invalida"  
+                                         value="#{novedadBean.novedad.horaFin}" 
+                                         required="#{novTipoAndDetBean.novedadTipoDet.reqHoras == 1}"
+                                         requiredMessage="Hora invalida" mask="99:99:99" 
+                                         disabled="#{not(novTipoAndDetBean.novedadTipoDet.reqHoras == 1)}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="hora_fin"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="sitio_grp">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Sitio" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            id="sitio"
+                            maxlength="150"
+                            required="#{novTipoAndDetBean.novedadTipoDet.reqSitio == 1}"
+                            disabled="#{not(novTipoAndDetBean.novedadTipoDet.reqSitio == 1)}"
+                            requiredMessage="Debe ingresar un sitio"
+                            value="#{novedadBean.novedad.sitio}"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="hora_grp">
+                            <p:outputLabel for="hora" value="Hora"/>
+                            <p:inputMask id="hora" validatorMessage="Hora invalida"  
+                                         value="#{novedadBean.novedad.hora}" 
+                                         required="#{novTipoAndDetBean.novedadTipoDet.reqHora == 1}"
+                                         disabled="#{not(novTipoAndDetBean.novedadTipoDet.reqHora == 1)}"
+                                         requiredMessage="Hora invalida" mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="hora"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" 
+                         jsf:rendered="#{ajustJorndFromGestionServ.visible()}" 
+                         jsf:id="motivo_grp">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Motivo Ajuste Jornada" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="motivo" 
+                                             value="#{prgSerconMotivoJSF.i_prgSerconMotivo}" 
+                                             filter="true"
+                                             disabled="#{novTipoAndDetBean.visibleMotivoJornada()}"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems value="#{prgSerconMotivoJSF.listPrgSerconMotivo}" 
+                                               var="items"
+                                               itemLabel="#{items.descripcion}"
+                                               itemValue="#{items.idPrgSerconMotivo}"/> 
+                                <p:ajax event="change" process="@this" global="false"
+                                        listener="#{prgSerconMotivoJSF.cargarPrgSerconMotivo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="sistema_grp">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{novTipoAndDetBean.novedadTipoDet.afectaDisponibilidad==1}">
+                            <ui:include src="../../../zComponent/selectDistSistema.xhtml" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="SOMAtv_lbl">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="SOMAtv" 
+                                           rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1}"
+                                           value="Tipo Atención: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectOneMenu  id="SOMAtv" filterMatchMode="contains" filter="true"
+                                              style="width: 99.9999%"
+                                              required="true"
+                                              rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1}"
+                                              value="#{atvBean.i_tipoAtención}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                <f:selectItems  value="#{atvBean.lstAtvTipoAtencion}" var="tipoAtv" 
+                                                itemValue="#{tipoAtv.idAtvTipoAtencion}" itemLabel="#{tipoAtv.nombre}" />
+                                <p:ajax listener="#{atvBean.findById}" 
+                                        process="@this"
+                                        update="frmNovedadesPm:SOMAtv_lbl_ii"
+                                        global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="SOMAtv_lbl_ii">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="op_patio" 
+                                           rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1}"
+                                           value="Destino" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectOneMenu  id="op_patio" filterMatchMode="contains" filter="true"
+                                              style="width: 99.9999%"
+                                              required="#{atvBean.requeridoDestino}"
+                                              title="Indica lugar en el cual debe llegar el vehículo afectado."
+                                              rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1}"
+                                              value="#{atvBean.i_operacionPatio}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                <f:selectItems  value="#{atvBean.lstOperacionPatios}" var="patioDest" 
+                                                itemValue="#{patioDest.idOperacionPatios}" itemLabel="#{patioDest.nombrePatio}" />
+                                <p:ajax listener="#{atvBean.findPatioById()}" 
+                                        process="@this"
+                                        global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="inmovilizado_lbl">
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding3">
+                            <p:selectBooleanButton id="inmovilizado" value="#{novedadBean.inmovilizado}" 
+                                                   class="cssWhite"
+                                                   rendered="#{novTipoAndDetBean.novedadTipoDet.afectaDisponibilidad==1}"
+                                                   onLabel="Si" offLabel="No" onIcon="fa fa-check" offIcon="fa fa-close">
+                                <p:ajax global="false" process="@this" />
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-9 ui-lg-9 Padding3">
+                            <p:outputLabel value="¿Inmovilizado?" rendered="#{novTipoAndDetBean.novedadTipoDet.afectaDisponibilidad==1}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="infraccion_grp">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{novTipoAndDetBean.novedadTipo.idNovedadTipo ==12}">
+                            <ui:include src="../../../zComponent/selectTipoInfraccion.xhtml" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="observaciones" value="Observaciones:" />
+                        <p:inputTextarea id="observaciones" 
+                                         value="#{novedadBean.novedad.observaciones}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una observación" />
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_nov"
+                             process="frmNovedadesPm"
+                             update="msgs,frmNovedadesPm "
+                             action="#{novedadBean.guardarNovedadPM()}"/>
+            <p:remoteCommand name="validarNovedadDuplicada"
+                             process="@this"
+                             update="msgs"
+                             action="#{novedadBean.validarNovedadDuplicada()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             id="btnGuardarNovedadPM"
+                             onclick="rc_nov()"
+                             icon="fa fa-save"
+                             class="cssWhite">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro de asignar la novedad al operador: #{novedadBean.empleado.nombres} #{novedadBean.empleado.apellidos}?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="../../../zComponent/dialogListNovedadTipo.xhtml" />
+    <ui:include src="../../../zComponent/dialogListNovedadTipoDet.xhtml" />
+    <ui:include src="ListaEmpleadosPP.xhtml" />
+    <ui:include src="verificarNovedadPP.xhtml" />
+</ui:composition>

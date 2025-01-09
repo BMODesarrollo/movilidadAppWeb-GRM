@@ -1,0 +1,146 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="lavadoCosto"
+              widgetVar="wlvLavadoCosto" 
+              modal="true" 
+              class="mr1024_50 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{lavadoCostoBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{lavadoCostoBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmLavadoCosto">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desde" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar fecha desde"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{lavadoCostoBean.fechaDesde}">
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Hasta" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar fecha hasta"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{lavadoCostoBean.fechaHasta}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo servicio" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="tipoServicio"
+                                         readonly="true"
+                                         value="#{lavadoCostoBean.lavadoTipoServicio.nombre}"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-list"
+                                                 action="#{lavadoCostoBean.prepareListLavadoTipoServicio()}"
+                                                 oncomplete="PF('TipoServicioListDialog').show();"
+                                                 process="@this"
+                                                 style="margin: 0px"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Costo" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber 
+                                required="true"
+                                requiredMessage="Debe ingresar costo"
+                                maxValue="9999999"
+                                minValue="0"
+                                symbol="$"
+                                decimalPlaces="0"
+                                value="#{lavadoCostoBean.lavadoCosto.costo}"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Contratista" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="contratista"
+                                         readonly="true"
+                                         value="#{lavadoCostoBean.lavadoContratista.nombre}"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-list"
+                                                 action="#{lavadoCostoBean.prepareListLavadoContratista()}"
+                                                 oncomplete="PF('ContratistaListDialog').show();"
+                                                 process="@this"
+                                                 style="margin: 0px"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmLavadoCosto,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtLavadoCosto" 
+                             action="#{lavadoCostoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmLavadoCosto,@this"
+                             update=":msgs,messages,:frmPrincipal:dtLavadoCosto"
+                             action="#{lavadoCostoBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{lavadoCostoBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{lavadoCostoBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListaTipoServicios.xhtml"/>
+    <ui:include src="ListaContratistas.xhtml"/>
+</ui:composition>     

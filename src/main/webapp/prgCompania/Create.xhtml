@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="PrgCompaniaCreateDlg" 
+              widgetVar="PrgCompaniaCreateDialog" 
+              modal="true" 
+              closeOnEscape="true"
+              resizable="false" 
+              responsive="true"
+              class="mr1024_30 mr500_90"
+              position="center top"
+              appendTo="@(body)" 
+              header="Registrar Nombre de Compañía">
+        <c:if test="#{prgCompaniaController.selected.idPrgCompania == null }">
+            <f:facet name="header">
+                Nuevo snc detalle
+            </f:facet>
+        </c:if>
+        <c:if test="#{prgCompaniaController.selected.idPrgCompania != null }">
+            <f:facet name="header">
+                Editar snc detalle: #{prgCompaniaController.selected.nombreCompania.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <p:ajax event="close" listener="#{prgCompaniaController.reset()}" update=":PrgCompaniaListForm:datalist" />
+        <h:form id="PrgCompaniaCreateForm">
+            <p:messages id="msgs" closable="true" showSummary="true" showDetail="true"/>  
+            <div class="ui-fluid" jsf:rendered="#{prgCompaniaController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Compañía" for="nombreCompania"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nombreCompania" 
+                                         maxlength="45"
+                                         value="#{prgCompaniaController.selected.nombreCompania}" 
+                                         required="true" 
+                                         requiredMessage="Nombre de Conpañía es requerido"/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <p:remoteCommand action="#{prgCompaniaController.registrar()}" 
+                             name="rc_comp"
+                             update=":PrgCompaniaListForm:datalist,msgs,PrgCompaniaCreateForm" />
+            <p:remoteCommand action="#{prgCompaniaController.modificar()}" 
+                             name="rc_update_comp"
+                             update=":PrgCompaniaListForm:datalist,msgs,PrgCompaniaCreateForm" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_comp();" 
+                             value="Guardar" 
+                             rendered="#{empty prgCompaniaController.selected.idPrgCompania}" 
+                             icon="fa fa-save"
+                             class="cssWhite"/>
+            <p:commandButton onclick="rc_update_comp();" 
+                             value="Actualizar" 
+                             rendered="#{!empty prgCompaniaController.selected.idPrgCompania}" 
+                             icon="fa fa-save"
+                             class="cssWhite"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+

@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <p:panel header="Resumen Estado Vehículo">
+            <h:form id="frmCumpleDiario">
+                <p:growl id="msgVehicleStatus" showDetail="true" showSummary="true" />
+
+                <p:dataTable var="vehiStatus" value="#{mttoCumpleDiarioMB.listVehicleStatus}"
+                             id="dtvehiStatus"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="50"
+                             filterDelay="2000"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="50,100,300,500"
+                             emptyMessage="No existe CumpleDiario para la fecha indicada">
+                    <f:facet name="header">
+                        <div align="right" id="botones"
+                             style="margin: 3px">
+                            <h:outputText value="Fecha Inicio: " title="Fecha Inicio de Consulta"
+                                          style="right: 300px"/>
+                            <p:calendar id="fromDate" styleClass="calendarFilter" 
+                                        value="#{mttoCumpleDiarioMB.fromDate}"
+                                        placeholder="Fecha Ini"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dtvehiStatus,frmCumpleDiario:msgVehicleStatus" 
+                                        listener="#{mttoCumpleDiarioMB.getByDate()}"/>
+                            </p:calendar>
+                            <h:outputText value="Fecha Fin: " title="Fecha Fin de Consulta"
+                                          style="right: 300px"/>
+                            <p:calendar id="toDate" styleClass="calendarFilter" 
+                                        value="#{mttoCumpleDiarioMB.toDate}"
+                                        placeholder="Fecha Fin"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dtvehiStatus,frmCumpleDiario:msgVehicleStatus" 
+                                        listener="#{mttoCumpleDiarioMB.getByDate()}"/>
+                            </p:calendar>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtvehiStatus" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Servbus" filterBy="#{vehiStatus.servbus}" filterMatchMode="contains">
+                        <h:outputText value="#{vehiStatus.servbus}" />
+                    </p:column>
+                    <p:column headerText="Tipo" filterBy="#{vehiStatus.idVehiculoTipo.nombreTipoVehiculo}" 
+                              style="text-align: center" filterMatchMode="contains">
+                        <h:outputText value="#{vehiStatus.idVehiculoTipo.nombreTipoVehiculo}" />
+                    </p:column>
+                    <p:column headerText="Expedición">
+                        <h:outputText value="#{vehiStatus.expedicion}" />
+                    </p:column>
+                    <p:column headerText="Actividad" filterBy="#{vehiStatus.idPrgActividad.actividad}" 
+                              filterMatchMode="contains" style="text-align: center">
+                        <h:outputText value="#{vehiStatus.idPrgActividad.actividad}" />
+                    </p:column>
+                    <p:column headerText="FromStop" style="text-align: center">
+                        <h:outputText value="#{vehiStatus.idFromDepot.name}" />
+                    </p:column>
+                    <p:column headerText="ToStop" style="text-align: center">
+                        <h:outputText value="#{vehiStatus.idToDepot.name}" />
+                    </p:column>
+                    <p:column headerText="TimeOrigin" style="text-align: center">
+                        <h:outputText value="#{vehiStatus.timeOrigin}" />
+                    </p:column>
+                    <p:column headerText="TimeDestiny" style="text-align: center">
+                        <h:outputText value="#{vehiStatus.timeDestiny}" />
+                    </p:column>
+                    <p:column headerText="TiempoComercial" style="text-align: center">
+                        <h:outputText value="#{vehiStatus.comercialTime}" />
+                    </p:column>
+                    <p:column headerText="TiempoVacío" style="text-align: center">
+                        <h:outputText value="#{vehiStatus.hlpTime}" />
+                    </p:column>
+                    <p:column headerText="TiempoMuerto" style="text-align: center">
+                        <h:outputText value="#{vehiStatus.deadTime}" />
+                    </p:column>
+                    <p:column headerText="TiempoProd" style="text-align: center">
+                        <h:outputText value="#{vehiStatus.productionTime}" />
+                    </p:column>
+                    <p:column headerText="DistanciaComercial" style="text-align: right">
+                        <h:outputText value="#{vehiStatus.comercialDistance}" />
+                    </p:column>
+                    <p:column headerText="DistanciaHlp" style="text-align: right">
+                        <h:outputText value="#{vehiStatus.hlpDistance}" />
+                    </p:column>
+                    <p:column headerText="DistanciaProd" style="text-align: right">
+                        <h:outputText value="#{vehiStatus.productionDistance}" />
+                    </p:column>
+                    <p:column headerText="Lineas" style="text-align: left">
+                        <h:outputText value="#{vehiStatus.lineas}" />
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{mttoCumpleDiarioMB.listVehicleStatus.size()} registros.
+                        <div align="right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtvehiStatus" fileName="ResumenEstadoVehiculo #{mttoCumpleDiarioMB.fechaIni()}-#{mttoCumpleDiarioMB.fechaFin()}" />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

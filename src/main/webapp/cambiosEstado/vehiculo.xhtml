@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="messages" showDetail="true" />
+        <h:form id="frmPrincipal">
+            <p:panel header="Cambiar estado (Vehículos)">
+                <p:dataTable id="dtvehiculoInactivo"
+                             paginator="true"
+                             rows="15"
+                             filterDelay="2000"
+                             sortBy="#{vehiculoInactivo.creado}"
+                             sortOrder="descending"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             var="vehiculoInactivo"
+                             rowStyleClass="text-center"
+                             value="#{cambioVehiculoBean.lstVehiculosInactivos}"
+                             emptyMessage="No hay vehículos registrados">
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton icon="fa fa-plus"
+                                             class="cssWhite"
+                                             value="Nuevo"
+                                             action="#{cambioVehiculoBean.nuevo()}"
+                                             update=":frmCambioVehiculo,:modalCambioVehiculo"
+                                             oncomplete="PF('cambioVehiculo').show();"
+                                             >
+                                <p:resetInput target=":frmCambioVehiculo:pGrid"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Desde">
+                        <h:outputText value="#{vehiculoInactivo.fromDate}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Hasta">
+                        <h:outputText value="#{vehiculoInactivo.toDate}">
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Cod_Vehículo" filterBy="#{vehiculoInactivo.idVehiculo.codigo}"
+                              width="80">
+                        <h:outputText value="#{vehiculoInactivo.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{vehiculoInactivo.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Estado"
+                              styleClass="#{vehiculoInactivo.activo eq 1 ? 'cssGreen': vehiculoInactivo.activo eq 0 ? 'cssRed' : ''}">
+                        <h:outputText value="Activo" rendered="#{vehiculoInactivo.activo eq 1}"
+                                      style="text-transform: uppercase" class="cssWhite"/>
+                        <h:outputText value="#{vehiculoInactivo.idVehiculoEstado.nombreTipoEstado}" rendered="#{not(vehiculoInactivo.activo eq 1)}"
+                                      style="text-transform: uppercase" class="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Acción">
+                        <p:commandButton icon="fa fa-thumbs-up"
+                                         class="cssWhite"
+                                         action="#{cambioVehiculoBean.prepareActivarVehiculo()}"
+                                         update=":frmActivarVehiculo,:modalActivarVehiculo"
+                                         oncomplete="PF('activarVehiculo').show();"
+                                         rendered="#{cambioVehiculoBean.verificarEstado(vehiculoInactivo.toDate) and vehiculoInactivo.activo == 0}">
+                            <p:resetInput target=":frmActivarVehiculo:pGrid"/>
+                            <f:setPropertyActionListener value="#{vehiculoInactivo}" target="#{cambioVehiculoBean.selected}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="cssWhite GreenButton"
+                                         action="#{cambioVehiculoBean.editar()}"
+                                         update=":frmCambioVehiculo,:modalCambioVehiculo"
+                                         oncomplete="PF('cambioVehiculo').show();">
+                            <p:resetInput target=":frmCambioVehiculo:pGrid"/>
+                            <f:setPropertyActionListener value="#{vehiculoInactivo}" target="#{cambioVehiculoBean.selected}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{cambioVehiculoBean.lstVehiculosInactivos.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtvehiculoInactivo" 
+                                                fileName="Estado Vehículo"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="vehiculos/Nuevo.xhtml"/>
+        <ui:include src="vehiculos/activarVehiculo.xhtml"/>
+    </ui:define>
+
+</ui:composition>

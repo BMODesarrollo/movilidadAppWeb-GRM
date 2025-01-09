@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <p:panel header="Tipos de estado (Vehículo)">
+            <h:form id="frmPrincipalVhclTipEstado">
+                <p:dataTable var="vehiculoTipoEstado" value="#{vehiculoTipoEstadoBean.lista}"
+                             id="dtTipo"
+                             rowIndexVar="nroFila"
+                             filterDelay="1000"
+                             rows="5"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                             emptyMessage="No existen tipos de estado registrados">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="dtTipo" fileName="Tipos de estado de vehículos"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton action="#{vehiculoTipoEstadoBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo tipo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update="frmNuevoTipo,modal"
+                                             value="Nuevo">
+                                <p:resetInput target="frmNuevoTipo" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre" filterBy="#{vehiculoTipoEstado.nombreTipoEstado}">
+                        <h:outputText value="#{vehiculoTipoEstado.nombreTipoEstado}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="No tiene" rendered="#{empty(vehiculoTipoEstado.descripcionTipoEstado)}" />
+                        <h:outputText value="#{vehiculoTipoEstado.descripcionTipoEstado}" rendered="#{vehiculoTipoEstado.descripcionTipoEstado!=null}" />
+                    </p:column>
+                    <p:column headerText="Restricción Operación"
+                              styleClass="#{vehiculoTipoEstado.restriccionOperacion gt 0 ? 'cssGreen': vehiculoTipoEstado.restriccionOperacion eq 0 ? 'cssRed' : ''}">
+                        <h:outputText value="Sí" rendered="#{vehiculoTipoEstado.restriccionOperacion == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{vehiculoTipoEstado.restriccionOperacion == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column headerText="Cierra Novedad"
+                              styleClass="#{vehiculoTipoEstado.cierraNovedad gt 0 ? 'cssGreen': vehiculoTipoEstado.cierraNovedad eq 0 ? 'cssRed' : ''}">
+                        <h:outputText value="Sí" rendered="#{vehiculoTipoEstado.cierraNovedad == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{vehiculoTipoEstado.cierraNovedad == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column headerText="Acción" exportable="false" width="10%">
+                        <p:commandButton icon="fa fa-pencil"
+                                         title="Editar registro"
+                                         class="GreenButton cssWhite"
+                                         action="#{vehiculoTipoEstadoBean.editar()}"
+                                         update=":frmNuevoTipo,modal"
+                                         oncomplete="PF('mtipo').show();">
+                            <f:setPropertyActionListener target="#{vehiculoTipoEstadoBean.selected}" value="#{vehiculoTipoEstado}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh"
+                                         title="Cambiar estado"
+                                         action="#{vehiculoTipoEstadoBean.cambiarEstado()}"
+                                         update=":frmNuevoTipo,modal,:frmNuevoTipo:messages,dtTipo"
+                                         rendered="false">
+                            <f:setPropertyActionListener target="#{vehiculoTipoEstadoBean.selected}" value="#{vehiculoTipoEstado}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{vehiculoTipoEstadoBean.lista.size()} tipos.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modals/gestionTipoEstado.xhtml"/>
+    </ui:define>
+</ui:composition>

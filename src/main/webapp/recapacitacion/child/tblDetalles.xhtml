@@ -1,0 +1,79 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dataTable id="dtRecapMaestroDetalle" var="detalle" 
+                 scrollable="true"
+                 widgetVar="wlVdtRecapMaestroDetalle"
+                 scrollHeight="600"
+                 disabledTextSelection="false"
+                 reflow="true"
+                 rows="10"
+                 filterDelay="1700"
+                 paginator="true"
+                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                 rowsPerPageTemplate="10,50,100"
+                 emptyMessage="No existen registros"
+                 value="#{recapacitacionBean.lstRecapacitacionNuevo}">
+
+        <f:facet name="header">
+            <div align="right" jsf:id="botones">
+
+                <p:commandButton
+                    icon="fa fa-plus"
+                    value="Seleccionar novedades"
+                    update=":frmNovedadesList:dtNovedades"
+                    action="#{recapacitacionBean.prepareListadoNovedades()}"
+                    oncomplete="PF('NovedadesListDialog').show();"
+                    class="cssWhite" />   
+            </div>
+        </f:facet>
+
+        <p:column headerText="Fecha Novedad" 
+                  filterBy="#{detalle.idNovedad.fecha}" 
+                  filterMatchMode="startsWith"
+                  styleClass="text-center">
+
+
+            <h:outputText value="#{detalle.idNovedad.fecha}">
+                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="Tipo Novedad" filterBy="#{detalle.idNovedad.idNovedadTipo.nombreTipoNovedad}">
+            <h:outputText value="#{detalle.idNovedad.idNovedadTipo.nombreTipoNovedad}" />
+        </p:column>
+
+        <p:column id="detTipoNovedad" filterBy="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+            <f:facet name="header">
+                <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+            </f:facet>
+            <h:outputText value="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}" 
+                          title="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}" />
+        </p:column>
+
+        <p:column exportable="false" filterBy="#{detalle.idNovedad.idEmpleado.codigoTm} #{detalle.idNovedad.idEmpleado.nombres} #{detalle.idNovedad.idEmpleado.apellidos}"
+                  filterMatchMode="contains"
+                  headerText="Operador">
+            <h:outputText value="#{detalle.idNovedad.idEmpleado.codigoTm}" class="cssBlack"/>
+            <h:outputText value=" #{detalle.idNovedad.idEmpleado.nombres.concat(' ').concat(detalle.idNovedad.idEmpleado.apellidos)}"/>
+        </p:column>
+
+        <p:column headerText="Observaciones" class="cortar">
+            <h:outputText value="#{detalle.idNovedad.observaciones}" />
+        </p:column>
+        <p:column headerText="Quitar" class="cortar">
+            <center>
+                <p:commandButton icon="fa fa-times"
+                                 class="cssWhite RedButton"
+                                 actionListener="#{recapacitacionBean.quitarItemslstRecapacitacionNuevo(detalle.idNovedad.idNovedad)}"
+                                 update="dtRecapMaestroDetalle" />
+            </center>
+        </p:column>
+
+    </p:dataTable>
+</ui:composition>     

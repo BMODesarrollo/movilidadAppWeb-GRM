@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <p:panel header="Propietarios de vehículos">
+            <h:form id="frmPrincipalVhclPropie">
+
+                <p:dataTable var="vehiculoPropietario" value="#{vehiculoPropietarioBean.lista}"
+                             id="dtTipo"
+                             reflow="true"
+                             rowIndexVar="nroFila"
+                             rows="5"
+                             filterDelay="1000"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                             emptyMessage="No existen propietarios de vehículos registrados">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton action="#{vehiculoPropietarioBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo tipo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":frmNuevoTipo"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmNuevoTipo" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Identificación" filterBy="#{vehiculoPropietario.identificacion}">
+                        <h:outputText value="#{vehiculoPropietario.identificacion}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{vehiculoPropietario.nombres}" />
+                    </p:column>
+
+                    <p:column headerText="Dirección">
+                        <h:outputText value="No tiene" rendered="#{empty(vehiculoPropietario.direccion)}" />
+                        <h:outputText value="#{vehiculoPropietario.direccion}" rendered="#{vehiculoPropietario.direccion!=null}" />
+                    </p:column>
+                    <p:column headerText="Teléfono">
+                        <h:outputText value="No tiene" rendered="#{empty(vehiculoPropietario.telefono)}" />
+                        <h:outputText value="#{vehiculoPropietario.telefono}" rendered="#{vehiculoPropietario.telefono!=null}" />
+                    </p:column>
+                    <p:column headerText="Acción">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="cssWhite GreenButton"
+                                         title="Editar registro"
+                                         action="#{vehiculoPropietarioBean.editar()}"
+                                         update=":frmNuevoTipo:modal"
+                                         oncomplete="PF('mtipo').show();"
+                                         >
+                            <f:setPropertyActionListener target="#{vehiculoPropietarioBean.selected}" value="#{vehiculoPropietario}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{vehiculoPropietarioBean.lista.size()} tipos.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <h:form id="frmNuevoTipo">
+                <p:dialog widgetVar="mtipo" id="modal" modal="true"
+                          position="center top" class="mr1024_40 mr500_90"
+                          resizable="false"
+                          closeOnEscape="true" responsive="true">
+                    <c:if test="#{vehiculoPropietarioBean.selected == null }">
+                        <f:facet name="header">
+                            Nuevo propietario
+                        </f:facet>
+                    </c:if>
+                    <c:if test="#{vehiculoPropietarioBean.selected != null }">
+                        <f:facet name="header">
+                            Editar propietario: #{vehiculoPropietarioBean.selected.nombres.toUpperCase()}
+                        </f:facet>
+                    </c:if>
+                    <p:messages id="messages" showDetail="true" closable="true"/>
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Identificación:" for="identificacion"/>
+                                <p:inputText id="identificacion" 
+                                             value="#{vehiculoPropietarioBean.vehiculoPropietario.identificacion}"
+                                             required="true" 
+                                             requiredMessage="Debe ingresar la identificación del propietario"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Nombre completo:" for="nombres"/>
+                                <p:inputText id="nombres" 
+                                             value="#{vehiculoPropietarioBean.vehiculoPropietario.nombres}"
+                                             required="true" 
+                                             requiredMessage="Debe ingresar el nombre del propietario"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Dirección" for="direccion"/>
+                                <p:inputText id="direccion" 
+                                             value="#{vehiculoPropietarioBean.vehiculoPropietario.direccion}"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Teléfono" for="telefono"/>
+                                <p:inputText id="telefono" 
+                                             value="#{vehiculoPropietarioBean.vehiculoPropietario.telefono}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar"
+                                         class="cssWhite"
+                                         icon="fa fa-check"
+                                         actionListener="#{vehiculoPropietarioBean.guardar()}"
+                                         update=":frmPrincipalVhclPropie:dtTipo,messages"
+                                         rendered="#{vehiculoPropietarioBean.selected == null }"
+                                         >
+                        </p:commandButton>
+                        <p:commandButton value="Actualizar" 
+                                         class="cssWhite"
+                                         icon="fa fa-check"
+                                         actionListener="#{vehiculoPropietarioBean.actualizar()}"
+                                         update=":frmPrincipalVhclPropie:dtTipo,messages"
+                                         rendered="#{vehiculoPropietarioBean.selected != null }"
+                                         />
+                    </f:facet>
+                </p:dialog>  
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

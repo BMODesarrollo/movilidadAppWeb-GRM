@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="Abogado" 
+              widgetVar="abogadoDlg" 
+              modal="true" 
+              closeOnEscape="true"
+              closable="false"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Nuevo Accidente Abogado
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('abogadoDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <p:ajax event="close" listener="#{accidenteAbogadoJSF.reset()}" update=":AbogadoListForm:datalist" />
+        <h:form id="form-abogado">
+            <p:messages id="msgs" closable="true" showSummary="true" showDetail="true"/>  
+            <h:panelGroup id="display">
+                <h:panelGrid columns="1">
+                    <p:outputLabel value="Accidente Abogado: *"/>
+                    <p:inputText id="tipo"
+                                 value="#{accidenteAbogadoJSF.accidenteAbogado.causaRaiz}" 
+                                 maxlength="60"
+                                 style="width: 300px"
+                                 required="true"
+                                 requiredMessage="Abogado es requerido"
+                                 />
+                </h:panelGrid>
+                <p:separator/>
+                <h:panelGrid cellpadding="5" columns="1" >
+                    <p:outputLabel value="Descripción: *"/>
+                    <p:inputTextarea  id="descripcion" 
+                                      maxlength="6000" 
+                                      style="width: 300px;height: 150px"
+                                      class="cssBlack"
+                                      value="#{accidenteAbogadoJSF.accidenteAbogado.descripcion}" 
+                                      required="true" 
+                                      requiredMessage="Descripción es requerido"/>
+                </h:panelGrid>
+                <p:separator/>
+                <p:commandButton actionListener="#{accidenteAbogadoJSF.guardar()}" 
+                                 value="Guardar" 
+                                 icon="fa fa-check"
+                                 class="cssWhite"
+                                 update="display,:AbogadoListForm:datalist,form-abogado:msgs" />
+                <p:commandButton value="Cancelar" 
+                                 process="@this"
+                                 icon="fa fa-times"
+                                 class="cssWhite"
+                                 actionListener="#{accidenteAbogadoJSF.reset()}"  
+                                 oncomplete="PF('abogadoDlg').hide();"
+                                 update=":AbogadoListForm:datalist"
+                                 />
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition> 

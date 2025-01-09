@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="atvMapModal" 
+              widgetVar="modalMapWV" 
+              modal="true" 
+              closable="true"
+              resizable="false" 
+              appendTo="@(body)" 
+              fitViewport="true"
+              header="Gestión seguimiento localicación"
+              class="mr1024_70 mr500_90"
+              position="center top">
+        <h:form prependId="false">
+            <p:poll interval="30" listener="#{atvNovedadJSF.onActualizarRutaReal()}" global="false" />
+            <div class="ui-fluid Padding5" >
+                <div class="ui-g Padding0" >
+                    <div class="ui-g-12 ui-md-12 ui-lg-2 Padding3"> 
+                        <p:commandButton id="realVsSug" 
+                                         title="Permite consultar la ruta real tomada por el carro atención y la ruta sugerida por el sistema"
+                                         value="Rut. Real vs Sugerida"
+                                         icon="fa fa-map-signs" 
+                                         class="GreenButton cssWhite Wid100"
+                                         update=":msgs,@form"
+                                         process="@this"
+                                         action="#{atvNovedadJSF.construirModelMap(1)}"
+                                         />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                        <p:calendar id="tiempoHolgura"
+                                    value="#{atvNovedadJSF.tiempoUbicacion}"
+                                    navigator="true"
+                                    title="Permite consultar por fecha y holgura una posición tentativa"
+                                    timeControlType="select"
+                                    pattern="yyyy-MM-dd hh:mm"
+                                    showOn="button" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-2 Padding3">
+                        <p:inputNumber id="holgura"
+                                       value="#{atvNovedadJSF.holgura}" 
+                                       class="Wid100"
+                                       placeholder="Holgura"
+                                       title="Representado en minutos"
+                                       minValue="0"/>
+                        <div class="botonFloat" >
+                            <p:commandButton id="realBusq" 
+                                             title="Permite consultar por fecha y holgura una posición tentativa"
+                                             icon="fa fa-map-marker" 
+                                             class="GreenButton cssWhite Wid100"
+                                             update=":msgs,@form"
+                                             process="holgura,tiempoHolgura,@this"
+                                             action="#{atvNovedadJSF.construirModelMap(2)}" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                        <p:commandButton id="sugerida" 
+                                         title="Permite consultar la ruta sugerida por el sistema"
+                                         value="Ruta Sugerida"
+                                         icon="fa fa-map-o" 
+                                         class="GreenButton cssWhite Wid100"
+                                         update=":msgs,@form"
+                                         process="@this"
+                                         action="#{atvNovedadJSF.construirModelMap(3)}"
+                                         />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-2 Padding3"> 
+                        <p:commandButton id="real" 
+                                         title="Permite consultar la ruta real tomada por el carro atención"
+                                         value="Ruta Real"
+                                         icon="fa fa-map-pin" 
+                                         class="GreenButton cssWhite Wid100"
+                                         update=":msgs,@form"
+                                         process="@this"
+                                         action="#{atvNovedadJSF.construirModelMap(4)}"
+                                         />
+                    </div>
+                </div>
+            </div>
+            <p:gmap id="gmapAtv" 
+                    center="#{atvNovedadJSF.centerMap}" 
+                    zoom="#{atvNovedadJSF.zoomMap}"
+                    type="TERRAIN"
+                    mapTypeControl="false" 
+                    navigationControl="false"
+                    style="width:100%;height:500px"
+                    model="#{atvNovedadJSF.modelMap}">
+                <p:ajax event="stateChange" listener="#{atvNovedadJSF.onStateChange}" global="false"/>
+                <p:ajax event="overlaySelect" listener="#{atvNovedadJSF.onMarkerSelect}" />
+                <p:gmapInfoWindow id="infoWindow">
+                    <p:outputPanel style="text-align: center; display: block; margin: auto">
+
+                        <!-- Para mostrar los datos de la evidencia-->
+                        <div class="Wid100" jsf:rendered="#{atvNovedadJSF.atvEvidencia != null}">
+                            <h:outputText value="#{atvNovedadJSF.atvEvidencia.idAtvTipoEstado.tipoEstado}"
+                                          class="cssBlack" />
+
+                            <p:panelGrid columns="2">
+
+                                <h:outputText value="Fecha" class="cssBlack"/>
+                                <h:outputText value="#{atvNovedadJSF.atvEvidencia.fecha}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                                </h:outputText>
+                            </p:panelGrid>
+                        </div>
+
+                        <!-- Para mostrar los datos de la localizacion sugerida-->
+                        <div class="Wid100" jsf:rendered="#{atvNovedadJSF.atvLocationSugerida != null}">
+                            <h:outputText value="#{atvNovedadJSF.atvLocationSugerida.username}"
+                                          class="cssBlack" />
+
+                            <p:panelGrid columns="2">
+
+                                <h:outputText value="Fecha" class="cssBlack"/>
+                                <h:outputText value="#{atvNovedadJSF.atvLocationSugerida.fecha}" >
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                                </h:outputText>
+                                <h:outputText value="Dirección Inicio" class="cssBlack"/>
+                                <h:outputText value="#{atvNovedadJSF.atvLocationSugerida.addressStart}" />
+                                <h:outputText value="Dirección Final" class="cssBlack"/>
+                                <h:outputText value="#{atvNovedadJSF.atvLocationSugerida.addressEnd}" />
+                                <h:outputText value="Distancia (km)" class="cssBlack"/>
+                                <h:outputText value="#{atvNovedadJSF.atvLocationSugerida.distance / 1000}" />
+                                <h:outputText value="Tiempo Aprox. (min)" class="cssBlack" title="Minutos"/>
+                                <h:outputText value="#{atvNovedadJSF.atvLocationSugerida.duration / 60}" >
+                                    <f:convertNumber maxFractionDigits="2" />
+                                </h:outputText>
+                            </p:panelGrid>
+                        </div>
+                    </p:outputPanel>
+                </p:gmapInfoWindow>
+            </p:gmap>                 
+        </h:form>
+    </p:dialog>
+</ui:composition> 

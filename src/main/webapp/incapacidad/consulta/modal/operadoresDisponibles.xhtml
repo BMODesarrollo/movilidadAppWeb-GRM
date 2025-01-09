@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:fieldset legend="Operadores Disponibles">
+        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+            <p:dataTable var="opd"
+                         value="#{consultaAusentismoAsignacionBean.operadoresDisponibles}"
+                         style="padding: 0px"
+                         rows="10"
+                         selection="#{consultaAusentismoAsignacionBean.prgTc}"
+                         selectionMode="single"
+                         filterDelay="1000"
+                         scrollHeight="400"
+                         scrollable="true"
+                         widgetVar="opdWV"
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                         rowIndexVar="nroFila"
+                         id="tbOpDispo"
+                         emptyMessage="no hay disponibles"
+                         rowKey="#{opd.idPrgTc}"
+                         reflow="true"
+                         paginator="true">
+                <p:ajax event="rowSelect" global="false"
+                        update="btnGuardarNovedadPM"
+                        listener="#{consultaAusentismoAsignacionBean.onRowSelectOpDispo}"/>
+
+                <p:column headerText="Codigo Tm - punto Ini - tipologia"
+                          filterBy="#{opd.idEmpleado.codigoTm} #{opd.idEmpleado.nombres} #{opd.idEmpleado.apellidos} #{opd.fromStop.name} #{opd.idEmpleado.idEmpleadoCargo.nombreCargo}"
+                          class="#{opd.sercon eq 'DP_CONTINGC' ? 'rowGrisOscuroStyle':''}"
+                          filterMatchMode="contains" >
+                    <span class="ui-fluid">
+                        <span class="ui-g">
+                            <span class="ui-g-12 ui-md-12 ui-lg-11" style="padding: 2px;font-weight: bold">
+                                <span class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;font-weight: bold">
+                                    #{opd.idEmpleado.codigoTm} &nbsp; - &nbsp; #{opd.idEmpleado.nombres} #{opd.idEmpleado.apellidos} - &nbsp;#{opd.sercon}
+                                </span>
+                                <span class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;font-weight: bold;color: red">
+                                    #{opd.timeOrigin}-#{opd.timeDestiny}
+                                </span>
+                                <span class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;font-weight: bold">
+                                    #{opd.fromStop.name}&nbsp;#{opd.idEmpleado.idEmpleadoCargo.nombreCargo}
+                                </span>
+                            </span>
+                            <span class="ui-g-12 ui-md-12 ui-lg-1" style="padding: 2px;font-weight: bold">
+                                <span class="Fs25 #{(opd.idEmpleado.certificado==1 or opd.idEmpleado.idEmpleadoCargo.idEmpleadoTipoCargo==29)
+                                                    ? 'yellowCar fa fa-bus': 'redCar fa fa-bus'}"/>
+                            </span>
+                        </span>
+                    </span>
+                </p:column>
+            </p:dataTable>
+        </div>
+    </p:fieldset>
+
+</ui:composition>

@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+    <p:dialog id="PmPuntosEmpresaCreateDlg" 
+              widgetVar="PmPuntosEmpresaCreateDialog" 
+              closeOnEscape="true"
+              modal="true" 
+              position="center top"
+              class="mr1024_30 mr500_90"
+              resizable="false" 
+              appendTo="@(body)" 
+              closable="false">
+        
+         <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Crear Pm Puntos Empresa" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('PmPuntosEmpresaCreateDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="PmPuntosEmpresaCreateForm">
+            <div class="ui-fluid" jsf:rendered="#{pmPuntosEmpresaController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desde" for="desde" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar 
+                                mask="99/99/9999"
+                                id="desde" 
+                                pattern="dd/MM/yyyy" 
+                                locale="es"
+                                value="#{pmPuntosEmpresaController.selected.desde}" 
+                                title="#{bundle.EditPmPuntosEmpresaTitle_desde}" 
+                                required="true" 
+                                requiredMessage="Debe ingresas DESDE" 
+                                showOn="button">
+                                <p:ajax event="dateSelect" update="hasta" />
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Hasta" for="hasta" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar 
+                                mask="99/99/9999"
+                                id="hasta" 
+                                locale="es"
+                                pattern="dd/MM/yyyy" 
+                                value="#{pmPuntosEmpresaController.selected.hasta}" 
+                                title="#{bundle.EditPmPuntosEmpresaTitle_hasta}" 
+                                required="true" 
+                                requiredMessage="Debe ingresar HASTA" 
+                                showOn="button"
+                                >
+                                <f:attribute name="startDate" value="#{myBean.startDate}" />
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Vr Puntos" for="vrPuntos" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber 
+                                decimalPlaces="0"
+                                id="vrPuntos" 
+                                value="#{pmPuntosEmpresaController.selected.vrPuntos}" 
+                                title="#{bundle.CreatePmPuntosEmpresaTitle_vrPuntos}"
+                                maxValue="100"
+                                required="true" 
+                                requiredMessage="Debe ingresar Vr Puntos"
+                                />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand
+                action="#{pmPuntosEmpresaController.registar()}" 
+                name="rc_pe"
+                update="@form,:PmPuntosEmpresaListForm:datalist,msgs" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_pe();"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             value="Guardar"/> 
+        </f:facet>
+    </p:dialog>
+
+</ui:composition>
+

@@ -1,0 +1,104 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="alternativa_dialog"
+              widgetVar="alternativa_dialog_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_60 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Alternativa de Respuesta"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('alternativa_dialog_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="alternativa_dialog_form">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                        <p:outputLabel for="id_input_numero" value="Número"/>
+                        <p:spinner id="id_input_numero" 
+                                   max="999"
+                                   min="0"
+                                   required="true" 
+                                   requiredMessage="Digite un valor numerico entero"
+                                   value="#{audiTipoRespuestaJSFMB.audiAlterResp.numero}" />
+                    </div>
+                    <div class="ui-g-12 ui-md-7 ui-lg-7 Padding5">
+                        <p:outputLabel for="id_input_enunciado" value="Enucnciado"/>
+                        <p:inputText id="id_input_enunciado" required="true" requiredMessage="Digite un enunciado."
+                                     value="#{audiTipoRespuestaJSFMB.audiAlterResp.enunciado}" />
+                    </div>
+                    <div class="ui-g-12 ui-md-2 ui-lg-1 Padding5">
+                        <p:outputLabel for="id_input_valor" value="Valor"/>
+                        <p:inputNumber id="id_input_valor" 
+                                       required="true"
+                                       maxValue="99"
+                                       requiredMessage="Digite un valor numerico entero"
+                                       value="#{audiTipoRespuestaJSFMB.audiAlterResp.valor}" />
+                    </div>
+                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                        <p:outputLabel for="label_genera_novedad" value="Genera Novedad"/>
+                        <p:selectBooleanButton 
+                            id="label_genera_novedad" 
+                            value="#{audiTipoRespuestaJSFMB.audiAlterResp.generaNovedad}" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            onLabel="Sí" 
+                            offLabel="No"/>
+                        <p:tooltip id="toolTip_genera_novedad" 
+                                   for="label_genera_novedad" 
+                                   value="Ideal para tener en cuenta en las novedades. Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <p:outputLabel for="id_input_descripcion" value="Descripción"/>
+                        <p:inputTextarea id="id_input_descripcion" 
+                                         required="true" 
+                                         requiredMessage="Digite una descripción"
+                                         maxlength="2000"
+                                         value="#{audiTipoRespuestaJSFMB.audiAlterResp.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rcAlter" 
+                             class="cssWhite"
+                             action="#{audiTipoRespuestaJSFMB.agregarAlternativa()}"
+                             rendered="#{audiTipoRespuestaJSFMB.audiAlterResp.idAuditoriaTipoRespuesta==null}"
+                             process="@this,alternativa_dialog_form"
+                             update="msgs,
+                             create_edit_dialog_form:datalist_alternativas,
+                             alternativa_dialog_form"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarAlter" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Agregar" 
+                             rendered="#{audiTipoRespuestaJSFMB.audiAlterResp.idAuditoriaTipoRespuesta==null}"
+                             onclick="rcAlter()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

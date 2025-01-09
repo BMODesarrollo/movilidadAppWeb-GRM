@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="pilonaMd" 
+              closeOnEscape="true" 
+              widgetVar="pilonaDlg"
+              modal="true"
+              header="PILONAS"
+              resizable="false" 
+              class="mr1024_50 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal-pilo">
+            <p:dataTable id="tabla-pilona"
+                         var="pilo" 
+                         value="#{novedadMttoDiariaJSF.listSegPilona}"  
+                         paginator="true"
+                         filterDelay="2000"
+                         rows="10"
+                         rowsPerPageTemplate="10,20,50"
+                         reflow="true"
+                         rowIndexVar="nropFila"
+                         selectionMode="single"
+                         rowKey="#{pilo.idSegPilona}"
+                         widgetVar="wvPil"
+                         emptyMessage="No existen registros">
+
+                <p:ajax event="rowSelect" 
+                        process="@this"
+                        update=":form-modal:pilona,:form:msg"
+                        listener="#{novedadMttoDiariaJSF.onGetPilona}" />
+
+                <f:facet name="paginatorTopRight">
+                    <p:commandButton id="null"   
+                                     value="Null"
+                                     title="Volver pilona null"
+                                     actionListener="#{novedadMttoDiariaJSF.onNullPilona()}" 
+                                     icon="fa fa-check" 
+                                     process="@this"
+                                     update=":form-modal:pilona"
+                                     class="cssWhite RedButton" />
+                </f:facet>
+
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nropFila+1}" />
+                </p:column>
+                <p:column headerText="Nombre" filterBy="#{pilo.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{pilo.nombre}" />
+                </p:column>
+                <p:column headerText="Código" filterBy="#{pilo.codigo}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{pilo.codigo}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

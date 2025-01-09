@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <p:dialog id="idParadasDlg" 
+              widgetVar="wvParadasDialog" 
+              modal="true" 
+              resizable="false" 
+              class="responsive_modal"
+              fitViewport="true"
+              closeOnEscape="true"
+              appendTo="@(body)" 
+              header="paradas" 
+              position="center top">
+        <h:form id="frmPrincipalParadasList">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Un click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="StopPoint" id="tablaParadas" value="#{arcosPropiosJSFMB.listParadasC}"  
+                         selectionMode="single"                
+                         rowIndexVar="nroFila"
+                         widgetVar="tablaParadasWV"
+                         rows="10"
+                         filterDelay="1000"
+                         reflow="true"
+                         paginator="true"
+                         rowKey="#{StopPoint.idPrgStoppoint}"
+                         emptyMessage="No existen Paradas registradas"       >
+                <p:ajax event="rowSelect" 
+                        listener="#{arcosPropiosJSFMB.onRowClckSelectParada}"
+                        process="@this" global="false"/>
+                <p:column headerText="#" style="width: 10%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column  headerText="Nombre"
+                           filterMatchMode="contains"
+                           filterBy="#{StopPoint.name}">
+                    <h:outputText  value="#{StopPoint.name}" />
+                    <p:tooltip  value="Hacer un click para seleccionar" trackMouse="true"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

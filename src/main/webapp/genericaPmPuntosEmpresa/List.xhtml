@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="../WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:form id="GenPmPuntosEmpresaListForm">
+            <p:panel header="Pm Puntos Empresa">
+                <p:dataTable id="datalist" value="#{genPmPuntosEmpJSF.items}" var="item"
+                             selectionMode="single" selection="#{genPmPuntosEmpJSF.selected}"
+                             paginator="true"
+                             rowKey="#{item.idGenericaPmPuntosEmpresa}"
+                             rows="20"
+                             emptyMessage="No existen registros"
+                             filterDelay="2000"
+                             rowsPerPageTemplate="20,50,100" >
+
+                    <p:ajax event="rowSelect"   update="createButton editButton"/>
+                    <p:ajax event="rowUnselect" update="createButton editButton"/>
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton class="cssWhite" id="createButton" 
+                                             icon="fa fa-plus"   
+                                             value="Nuevo" 
+                                             actionListener="#{genPmPuntosEmpJSF.prepareCreate}" 
+                                             update=":genPmPuntosEmpresaCreateForm" 
+                                             oncomplete="PF('genPmPuntosEmpresaCreateDialog').show()">
+                                <p:resetInput target="genPmPuntosEmpresaCreateDlg" ></p:resetInput>
+                            </p:commandButton>
+                            <p:commandButton id="editButton" class="cssWhite GreenButton"  
+                                             icon="fa fa-pencil" 
+                                             value="Editar"
+                                             update=":genPmPuntosEmpresaEditForm" 
+                                             oncomplete="PF('genPmPuntosEmpresaEditDialog').show()" 
+                                             disabled="#{empty genPmPuntosEmpJSF.selected.idGenericaPmPuntosEmpresa}">
+                                <p:resetInput target="genPmPuntosEmpresaEditDlg" ></p:resetInput>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Desde"/>
+                        </f:facet>
+                        <h:outputText value="#{item.desde}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Hasta">
+                        <h:outputText value="#{item.hasta}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Vr Puntos"/>
+                        </f:facet>
+                        <h:outputText value="#{item.vrPuntos}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+

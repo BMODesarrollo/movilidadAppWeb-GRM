@@ -1,0 +1,164 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="aseo_dialog_wv" id="aseo_dialog_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top" class="mr1024_50 mr500_90"
+              height="auto" header="Gestión Aseo">
+        <h:form id="aseo_dialog_form">
+            <div class="ui-fluid">
+                <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha_ini" value="Fecha Inicio:" />
+                        <p:calendar id="fecha_ini" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Fecha Inicio es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    timeControlType="select"
+                                    mask="true"
+                                    value="#{aseoJSFMB.aseo.fechaIni}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha_fin" value="Fecha Fin:" />
+                        <p:calendar id="fecha_fin" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Fecha Fin es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{aseoJSFMB.aseo.fechaFin}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5" jsf:rendered="false">
+                        <p:outputLabel for="id_sst_empresa_visitante" value="Responsable: *"/>
+                        <p:selectOneMenu id="id_sst_empresa_visitante"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{aseoJSFMB.i_idResponsable}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{aseoJSFMB.listResponsables}"
+                                           var="responsable" 
+                                           itemLabel="#{responsable.numeroDocumento} - #{responsable.nombre} #{responsable.apellidos}"
+                                           itemValue="#{responsable.idSstEmpresaVisitante}" />
+                            <p:ajax listener="#{aseoJSFMB.prepareObjeto(1)}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="id_aseo_tipo" value="Tipo Aseo: *"/>
+                        <p:selectOneMenu id="id_aseo_tipo"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{aseoJSFMB.i_idTipoAseo}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{aseoJSFMB.listAseoTipo}"
+                                           var="tipoAseo" itemLabel="#{tipoAseo.nombre}"
+                                           itemDescription="#{tipoAseo.descripcion}"
+                                           itemValue="#{tipoAseo.idAseoTipo}" />
+                            <p:ajax listener="#{aseoJSFMB.prepareObjeto(2)}" />
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="id_estacion" value="Estación: *"/>
+                        <p:selectOneMenu id="id_estacion"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{aseoJSFMB.i_idCableEstacion}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{aseoJSFMB.listEstacion}"
+                                           var="estacion" itemLabel="#{estacion.nombre}"
+                                           itemDescription="#{estacion.descripcion}"
+                                           itemValue="#{estacion.idCableEstacion}" />
+                            <p:ajax listener="#{aseoJSFMB.prepareObjeto(4)}" update="aseo_dialog_form:id_aseo_param_area"/>
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="id_aseo_param_area" value="Area Actividad: *"/>
+                        <p:selectOneMenu id="id_aseo_param_area"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{aseoJSFMB.i_idAseoParamArea}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{aseoJSFMB.listAseoParamArea}"
+                                           var="area" itemLabel="#{area.nombre}"
+                                           itemDescription="#{area.descripcion}"
+                                           itemValue="#{area.idAseoParamArea}" />
+                            <p:ajax listener="#{aseoJSFMB.prepareObjeto(3)}" />
+
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Responsable" for="@next"/>
+                        </div>
+                        <div class="ui-g-10 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="label_responsable"
+                                         readonly="true"
+                                         value="#{aseoJSFMB.responsable.numeroDocumento} #{aseoJSFMB.responsable.nombre} #{aseoJSFMB.responsable.apellidos}"/>
+                            <div class="botonFloat" >
+                                <p:commandButton icon="fa fa-qrcode"
+                                                 onclick="PF('fotoDialog').show();load()"
+                                                 title="Click para leer código qr"
+                                                 style="margin: 0px"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Fotos actividad">
+
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{aseoJSFMB.handleFileUpload}"
+                                              id="foto"
+                                              style="width: 99.9999%"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="@form"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_save_aseo" 
+                             class="cssWhite"
+                             actionListener="#{aseoJSFMB.guardar()}"  
+                             process="aseo_dialog_form,"
+                             update="msgs,form_aseo:dt_aseo_id"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnAgregarNov" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc_save_aseo()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="leerQr.xhtml"/>
+</ui:composition>

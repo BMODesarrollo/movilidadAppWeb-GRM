@@ -1,0 +1,92 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="form-bio-param">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <div class="Padding5">
+                <p:dataTable id="datalist" 
+                             value="#{biometricoConfig.listBiometricoConfig}"
+                             var="item"
+                             paginator="true"
+                             rowKey="#{item.idBioConfig}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             editable="true" 
+                             editMode="cell" 
+                             widgetVar="bioWV"
+                             emptyMessage="No existen registros">
+                    <f:facet name="header">
+                        <div style="text-transform: uppercase;text-align: left">
+                            Parametrización Jornadas Biométricos
+                        </div>
+                    </f:facet>
+
+                    <p:ajax event="cellEdit" listener="#{biometricoConfig.onCellEdit}" update="datalist,form-bio-param:msg" />
+
+                    <p:column headerText="#" style="width: 2%">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Tipo" style="width: 10%">
+                        <p:outputLabel value="#{item.item}"/>
+                    </p:column>
+                    <p:column headerText="Concepto" id="concepto" ariaHeaderText="1" style="width:40%">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.concepto}" /></f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{biometricoConfig.cNuevoVal}" 
+                                             style="width:96%" 
+                                             label="Valor" 
+                                             placeholder="#{item.concepto}"
+                                             maxlength="45"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Valor (minutos)" id="valor" ariaHeaderText="2" style="width: 5%">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.valor}" /></f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{biometricoConfig.cNuevoVal}" 
+                                             style="width:96%" 
+                                             label="Valor" 
+                                             placeholder="#{item.valor}"
+                                             maxlength="45"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Usuario Creación" filterBy="#{item.usernameCre}" filterMatchMode="contains" style="width: 5%">
+                        <h:outputText value="#{item.usernameCre}"/>
+                    </p:column>
+                  
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="Biometrico parametros reporte #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="Biometrico parametros reporte #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="Biometrico parametros reporte #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </div>
+            <p:contextMenu for="datalist" widgetVar="cMenu">   
+                <p:menuitem value="Editar Valor" icon="fa fa-search" onclick="PF('bioWV').showCellEditor();return false;"/>  
+                <p:menuitem value="Cerrar Menú" icon="fa fa-times" onclick="PF('cMenu').hide()"/>  
+            </p:contextMenu> 
+        </h:form>
+    </ui:define>
+</ui:composition>

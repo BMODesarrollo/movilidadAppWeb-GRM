@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="../WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:form id="PmPuntosEmpresaListForm">
+            <p:panel header="Pm Puntos Empresa">
+                <p:dataTable id="datalist" value="#{pmPuntosEmpresaController.items}" var="item"
+                             selectionMode="single" selection="#{pmPuntosEmpresaController.selected}"
+                             paginator="true"
+                             rowKey="#{item.idPmPuntosEmpresa}"
+                             rows="20"
+                             emptyMessage="No existen registros"
+                             filterDelay="2000"
+                             rowsPerPageTemplate="20,50,100">
+                    <f:facet name="header">
+                        <f:facet name="footer">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="datalist" fileName="Pm Puntos Empresa"/>
+                            </h:commandLink>
+                        </f:facet>
+                    </f:facet>
+
+                    <p:ajax event="rowSelect"   update="createButton viewButton editButton"/>
+                    <p:ajax event="rowUnselect" update="createButton viewButton editButton"/>
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton class="cssWhite" id="createButton" icon="fa fa-plus"   value="#{bundle.Create}" actionListener="#{pmPuntosEmpresaController.prepareCreate}" update=":PmPuntosEmpresaCreateForm" oncomplete="PF('PmPuntosEmpresaCreateDialog').show()">
+                                <p:resetInput target="PmPuntosEmpresaCreateDlg" ></p:resetInput>
+                            </p:commandButton>
+                            <p:commandButton id="viewButton" rendered="false" class="cssWhite OrangeButton"  icon="fa fa-search" value="#{bundle.View}" update=":PmPuntosEmpresaViewForm" oncomplete="PF('PmPuntosEmpresaViewDialog').show()" disabled="#{empty pmPuntosEmpresaController.selected.idPmPuntosEmpresa}"/>
+                            <p:commandButton id="editButton" class="cssWhite GreenButton"  icon="fa fa-pencil" value="#{bundle.Edit}" update=":PmPuntosEmpresaEditForm" oncomplete="PF('PmPuntosEmpresaEditDialog').show()" disabled="#{empty pmPuntosEmpresaController.selected.idPmPuntosEmpresa}">
+                                <p:resetInput target="PmPuntosEmpresaEditDlg" ></p:resetInput>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Desde"/>
+                        </f:facet>
+                        <h:outputText value="#{item.desde}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Hasta">
+                        <h:outputText value="#{item.hasta}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Vr Puntos"/>
+                        </f:facet>
+                        <h:outputText value="#{item.vrPuntos}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+        <ui:include src="View.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+

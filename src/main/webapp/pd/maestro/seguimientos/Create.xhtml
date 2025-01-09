@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="novedadDocumentos" id="modalDocumentos" modal="true" closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)" position="center,top"
+              class="mr1024_40 mr500_90">
+        <c:if test="#{pdMaestroSeguimientoBean.selected == null }">
+            <f:facet name="header">
+                Nuevo registro
+            </f:facet>
+        </c:if>
+        <c:if test="#{pdMaestroSeguimientoBean.selected != null }">
+            <f:facet name="header">
+                Editar registro
+            </f:facet>
+        </c:if>
+        <h:form id="frmNuevoDocumento">
+            <p:panel id="panel">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <div class="ui-fluid">
+                    <div class="ui-g" jsf:id="pGrid">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Seguimiento" for="@next"/>
+                            </div>
+                            <p:inputTextarea autoResize="false"
+                                             value="#{pdMaestroSeguimientoBean.seguimiento.seguimiento}"
+                                             required="true"
+                                             requiredMessage="Debe ingresar un seguimiento"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <div align="center">
+                                <p:commandButton title="Cargar documento de la novedad"
+                                                 icon="fa fa-upload"
+                                                 value="Cargar Documentos"
+                                                 class="cssWhite OrangeButton"
+                                                 style="width: 40%"
+                                                 process="@this"
+                                                 update="frmAddFiles"
+                                                 oncomplete="PF('AddFilesListDialog').show()">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p:panel>
+            <p:remoteCommand name="rc_doc"
+                             action="#{pdMaestroSeguimientoBean.guardarSeguimiento()}"
+                             update=":frmNovedadDocumentosList:dtNovedadDocumentos,
+                             pGrid,messages"
+                             rendered="#{pdMaestroSeguimientoBean.selected == null }"
+                             />
+            <p:remoteCommand name="rc_update_doc" 
+                             action="#{pdMaestroSeguimientoBean.actualizarSeguimiento()}"
+                             update=":frmNovedadDocumentosList:dtNovedadDocumentos,msgs"
+                             rendered="#{pdMaestroSeguimientoBean.selected != null }"
+                             />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             rendered="#{pdMaestroSeguimientoBean.selected == null }"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             onclick="rc_doc();"
+                             />
+            <p:commandButton value="Actualizar" 
+                             rendered="#{pdMaestroSeguimientoBean.selected != null }"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             onclick="rc_update_doc();"
+                             />
+        </f:facet>
+    </p:dialog> 
+    <ui:include src="AddFiles.xhtml"/>
+</ui:composition>

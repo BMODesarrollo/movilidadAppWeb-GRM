@@ -1,0 +1,274 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="autorizacion"
+              widgetVar="wlVAutorizacion" 
+              modal="true" 
+              class="modalResponsivo"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{sstAutorizacionPublicoJSF.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{sstAutorizacionPublicoJSF.selected != null}">
+            <f:facet name="header">
+                EDITAR AUTORIZACIÓN
+            </f:facet>
+        </c:if>
+        <h:form id="frmAutorizacion">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding3">
+                            <p:outputLabel value="Visitante"/>
+                        </div>
+                        <div class="ui-g-10 ui-md-11 ui-lg-11 Padding3">
+                            <p:inputText id="nomVisitante"
+                                         readonly="true"
+                                         value="#{sstAutorizacionPublicoJSF.sstEmpresaVisitante.nombre} #{sstAutorizacionPublicoJSF.sstEmpresaVisitante.apellidos}"/>
+                        </div>
+                        <div class="ui-g-2 ui-md-1 ui-lg-1 Padding3">
+                            <p:commandButton icon="fa fa-list"
+                                             action="#{sstAutorizacionPublicoJSF.prepareListVisitantes()}"
+                                             onclick="PF('wVVisitantesListDialog').clearFilters();"
+                                             oncomplete="PF('VisitantesListDialog').show();"
+                                             process="@this"
+                                             styleClass="cssWhite"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:outputLabel value="Fecha y hora llegada" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar Fecha y hora llegada"
+                                        timeInput="true"
+                                        mask="true"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        value="#{sstAutorizacionPublicoJSF.sstAutorizacion.fechaHoraLlegada}">
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:outputLabel value="Fecha y hora salida" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar fecha y hora salida"
+                                        timeInput="true"
+                                        mask="true"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        value="#{sstAutorizacionPublicoJSF.sstAutorizacion.fechaHoraSalida}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:outputLabel value="Tipo Labor" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:selectOneMenu 
+                                style="width: 99.999%"
+                                filter="true"
+                                required="true"
+                                requiredMessage="Debe seleccionar un tipo de labor"
+                                value="#{sstAutorizacionPublicoJSF.i_sstTipoLabor}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="labor"
+                                    value="#{sstAutorizacionPublicoJSF.lstTipoLabor}"
+                                    itemLabel="#{labor.tipoLabor}"
+                                    itemValue="#{labor.idSstTipoLabor}"
+                                    />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <p:outputLabel value="Motivo Visita" for="@next"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <p:inputTextarea autoResize="false"
+                                         value="#{sstAutorizacionPublicoJSF.sstAutorizacion.motivoVisita}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar un motivo"
+                                         rows="5"/>
+                    </div>
+                    <div class="EmptyBox5"></div>
+
+                    <p:separator/>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0"></div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding3">
+                            ¿Agregar Herramienta/Equipo?
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding3">
+                            <p:selectBooleanButton 
+                                value="#{sstAutorizacionPublicoJSF.flagMateriales}" 
+                                class="cssWhite"
+                                onLabel="Si" offLabel="No" 
+                                onIcon="fa fa-check" 
+                                offIcon="fa fa-times">
+                                <p:ajax update="materiales"
+                                        global="false" />
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0"></div>
+
+                    <div class="EmptyBox5"></div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" jsf:id="materiales">
+                        <div class="ui-g-12 ui-md-4 ui-lg-4" jsf:rendered="#{sstAutorizacionPublicoJSF.flagMateriales}">
+                            <p:fieldset legend="E/S Materiales y Equipos">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                    <p:outputLabel value="Tipo Acceso" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                    <p:selectOneMenu  
+                                        style="width: 99.999%"
+                                        filter="true"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar un tipo de acceso"
+                                        value="#{sstAutorizacionPublicoJSF.i_tipoAcceso}">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                        <f:selectItem itemLabel="Entrada" itemValue="#{0}" />
+                                        <f:selectItem itemLabel="Salida" itemValue="#{1}" />
+                                        <f:selectItem itemLabel="Ambos" itemValue="#{2}" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </p:fieldset>
+                        </div>
+                        <div class="ui-g-12 ui-md-8 ui-lg-8" jsf:rendered="#{sstAutorizacionPublicoJSF.flagMateriales}">
+                            <p:fieldset legend="Listado de Materiales/herramientas">
+                                <p:dataTable id="dtMateriales" 
+                                             rowIndexVar="index"
+                                             var="material" 
+                                             scrollable="true"
+                                             widgetVar="wlVMateriales"
+                                             scrollHeight="200"
+                                             disabledTextSelection="false"
+                                             reflow="true"
+                                             rows="10"
+                                             editable="true"
+                                             editMode="cell" 
+                                             filterDelay="1700"
+                                             paginator="true"
+                                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             rowsPerPageTemplate="10,50,100"
+                                             emptyMessage="No existen registros"
+                                             value="#{sstAutorizacionPublicoJSF.lstEsMatEquiDet}">
+
+
+                                    <f:facet name="header">
+                                        <div align="right" jsf:id="botones">
+                                            <p:commandButton
+                                                icon="fa fa-plus"
+                                                value="Agregar Item"
+                                                process="@this"
+                                                actionListener="#{sstAutorizacionPublicoJSF.prepareListMateriales()}"
+                                                class="cssWhite"
+                                                update=":MaterialesListDlg,:frmMaterialesList:dtListaMateriales,:msgs"
+                                                >
+                                            </p:commandButton>    
+                                        </div>
+                                    </f:facet>
+
+                                    <p:column headerText="Material"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{material.idSstMatEqui.nombre}"/>
+                                    </p:column>
+                                    <p:column headerText="Tipo Material"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{material.idSstMatEqui.idSstMatEquiTipo.tipo}"/>
+                                    </p:column>
+                                    <p:column headerText="Marca Material"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{material.idSstMatEqui.idSstMatEquiMarca.marca}"/>
+                                    </p:column>
+                                    <p:column headerText="Serial"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{material.serial}" rendered="#{material.serial != null}"/>
+                                        <h:outputText value="N/A" rendered="#{empty(material.serial)}"/>
+                                    </p:column>
+                                    <p:column headerText="Cantidad"
+                                              width="10%"
+                                              style="text-align: center;">
+                                        <p:cellEditor>
+                                            <f:facet name="output"><h:outputText value="#{material.cantidad}"/></f:facet>
+                                            <f:facet name="input"><p:spinner value="#{material.cantidad}" min="1" label="Cantidad"/></f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+
+                                    <p:column headerText="Acciones" style="text-align: center;"
+                                              exportable="false">
+                                        <div class="ui-g Padding0">
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                                 title="Editar"
+                                                                 process="@this"
+                                                                 actionListener="#{sstAutorizacionPublicoJSF.editarDetalle(material)}"
+                                                                 update=":EsMatEquiDet ,:frmMateriales:pGridDatos"
+                                                                 oncomplete="PF('wlvEsMatEquiDet').show();"
+                                                                 icon="fa fa-pencil">
+                                                    <p:resetInput target=":frmMateriales:pGridDatos"/>
+                                                </p:commandButton>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                <p:commandButton styleClass="cssWhite RedButton"
+                                                                 title="Eliminar detalle"
+                                                                 process="@this"
+                                                                 actionListener="#{sstAutorizacionPublicoJSF.eliminarDetalle(material)}"
+                                                                 update="dtMateriales,:msgs"
+                                                                 icon="fa fa-times">
+                                                    <p:confirm header="Confirmación" message="Está seguro de eliminar éste item?" icon="fa fa-exclamation-triangle" />
+                                                </p:commandButton>
+                                            </div>
+                                        </div>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmAutorizacion,@this"
+                             update=":msgs,pGridDatos,:frmAutorizacionList:dtAutorizacion" 
+                             action="#{sstAutorizacionPublicoJSF.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmAutorizacion,@this"
+                             update=":msgs,:frmAutorizacionList:dtAutorizacion"
+                             action="#{sstAutorizacionPublicoJSF.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                 rendered="#{sstAutorizacionPublicoJSF.selected == null}"
+                                 class="cssWhite" onclick="guardar()"/>
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{sstAutorizacionPublicoJSF.selected != null}"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

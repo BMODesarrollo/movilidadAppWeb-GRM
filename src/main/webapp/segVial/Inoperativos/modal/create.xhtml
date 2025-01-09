@@ -1,0 +1,502 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="id_dialog_inoperativos"
+              widgetVar="wv_inoperativos" 
+              modal="true" 
+              class="mr1024_70 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              focus=":form_inoperativos:codigo_operador"
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{segInoperativosBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO DE INOPERATIVIDAD
+            </f:facet>
+        </c:if>
+        <c:if test="#{segInoperativosBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO DE INOPERATIVIDAD
+            </f:facet>
+        </c:if>
+        <h:form id="form_inoperativos">
+            <p:focus context="comps"/>
+            <div class="ui-fluid">
+                <p:messages id="messages" showDetail="true" closable="true"/>
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Fecha Evento"/>
+                        </div>
+                        <p:calendar id="fechaEvento" required="true"
+                                    value="#{segInoperativosBean.fechaEvento}"
+                                    navigator="true"
+                                    locale="es"
+                                    maxdate="today"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="fechaEvento"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="codigo_operador" value="Empleado"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputNumber id="codigo_operador" placeholder="Codígo TM"
+                                               decimalPlaces="0" emptyValue="0"
+                                               maxValue="2147483647"
+                                               thousandSeparator=""
+                                               value="#{segInoperativosBean.codigoTransMi}" />
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Consultar Empleado"
+                                                     icon="fa fa-search"
+                                                     style="margin: 0px"
+                                                     class="cssWhite"
+                                                     process="@this, form_inoperativos:codigo_operador"
+                                                     update="form_inoperativos:codigo_operador,messages,msgs"
+                                                     action="#{segInoperativosBean.cargarEmpleado}">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="codigo_vehiculo" value="Vehículo"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="codigo_vehiculo" placeholder="Codígo Movil"
+                                             value="#{segInoperativosBean.codigoVehiculo}" />
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Consultar Movil"
+                                                     icon="fa fa-search"
+                                                     style="margin: 0px"
+                                                     class="cssWhite"
+                                                     process="@this, form_inoperativos:codigo_vehiculo"
+                                                     update="form_inoperativos:codigo_vehiculo,messages,msgs"
+                                                     action="#{segInoperativosBean.cargarVehiculo}">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Fecha reporte a la empresa"/>
+                        </div>
+                        <p:calendar id="fechanotificacion" 
+                                    value="#{segInoperativosBean.fechaNotificacion}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="fechanotificacion"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Fecha sanción"/>
+                        </div>
+                        <p:calendar id="fechaSancion" 
+                                    value="#{segInoperativosBean.fechaSancion}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="fechaSancion"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Fecha sanción Indefinida"/>
+                        </div>
+                        <p:calendar id="fechaSancionInde" 
+                                    value="#{segInoperativosBean.fechaSancionIndefinida}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="fechaSancionInde"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Fecha habilitación"/>
+                        </div>
+                        <p:calendar id="fechaHabilitacion" 
+                                    value="#{segInoperativosBean.fechaHabilitacion}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="fechaHabilitacion"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Fecha envio soportes a TMSA"/>
+                        </div>
+                        <p:calendar id="primeraFecha" 
+                                    value="#{segInoperativosBean.primerafechaEnvioSoporteEnte}"
+                                    navigator="true"
+                                    locale="es"
+                                    title="Primera fecha de envio de soportes al ente gestor."
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="primeraFecha"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " style="background-color: #ff0066;
+                             border-radius: 3px;">
+                            <p:outputLabel for="@next" style="color: black" value="Días Inoperabilidad"/>
+                        </div>
+                        <p:inputNumber id="diasInoperable"
+                                       decimalPlaces="0"
+                                       value="#{segInoperativosBean.diasInoperativos}">
+                        </p:inputNumber>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="¿A quién se le envio el correo?"/>
+                        </div>
+                        <p:inputText id="quienSeNotifico"
+                                     value="#{segInoperativosBean.quienSeNotifico}">
+                        </p:inputText>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " style="background-color: yellow;
+                             border-radius: 3px;">
+                            <p:outputLabel for="@next" style="color: black" value="Fecha envio soportes"/>
+                        </div>
+                        <p:calendar id="segundaFecha" 
+                                    value="#{segInoperativosBean.segundafechaEnvioSoporteEnte}"
+                                    navigator="true"
+                                    title="Segunda fecha de envio de soportes al ente gestor."
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="segundaFecha"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " style="background-color: yellow;
+                             border-radius: 3px;">
+                            <p:outputLabel for="@next" style="color: black" value="Fecha Cita TM"/>
+                        </div>
+                        <p:calendar id="fechaCitaEnte" 
+                                    value="#{segInoperativosBean.fechaCitaEnte}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="fechaCitaEnte"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Sanción" />
+                        </div>
+                        <div class="ui-g-10 ui-md-10 ui-lg-10 Padding0">
+                            <p:selectOneMenu id="tipoSancion" 
+                                             value="#{segInoperativosBean.idSegTipoSancion}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{segInoperativosBean.lstTiposSancion}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}"
+                                               itemValue="#{item.idSegTipoSancion}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0">
+                            <p:commandButton title="Cargar Tipos sanción"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{segInoperativosBean.cargarTiposSancion(true)}"
+                                             update="tipoSancion"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Incumplimiento" />
+                        </div>
+                        <div class="ui-g-10 ui-md-10 ui-lg-10 Padding0">
+                            <p:selectOneMenu id="tipoIncumplimiento" 
+                                             value="#{segInoperativosBean.idSegTipoIncumplimiento}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{segInoperativosBean.lstTiposIncumplimiento}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}"
+                                               itemValue="#{item.idSegTipoIncumplimiento}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0">
+                            <p:commandButton title="Cargar Tipos Incumplimientos"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{segInoperativosBean.cargarTiposIncumplimiento(true)}"
+                                             update="tipoIncumplimiento"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Conduta" />
+                        </div>
+                        <div class="ui-g-10 ui-md-10 ui-lg-10 Padding0">
+                            <p:selectOneMenu id="tipoConducta" 
+                                             value="#{segInoperativosBean.idSegTipoConducta}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{segInoperativosBean.lstTiposConducta}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}"
+                                               itemValue="#{item.idSegTipoConducta}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0">
+                            <p:commandButton title="Cargar Tipos de Conductas"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{segInoperativosBean.cargarTiposConducta(true)}"
+                                             update="tipoConducta"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo respuesta TMSA" />
+                        </div>
+                        <div class="ui-g-10 ui-md-10 ui-lg-10 Padding0">
+                            <p:selectOneMenu id="tipoRsptEnte" 
+                                             value="#{segInoperativosBean.idSegTipoRespuestaEnte}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax listener="#{segInoperativosBean.evaluarValor()}" update="fechaRsptEnte_div"/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{segInoperativosBean.lstTiposRsptEnte}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}"
+                                               itemValue="#{item.idSegTipoRespuestaEnte}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0">
+                            <p:commandButton title="Cargar Tipos de Respuesta del Ente Gestor"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{segInoperativosBean.cargarTiposRsptEnte(true)}"
+                                             update="tipoRsptEnte"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5" jsf:id="fechaRsptEnte_div">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Fecha respuesta TMSA"/>
+                        </div>
+                        <p:calendar id="fechaRsptEnte" 
+                                    value="#{segInoperativosBean.fechaRespuestaEnte}"
+                                    navigator="true"
+                                    locale="es"
+                                    required="#{!segInoperativosBean.flagRsptEnte}"
+                                    disabled="#{segInoperativosBean.flagRsptEnte}"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="fechaRsptEnte"/>
+                        </p:calendar>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Medio en el que reportan" />
+                        </div>
+                        <div class="ui-g-10 ui-md-10 ui-lg-10 Padding0">
+                            <p:selectOneMenu id="medioReporta" 
+                                             value="#{segInoperativosBean.idSegMedioReporta}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax />
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{segInoperativosBean.lstMediosReporta}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}"
+                                               itemValue="#{item.idSegMedioReporta}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0">
+                            <p:commandButton title="Cargar medios por los cuales reporta el Ente Gestor"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{segInoperativosBean.cargarMediosReporta(true)}"
+                                             update="medioReporta"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Quién Reporta "/>
+                        </div>
+                        <p:inputText id="quieReporta"
+                                     maxlength="60"
+                                     value="#{segInoperativosBean.quienReporta}">
+                        </p:inputText>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="¿Quién gestiona habilitación?" />
+                        </div>
+                        <div class="ui-g-10 ui-md-10 ui-lg-10 Padding0">
+                            <p:selectOneMenu id="gestionaHabilita" 
+                                             value="#{segInoperativosBean.idSegGestionaHabilitacion}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax />
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{segInoperativosBean.lstGestionaHabilitacion}" 
+                                               var="obj"
+                                               itemLabel="#{obj.nombre}"
+                                               itemDescription="#{obj.descripcion}"
+                                               itemValue="#{obj.idSegGestionaHabilitacion}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0">
+                            <p:commandButton title="Cargar Gestores de habilitación"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{segInoperativosBean.cargarGestionaHabilitacion(true)}"
+                                             update="gestionaHabilita"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Mes"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" style="text-transform: uppercase">
+                            <h:outputText id="mes" value="#{segInoperativosBean.fechaEvento}" class="cssBlack">
+                                <f:convertDateTime pattern="MMMM" />
+                            </h:outputText>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="SOMEstado"  value="Estado" />
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="SOMEstado"
+                                             filterMatchMode="contains" 
+                                             filter="true" style="width: 99.999%"
+                                             value="#{segInoperativosBean.estadoEmpleado}"
+                                             required="true">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                <f:selectItems value="#{emplEstCtrl.listEmplEstd}"
+                                               var="std" itemLabel="#{std.nombre}"
+                                               itemValue="#{std.idEmpleadoEstado}" />
+
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Actividades realizadas para habilitación"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" style="
+                             border: solid 1px #c0c5c7;
+                             border-radius: 3px;">
+                            <p:selectManyCheckbox style="display: block;
+                                                  width: 100%;
+                                                  max-height:  200px;
+                                                  overflow-y: auto;
+                                                  scroll-behavior: smooth;" 
+                                                  id="comps" 
+                                                  value="#{segInoperativosBean.actividadesSeleccionadas}" 
+                                                  layout="grid" 
+                                                  columns="1">
+                                <f:selectItems value="#{segInoperativosBean.lstActividades}"
+                                               var="item"
+                                               itemDescription="#{item.descripcion}" 
+                                               itemLabel="#{item.nombre}" 
+                                               itemValue="#{segInoperativosBean.toString(item.idSegActividadHabilitacion)}"  />
+                                <p:ajax global="false" process="@this"/>
+                            </p:selectManyCheckbox>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" style="background-color: #92d050;
+                             border-radius: 3px;">
+                            <p:outputLabel value="Calificación Seguridad Vial" style="color: black" for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         value="#{segInoperativosBean.calificaionSegVial}"
+                                         maxlength="150"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="form_inoperativos,@this"
+                             update="messages,msgs,form_inoperativos_list:id_dt_inoperativos,
+                             form_inoperativos" 
+                             action="#{segInoperativosBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="form_inoperativos,@this"
+                             update="messages,msgs,form_inoperativos_list:id_dt_inoperativos"
+                             action="#{segInoperativosBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-save"
+                             rendered="#{segInoperativosBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-save"
+                             rendered="#{segInoperativosBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

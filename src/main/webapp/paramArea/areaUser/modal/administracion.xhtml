@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-usu" 
+              closeOnEscape="true" 
+              widgetVar="usuDlg" 
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closable="false"
+              resizable="false" 
+              appendTo="@(body)" position="center top" responsive="true">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{paramAreaUserJSF.paramAreaUsr.idParamAreaUsr != null 
+                                                    ? 'EDITAR PARAMETRIZACIÓN DE ÁREA - USUARIO' 
+                                                    : 'NUEVA PARAMETRIZACIÓN DE ÁREA - USUARIO'}"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('usuDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-usu">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Área *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="t-area" 
+                                             value="#{paramAreaUserJSF.i_idArea}" 
+                                             filter="true" 
+                                             filterMatchMode="contains" >
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{paramAreaUserJSF.listParamArea}" 
+                                               var="listarea" 
+                                               itemLabel="#{listarea.area}" 
+                                               itemDescription="#{listarea.descripcion}"
+                                               itemValue="#{listarea.idParamArea}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Usuario *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="t-usu" 
+                                             value="#{paramAreaUserJSF.i_idUsers}" 
+                                             style="width: 99.9999%" 
+                                             filter="true" 
+                                             filterMatchMode="contains" >
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{paramAreaUserJSF.listUsers}" 
+                                               var="listusu" 
+                                               itemLabel="#{listusu.username}" 
+                                               itemDescription="#{listusu.nombres}"
+                                               itemValue="#{listusu.userId}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand id="btn-guardar"
+                             name="rc_au"
+                             rendered="#{empty paramAreaUserJSF.paramAreaUsr.idParamAreaUsr}"
+                             actionListener="#{paramAreaUserJSF.guardar()}"
+                             update=":AreaUsuarioListForm,@form"
+                             process="@form" />
+            <p:remoteCommand id="btn-editar"
+                             name="rc_update_au"
+                             rendered="#{not empty paramAreaUserJSF.paramAreaUsr.idParamAreaUsr}"
+                             actionListener="#{paramAreaUserJSF.editar()}"
+                             update=":AreaUsuarioListForm"/>
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_au();"
+                             rendered="#{empty paramAreaUserJSF.paramAreaUsr.idParamAreaUsr}"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar"/>
+            <p:commandButton onclick="rc_update_au();"
+                             class="cssWhite"
+                             rendered="#{not empty paramAreaUserJSF.paramAreaUsr.idParamAreaUsr}"
+                             icon="fa fa-save"
+                             value="Actualizar"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

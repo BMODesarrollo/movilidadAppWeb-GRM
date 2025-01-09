@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dialog_empleados" 
+              closeOnEscape="true" 
+              closable="false"
+              widgetVar="empleado_list_wv" 
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)" 
+              class="mr1024_60 mr500_90"
+              position="top" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Empleados " class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('empleado_list_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="formEmpleados">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Un click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="item" id="tabla" value="#{genCtrlJornadaMB.listaEmpleados}"  
+                         selectionMode="single" selection="#{genCtrlJornadaMB.empl}"                       
+                         rowIndexVar="nroFila"
+                         rows="15"
+                         filterDelay="1000"
+                         paginatorPosition="top"
+                         paginator="true"
+                         rowKey="#{item.idEmpleado}"
+                         emptyMessage="No existen empleados registrados"       >
+                <p:ajax event="rowSelect" 
+                        listener="#{genCtrlJornadaMB.onRowDblClckSelect}"
+                        global="false" />
+                <p:column headerText="#" style="width: 10%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column  headerText="Identificación"
+                           filterMatchMode="contains"
+                           filterBy="#{item.identificacion}">
+                    <h:outputText  value="#{item.identificacion}" />
+                    <p:tooltip  value="Hacer doble click para seleccionar" trackMouse="true"/>
+                </p:column>
+                <p:column headerText="Nombre"
+                          filterMatchMode="contains"
+                          filterBy="#{item.nombres} #{item.apellidos}">
+                    <h:outputText value="#{item.nombres} #{item.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

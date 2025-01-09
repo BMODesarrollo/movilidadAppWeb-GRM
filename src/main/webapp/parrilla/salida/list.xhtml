@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .ui-filter-column .ui-column-customfilter .custom-filter {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .ui-panelgrid.showcase-text-align-center .ui-grid-responsive .ui-panelgrid-cell {
+                text-align: center;
+            }
+
+            .customPanelGrid .ui-panelgrid-content {
+                align-items: center;
+            }
+        </style>
+    </ui:define>
+
+
+    <p:dialog widgetVar="salida-patio-wv" 
+              id="id-salida-patio" 
+              modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              header="Salidas de Patio"
+              class="mr1024_60 mr500_90"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <h:form id="form-salida-patio">
+            <p:panel id="panel-salida-patio" 
+                     toggleable="true"
+                     toggleSpeed="500"
+                     widgetVar="panel-buscar"
+                     style="margin-bottom:20px">
+
+                <span class="ui-fluid"
+                      jsf:rendered="#{salidaPatioVehiculoJSF.prgTc != null}">
+                    <div class="ui-g">
+                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                            <span class="Fs12">#{salidaPatioVehiculoJSF.prgTc.timeOrigin}</span>
+                            <br/>
+                            <span class="Fs12">#{salidaPatioVehiculoJSF.prgTc.timeDestiny}</span>
+                        </span>
+                        <span class="ui-g-12 ui-md-12 ui-lg-3 Padding5 TexAlCenter" >
+                            <span class="Fs12 cssBlack" >#{salidaPatioVehiculoJSF.prgTc.toStop.name}</span>
+                            <br/>
+                            desde
+                            <br/>
+                            <span class="Fs12 cssBlack">#{salidaPatioVehiculoJSF.prgTc.fromStop.name}</span>
+                        </span>
+                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                            <span class="Fs12 cssBlack">Servbus</span>
+                            <br/>
+                            <span class="Fs12">#{salidaPatioVehiculoJSF.prgTc.servbus}</span>
+                        </span>
+                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                            <span class="Fs12 cssBlack" jsf:id="emp">
+                                Operador
+                            </span>
+                            <p:tooltip id="tooltip"
+                                       value="#{salidaPatioVehiculoJSF.prgTc.idEmpleado.getNombresApellidos()}"
+                                       position="top"
+                                       for=":form-salida-patio:emp" />
+                            <br/>
+                            <span class="Fs12">#{salidaPatioVehiculoJSF.prgTc.idEmpleado.codigoTm}</span>
+                        </span>
+                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter" >
+                            <span class="Fs12 cssBlack">Vehículo</span>
+                            <br/>
+                            <span class="Fs12">#{salidaPatioVehiculoJSF.prgTc.idVehiculo.codigo}</span>
+                        </span>
+                        <span class="ui-g-12 ui-md-12 ui-lg-1 Padding5 TexAlCenter" >
+                            <p:commandButton id="btn-confirmar-salida" 
+                                             icon="fa fa-check"
+                                             class="cssWhite"
+                                             style="right: 0"
+                                             actionListener="#{salidaPatioVehiculoJSF.confirmarSalidaPatio()}" 
+                                             process="@this,@form"
+                                             update="msgs,@form"
+                                             />
+                        </span>
+                    </div>
+                </span>
+
+                <f:facet name="header">
+                    Buscar salidas a patio
+                    <div align="right">
+                        <p:calendar id="fecha" 
+                                    value="#{salidaPatioVehiculoJSF.fecha}" 
+                                    pattern="yyyy/MM/dd" 
+                                    navigator="true"
+                                    title="Fecha"
+                                    mask="true"
+                                    locale="es"
+                                    mindate="today-1"
+                                    maxdate="today"
+                                    readonlyInput="true"
+                                    style="right: 0"
+                                    showOn="button"
+                                    required="true"
+                                    requiredMessage="Fecha es requerido"/>
+                        <p:inputMask id="hora" 
+                                     value="#{salidaPatioVehiculoJSF.hora}"
+                                     mask="99:99:00"
+                                     required="true"
+                                     requiredMessage="Hora es requerida"/>
+                        <p:inputText id="cod-veh"
+                                     value="#{salidaPatioVehiculoJSF.codigoVeh}" 
+                                     style="right: 0"
+                                     placeholder="Código Vehículo"/>
+                        <p:commandButton value="Buscar" 
+                                         icon="fa fa-search"
+                                         class="cssWhite"
+                                         style="right: 0"
+                                         actionListener="#{salidaPatioVehiculoJSF.consultarSalidaPatio()}"
+                                         process="@this,cod-veh,fecha,hora"
+                                         update="msgs,@form"
+                                         />
+                    </div>
+                </f:facet>
+            </p:panel>
+        </h:form>
+    </p:dialog>
+</ui:composition>

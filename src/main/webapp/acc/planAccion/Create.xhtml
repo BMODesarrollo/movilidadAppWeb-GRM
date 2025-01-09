@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:composition>
+        <p:dialog id="AccPlanAccionCreateDlg" 
+                  closeOnEscape="true"
+                  widgetVar="AccPlanAccionCreateDialog" 
+                  position="center top"
+                  modal="true"
+                  class="mr1024_30 mr500_90" 
+                  closable="false"
+                  resizable="false"
+                  appendTo="@(body)" 
+                  responsive="true">
+
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                                <c:if test="#{accPlanAccionBean.selected == null }">
+                                    Nuevo registro
+                                </c:if>
+                                <c:if test="#{accPlanAccionBean.selected != null }">
+                                    Editar Registro
+                                </c:if>
+                            </div>
+                            <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                                <i onclick="PF('AccPlanAccionCreateDialog').hide()"
+                                   title="Cerrar ventana"
+                                   style="cursor: pointer"
+                                   class="cssWhite fa fa-close Fs20"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="AccPlanAccionCreateForm">
+                <div class="ui-fluid">
+                    <p:focus context="display"/>
+                    <p:growl id="msgs" showDetail="true" escape="false"/>
+                    <p:growl id="messages" showDetail="true" />  
+                    <div jsf:id="display" class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Plan:" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="plan"
+                                         value="#{accPlanAccionBean.accPlanAccion.plan}"
+                                         required="true" 
+                                         requiredMessage="El campo plan es obligatorio"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción:" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion" 
+                                             autoResize="false"
+                                             value="#{accPlanAccionBean.accPlanAccion.descripcion}"
+                                             required="true" 
+                                             requiredMessage="Debe ingresar una descripción"/>
+                        </div>
+                    </div>
+                </div>
+                <p:remoteCommand name="rc" 
+                                 class="cssWhite"
+                                 actionListener="#{accPlanAccionBean.guardar()}"  
+                                 value="Guardar" 
+                                 update="display,:AccPlanAccionListForm:datalist,messages"/>
+            </h:form>
+            <f:facet name="footer">
+                <p:commandButton id="btnGuardarAdd" 
+                                 icon="fa fa-save" value="Guardar" 
+                                 class="cssWhite" onclick="rc()"/>
+            </f:facet>
+        </p:dialog>
+    </ui:composition>
+</html>

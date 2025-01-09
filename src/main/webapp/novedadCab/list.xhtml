@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            img {
+                display:block;
+                max-width:100% !important;
+                max-height:100vh
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Novedades Cabina">
+            <h:form id="form_aseo_bano">
+                <div class="ui-g">
+                    <p:dataTable id="dt_aseo_bano_id" var="nov" 
+                                 scrollable="true"
+                                 widgetVar="wlVdt_aseo_bano_id"
+                                 scrollHeight="600"
+                                 disabledTextSelection="false"
+                                 reflow="true"
+                                 rows="10"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,50,100"
+                                 emptyMessage="No existen registros"
+                                 value="#{aseoCabinaNovJSFMB.list}">
+
+                        <f:facet name="header">
+                            <div align="right" jsf:id="botones">
+                                <p:outputLabel for="desde" style="color: white" value="Fecha: " />
+                                <p:calendar id="desde" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{aseoCabinaNovJSFMB.desde}"
+                                            locale="es"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{aseoCabinaNovJSFMB.consultar()}"
+                                            update="dt_aseo_bano_id"/>
+                                </p:calendar>
+                                <p:calendar id="hasta" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{aseoCabinaNovJSFMB.hasta}"
+                                            locale="es"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{aseoCabinaNovJSFMB.consultar()}"
+                                            update="dt_aseo_bano_id"/>
+                                </p:calendar>
+                                <p:commandButton
+                                    icon="fa fa-plus"
+                                    value="Nuevo"
+                                    rendered="true"
+                                    actionListener="#{aseoCabinaNovJSFMB.nuevo()}"
+                                    class="cssWhite"
+                                    update="nov_dialog_id"/>   
+                            </div>
+                        </f:facet>
+
+                        <p:column headerText="Fecha" styleClass="text-center">
+                            <h:outputText value="#{nov.fechaHora}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Cabina" styleClass="text-center">
+                            <h:outputText value="#{nov.idCableCabina.nombre}" />
+                        </p:column>
+                        <p:column headerText="Tipo Novedad" styleClass="text-center">
+                            <h:outputText value="#{nov.idNovedadTipoCab.nombre}" />
+                        </p:column>
+                        <p:column headerText="Tipo Detalle" styleClass="text-center">
+                            <h:outputText value="#{nov.idNovedadTipoDetCab.nombre}" />
+                        </p:column>
+                        <p:column headerText="Observación" styleClass="text-center">
+                            <h:outputText value="#{nov.observacion}" />
+                        </p:column>
+                        <p:column headerText="Usuario" styleClass="text-center">
+                            <h:outputText value="#{nov.username}" />
+                        </p:column>
+                        <p:column headerText="Creado" styleClass="text-center">
+                            <h:outputText value="#{nov.creado}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column  headerText="Estado">
+                            <h:outputText style="font-weight: bold;color: black" value="#{nov.estadoNov==0 ? 'Abierta' : 'Cerrado'}" />
+                        </p:column>
+                        <p:column headerText="Usuario Estado" styleClass="text-center">
+                            <h:outputText value="#{nov.usernameEstado}" />
+                        </p:column>
+                        <p:column headerText="Fecha Estado" styleClass="text-center">
+                            <h:outputText value="#{nov.fechaEstado}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Acciones" styleClass="text-center"
+                                  width="10%"
+                                  exportable="false">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                    <p:commandButton styleClass="cssWhite GreenButton"
+                                                     title="Editar"
+                                                     action="#{aseoCabinaNovJSFMB.editar(nov)}"
+                                                     process="@this"
+                                                     rendered="true"
+                                                     update="msgs,nov_dialog_form"
+                                                     icon="fa fa-pencil">
+                                    </p:commandButton>
+                                    <p:commandButton title="Ver fotos"
+                                                     icon="fa fa-photo"
+                                                     class="cssWhite OrangeButton"
+                                                     update="galeria_foto_dialog_id,galeria_fotos_form"  
+                                                     rendered="#{!empty(nov.pathFoto)}"
+                                                     action="#{aseoCabinaNovJSFMB.obtenerFotos()}"
+                                                     oncomplete="PF('galeria_foto_dialog_wv').show()" >
+                                        <f:setPropertyActionListener target="#{aseoCabinaNovJSFMB.novedadCab}" value="#{nov}"/>
+                                    </p:commandButton>
+                                    <p:commandButton title="Ver Fotos Aseo Cabina"
+                                                     icon="fa fa-photo"
+                                                     class="cssWhite PurpleButton"
+                                                     update="galeria_foto_dialog_id,galeria_fotos_form"  
+                                                     rendered="#{!empty(aseoCabinaNovJSFMB.returnPathFotosAseoCabina(nov))}"
+                                                     action="#{aseoCabinaNovJSFMB.obtenerFotosAseoCabina(nov)}"
+                                                     oncomplete="PF('galeria_foto_dialog_wv').show()" >
+                                    </p:commandButton>
+                                    <p:commandButton styleClass="cssWhite"
+                                                     title="Abrir novedad"
+                                                     action="#{aseoCabinaNovJSFMB.estadoNov(nov,0)}"
+                                                     process="@this"
+                                                     rendered="#{nov.estadoNov==1}"
+                                                     update="msgs,dt_aseo_bano_id"
+                                                     icon="fa fa-folder-open">
+                                    </p:commandButton>
+                                    <p:commandButton styleClass="cssWhite"
+                                                     title="Cerrar novedad"
+                                                     action="#{aseoCabinaNovJSFMB.estadoNov(nov,1)}"
+                                                     process="@this"
+                                                     rendered="#{nov.estadoNov==0}"
+                                                     update="msgs,dt_aseo_bano_id"
+                                                     icon="fa fa-archive">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </p:column>
+
+                        <f:facet name="footer">
+                            En total existen #{aseoCabinaNovJSFMB.list.size()} registros.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="dt_aseo_bano_id" 
+                                                    fileName="Novedades Aseo Cabina"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="../galeriaFotos.xhtml"/>
+        <ui:include src="modal/gestionNovCab.xhtml"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,61 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="reporteAsistencia" widgetVar="wlvReporteAsistencia" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de errores"
+              class="mr1024_50 mr500_90" closeOnEscape="true" responsive="true" 
+              position="center top" fitViewport="true">
+        <h:form id="frmReporteAsistencia">
+
+            <p:spacer height="15"/> 
+
+            <p:staticMessage
+                detail="Los siguientes registros NO fueron encontrados en el sistema" 
+                summary="Aviso"
+                severity="error"
+                />
+            <p:spacer height="15"/> 
+
+            <p:dataTable var="error" value="#{reporteAsistenciaBean.lstParteTrabajosError}" 
+                         id="dtReporteAsistencia"
+                         widgetVar="wlVdtReporteAsistencia"
+                         paginator="true"
+                         reflow="true"
+                         filterDelay="1700"
+                         rows="20"
+                         rowsPerPageTemplate="20,50,100"
+                         emptyMessage="No existen errores">
+                <f:facet name="footer">
+                    <h:commandLink>
+                        <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                        <p:dataExporter type="xlsx" target="dtReporteAsistencia" fileName="Errores de carga"/>
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="Fecha">
+                    <h:outputText value="#{error.fecha}" >
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>   
+                <p:column  headerText="Código Operador"
+                           filterBy="#{error.codOperador}"
+                           filterMatchMode="contains">
+                    <h:outputText value="#{error.codOperador}"/>
+                </p:column>    
+                <p:column headerText="Sercon"
+                          filterBy="#{error.sercon}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{error.sercon}"/>
+                </p:column>    
+                <p:column headerText="Parte"
+                          filterBy="#{error.parteTrabajo}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{error.parteTrabajo}"/>
+                </p:column>    
+            </p:dataTable>
+
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,182 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    #{cableAccPlanAccionJSF.init()}
+    <h:form id="formPlanAccion">
+        <div jsf:id="dPlanAccion" class="ui-g">
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                 jsf:id="dContainerData"
+                 jsf:rendered="#{cableAccPlanAccionJSF.cableAccPlanAccion != null}">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha " for="fechaHr" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fechaHr" 
+                                        value="#{cableAccPlanAccionJSF.cableAccPlanAccion.fecha}" 
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        class="Wid100"
+                                        mask="true"
+                                        showOn="button"
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Fecha es requerido"
+                                        navigator="true" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Actividad" for="actividad"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="actividad" 
+                                         required="true"
+                                         requiredMessage="Actividad es requerido"
+                                         value="#{cableAccPlanAccionJSF.cableAccPlanAccion.actividad}"
+                                         maxlength="60" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Responsable" for="responsable" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="responsable" 
+                                             value="#{cableAccPlanAccionJSF.idCableAccResponsable}" 
+                                             style="width: 99.999%">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{cableAccResponsableJSF.listCableAccResponsable}" 
+                                               var="repons" 
+                                               itemLabel="#{repons.nombre}" 
+                                               itemDescription="#{repons.descripcion}"
+                                               itemValue="#{repons.idCableAccResponsable}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <p:outputLabel value="Observaciones:" for="observaciones"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <p:inputTextarea id="observaciones"
+                                         value="#{cableAccPlanAccionJSF.cableAccPlanAccion.observacion}"
+                                         rows="5"
+                                         autoResize="false"
+                                         maxlength="255"/>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-6 Padding0"><span style="visibility: hidden">ss</span></div>
+                <div class="ui-g-12 ui-md-12 ui-lg-6 Padding0">
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                        <p:commandButton id="guardar"
+                                         value="Guardar"
+                                         process="@form,@this"
+                                         update=":accidente-form:msg,@form"
+                                         actionListener="#{cableAccPlanAccionJSF.guardar()}"
+                                         rendered="#{empty cableAccPlanAccionJSF.cableAccPlanAccion.idCableAccPlanAccion}"
+                                         icon="fa fa-check"
+                                         class="cssWhite GreenButton" />
+                        <p:commandButton id="actualizar"
+                                         value="Actualizar"
+                                         process="@form,@this"
+                                         update=":accidente-form:msg,@form"
+                                         actionListener="#{cableAccPlanAccionJSF.actualizar()}"
+                                         rendered="#{not empty cableAccPlanAccionJSF.cableAccPlanAccion.idCableAccPlanAccion}"
+                                         icon="fa fa-check"
+                                         class="cssWhite GreenButton" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                        <p:commandButton id="cancel"
+                                         value="Cancelar"
+                                         actionListener="#{cableAccPlanAccionJSF.reset()}"
+                                         update="@form"
+                                         process="@this"
+                                         icon="fa fa-times"
+                                         class="cssWhite" />
+                    </div>
+                </div>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0"><span style="visibility: hidden">ss</span></div>
+                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0">
+                    <p:commandButton id="nuevo" 
+                                     value="Nuevo"
+                                     actionListener="#{cableAccPlanAccionJSF.prepareGuardar()}"
+                                     rendered="#{empty cableAccPlanAccionJSF.cableAccPlanAccion.idCableAccPlanAccion}"
+                                     class="cssWhite"
+                                     process="@this"
+                                     update="@form"
+                                     icon="fa fa-plus" />
+                </div>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12" jsf:id="dTbPlanAccion">
+                <p:dataTable id="tbPlanAccion"
+                             value="#{cableAccPlanAccionJSF.listCableAccPlanAccion}"
+                             rows="5"
+                             var="item"
+                             rowIndexVar="numRow"
+                             rowsPerPageTemplate="5,10,20"
+                             paginator="true"
+                             reflow="true"
+                             scrollable="true"
+                             scrollHeight="500">
+                    <p:column headerText="#" style="width: 40px">
+                        <p:outputLabel value="#{numRow+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <div class="ui-g">
+                            <p:outputLabel value="#{item.fecha}" style="text-transform: uppercase" >
+                                <f:convertDateTime pattern="EEEE yyyy-MM-dd HH:mm" />
+                            </p:outputLabel>
+                        </div>
+                    </p:column>
+                    <p:column headerText="Actividad">
+                        <p:outputLabel value="#{item.actividad}" />
+                    </p:column>
+
+                    <p:column headerText="Observaciones">
+                        <div class="ui-g">
+                            <p:outputLabel value="#{item.observacion}" />
+                        </div>
+                    </p:column>
+                    <p:column headerText="Responsable">
+                        <div class="ui-g">
+                            <p:outputLabel value="#{item.idCableAccResponsable.nombre}" />
+                        </div>
+                    </p:column>
+                    <p:column headerText="Acciones" style="width: 100px">
+                        <div class="ui-g Padding3">
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" style="text-align: center">
+                                <p:commandButton id="btnOnEditar"
+                                                 title="Editar"
+                                                 actionListener="#{cableAccPlanAccionJSF.onGetCableAccPlanAccion(item)}"
+                                                 class="cssWhite OrangeButton"
+                                                 process="@this"
+                                                 update="tInformacion:formPlanAccion"
+                                                 icon="fa fa-pencil" />
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" style="text-align: center">
+                                <p:commandButton id="btnOnEliminar"
+                                                 title="eliminar"
+                                                 class="cssWhite RedButton"
+                                                 process="@this"
+                                                 update=":accidente-form,@form"
+                                                 actionListener="#{cableAccPlanAccionJSF.eliminarPlanAccion(item)}"
+                                                 icon="fa fa-trash" >
+                                    <p:confirm header="Confirmación" message="Seguro de eliminar este registro de plan acción?" 
+                                               icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+    </h:form>
+</ui:composition>  

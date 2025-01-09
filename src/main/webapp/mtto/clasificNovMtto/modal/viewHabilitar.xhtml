@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="wv_habilitar"
+              id="dlg_habilitar"
+              modal="true" 
+              closeOnEscape="true"
+              header="Habilitar el vehículo: #{dispActivBean.headerModal}"
+              responsive="true"
+              class="mr1024_40 mr500_90"
+              resizable="false"
+              closable="false"
+              appendTo="@(body)"
+              position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Habilitar el vehículo: #{dispActivBean.headerModal}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wv_habilitar').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form_habilitar_dlg">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Observación " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea value="#{dispActivBean.observacion}"
+                                             id="id_observacion"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"
+                                             />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand 
+                name="rc_save"
+                action="#{dispActivBean.guardarHabilitacion()}"
+                process="form_habilitar_dlg"
+                update="form_habilitar_dlg,
+                msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_save();"
+                oncomplete="cargarTablaPrincipal();actualizarResumenFlota();"
+                class="cssWhite"
+                value="Guardar"/>
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

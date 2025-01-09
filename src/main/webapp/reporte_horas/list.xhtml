@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <p:panel header="REPORTE DE NÓMINA">
+            <h:form>
+                <div class="ui-fluid" >
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="FECHA INICIO: "/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:calendar value="#{reporteNominaBean.fecha_inicio}"
+                                            locale="es"
+                                            readonlyInput="true"
+                                            maxdate="today"
+                                            navigator="true"
+                                            showOn="button"
+                                            required="true"
+                                            placeholder="Seleccione fecha inicio"
+                                            requiredMessage="Debe seleccionar fecha de inicio"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="FECHA FIN: "/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:calendar value="#{reporteNominaBean.fecha_fin}"
+                                            locale="es"
+                                            readonlyInput="true"
+                                            maxdate="today"
+                                            navigator="true"
+                                            showOn="button"
+                                            required="true"
+                                            placeholder="Seleccione fecha fin"
+                                            requiredMessage="Debe seleccionar fecha fin"/>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="UNIDAD FUNCIONAL: "/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu id="uni_func" value="#{reporteNominaBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="-" style="visibility: hidden" class="cssWhite" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:commandButton value="Generar reporte" icon="fa fa-download"
+                                                 class="cssWhite"
+                                                 update=":msgs"
+                                                 ajax="false"
+                                                 actionListener="#{reporteNominaBean.generarReporte()}">
+                                    <p:fileDownload value="#{reporteNominaBean.file}" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

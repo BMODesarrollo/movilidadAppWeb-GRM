@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="novedadSeguimiento" id="modal" modal="true" closeOnEscape="true"
+              responsive="true" fitViewport="true" 
+              resizable="false" appendTo="@(body)" position="center,top"
+              width="70%" height="auto">
+        <c:if test="#{genericaBean.selectedSeguimiento == null }">
+            <f:facet name="header">
+                Nuevo seguimiento
+            </f:facet>
+        </c:if>
+        <c:if test="#{genericaBean.selectedSeguimiento != null }">
+            <f:facet name="header">
+                Editar seguimiento : #{genericaBean.selectedSeguimiento.seguimiento}
+            </f:facet>
+        </c:if>
+        <h:form id="frmNuevoSeguimiento">
+            <p:panel style="margin-bottom: 0px">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <c:if test="#{genericaBean.selectedSeguimiento == null }">
+                    <p:fieldset legend="Datos novedad">
+                        <div class="ui-g ui-fluid">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:outputLabel for="tipo_novedad" 
+                                               value="Tipo novedad: "
+                                               styleClass="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{genericaBean.selected.idGenericaTipo.nombreTipoNovedad}"
+                                             id="tipo_novedad"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:outputLabel value="Detalle novedad: " 
+                                               styleClass="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{genericaBean.selected.idGenericaTipoDetalle.tituloTipoGenerica}"
+                                               />
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:outputLabel for="observacion" 
+                                               value="Observación:" 
+                                               styleClass="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{genericaBean.selected.observaciones}"
+                                                 id="observacion"/>
+                            </div>
+                        </div>
+                    </p:fieldset>
+                    <p:outputLabel value=""/>
+                </c:if>
+                <div class="ui-g ui-fluid" jsf:id="pGrid">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <p:outputLabel for="fecha" value="Fecha:" />
+                        <p:calendar id="fecha" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{genericaBean.genericaSeguimiento.fecha}" 
+                                    maxdate="today" 
+                                    showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    readonlyInput="true"
+                                    requiredMessage="Debe seleccionar una fecha"
+                                    showTodayButton="true"
+                                    navigator="true"
+                                    />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <p:outputLabel for="seguimiento" value="Seguimiento:" />
+                        <p:inputTextarea id="seguimiento" value="#{genericaBean.genericaSeguimiento.seguimiento}"
+                                         rows="5" cols="10" 
+                                         autoResize="false"
+                                         required="true"
+                                         requiredMessage="Debe ingresar el seguimiento de la novedad"
+                                         style="width: 100%"/>
+
+                    </div>
+                </div>
+                <f:facet name="footer">
+                    <p:commandButton value="Registrar"
+                                     onclick="guardar()"
+                                     rendered="#{genericaBean.selectedSeguimiento == null }"
+                                     />
+                    <p:commandButton value="Actualizar" 
+                                     onclick="actualizar()"
+                                     rendered="#{genericaBean.selectedSeguimiento != null }"
+                                     />
+                </f:facet>
+            </p:panel>
+            <p:remoteCommand name="guardar"
+                             actionListener="#{genericaBean.guardarSeguimiento}"
+                             update=":frmNovedadSeguimientoList:dtNovedadSeguimiento,
+                             pGrid,messages,frmPrincipal:dtTipo" />
+
+            <p:remoteCommand name="actualizar" 
+                             actionListener="#{genericaBean.actualizarSeguimiento}"
+                             update=":frmNovedadSeguimientoList:dtNovedadSeguimiento,
+                             messages" />
+        </h:form>
+    </p:dialog>  
+</ui:composition>

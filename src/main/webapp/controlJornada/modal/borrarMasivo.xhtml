@@ -1,0 +1,133 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <p:dialog id="borrar_id_dialog"
+              widgetVar="borrar_wv_dialog"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_60 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Borrar Jornada Masiva" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('borrar_wv_dialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form_borrar_masivo">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4" style="padding: 3px; ">
+                        <p:outputLabel for="CFechaDesde" value="Desde"/>
+                        <p:calendar id="CFechaDesde" required="true"
+                                    value="#{controlJornada.fechaDesdeBM}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="CFechaDesde"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4" style="padding: 3px; ">
+                        <p:outputLabel for="CFechaHasta" value="Hasta"/>
+                        <p:calendar id="CFechaHasta" required="true"
+                                    value="#{controlJornada.fechaHastaBM}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="CFechaHasta"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4" style="padding: 3px; ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12"  style="padding: 0px; " >
+                            <p:outputLabel value="Empleado"/>
+                            <div class="ui-g-11 ui-md-11 ui-lg-11" style="padding: 0px; " >
+                                <p:inputText id="codigo_operador" placeholder="Codígo TM"
+                                             value="#{controlJornada.codigoTransMi}"/>
+                            </div>
+                            <div class="ui-g-1 ui-md-1 ui-lg-1" style="padding: 0px; " >
+                                <p:commandButton title="Consultar Empleado"
+                                                 icon="fa fa-search"
+                                                 class="cssWhite"
+                                                 process="@this, form_borrar_masivo:codigo_operador"
+                                                 update="form_borrar_masivo:codigo_operador,
+                                                 form_borrar_masivo:nombre_operador,msgs_turno"
+                                                 actionListener="#{controlJornada.emplFindByCodigoTBM}">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 3px; ">
+                        <div align="center">
+                            <p:outputLabel id="nombre_operador" class="cssWhite" style="background-color: #0f6bb8;
+                                           border-radius: 15px;
+                                           padding: 5px;" value="#{controlJornada.nombreEmpleado}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 3px; ">
+                        <hr/>
+                        <p:outputLabel value="Motivo del registro" />
+                        <p:selectOneMenu id="motivo" 
+                                         value="#{controlJornada.i_prgSerconMotivo}" 
+                                         filter="true"
+                                         filterMatchMode="contains"
+                                         required="true"
+                                         requiredMessage="Motivo es requerido">
+                            <p:ajax/>
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                            <f:selectItems value="#{controlJornada.prgSerconMotivoList}" 
+                                           var="items"
+                                           itemLabel="#{items.descripcion}"
+                                           itemValue="#{items.idPrgSerconMotivo}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100" style="padding: 3px; ">
+                        <p:outputLabel for="observacion" value="Observación"/>
+                        <p:inputTextarea id="observacion" 
+                                         required="true" 
+                                         maxlength="2000"
+                                         style="width: 100%; height: 160px; max-height: 150px"
+                                         value="#{controlJornada.observacionesBM}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             process="@this,
+                             form_borrar_masivo:motivo,
+                             form_borrar_masivo:observacion"
+                             action="#{controlJornada.guardarBM()}"
+                             oncomplete="PF('dtserconlist').clearFilters()"
+                             update="formcontroljornada:serconlist,msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarBorradoMasivo" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

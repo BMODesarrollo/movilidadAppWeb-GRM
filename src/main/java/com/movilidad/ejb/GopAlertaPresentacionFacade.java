@@ -1,0 +1,46 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.movilidad.ejb;
+
+import com.movilidad.model.GopAlertaPresentacion;
+import java.util.List;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+/**
+ *
+ * @author soluciones-it
+ */
+@Stateless
+public class GopAlertaPresentacionFacade extends AbstractFacade<GopAlertaPresentacion> implements GopAlertaPresentacionFacadeLocal {
+
+    @PersistenceContext(unitName = "rigel")
+    private EntityManager em;
+
+    @Override
+    protected EntityManager getEntityManager() {
+        return em;
+    }
+
+    public GopAlertaPresentacionFacade() {
+        super(GopAlertaPresentacion.class);
+    }
+
+    /**
+     * Obtener objeto List de GopAlertaPresentacion por estadoReg = 0
+     *
+     * @return List GopAlertaPresentacion
+     */
+    @Override
+    public List<GopAlertaPresentacion> findAllEstadoReg() {
+        String sql = "SELECT * FROM gop_alerta_presentacion WHERE estado_reg = 0";
+        Query q = em.createNativeQuery(sql, GopAlertaPresentacion.class);
+        return q.getResultList();
+    }
+
+}

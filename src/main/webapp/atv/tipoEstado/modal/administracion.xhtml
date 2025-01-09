@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{atvTipoEstadoJSF.atvTipoEstado.idAtvTipoEstado != null ? 'EDITAR ATV TIPO ESTADO' : 'NUEVA ATV TIPO ESTADO'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid Padding0">
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Nombre *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputText id="nombre"
+                                     maxlength="45"
+                                     required="true"
+                                     requiredMessage="Nombre es requerido"
+                                     value="#{atvTipoEstadoJSF.atvTipoEstado.tipoEstado}" />
+                    </div>
+                </div>
+
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                        <p:outputLabel value="Acción ATV *" /> <br/>
+                        <p:selectOneMenu id="estado" 
+                                         value="#{atvTipoEstadoJSF.atvTipoEstado.estado}" 
+                                         style="width: 99.999%" 
+                                         title="Permite definir si el tipo de estado será una acción que abre o cierra la novedad"
+                                         required="true"
+                                         requiredMessage="Acción ATV es requerido">
+                            <f:selectItem itemLabel="NA" itemValue="0" />
+                            <f:selectItem itemLabel="ABIERTO" itemValue="1" />
+                            <f:selectItem itemLabel="CERRADO" itemValue="2" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                        <p:outputLabel value="Orden *" /> <br/>
+                        <p:spinner id="orden"
+                                   value="#{atvTipoEstadoJSF.atvTipoEstado.orden}" />
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Tipo de Atencíon *" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:selectOneMenu id="tp-atencion" 
+                                         value="#{atvTipoEstadoJSF.idAtvAtencion}" 
+                                         style="width: 99.999%" 
+                                         required="true"
+                                         requiredMessage="Tipo de Atencíon es requerido">
+                            <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                            <f:selectItems value="#{atvTipoAtencionBean.lstAtvTipoAtencion}" 
+                                           var="atvTpAt" 
+                                           itemLabel="#{atvTpAt.nombre}" 
+                                           itemDescription="#{atvTpAt.descripcion}"
+                                           itemValue="#{atvTpAt.idAtvTipoAtencion}" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Descripción *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputTextarea id="descripcion"
+                                         maxlength="255"
+                                         required="true"
+                                         requiredMessage="Descripción es requerido"
+                                         value="#{atvTipoEstadoJSF.atvTipoEstado.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="@form" 
+                             rendered="#{empty atvTipoEstadoJSF.atvTipoEstado.idAtvTipoEstado}"
+                             update=":form,@form"
+                             actionListener="#{atvTipoEstadoJSF.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             rendered="#{not empty atvTipoEstadoJSF.atvTipoEstado.idAtvTipoEstado}"
+                             process="@form,@this"
+                             update=":form,@form"
+                             actionListener="#{atvTipoEstadoJSF.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" 
+                             icon="fa fa-save"
+                             rendered="#{empty atvTipoEstadoJSF.atvTipoEstado.idAtvTipoEstado}"
+                             class="cssWhite" 
+                             onclick="guardar()"/>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-save"
+                             rendered="#{not empty atvTipoEstadoJSF.atvTipoEstado.idAtvTipoEstado}"
+                             class="cssWhite" 
+                             onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

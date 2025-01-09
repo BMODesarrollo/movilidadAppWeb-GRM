@@ -1,0 +1,46 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dialog_nov_tipo_det"
+              closeOnEscape="true" widgetVar="dialog_nov_tipo_det_wv" modal="true" 
+              resizable="false" appendTo="@(body)" header="Detalles tipo de novedad"
+              class="mr1024_50 mr500_90" responsive="true" position="center top">
+        <p:cache disabled="true"/>
+        <h:form id="dialog_nov_tipo_det_form">
+            <p:dataTable var="novedadTipoDetalle" 
+                         value="#{novTipoAndDetGenBean.lstNovedadTipoDetalles}"
+                         id="dialog_nov_tipo_det_dt"
+                         widgetVar="dialog_nov_tipo_det_dt_wv"
+                         selectionMode="single" 
+                         selection="#{novTipoAndDetGenBean.novedadTipoDet}"                       
+                         rowIndexVar="nroFila"
+                         liveScroll="true"
+                         paginator="true"
+                         filterDelay="500"
+                         rows="10"
+                         rowKey="#{novedadTipoDetalle.idGenericaTipoDetalle}"
+                         emptyMessage="No existen detalles de tipo novedad registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{novTipoAndDetGenBean.onRowSelectNovTipoDet}"
+                        update="#{novTipoAndDetGenBean.compUpdateVistaCreateNov}"
+                        oncomplete="PF('dialog_nov_tipo_det_wv').hide()"/>
+                <p:column headerText="#" width="7%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Titulo tipo novedad" 
+                          width="30%"
+                          filterBy="#{novedadTipoDetalle.tituloTipoGenerica}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipoDetalle.tituloTipoGenerica}" />
+                </p:column>
+                <p:column headerText="Descripción tipo novedad" filterBy="#{novedadTipoDetalle.descripcionTipoGenerica}"
+                          width="60%"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipoDetalle.descripcionTipoGenerica}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

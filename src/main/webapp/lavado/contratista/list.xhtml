@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="PARAMETRIZACIÓN LAVADO CONTRATISTA">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtLavadoContratista" var="tipo" 
+                             scrollable="true"
+                             widgetVar="wlVdtLavadoContratista"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{lavadoContratistaBean.lstLavadoContratistas}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{lavadoContratistaBean.nuevo()}"
+                                oncomplete="PF('wlvTipoEvidencia').show();"
+                                class="cssWhite"
+                                update="dtLavadoContratista,:tipoAseo,:frmTipoEvidencia"
+                                >
+                                <p:resetInput target=":frmTipoEvidencia:pGridDatos"/>
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Nombre" 
+                              filterBy="#{tipo.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{tipo.nombre}" />
+                    </p:column>
+                    
+                    <p:column headerText="Desde"
+                              filterBy="#{tipo.desde}" 
+                              filterMatchMode="startsWith"
+                              styleClass="text-center">
+
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="yyyy-MM-dd" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdtLavadoContratista').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdtLavadoContratista').filter()" update="dtLavadoContratista"/>
+                            </p:calendar> 
+                        </f:facet>
+
+                        <h:outputText value="#{tipo.desde}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Hasta"
+                              filterBy="#{tipo.hasta}" 
+                              filterMatchMode="startsWith"
+                              styleClass="text-center">
+
+                        <f:facet name="filter">
+                            <p:calendar id="search2" pattern="yyyy-MM-dd" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdtLavadoContratista').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdtLavadoContratista').filter()" update="dtLavadoContratista"/>
+                            </p:calendar> 
+                        </f:facet>
+
+                        <h:outputText value="#{tipo.hasta}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column style="text-align: center;"
+                              width="10%"
+                              styleClass="#{tipo.activo == 1 ? 'cssGreen texto-blanco' : tipo.activo == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Activo"/>
+                        </f:facet>
+                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{tipo.activo == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{tipo.activo == 0}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción" styleClass="text-word-wrap cortar">
+                        <h:outputText value="#{tipo.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{lavadoContratistaBean.editar()}"
+                                                 process="@this"
+                                                 update=":tipoAseo,:frmTipoEvidencia"
+                                                 oncomplete="PF('wlvTipoEvidencia').show();"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{tipo}" target="#{lavadoContratistaBean.selected}"/>
+                                    <p:resetInput target=":frmTipoEvidencia:pGridDatos"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{lavadoContratistaBean.lstLavadoContratistas.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtLavadoContratista" 
+                                                fileName="Contratistas Lavado"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="visitante" widgetVar="wlvVisitante" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de visitantes"
+              class="mr1024_50 mr500_90" closeOnEscape="true" responsive="true" position="center top">
+        <h:form id="frmVisitante">
+            <p:dataTable var="visitante" value="#{reporteQrBean.lstSstEmpresaVisitantes}" 
+                         id="dtVisitante"
+                         widgetVar="wlVdtVisitante"
+                         selectionMode="single" 
+                         selection="#{reporteQrBean.sstEmpresaVisitante}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         rowIndexVar="nroFila"
+                         rowKey="#{visitante.idSstEmpresaVisitante}"
+                         emptyMessage="No existen visitantes registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{reporteQrBean.onRowVisitantesClckSelect}"
+                        update=":frmBusquedaIndividual,:panel-imprimir-aseo-individual,:panel-imprimir-visitante-individual"
+                        oncomplete="PF('wlvVisitante').hide()"
+                        global="false" />
+                <p:column  headerText="Empresa"
+                           filterBy="#{visitante.idSstEmpresa.razonSocial}"
+                           filterMatchMode="contains">
+                    <h:outputText value="#{visitante.idSstEmpresa.razonSocial}"/>
+                </p:column>    
+                <p:column headerText="Num Documento"
+                          filterBy="#{visitante.numeroDocumento}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{visitante.numeroDocumento}"/>
+                </p:column>    
+                <p:column headerText="Nombre"
+                          filterBy="#{visitante.nombre} #{visitante.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{visitante.nombre} #{visitante.apellidos}"/>
+                </p:column>    
+                <p:column headerText="Tipo Labor" 
+                          filterBy="#{visitante.idSstTipoLabor.tipoLabor}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{visitante.idSstTipoLabor.tipoLabor}"/>
+                </p:column>    
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

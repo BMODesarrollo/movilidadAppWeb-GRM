@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="crear_audi_area_id_dialog"
+              widgetVar="crear_audi_area_dialog_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="true"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" 
+              header="Gestión Área Común para Auditoría">
+        <h:form id="create_edit_dialog_form">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="label_nombre" value="Nombre"/>
+                        <p:inputText id="label_nombre" 
+                                     maxlength="45"
+                                     value="#{audiAreaComunJSFMB.auditoriaAreaComun.nombre}" />
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <p:outputLabel for="descripcion" value="Descripción"/>
+                        <p:inputTextarea id="descripcion" 
+                                         required="true" 
+                                         maxlength="100"
+                                         value="#{audiAreaComunJSFMB.auditoriaAreaComun.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{audiAreaComunJSFMB.guardar()}"
+                             rendered="#{audiAreaComunJSFMB.auditoriaAreaComun.idAuditoriaAreaComun==null}"
+                             process="@this,create_edit_dialog_form:descripcion,label_nombre"
+                             update="msgs,
+                             audi_estacion_form:datalist,create_edit_dialog_form"/>
+            <p:remoteCommand name="rcc" 
+                             class="cssWhite"
+                             action="#{audiAreaComunJSFMB.edit()}"
+                             rendered="#{audiAreaComunJSFMB.auditoriaAreaComun.idAuditoriaAreaComun!=null}"
+                             process="@this,create_edit_dialog_form:descripcion,label_nombre"
+                             update="msgs,create_edit_dialog_form,
+                             audi_estacion_form:datalist"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarL" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             rendered="#{audiAreaComunJSFMB.auditoriaAreaComun.idAuditoriaAreaComun==null}"
+                             onclick="rc()"/>
+            <p:commandButton id="btnGuardarLC" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{audiAreaComunJSFMB.auditoriaAreaComun.idAuditoriaAreaComun!=null}"
+                             value="Actualizar" 
+                             onclick="rcc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

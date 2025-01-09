@@ -1,0 +1,79 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Gestión flota">
+                <p:dataTable id="datalist" 
+                             value="#{gestionVehiculoJSF.listGestionVehiculo}"
+                             var="item"
+                             paginator="true"
+                             rowKey="#{rVar + 1}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             emptyMessage="No existen registros">
+
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Vehículo" filterBy="#{item.idVehiculo.codigo}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Estado" filterBy="#{item.idGestionVehiculoEstado.nombreTipoEstado}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idGestionVehiculoEstado.nombreTipoEstado}"/>
+                    </p:column>
+                    <p:column headerText="Posición" filterBy="#{item.idGestionVehiculoUbicacion.posicion}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idGestionVehiculoUbicacion.posicion}"/>
+                    </p:column>
+                    <p:column headerText="Carga Inicial">
+                        <h:outputText value="#{item.cargaInicial}"/>
+                    </p:column>
+                    <p:column headerText="Carga Final">
+                        <h:outputText value="#{item.cargaFinal}"/>
+                    </p:column>
+                    <p:column headerText="Kilometraje">
+                        <h:outputText value="#{item.kilometraje}"/>
+                    </p:column>
+                    <p:column headerText="Bateria">
+                        <h:outputText value="#{item.bateria} %"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha" class="TexAlCenter">
+                        <p:outputLabel value="#{item.modificado}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Actualizo" >
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column headerText="Acciones" style="width: 70px" exportable="false">
+                        <p:commandButton id="editButton"   
+                                         update="dial-modal" 
+                                         icon="fa fa-pencil" 
+                                         actionListener="#{gestionVehiculoJSF.onGetGestionVehiculo(item)}"
+                                         class="cssWhite GreenButton"
+                                         oncomplete="PF('modalDlg').show()">
+                            <p:resetInput target="form-modal"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="parametros calificacion lavado #{now}" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/administracion.xhtml"/>
+    </ui:define>
+</ui:composition>

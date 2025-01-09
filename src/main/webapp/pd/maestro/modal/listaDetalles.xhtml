@@ -1,0 +1,146 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="pdListaDetalle"
+              widgetVar="wlvPdListaDetalle" 
+              modal="true" 
+              header="LISTADO DE DETALLES"
+              closeOnEscape="true"
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <h:form id="frmPdListaDetalle">
+            <p:dataTable id="dtListaDetalle" var="detalle" 
+                         scrollable="true"
+                         widgetVar="wlVdtListaDetalle"
+                         scrollHeight="600"
+                         disabledTextSelection="false"
+                         reflow="true"
+                         rows="10"
+                         filterDelay="1700"
+                         paginator="true"
+                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,50,100"
+                         emptyMessage="No existen registros"
+                         value="#{pdMaestroBean.selected.pdMaestroDetalleList}">
+
+                <p:column headerText="Fecha Novedad" 
+                          filterBy="#{detalle.idNovedad.fecha}" 
+                          filterMatchMode="startsWith"
+                          styleClass="text-center">
+
+                    <f:facet name="filter">
+                        <p:calendar id="search1" pattern="yyyy-MM-dd" 
+                                    locale="es"
+                                    autocomplete="off"
+                                    required="false"
+                                    navigator="true" showTodayButton="true"
+                                    inputStyle="width: 100%;"
+                                    placeholder="Fecha"
+                                    onkeyup="PF('wlVdtListaDetalle').filter()"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }">
+                            <p:ajax event="dateSelect" oncomplete="PF('wlVdtListaDetalle').filter()" update="dtListaDetalle"/>
+                        </p:calendar> 
+                    </f:facet>
+
+                    <h:outputText value="#{detalle.idNovedad.fecha}">
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Tipo Novedad" filterBy="#{detalle.idNovedad.idNovedadTipo.nombreTipoNovedad}">
+                    <h:outputText value="#{detalle.idNovedad.idNovedadTipo.nombreTipoNovedad}" />
+                </p:column>
+
+                <p:column id="detTipoNovedad" filterBy="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+                    <f:facet name="header">
+                        <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                    </f:facet>
+                    <h:outputText value="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}" 
+                                  title="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                                  rendered="#{detalle.idNovedad.idNovedadDano eq null and detalle.idNovedad.idMulta eq null}" />
+
+                    <h:outputText value="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                                  title="#{detalle.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                                  rendered="#{detalle.idNovedad.idNovedadTipoDetalle.idNovedadTipoDetalle gt 0 and detalle.idNovedad.idMulta.idMulta gt 0}" />
+
+                    <h:outputText value="#{detalle.idNovedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}" 
+                                  title="#{detalle.idNovedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}"
+                                  rendered="#{detalle.idNovedad.idNovedadDano.idNovedadDano gt 0}"/>
+
+                    <h:outputText value="#{detalle.idNovedad.idMulta.idMultaTipo.tipo}" 
+                                  title="#{detalle.idNovedad.idMulta.idMultaTipo.tipo}"
+                                  rendered="#{detalle.idNovedad.idMulta.idMulta gt 0 and detalle.idNovedad.idNovedadTipoDetalle eq null}"/>
+                </p:column>
+
+                <p:column exportable="false" filterBy="#{detalle.idNovedad.idEmpleado.codigoTm} #{detalle.idNovedad.idEmpleado.nombres} #{detalle.idNovedad.idEmpleado.apellidos}"
+                          filterMatchMode="contains"
+                          headerText="Operador">
+                    <h:outputText value="#{detalle.idNovedad.idEmpleado.codigoTm}" class="cssBlack"/>
+                    <h:outputText value=" #{detalle.idNovedad.idEmpleado.nombres.concat(' ').concat(detalle.idNovedad.idEmpleado.apellidos)}"/>
+                </p:column>
+                <p:column id="procede"
+                          styleClass="#{detalle.idNovedad.procede gt 0 ? 'cssGreen': detalle.idNovedad.procede eq 0 ? 'cssRed' : ''}">
+                    <f:facet name="header">
+                        <h:outputText value="Procede"/>
+                    </f:facet>
+                    <h:outputText value="Sí" rendered="#{detalle.idNovedad.procede == 1}"
+                                  style=" color: white;"/>
+                    <h:outputText value="No" rendered="#{detalle.idNovedad.procede == 0}"
+                                  style=" color: white;"/>
+                </p:column>
+
+                <p:column headerText="Observaciones" class="cortar">
+                    <h:outputText value="#{detalle.idNovedad.observaciones}" />
+                </p:column>
+
+                <p:column headerText="Fecha Proceso" 
+                          filterBy="#{detalle.fechaProceso}" 
+                          filterMatchMode="startsWith"
+                          styleClass="text-center">
+
+                    <f:facet name="filter">
+                        <p:calendar id="search2" pattern="yyyy-MM-dd" 
+                                    locale="es"
+                                    autocomplete="off"
+                                    required="false"
+                                    navigator="true" showTodayButton="true"
+                                    inputStyle="width: 100%;"
+                                    placeholder="Fecha"
+                                    onkeyup="PF('wlVdtListaDetalle').filter()"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }">
+                            <p:ajax event="dateSelect" oncomplete="PF('wlVdtListaDetalle').filter()" update="dtListaDetalle"/>
+                        </p:calendar> 
+                    </f:facet>
+
+                    <h:outputText value="#{detalle.fechaProceso}">
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>
+
+                <f:facet name="footer">
+                    En total existen #{pdMaestroBean.lstProcesos.size()} registros.
+                    <div style="float: right;padding-bottom: 5px">
+                        <h:commandLink>
+                            <img src="./../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="dtListaDetalle" 
+                                            fileName="Lista de detalles"/>
+                        </h:commandLink>
+                    </div>
+                </f:facet>
+
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>     

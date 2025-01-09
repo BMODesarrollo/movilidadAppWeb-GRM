@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="NovedadClasifListDlg" 
+              closeOnEscape="true" widgetVar="NovedadClasifListDialog" modal="true" 
+              position="center top"
+              closable="false"
+              resizable="false" class="mr1024_40 mr500_90" appendTo="@(body)">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Clasificación novedad" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('NovedadClasifListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmClasifList">
+            <p:dataTable id="id_clasf_nov_dt"
+                         var="clasif" value="#{novedadTipoDetBean.listaNovedadClasif}"
+                         selectionMode="single" selection="#{novedadTipoDetBean.novedadClasif}"  
+                         rowIndexVar="nroRow"
+                         filterDelay="1000"
+                         rows="5" paginator="true"
+                         rowKey="#{clasif.idNovedadClasificacion}"
+                         emptyMessage="No existe clasificaciones de novedad registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{novedadTipoDetBean.onRowDblClckSelectClasif}"
+                        update=":NovedadTipoDetalleCreateForm:clasifNovedad"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroRow+1}" />
+                </p:column>
+                <p:column headerText="Nombre" filterBy="#{clasif.nombre}">
+                    <h:outputText value="#{clasif.nombre}" />
+                </p:column>
+                <p:column headerText="Descripción" filterBy="#{clasif.descripcion}">
+                    <h:outputText value="#{clasif.descripcion}" />
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

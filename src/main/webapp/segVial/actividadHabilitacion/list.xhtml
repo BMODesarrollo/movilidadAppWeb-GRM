@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="content">
+        <p:panel header="Actividades Habilitación (Inoperativos)">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="id_dt_actvd_habilita" var="tipo" 
+                             scrollable="true"
+                             widgetVar="wlVid_dt_actvd_habilita"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{segActvdHabilitaBean.lstSegActividadHabilitaciones}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{segActvdHabilitaBean.nuevo()}"
+                                oncomplete="PF('wv_actvd_habilita').show();"
+                                class="cssWhite"
+                                update="id_dialog_actvd_habilita,form_actvd_habilita"
+                                >
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Nombre" filterBy="#{tipo.nombre}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tipo.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{tipo.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{segActvdHabilitaBean.editar()}"
+                                                 process="@this"
+                                                 update="id_dialog_actvd_habilita,form_actvd_habilita"
+                                                 oncomplete="PF('wv_actvd_habilita').show();"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{tipo}" target="#{segActvdHabilitaBean.selected}"/>
+                                    <p:resetInput target="form_actvd_habilita"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{segActvdHabilitaBean.lstSegActividadHabilitaciones.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="id_dt_actvd_habilita" 
+                                                fileName="Actividades Habilitación"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>

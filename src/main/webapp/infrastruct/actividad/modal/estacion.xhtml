@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="estacionMd" 
+              closeOnEscape="true" 
+              widgetVar="estacionDlg"
+              modal="true"
+              header="ESTACIONES"
+              resizable="false" 
+              class="mr1024_50 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal-est">
+            <p:dataTable id="tabla-estacion"
+                         var="est" 
+                         value="#{actividadInfraDiariaJSF.listCableEstacion}"  
+                         paginator="true"
+                         filterDelay="2000"
+                         rows="10"
+                         rowsPerPageTemplate="10,20,50"
+                         reflow="true"
+                         rowIndexVar="nroeFila"
+                         selectionMode="single"
+                         rowKey="#{est.idCableEstacion}"
+                         widgetVar="wvEst"
+                         emptyMessage="No existen registros">
+
+                <p:ajax event="rowSelect" 
+                        process="@this"
+                        update=":form-modal:estacion,:form-modal:msgs_adm,:form:msg"
+                        listener="#{actividadInfraDiariaJSF.onGetEstacion}" />
+
+                <f:facet name="paginatorTopRight">
+                    <p:commandButton id="null"   
+                                     value="Null"
+                                     title="Volver Estacion null"
+                                     actionListener="#{actividadInfraDiariaJSF.onNullEstacion()}" 
+                                     icon="fa fa-check" 
+                                     process="@this"
+                                     update=":form-modal:estacion"
+                                     class="cssWhite RedButton" />
+                </f:facet>
+
+
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroeFila+1}" />
+                </p:column>
+                <p:column headerText="Nombre" filterBy="#{est.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{est.nombre}" />
+                </p:column>
+                <p:column headerText="Código" filterBy="#{est.codigo}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{est.codigo}" />
+                </p:column>
+                <p:column headerText="Descrpción">
+                    <h:outputText value="#{est.descripcion}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

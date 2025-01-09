@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog closable="true" id="ParamFeriadoEditDlg" 
+              closeOnEscape="true"
+              position="center top"
+              class="mr1024_30 mr500_90"
+              responsive="true"
+              widgetVar="ParamFeriadoEditDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Modificar Parametro Feriado">
+        <h:form id="ParamFeriadoEditForm">
+            <p:messages id="msgsLocal" showDetail="true" showSummary="true"/>
+            <div class="ui-fluid " jsf:rendered="#{paramFeriadoController.selected != null}">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-gl-12 ui-md-12 Padding5">
+                        <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                            <p:outputLabel value="Nombre" for="nombre" />
+                        </div>
+                        <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                            <p:inputText 
+                                maxlength="45"
+                                id="nombre" 
+                                value="#{paramFeriadoController.selected.nombre}" 
+                                title="#{bundle.EditParamFeriadoTitle_nombre}"
+                                required="true" 
+                                requiredMessage="Debe ingresar Nombre"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-gl-12 ui-md-12 Padding5">
+                        <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                            <p:outputLabel value="Fecha" for="fecha" />
+                        </div>
+                        <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                            <p:calendar 
+                                id="fecha"
+                                mask="99/99/9999"
+                                selectOtherMonths="true"
+                                navigator="true"
+                                pattern="dd/MM/yyyy" 
+                                value="#{paramFeriadoController.selected.fecha}" 
+                                title="#{bundle.EditParamFeriadoTitle_fecha}" 
+                                required="true" 
+                                requiredMessage="Debe seleccionar una fecha" showOn="button"/>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_update_pf"
+                             action="#{paramFeriadoController.modificar()}"
+                             update="ParamFeriadoListForm:datalist,@form,msgs" />
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_update_pf();"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             value="Actualizar" 
+                             />
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+

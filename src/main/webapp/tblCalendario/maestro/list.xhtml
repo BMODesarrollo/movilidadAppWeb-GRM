@@ -1,0 +1,236 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .aTexAlRight{
+                text-align: right;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Tabla Calendario - Maestro
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmPrincipal:dtTablaCalendario,:msgs" 
+                                            oncomplete="PF('dtDocumento').getPaginator().setPage(0);"
+                                            listener="#{tblCalendarioBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtTablaCalendario" var="item" 
+                             scrollable="true"
+                             widgetVar="dtDocumento"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             sortBy="#{item.fecha}"
+                             sortOrder="descending"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{tblCalendarioBean.lstRegistros}">
+
+                    <f:facet name="header">
+                        <div jsf:id="botones">
+                            <div class="ui-fluid">
+                                <div align="right">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-7 ui-lg-7 Padding5">
+                                        </div>
+                                        <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5">
+                                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Desde: " for="desde" class="cssWhite"/>
+                                                <p:calendar id="desde" 
+                                                            readonlyInput="true"
+                                                            locale="es" navigator="true"
+                                                            value="#{tblCalendarioBean.desde}" placeholder="Fecha">
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Hasta: " for="hasta" class="cssWhite"/>
+                                                <p:calendar id="hasta"
+                                                            readonlyInput="true"
+                                                            locale="es" navigator="true"
+                                                            value="#{tblCalendarioBean.hasta}" placeholder="Fecha">
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-search"
+                                                    value="Buscar"
+                                                    process="desde,hasta,@this"
+                                                    action="#{tblCalendarioBean.consultar()}"
+                                                    class="cssWhite"
+                                                    update="dtTablaCalendario,:msgs"
+                                                    >
+                                                </p:commandButton>       
+                                            </div>
+                                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-plus"
+                                                    value="Nuevo"
+                                                    action="#{tblCalendarioBean.nuevo()}"
+                                                    class="cssWhite"
+                                                    update="dtTablaCalendario,:tblCalendario,:frmTblCalendario,msgs"
+                                                    >
+                                                </p:commandButton>       
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center"
+                              filterBy="#{item.tipoDia}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Tipo Día"/>
+                        </f:facet>
+                        <h:outputText value="#{item.tipoDia}"/>
+                    </p:column>
+                    <p:column styleClass="text-center"
+                              filterBy="#{item.idTblCalendarioCaracteristicaDia.nombre}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Característica"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idTblCalendarioCaracteristicaDia.nombre}"/>
+                    </p:column>
+
+                    <p:column style="text-align: center;"
+                              width="10%"
+                              styleClass="#{item.estacionalidad == 1 ? 'cssGreen texto-blanco' : item.estacionalidad == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Estacionalidad"/>
+                        </f:facet>
+                        <h:outputText value="Si" style="color: white; font-weight: bolder" rendered="#{item.estacionalidad == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{item.estacionalidad == 0}"/>
+                    </p:column>
+
+                    <p:column headerText="Desde"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.desde}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Hasta"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.hasta}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column styleClass="cortar">
+                        <f:facet name="header">
+                            <h:outputText value="Observación"/>
+                        </f:facet>
+                        <h:outputText value="#{item.observacion}">
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Usuario"/>
+                        </f:facet>
+                        <h:outputText value="#{item.username}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Acciones" style="text-align: center;"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{tblCalendarioBean.editar()}"
+                                                 process="@this"
+                                                 update=":tblCalendario,:frmTblCalendario,msgs"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{item}" target="#{tblCalendarioBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6" jsf:rendered="#{tblCalendarioBean.flagProfPrg}">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Eliminar Registro"
+                                                 action="#{tblCalendarioBean.eliminar()}"
+                                                 process="@this"
+                                                 update="msgs"
+                                                 icon="fa fa-trash">
+                                    <p:confirm header="Confirmación" message="Ésta seguro de eliminar éste registro?" icon="fa fa-exclamation-triangle" />
+                                    <f:setPropertyActionListener value="#{item}" target="#{tblCalendarioBean.tblCalendario}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{tblCalendarioBean.lstRegistros.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtTablaCalendario" 
+                                                fileName="Tabla Calendario"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

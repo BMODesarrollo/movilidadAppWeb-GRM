@@ -1,0 +1,221 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .text-center {
+                text-align: center;
+            }
+
+            .form-select {
+                width: 99.999% !important;
+            }
+
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Componentes">
+            <h:form id="frmPrincipalVhclComponente">
+                <p:dataTable var="vechiculoComponente" value="#{vehiculoComponenteBean.lista}"
+                             id="dtTipo"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             scrollable="true"
+                             scrollHeight="600"
+                             filterDelay="1000"
+                             rows="7"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="7,30,50"
+                             emptyMessage="No existen componente registrados">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="dtTipo" fileName="Componentes"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton actionListener="#{vehiculoComponenteBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo componente" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":frmNuevoTipo"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmNuevoTipo:pGrid" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#"
+                              styleClass="text-center"
+                              width="30">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre" 
+                              styleClass="text-center"
+                              filterBy="#{vechiculoComponente.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{vechiculoComponente.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción"
+                              styleClass="text-center">
+                        <h:outputText value="#{vechiculoComponente.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="Zona_Componente"
+                              styleClass="text-center"
+                              filterBy="#{vechiculoComponente.idVehiculoComponenteZona.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{vechiculoComponente.idVehiculoComponenteZona.nombre}" />
+                    </p:column>
+                    <p:column headerText="Grupo_Componente"
+                              styleClass="text-center"
+                              filterBy="#{vechiculoComponente.idVehiculoComponenteGrupo.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{vechiculoComponente.idVehiculoComponenteGrupo.nombre}" />
+                    </p:column>
+                    <p:column headerText="Acción" 
+                              styleClass="text-center"
+                              width="10%">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton icon="fa fa-pencil"
+                                                 class="cssWhite GreenButton"
+                                                 title="Editar registro"
+                                                 action="#{vehiculoComponenteBean.editar()}"
+                                                 update=":frmNuevoTipo:modal"
+                                                 oncomplete="PF('mtipo').show();"
+                                                 >
+                                    <p:resetInput target=":frmNuevoTipo:pGrid" />
+                                    <f:setPropertyActionListener target="#{vehiculoComponenteBean.selected}" value="#{vechiculoComponente}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                        <p:commandButton icon="fa fa-refresh"
+                                         class="cssWhite OrangeButton"
+                                         title="Cambiar estado"
+                                         action="#{vehiculoComponenteBean.cambiarEstado()}"
+                                         update=":frmNuevoTipo:modal,:frmNuevoTipo:messages,dtTipo"
+                                         rendered="false">
+                            <f:setPropertyActionListener target="#{vehiculoComponenteBean.selected}" value="#{vechiculoComponente}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{vehiculoComponenteBean.lista.size()} tipos.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <h:form id="frmNuevoTipo">
+                <p:dialog widgetVar="mtipo" id="modal" modal="true" 
+                          closeOnEscape="true" responsive="true" 
+                          position="center top" class="mr1024_40 mr500_90"
+                          resizable="false">
+                    <c:if test="#{vehiculoComponenteBean.selected == null }">
+                        <f:facet name="header">
+                            Nuevo componente
+                        </f:facet>
+                    </c:if>
+                    <c:if test="#{vehiculoComponenteBean.selected != null }">
+                        <f:facet name="header">
+                            Editar componente
+                        </f:facet>
+                    </c:if>
+
+                    <div class="ui-fluid" jsf:id="pGrid">
+
+                        <p:messages id="messages" showDetail="true" closable="true"/>
+                        <p:focus context="nombre"/>
+
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Nombre:" for="nombre"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText id="nombre" value="#{vehiculoComponenteBean.vechiculoComponente.nombre}"
+                                                 required="true" requiredMessage="Debe ingresar un nombre"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="zonaCte" value="Zona componente: " />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="zonaCte" 
+                                                     styleClass="form-select"
+                                                     value="#{vehiculoComponenteBean.vehiCompZona.idVehiculoComponenteZona}"
+                                                     filter="true" 
+                                                     filterMatchMode="startsWith"
+                                                     required="true" 
+                                                     requiredMessage="Debe seleccionar una zona de componente">
+                                        <f:selectItem itemLabel="Seleccione zona componente" itemValue="" />
+                                        <f:selectItems value="#{vehiculoComponenteBean.lstCteZona}"
+                                                       var="item" itemLabel="#{item.nombre}"  itemValue="#{item.idVehiculoComponenteZona}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Descripción:" for="descripcion"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputTextarea id="descripcion" 
+                                                     autoResize="false"
+                                                     value="#{vehiculoComponenteBean.vechiculoComponente.descripcion}"
+                                                     required="true" requiredMessage="Debe ingresar una descripción"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <f:facet name="footer">
+                        <p:commandButton  icon="fa fa-check"
+                                          value="Guardar"
+                                          class="cssWhite"
+                                          actionListener="#{vehiculoComponenteBean.guardar()}"
+                                          update=":frmPrincipalVhclComponente:dtTipo,pGrid,messages"
+                                          rendered="#{vehiculoComponenteBean.selected == null }"
+                                          >
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-check"
+                                         value="Actualizar" 
+                                         class="cssWhite"
+                                         actionListener="#{vehiculoComponenteBean.actualizar()}"
+                                         update=":frmPrincipalVhclComponente:dtTipo,messages"
+                                         rendered="#{vehiculoComponenteBean.selected != null }"
+                                         />
+                    </f:facet>
+
+                </p:dialog>  
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,171 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="content">
+        <h:form id="formTq">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                TQ04
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="tqListId" 
+                                            listener="#{novedadPrgTcJSFMB.consultarTq()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:dataTable id="tqListId" 
+                             value="#{novedadPrgTcJSFMB.listBloqueadoVia}" 
+                             var="item"
+                             rowIndexVar="index"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             scrollHeight="600"
+                             filterDelay="1000"
+                             rows="20"
+                             widgetVar="dtrutasList"
+                             rowsPerPageTemplate="20,50,100">
+
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="tqListId" 
+                                            fileName="TQ04 #{novedadPrgTcJSFMB.fecha(1)} a #{novedadPrgTcJSFMB.fecha(2)}"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header" rendered="false">
+                        <div align="right" jsf:rendered="false">
+                            <p:outputLabel value="Fechas: " class="cssWhite Fs20" for="desde"/>
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{novedadPrgTcJSFMB.desde}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" process="desde"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{novedadPrgTcJSFMB.hasta}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" process="hasta"/>
+                            </p:calendar>
+                            <p:commandButton 
+                                value="Buscar"
+                                class="cssWhite"
+                                icon="fa fa-search"
+                                process="formTq"
+                                actionListener="#{novedadPrgTcJSFMB.consultarTq()}"
+                                update="formTq:tqListId,msgs">
+                            </p:commandButton>
+
+                        </div>
+                    </f:facet>
+                    <p:column headerText="ID"
+                              filterBy="#{novedad.idNovedad}"
+                              filterMatchMode="contains"
+                              style="min-width: 80px">
+                        <h:outputText value="N-#{novedad.idNovedad}" />
+                    </p:column>
+                    <p:column headerText="Fecha Registro"
+                              style="width: 7%">
+                        <h:outputText value="#{item.fecha_registro}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha"
+                              filterBy="#{item.fecha}" 
+                              filterMatchMode="startsWith"
+                              style="width: 7%">
+                        <f:facet name="filter">
+                            <p:calendar pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width:80%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('dtrutasList').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dtrutasList').filter()" update="tqListId"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Servicio Afectado" filterMatchMode="contains" 
+                              filterBy="#{item.servicio_afectado}">
+                        <h:outputText value="#{item.servicio_afectado}" />
+                    </p:column>
+                    <p:column headerText="Servbus" filterMatchMode="contains" 
+                              filterBy="#{item.servbus}">
+                        <h:outputText value="#{item.servbus}" />
+                    </p:column>
+                    <p:column headerText="Ultima Parada" filterMatchMode="contains" 
+                              filterBy="#{item.ultima_parada}">
+                        <h:outputText value="#{item.ultima_parada}" />
+                    </p:column>
+                    <p:column headerText="Tipo Novedad" filterBy="#{item.tipo_novedad}">
+                        <h:outputText value="#{item.tipo_novedad}" />
+                    </p:column>
+                    <p:column headerText="Det Tipo Novedad" filterBy="#{item.tipo_detalle_novedad}">
+                        <h:outputText value="#{item.tipo_detalle_novedad}" />
+                    </p:column>
+                    <p:column  filterBy="#{item.codigo_operador}"
+                               filterMatchMode="contains"
+                               headerText="Cod. Operador">
+                        <h:outputText value="#{item.codigo_operador}" class="cssBlack"/>
+                    </p:column>
+                    <p:column  filterBy="#{item.operador}"
+                               filterMatchMode="contains"
+                               headerText="Operador">
+                        <h:outputText value=" #{item.operador}"/>
+                    </p:column>
+
+                    <p:column headerText="Vehículo" filterBy="#{item.vehiculo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.vehiculo}" />
+                    </p:column>
+                    <p:column headerText="Vehículo Remplazo" filterBy="#{item.vehiculo_remplazo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.vehiculo_remplazo}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{item.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{item.usuario}" />
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

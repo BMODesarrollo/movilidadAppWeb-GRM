@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="mtipo" id="modal" modal="true" closeOnEscape="true"
+              class="mr1024_30 mr500_90"
+              resizable="false"
+              position="center top"
+              responsive="true">
+        <c:if test="#{vehiculoTipoTransmisionBean.selected == null }">
+            <f:facet name="header">
+                Nuevo tipo de transmisión
+            </f:facet>
+        </c:if>
+        <c:if test="#{vehiculoTipoTransmisionBean.selected != null }">
+            <f:facet name="header">
+                Editar tipo de transmisión: #{vehiculoTipoTransmisionBean.selected.nombreTipoTransmision.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             onclick="rc_save_tt();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoTipoTransmisionBean.selected == null }"/>
+            <p:commandButton value="Actualizar" 
+                             onclick="rc_update_tt();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoTipoTransmisionBean.selected != null }"/>
+        </f:facet>
+
+        <h:form id="frmNuevoTipo">
+            <p:remoteCommand name="rc_save_tt" action="#{vehiculoTipoTransmisionBean.guardar()}"
+                             update=":frmPrincipalTipoTransmision:dtTipo,messages,msgs,frmNuevoTipo"
+                             rendered="#{vehiculoTipoTransmisionBean.selected == null }"/>
+            <p:remoteCommand name="rc_update_tt" action="#{vehiculoTipoTransmisionBean.actualizar()}"
+                             update=":frmPrincipalTipoTransmision:dtTipo,messages,msgs"
+                             rendered="#{vehiculoTipoTransmisionBean.selected != null }"/>
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Nombre:" for="nombre"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:inputText id="nombre" value="#{vehiculoTipoTransmisionBean.vehiculoTipoTransmision.nombreTipoTransmision}"
+                                         required="true" requiredMessage="El nombre del tipo es obligatorio"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Descripción:" for="descripcion"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:inputTextarea id="descripcion" value="#{vehiculoTipoTransmisionBean.vehiculoTipoTransmision.descripcionTipoTransmision}"
+                                             />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>  
+    </p:dialog>  
+</ui:composition>

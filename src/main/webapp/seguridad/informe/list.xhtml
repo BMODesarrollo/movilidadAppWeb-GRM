@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="INFORMES DE SEGURIDAD">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtInformeSeguridad" var="informe" 
+                             scrollable="true"
+                             widgetVar="wlVdtInformeSeguridad"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{informeSeguridadBean.lstInformeSeguridad}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{informeSeguridadBean.nuevo()}"
+                                oncomplete="PF('wlvInformeSeguridad').show();"
+                                class="cssWhite"
+                                update="dtInformeSeguridad,:informeSeguridad,:frmInformeSeguridad"
+                                >
+                                <p:resetInput target=":frmInformeSeguridad:pGridDatos"/>
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha Ini Op" styleClass="text-center">
+                        <h:outputText value="#{informe.fechaIni}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha Fin Op" styleClass="text-center">
+                        <h:outputText value="#{informe.fechaFin}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Empresa" 
+                              filterBy="#{informe.idSstEmpresa.razonSocial}"
+                              styleClass="text-center">
+                        <h:outputText value="#{informe.idSstEmpresa.razonSocial}" />
+                    </p:column>
+
+                    <p:column headerText="Número Documento Visitante" visible="false">
+                        <h:outputText value="#{informe.idSstEmpresaVisitante.numeroDocumento}"/>
+                    </p:column>    
+                    <p:column headerText="Nombre Visitante" visible="false">
+                        <h:outputText value="#{informe.idSstEmpresaVisitante.nombre}"/>
+                    </p:column>    
+                    <p:column headerText="Apellidos Visitante" visible="false">
+                        <h:outputText value="#{informe.idSstEmpresaVisitante.apellidos}"/>
+                    </p:column>    
+
+                    <p:column headerText="Tipo Documento Empleado" styleClass="text-center">
+                        <h:outputText value="#{informe.idSstEmpresaVisitante.idSstTipoIdentificacion.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Empleado" 
+                              exportable="false"
+                              filterBy="#{informe.idSstEmpresaVisitante.numeroDocumento} #{informe.idSstEmpresaVisitante.nombre} #{informe.idSstEmpresaVisitante.apellidos}"
+                              filterMatchMode="contains">
+                        <h:outputText 
+                            value="#{informe.idSstEmpresaVisitante.numeroDocumento} - "
+                            styleClass="cssBlack"
+                            />
+                        <h:outputText value="#{informe.idSstEmpresaVisitante.nombre} #{informe.idSstEmpresaVisitante.apellidos}"/>
+                    </p:column>
+
+                    <p:column headerText="Observación" styleClass="text-word-wrap">
+                        <h:outputText value="#{informe.observacion}" />
+                    </p:column>
+
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{informeSeguridadBean.editar()}"
+                                                 process="@this"
+                                                 update=":informeSeguridad,:frmInformeSeguridad"
+                                                 oncomplete="PF('wlvInformeSeguridad').show();"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{informe}" target="#{informeSeguridadBean.selected}"/>
+                                    <p:resetInput target=":frmInformeSeguridad:pGridDatos"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                <p:commandButton action="#{informeSeguridadBean.cargarRecurso()}"
+                                                 title="Ver Informe" 
+                                                 update=":frmDocumento,:DocumentoListDlg"
+                                                 styleClass="cssWhite"
+                                                 process="@this"
+                                                 icon="fa fa-eye">
+                                    <f:setPropertyActionListener value="#{informe}" target="#{informeSeguridadBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{informeSeguridadBean.lstInformeSeguridad.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtInformeSeguridad" 
+                                                fileName="Informes de seguridad"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+        <ui:include src="modal/ModalDocumento.xhtml"/>
+    </ui:define>
+
+</ui:composition>

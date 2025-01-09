@@ -1,0 +1,123 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="chkComponente"
+              widgetVar="wlgVehiculoDanoCosto" 
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{vehiculoDanoCostoBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{vehiculoDanoCostoBean.selected != null}">
+            <f:facet name="header">
+                EDITAR DATOS
+            </f:facet>
+        </c:if>
+        <h:form id="frmVehiculoDanoCosto">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true"/>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desde" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha desde"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{vehiculoDanoCostoBean.desde}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Hasta" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha hasta"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{vehiculoDanoCostoBean.hasta}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Severidad" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu 
+                                styleClass="custom-filter" 
+                                filter="true" 
+                                value="#{vehiculoDanoCostoBean.idDanoSeveridad}"
+                                filterMatchMode="contains" 
+                                required="true"
+                                requiredMessage="Debe seleccionar una severidad de daño"
+                                style="width: 99.999%" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="Seleccione severidad" 
+                                              itemValue="#{null}"
+                                              itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{vehiculoDanoCostoBean.lstSeveridades}"
+                                               var="cte" itemLabel="#{cte.nombre}"
+                                               itemValue="#{cte.idVehiculoDanoSeveridad}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Valor" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber 
+                                required="true"
+                                requiredMessage="Debe ingresar valor"
+                                minValue="0"
+                                decimalPlaces="0"
+                                value="#{vehiculoDanoCostoBean.danoCosto.valor}"/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="messages,:msgs,pGridDatos,:frmPrincipal:dtVehiculoDanoCosto" 
+                             action="#{vehiculoDanoCostoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update="messages,:msgs,:frmPrincipal:dtVehiculoDanoCosto"
+                             action="#{vehiculoDanoCostoBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{vehiculoDanoCostoBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{vehiculoDanoCostoBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

@@ -1,0 +1,205 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form id="carga-info-entrega-operador"  enctype="multipart/form-data">
+            <p:panel header="Carga Registros Entrega Operador"
+                     toggleable="true" 
+                     toggleSpeed="500" 
+                     closeSpeed="500"  
+                     collapsed="true"
+                     widgetVar="panel" 
+                     style="margin-bottom:20px">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <h:panelGrid columns="2" style="text-align: center; margin: 0 auto">
+                    <p:fileUpload fileUploadListener="#{plaRecuEntregaOperadorBean.cargarEntregaOperador}" mode="advanced" dragDropSupport="false"
+                                  update="messages" sizeLimit="2000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/" 
+                                  label="Buscar archivo" uploadLabel="Cargar" cancelLabel="Cancelar carga"
+                                  invalidFileMessage="Debe cargar un archivo excel válido"
+                                  invalidSizeMessage="El archivo no debe ser mayor a 2mb"
+                                  oncomplete="PF('w_entrega-operadorList').clearFilters(); PF('w_entrega-operadorList').filter();"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+        <h:form id="formEntregaOperador">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Entrega Operador">
+
+                <p:dataTable id="entrega-operadorList" 
+                             value="#{plaRecuEntregaOperadorBean.listForDesEntregaOperador}" 
+                             var="item"
+                             rowKey="#{item.idPlaRecuEntregaOperador}"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             tableStyle="table-layout:fixed"
+                             reflow="true"
+                             filterDelay="1000"
+                             rows="25"
+                             selectionMode="single"
+                             widgetVar="w_entrega-operadorList"
+                             rowsPerPageTemplate="25,50,100,200,500">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="entrega-operadorList" fileName="Entrega Operador"/>
+                        </h:commandLink>
+                    </f:facet>
+
+                    <f:facet name="header">       
+                        <div align="right">
+                            <p:outputLabel value="Semana a Programar " class="cssWhite" for="desde" />
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta: " 
+                                        value="#{plaRecuEntregaOperadorBean.desde}"
+                                        mindate="#{plaRecuEjecucionBean.dia_inicio}"
+                                        maxdate="#{plaRecuEjecucionBean.dia_fin}"
+                                        pattern="yyyy-MM-dd"
+                                        style="width: 100px;margin-left: 5px;">
+                                <p:ajax event="dateSelect" listener="#{plaRecuEntregaOperadorBean.consultar()}" 
+                                        update="entrega-operadorList"></p:ajax>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta: " 
+                                        value="#{plaRecuEntregaOperadorBean.hasta}"
+                                        mindate="#{plaRecuEjecucionBean.dia_inicio}"
+                                        maxdate="#{plaRecuEjecucionBean.dia_fin}"
+                                        pattern="yyyy-MM-dd"
+                                        style="width: 100px;">
+                                <p:ajax event="dateSelect" listener="#{plaRecuEntregaOperadorBean.consultar()}" 
+                                        update="entrega-operadorList"></p:ajax>
+                            </p:calendar>
+
+                            <h:outputText value="Unidad Funcional" class="cssWhite" style="margin-left: 5px;"/>
+                            <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                             filter="true" 
+                                             rendered="#{uniFuncSessionBean.filtradoUF}"
+                                             style="margin-left: 5px; width: 150px;"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                               var="uniFunc" 
+                                               itemLabel="#{uniFunc.nombre}"
+                                               itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                <p:ajax process="@this"
+                                        event="change"
+                                        listener="#{plaRecuEntregaOperadorBean.filtrarPorUF()}"
+                                        update="formEntregaOperador:entrega-operadorList"/>
+                            </p:selectOneMenu>
+
+                            <p:commandButton id="plantalla_id"
+                                             value="Plantilla"
+                                             icon="fa fa-download"
+                                             ajax="false"
+                                             style="margin-left: 5px;"
+                                             class="cssWhite GreenButton"
+                                             actionListener="#{plaRecuEntregaOperadorBean.prepDownloadLocal('PLANTILLA_CARGA_RECURSOS_ENTREGA_OPERADOR')}">
+                                <p:fileDownload value="#{viewDocuJSFMB.download}" />
+                            </p:commandButton>
+                            <p:commandButton id="crear_entrega-operador"
+                                             icon="fa fa-plus"
+                                             value="Entrega Operador"
+                                             title="Crear nuevo registro de 'Entrega Operador'"
+                                             update="dlgForDesEntregaOperador"
+                                             actionListener="#{plaRecuEntregaOperadorBean.preGestionar()}"
+                                             class="cssWhite"
+                                             style="margin-left: 5px;"
+                                             oncomplete="PF('wvForDesEntregaOperador').show()" />
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="formEntregaOperador:entrega-operadorList" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Categoria" filterBy="#{item.idPlaRecuCategoria.name}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idPlaRecuCategoria.name}" title="Categoria que se asocia al registro" />
+                    </p:column>
+                    <p:column headerText="Código TM" filterBy="#{item.empleado.codigoTm}" filterMatchMode="contains">
+                        <h:outputText  value="#{item.empleado.codigoTm}" />
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.identificacion}"
+                              filterMatchMode="contains"
+                              headerText="Cédula">
+                        <h:outputText value="#{item.empleado.identificacion}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.nombres}"
+                              filterMatchMode="contains"
+                              headerText="Nombres">
+                        <h:outputText value="#{item.empleado.nombres}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Apellidos">
+                        <h:outputText value="#{item.empleado.apellidos}" />
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.idEmpleadoCargo.nombreCargo}"
+                              filterMatchMode="contains"
+                              headerText="Cargo">
+                        <h:outputText value="#{item.empleado.idEmpleadoCargo.nombreCargo}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.telefonoMovil}"
+                              filterMatchMode="contains"
+                              headerText="Telefono">
+                        <h:outputText value="#{item.empleado.telefonoMovil}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.emailCorporativo}"
+                              filterMatchMode="contains"
+                              headerText="Email">
+                        <h:outputText value="#{item.empleado.emailCorporativo}"/>
+                    </p:column>
+
+                    <p:column headerText="F. Contrato" filterBy="#{item.empleado.fechaIngreso}" filterMatchMode="contains">
+                        <h:outputText value="#{item.empleado.fechaIngreso}" title="Fecha de Contrato">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>    
+                    </p:column>
+                    <p:column headerText="F. Entrega Programación" filterBy="#{item.fechaEntregaProgramacion}" filterMatchMode="contains">
+                        <h:outputText value="#{item.fechaEntregaProgramacion}" title="Fecha Entrega de Operaciones">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>    
+                    </p:column>
+                    <p:column headerText="F. Ascenso Nom." filterBy="#{item.fechaAscensoNomina}" filterMatchMode="contains">
+                        <h:outputText value="#{item.fechaAscensoNomina}" title="Fecha Ascenso Nómina">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>    
+                    </p:column>
+                    <p:column headerText="Usuario crea" filterBy="#{item.usernameCreate}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.usernameCreate}" title="nombre del usuario que creó el registro"/>
+                    </p:column>
+                    <p:column headerText="Fecha crea" filterBy="#{item.creado}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.creado}" title="Fecha de creación del registro">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Usuario modifica" filterBy="#{item.usernameEdit}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.usernameEdit}" title="nombre del último usuario que modifica el registro"/>
+                    </p:column>
+                    <p:column headerText="Fecha crea" filterBy="#{item.modificado}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.modificado}" title="Fecha de la última modificación del registro">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Opción">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite" 
+                                         title="Modificar Registro" 
+                                         process="@this"
+                                         actionListener="#{plaRecuEntregaOperadorBean.editar(item)}"
+                                         update="dlgForDesEntregaOperador"
+                                         oncomplete="PF('wvForDesEntregaOperador').show()"
+                                         disabled="#{emple.estadoReg==1}"> 
+                        </p:commandButton>          
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/create.xhtml"/>
+        <ui:include src="modal/listaErrores.xhtml"/>
+    </ui:define>
+</ui:composition>

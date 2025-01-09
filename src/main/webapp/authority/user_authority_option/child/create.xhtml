@@ -1,0 +1,100 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="checklist"
+              widgetVar="checklistDlg" 
+              modal="true" 
+              closeOnEscape="true"
+              width="50%"
+              responsive="true"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+        <f:facet name="header">
+            NUEVO REGISTRO
+        </f:facet>
+        <h:form id="frmCheckListAdd">
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div align="center">
+                <h:panelGrid columns="1" id="pGridDatos" styleClass="ui-fluid">
+                    <h:panelGrid columns="1">
+                        <p:outputLabel for="@next" value="Authority: "/>
+                        <h:panelGrid columns="2">
+                            <p:inputText id="tipo_evento" 
+                                         required="true"
+                                         readonly="true"
+                                         placeholder="Seleccione authority"
+                                         requiredMessage="Debe seleccionar un authority"
+                                         value="#{userAuthorityOptBean.userAuthority.authority}">
+                            </p:inputText>
+                            <p:commandButton title="Cargar detalle tipo de novedad"
+                                             id="novedad_tipo_detalleBtn"
+                                             icon="fa fa-search"
+                                             process="@this"
+                                             class="cssWhite"
+                                             update=":frmPmNovedadTipoDetalleList"
+                                             onclick="PF('dtNovedadTipoDetalle').getPaginator().setPage(0);"
+                                             action="#{userAuthorityOptBean.prepareListUserAuthority()}"
+                                             oncomplete="PF('PmNovedadTipoDetalleListDialog').show()">
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1">
+                        <p:outputLabel value="Opciones: "/>
+                        <p:dataTable var="doc" id="dtAccDocumentos"
+                                     rows="4"
+                                     paginator="true"
+                                     value="#{userAuthorityOptBean.lstOpciones}"
+                                     rowIndexVar="fila"
+                                     emptyMessage="No se han agregado opciones">
+                            <f:facet name="header">
+                                <div align="right">
+                                    <p:commandButton value="AGREGAR"
+                                                     icon="fa fa-plus"
+                                                     update=":frmAccTipoDocsList"
+                                                     process="@this"
+                                                     onclick="PF('dtAccTipoDoc').getPaginator().setPage(0);"
+                                                     action="#{userAuthorityOptBean.prepareListOpcion()}"
+                                                     oncomplete="PF('AccTipoDocsListDialog').show()"
+                                                     styleClass="cssWhite"/>
+                                </div>
+                            </f:facet>
+                            <p:column headerText="#">
+                                <h:outputText value="#{fila+1}" />
+                            </p:column>
+
+                            <p:column headerText="Opción" styleClass="text-center">
+                                <h:outputText value="#{doc.nameop}" />
+                            </p:column>
+                            
+                            <p:column headerText="Acción" styleClass="text-center">
+                                <p:commandButton icon="fa fa-ban"
+                                                 value="Eliminar"
+                                                 update="dtAccDocumentos"
+                                                 actionListener="#{userAuthorityOptBean.eliminarOpcionLista(doc)}"
+                                                 styleClass="cssWhite RedButton"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="messages,pGridDatos,:frmCheckList:dtCheckLists" 
+                             action="#{userAuthorityOptBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                 rendered="#{userAuthorityOptBean.selected == null}"
+                                 class="cssWhite" onclick="guardar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListPmNovedadTipoDetalles.xhtml" />
+    <ui:include src="ListAccTipoDocs.xhtml" />
+</ui:composition>     

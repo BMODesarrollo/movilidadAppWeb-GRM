@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="genPmDiasEmpresaCreateDlg" 
+              widgetVar="genPmDiasEmpresaCreateDialog" 
+              modal="true" 
+              closeOnEscape="true"
+              resizable="false"
+              class="mr1024_30 mr500_90"
+              responsive="true"
+              appendTo="@(body)" 
+              header="Registrar Pm días Empresa"
+              position="center,top">
+        <p:ajax event="close" listener="#{genPmDiasEmpresaJSF.reset()}" update=":genPmDiasEmpresaListForm:datalist" />
+        <h:form id="genPmDiasEmpresaCreateForm">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Desde" for="desde" />
+                        <p:calendar id="desde" 
+                                    pattern="yyyy-MM-dd" 
+                                    value="#{genPmDiasEmpresaJSF.selected.desde}" 
+                                    title="Fecha desde"
+                                    mask="9999-99-99"
+                                    required="true" 
+                                    requiredMessage="Debe ingresar DESDE" showOn="button">
+                            <p:ajax event="dateSelect" update="hasta" />
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+
+                        <p:outputLabel value="Hasta" for="hasta" />
+                        <p:calendar id="hasta" 
+                                    pattern="dd/MM/yyyy"  
+                                    mask="99/99/9999"
+                                    value="#{genPmDiasEmpresaJSF.selected.hasta}" 
+                                    title="Fecha hasta"
+                                    required="true" requiredMessage="Debe ingresar HASTA" showOn="button">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+
+                        <p:outputLabel value="Número de días" for="NroDias"  />
+                        <p:inputNumber maxlength="3" 
+                                       maxValue="999" 
+                                       decimalPlaces="0"    
+                                       minValue="0"  
+                                       id="NroDias" 
+                                       value="#{genPmDiasEmpresaJSF.selected.nroDias}" 
+                                       required="true" 
+                                       requiredMessage="Debe ingresar el NUMERO DE DIAS "  >
+                        </p:inputNumber>
+
+                    </div>
+                    <p:remoteCommand name="rc" 
+                                     actionListener="#{genPmDiasEmpresaJSF.guardar()}" 
+                                     update="genPmDiasEmpresaListForm:datalist,msgs,genPmDiasEmpresaCreateForm" 
+                                     />
+                </div> 
+            </div> 
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnCreate" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+

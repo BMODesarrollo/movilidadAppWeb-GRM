@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{contableCtaJSF.contableCta.idContableCta != null ? 'EDITAR CUENTA CONTABLE' : 'NUEVA CUENTA CONTABLE'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid">
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Número Cuenta *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nombre"
+                                         maxlength="45"
+                                         required="true"
+                                         requiredMessage="Número Cuenta es requerido"
+                                         value="#{contableCtaJSF.contableCta.nroCuenta}" >
+                                <p:keyFilter regEx="/[0-9]/i"/>  
+                            </p:inputText>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Tipo Cuenta *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  id="tipoCuenta"
+                                              filter="true"
+                                              filterMatchMode="contains"
+                                              required="true"
+                                              requiredMessage="Tipo Cuenta es requierido"
+                                              value="#{contableCtaJSF.idContableCuentaTipo}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems var="tipoC"
+                                               value="#{contableCtaTipoJSF.listContableCtaTipo}"
+                                               itemLabel="#{tipoC.tipoCuenta}"
+                                               itemDescription="#{tipoC.descripcion}"
+                                               itemValue="#{tipoC.idContableCtaTipo}"
+                                               />
+                                <p:ajax global="false" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-8 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <h:outputText value="Concepto *"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputText id="concepto"
+                                             maxlength="45"
+                                             required="true"
+                                             requiredMessage="Concepto es requerido"
+                                             value="#{contableCtaJSF.contableCta.concepto}" />
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-4 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <h:outputText value="Es Multa? *"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectBooleanButton id="multa" 
+                                                       value="#{contableCtaJSF.bEsMulta}" 
+                                                       onLabel="Sí" 
+                                                       offLabel="No"  />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             maxlength="255"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             value="#{contableCtaJSF.contableCta.descripcion}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             rendered="#{empty contableCtaJSF.contableCta.idContableCta}"
+                             actionListener="#{contableCtaJSF.guardar()}"
+                             update=":form,@form"
+                             process="@form" />
+            <p:remoteCommand name="editar" 
+                             rendered="#{not empty contableCtaJSF.contableCta.idContableCta}"
+                             actionListener="#{contableCtaJSF.actualizar()}"
+                             update=":form"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-guardar"
+                             value="Guardar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{empty contableCtaJSF.contableCta.idContableCta}"
+                             onclick="guardar()"/>
+            <p:commandButton id="btn-editar"
+                             value="Actualizar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             onclick="editar()"
+                             rendered="#{not empty contableCtaJSF.contableCta.idContableCta}" />
+        </f:facet>
+    </p:dialog>
+</ui:composition>

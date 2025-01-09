@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-config-emp" 
+              closeOnEscape="true"
+              widgetVar="config_empDlg_wv"
+              modal="true"
+              header="#{configEmpresaJSF.configEmpresa.idConfigEmpresa != null ? 'EDITAR CONFIGURACIÓN EMPRESA' : 'NUEVA CONFIGURACIÓN EMPRESA'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90" 
+              appendTo="@(body)"
+              position="center top" 
+              responsive="true">
+        <h:form id="form-config-empresa">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Llave" for="t_area"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="t_area"
+                                         required="true"
+                                         value="#{configEmpresaJSF.configEmpresa.llave}"
+                                         maxlength="45"
+                                         />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Valor" for="motivo"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="motivo"
+                                             value="#{configEmpresaJSF.configEmpresa.valor}"
+                                             rows="5"
+                                             maxlength="255"
+                                             required="true"
+                                             counter="cou"
+                                             counterTemplate="Quedan {0} carácteres" 
+                                             autoResize="false"
+                                             placeholder="Valor" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Observación *" for="descripcion"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             value="#{configEmpresaJSF.configEmpresa.observacion}"
+                                             rows="5"
+                                             maxlength="255"
+                                             required="true"
+                                             counter="cou"
+                                             counterTemplate="Quedan {0} carácteres" 
+                                             autoResize="false"
+                                             placeholder="Observación" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" style="text-align: right; font-size: 12px">
+                            <h:outputText id="cou" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             actionListener="#{configEmpresaJSF.guardar()}"
+                             rendered="#{empty configEmpresaJSF.configEmpresa.idConfigEmpresa}"
+                             process="@this,@form"
+                             update=":form-conf-empresa,@form"/>
+            <p:remoteCommand name="editar"
+                             actionListener="#{configEmpresaJSF.editar()}"
+                             process="@this,@form"
+                             rendered="#{not empty configEmpresaJSF.configEmpresa.idConfigEmpresa}"
+                             update=":form-conf-empresa"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-guardar"
+                             value="Guardar"
+                             class="cssWhite"
+                             rendered="#{empty configEmpresaJSF.configEmpresa.idConfigEmpresa}"
+                             icon="fa fa-save"
+                             onclick="guardar()">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro que desea guardar esta información?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+            <p:commandButton id="btn-editar"
+                             value="Actualizar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{not empty configEmpresaJSF.configEmpresa.idConfigEmpresa}"
+                             onclick="editar()">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro que desea guardar esta información?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

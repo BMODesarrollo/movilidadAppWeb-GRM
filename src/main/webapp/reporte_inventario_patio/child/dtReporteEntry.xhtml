@@ -1,0 +1,73 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dataTable var="reporte"
+                 id="dtReporteConsultaEntry"
+                 reflow="true"
+                 paginator="true"
+                 scrollable="true"
+                 scrollHeight="600"
+                 filterDelay="1700"
+                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                 rowsPerPageTemplate="10,20,50,100"
+                 emptyMessage="No se han encontrado registos."
+                 rowStyleClass="TexAlCenter"
+                 value="#{reporteInventarioPatioBean.lstDepotEntries}" 
+                 rowIndexVar="idx" 
+                 rows="20">
+
+        <p:column headerText="Tarea" 
+                  filterBy="#{reporte.idPrgTc.idTaskType.tarea}" 
+                  filterMatchMode="contains">
+            <h:outputText value="#{reporte.idPrgTc.idTaskType.tarea}" />
+        </p:column>
+        <p:column headerText="Fecha">
+            <h:outputText value="#{reporte.fechaHora}" >
+                <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="Vehículo" 
+                  filterBy="#{reporte.idPrgTc.idVehiculo.codigo}" 
+                  filterMatchMode="contains">
+            <h:outputText value="#{reporte.idPrgTc.idVehiculo.codigo}" />
+        </p:column>
+        <p:column headerText="Código"
+                  filterBy="#{reporte.idPrgTc.idEmpleado.codigoTm}" 
+                  filterMatchMode="contains">
+            <h:outputText value="#{reporte.idPrgTc.idEmpleado.codigoTm}"/>
+        </p:column>
+        <p:column headerText="Operador"
+                  filterBy="#{reporte.idPrgTc.idEmpleado.nombres} #{reporte.idPrgTc.idEmpleado.apellidos}" 
+                  filterMatchMode="contains">
+            <h:outputText value="#{reporte.idPrgTc.idEmpleado.nombresApellidos()}"/>
+        </p:column>
+        <p:column headerText="Hora Entrada Programada"
+                  sortable="true"
+                  sortBy="#{reporte.idPrgTc.timeDestiny}">
+            <h:outputText value="#{reporte.idPrgTc.timeDestiny}" />
+        </p:column>
+        <p:column headerText="Hora Entrada Real"
+                  sortable="true"
+                  sortBy="#{reporte.fechaHora}">
+            <h:outputText value="#{reporte.fechaHora}" >
+                <f:convertDateTime pattern="HH:mm:ss" />
+            </h:outputText>
+        </p:column>
+        <f:facet name="footer">
+            En total existen #{reporteInventarioPatioBean.lstDepotEntries.size()} registrados.
+            <div style="float: right;padding-bottom: 5px" align="center">
+                <h:commandLink>
+                    <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                         alt="excel" style="width: 24px;height: 24px"/>
+                    <p:dataExporter type="xlsx" target="dtReporteConsultaEntry" fileName="Entradas"/>
+                </h:commandLink>
+            </div>
+        </f:facet>
+    </p:dataTable>
+
+</ui:composition>     

@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../../../public/template/template-aseo.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <script >
+            function ii() {
+
+            }
+        </script>
+        <style>
+            video {
+                border-radius: 2pc;
+                border: dashed #a99d9e 7px;
+                width: 100%;height: auto
+            }
+        </style>
+        <h:outputScript name="js/leerQr.js" library="sentinel-layout" />
+        <h:outputScript name="js/gestionQr.js" library="sentinel-layout" />
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Autorizar Aseos de Baños">
+            <h:form id="form_aseo_bano">
+                <div class="ui-g">
+                    <p:dataTable id="dt_aseo_bano_id" var="aseoBano" 
+                                 scrollable="true"
+                                 widgetVar="wlVdt_aseo_bano_id"
+                                 scrollHeight="600"
+                                 disabledTextSelection="false"
+                                 reflow="true"
+                                 rows="10"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,50,100"
+                                 emptyMessage="No existen registros"
+                                 value="#{aseoBanoAutorizarBean.listAseoBano}">
+
+                        <f:facet name="header">
+                            <div align="right" jsf:id="botones">
+                                <p:commandLink id="link_responsable" 
+                                               rendered="true" 
+                                               title="Click para leer código qr"
+                                               value="Área Aseo" 
+                                               class="white"
+                                               onclick="load()"
+                                               action="#{aseoBanoAutorizarBean.prepareLeerQR()}" >
+                                    <i class="fa fa-qrcode Fs40 "/> 
+                                </p:commandLink>
+                            </div>
+                        </f:facet>
+
+
+                        <p:column headerText="Fecha Ini" styleClass="text-center">
+                            <h:outputText value="#{aseoBano.fechaHoraIni}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha Fin" styleClass="text-center">
+                            <h:outputText value="#{aseoBano.fechaHoraFin}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Identificación Responsable"
+                                  filterBy="#{aseoBano.sstEmpresaVisitante.numeroDocumento}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{aseoBano.sstEmpresaVisitante.numeroDocumento}" />
+                        </p:column>
+                        <p:column headerText="Nombre Responsable"
+                                  filterBy="#{aseoBano.sstEmpresaVisitante.nombre} #{aseoBano.sstEmpresaVisitante.apellidos}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{aseoBano.sstEmpresaVisitante.nombre} #{aseoBano.sstEmpresaVisitante.apellidos}" />
+                        </p:column>
+
+                        <p:column headerText="Área de actividad"
+                                  filterBy="#{aseoBano.aseoParamArea.nombre}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-word-wrap">
+                            <h:outputText value="#{aseoBano.aseoParamArea.nombre}" />
+                        </p:column>
+
+                        <p:column headerText="Código"
+                                  filterBy="#{aseoBano.codigoPlanilla}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-word-wrap">
+                            <h:outputText value="#{aseoBano.codigoPlanilla}" />
+                        </p:column>
+                        <p:column filterBy="#{aseoBano.autorizado}" 
+                                  exportable="false"
+                                  headerText="Autorizado"
+                                  styleClass="#{aseoBano.autorizado eq 1 ? 'cssGreen' : aseoBano.autorizado eq 0 ?  'cssRed' : 'cssGray'}" 
+                                  filterMatchMode="exact">
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('wlVdt_aseo_bano_id').filter()" 
+                                                 styleClass="custom-filter" style="width: 10%">
+                                    <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemValue="#{-1}" itemLabel="Pendiente"/>
+                                    <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                    <f:selectItem itemValue="#{2}" itemLabel="No"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText class="cssWhite" value="#{aseoBano.autorizado==1 ? 'Sí': aseoBano.autorizado==2 ? 'No': 'Pendiente'}" />
+                        </p:column>
+                        <p:column headerText="usuario" styleClass="text-word-wrap">
+                            <h:outputText value="#{aseoBano.username}" />
+                        </p:column>
+
+                        <p:column headerText="Acciones" exportable="false">
+                            <p:commandButton title="Ver fotos"
+                                             icon="fa fa-photo"
+                                             class="cssWhite OrangeButton"
+                                             update="galeria_fotos_form"  
+                                             rendered="#{!empty(aseoBano.pathFoto)}"
+                                             action="#{aseoBanoAutorizarBean.obtenerFotos()}"
+                                             oncomplete="PF('galeria_foto_dialog_wv').show()" >
+                                <f:setPropertyActionListener target="#{aseoBanoAutorizarBean.aseoBano}" value="#{aseoBano}"/>
+                            </p:commandButton>
+                            <p:commandButton actionListener="#{aseoBanoAutorizarBean.autorizar(aseoBano, 1)}"
+                                             icon="fa fa-thumbs-up"
+                                             class="cssWhite GreenButton"
+                                             update="dt_aseo_bano_id"
+                                             rendered="#{aseoBano.autorizado== -1 or aseoBano.autorizado == 0}"
+                                             title="Autorizar">
+                                <p:confirm header="Confirmación" 
+                                           message="Está seguro de autorizar?"
+                                           icon="fa fa-exclamation-triangle"
+                                           class="cssWhite"/>
+                            </p:commandButton>
+                            <p:commandButton actionListener="#{aseoBanoAutorizarBean.autorizar(aseoBano, 0)}"
+                                             icon="fa fa-thumbs-down"
+                                             class="cssWhite RedButton"
+                                             update="dt_aseo_bano_id"
+                                             rendered="#{aseoBano.autorizado== -1 or aseoBano.autorizado == 1 }"
+                                             title="No Autorizar">
+                                <p:confirm header="Confirmación" 
+                                           message="Está seguro de NO autorizar?"
+                                           icon="fa fa-exclamation-triangle"
+                                           class="cssWhite"/>
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="../../../galeriaFotos.xhtml"/>
+        <ui:include src="modal/leerQr.xhtml"/>
+    </ui:define>
+</ui:composition>

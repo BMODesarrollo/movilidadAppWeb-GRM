@@ -1,0 +1,33 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="VehiculoCteDanoDlg" widgetVar="VehiculoCteDanoDialog" modal="true" 
+              position="center top"
+              resizable="false" appendTo="@(body)" header="Componentes de daños"
+              closeOnEscape="true" class="mr1024_50 mr500_90" responsive="true">
+        <h:form id="frmVehiculoCteDanoList">
+            <p:cache disabled="true"/>
+            <p:dataTable var="vht" value="#{novedadDanoBean.lstVehiculoComponenteDano}"  
+                         selectionMode="single" selection="#{novedadDanoBean.vehiculoComponenteDano}"                       
+                         rowIndexVar="nroFila"
+                         filterDelay="1000"
+                         paginator="true"
+                         rows="8"
+                         rowKey="#{vht.idVehiculoComponenteDano}"
+                         emptyMessage="No existen vehículos registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{novedadDanoBean.onRowDblClckSelect}"
+                        update=":frmDano:cteDano"
+                        oncomplete="PF('VehiculoCteDanoDialog').hide()"/>
+                <p:column headerText="#" width="15%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Daño">
+                    <h:outputText value="#{vht.idVehiculoDano.nombre}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="VEHICULO ODÓMETRO">
+            <h:form id="frmCargaVehiculoOdometro" enctype="multipart/form-data">
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect event="load" type="pulsate" delay="200"/>
+                </p:messages>
+                <div align="center" jsf:id="archivo">
+                    <p:fileUpload fileUploadListener="#{vehiculoOdometroBean.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                  update="messages,archivo" sizeLimit="1000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/" 
+                                  label="Buscar archivo" uploadLabel="Cargar" cancelLabel="Cancelar carga"
+                                  invalidFileMessage="Debe cargar un archivo excel válido"
+                                  invalidSizeMessage="El archivo debe ser máximo de 1mb"/>
+
+                </div>
+            </h:form>
+            <h:form id="frmVehiculoOdometro">
+                <p:cache disabled="false"/>
+                <div align="center" jsf:id="panelFecha">
+                    <p:outputLabel value="Seleccione fecha: "
+                                   for="@next"/>
+                    <p:calendar id="fecha"
+                                value="#{vehiculoOdometroBean.fecha}"
+                                pattern="yyyy-MM-dd" 
+                                locale="es"
+                                autocomplete="off"
+                                required="false"
+                                navigator="true" 
+                                showTodayButton="true"
+                                readonlyInput="true"
+                                maxdate="today"
+                                placeholder="Seleccione fecha"
+                                showOn="button"
+                                onkeypress="if (event.keyCode === 13) {
+                                            return false;
+                                        }"
+                                >
+                        <p:ajax event="dateSelect"
+                                listener="#{vehiculoOdometroBean.buscar()}"
+                                update="dtVehiculoOdometro,
+                                frmCargaVehiculoOdometro:messages"/>
+                    </p:calendar>
+                </div>
+                <p:spacer height="20"/>
+                <p:dataTable var="vehiculoOdometro" value="#{vehiculoOdometroBean.lstVehiculoOdometros}"
+                             id="dtVehiculoOdometro"      
+                             widgetVar="dtVehiculosOdometro"
+                             reflow="true"
+                             paginator="true"
+                             scrollable="true"
+                             scrollHeight="600"
+                             filterDelay="1700"
+                             emptyMessage="No existe un archivo de odómetro cargado">
+                    <p:column headerText="Fecha"
+                              width="90"
+                              styleClass="text-center"
+                              >
+                        <h:outputText value="#{vehiculoOdometro.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vehículo" 
+                              styleClass="text-center"
+                              width="70"
+                              filterBy="#{vehiculoOdometro.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{vehiculoOdometro.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Odómetro"
+                              styleClass="text-center"
+                              width="100"
+                              >
+                        <h:outputText value="#{vehiculoOdometro.odometro}" />
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

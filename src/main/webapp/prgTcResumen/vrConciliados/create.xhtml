@@ -1,0 +1,188 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="registroVrConciliado"
+              widgetVar="wlgValoresConciliados" 
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{registroVrConciliadoBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{registroVrConciliadoBean.selected != null}">
+            <f:facet name="header">
+                EDITAR DATOS
+            </f:facet>
+        </c:if>
+        <h:form id="frmRegistroVrConciliado">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{registroVrConciliadoBean.fecha}">
+                                <p:ajax event="dateSelect" 
+                                        process="@this"
+                                        listener="#{registroVrConciliadoBean.asignarTipoDia()}"
+                                        update="tipoDia"
+                                        />
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="tipoDia">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Día" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 text-center">
+                            <p:inputText value="#{registroVrConciliadoBean.tipoDia}"
+                                         title="#{registroVrConciliadoBean.tipoDia eq 'H' ? 'Hábil':registroVrConciliadoBean.tipoDia eq 'S' ? 'Sábado':'Domingo/Feriado'}"
+                                         readonly="true"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo vehículo" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu 
+                                styleClass="custom-filter" 
+                                filter="true" 
+                                value="#{registroVrConciliadoBean.i_VehiculoTipo}"
+                                filterMatchMode="contains" 
+                                required="true"
+                                requiredMessage="Debe seleccionar un tipo de vehículo"
+                                style="width: 99.999%" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="Seleccione tipo" 
+                                              itemValue="#{null}"
+                                              itemDisabled="true"
+                                              itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{registroVrConciliadoBean.lstTipoVehiculos}"
+                                               var="cte" itemLabel="#{cte.nombreTipoVehiculo}"
+                                               itemValue="#{cte.idVehiculoTipo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Kms Comercial" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber 
+                                required="true"
+                                requiredMessage="Debe ingresar valor Kms comerciales"
+                                minValue="0"
+                                decimalPlaces="0"
+                                value="#{registroVrConciliadoBean.vrConciliado.kmsComercial}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Kms Vacío" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber 
+                                required="true"
+                                requiredMessage="Debe ingresar valor Kms vacío"
+                                minValue="0"
+                                decimalPlaces="0"
+                                value="#{registroVrConciliadoBean.vrConciliado.kmsVacio}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Vr Km Comercial" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber 
+                                required="true"
+                                requiredMessage="Debe ingresar valor kms comercial"
+                                minValue="0"
+                                decimalPlaces="0"
+                                value="#{registroVrConciliadoBean.vrConciliado.vrKmComercial}">
+                                <p:ajax 
+                                    process="@this"
+                                    listener="#{registroVrConciliadoBean.calcularTotalConciliacion()}"
+                                    update="totalConciliacion"/>
+                            </p:inputNumber>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Vr Km Vacío" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber 
+                                required="true"
+                                requiredMessage="Debe ingresar valor km vacío"
+                                minValue="0"
+                                decimalPlaces="0"
+                                value="#{registroVrConciliadoBean.vrConciliado.vrKmVacio}">
+                                <p:ajax 
+                                    process="@this"
+                                    listener="#{registroVrConciliadoBean.calcularTotalConciliacion()}"
+                                    update="totalConciliacion"/>
+                            </p:inputNumber>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" jsf:id="totalConciliacion">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Total conciliación" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber 
+                                required="true"
+                                requiredMessage="Total conciliación es requerido"
+                                readonly="true"
+                                minValue="0"
+                                decimalPlaces="0"
+                                value="#{registroVrConciliadoBean.vrConciliado.totalConciliacion}"/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="messages,:msgs,pGridDatos,:frmPrincipal:dtValoresConciliados" 
+                             action="#{registroVrConciliadoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update="messages,:msgs,:frmPrincipal:dtValoresConciliados"
+                             action="#{registroVrConciliadoBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{registroVrConciliadoBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{registroVrConciliadoBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

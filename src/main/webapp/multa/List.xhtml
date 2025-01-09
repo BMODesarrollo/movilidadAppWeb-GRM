@@ -1,0 +1,283 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <h:form id="MultaListForm">
+            <p:hotkey bind="ctrl+shift+d" 
+                      update="MultaListForm:datalist,MultaListForm" 
+                      action="#{multaController.clearFilters()}"/>
+            <p:growl id="msgs" showDetail="true" showSummary="true" life="4000"/>
+            <p:cache disabled="true"/>
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Multa
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0"
+                                 jsf:id="uFSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="datalist" 
+                                            oncomplete="PF('dtMultas').getPaginator().setPage(0);"
+                                            listener="#{multaController.getByDateRange()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:dataTable id="datalist" value="#{multaController.items}" var="item"
+                             widgetVar="dtMultas"
+                             selectionMode="single" selection="#{multaController.selected}"
+                             paginator="true" reflow="true"
+                             sortBy="#{item.fechaHora}"
+                             filterDelay="1000"
+                             emptyMessage="No existen registros"
+                             sortOrder="descending"
+                             rowKey="#{item.idMulta}"
+                             rows="10">
+
+                    <f:facet name="header">
+                        <div aling="left" jsf:id="header">
+                            <p:commandButton id="toggle" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify"  
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="datalist" trigger="toggle" />
+                        </div>
+                        <div align="right" jsf:id="botones">
+                            <h:outputText value="Fechas:" title="Fecha Inicio"
+                                          style="right: 300px"/>&#160;&#160;
+                            <p:calendar id="firstDate" 
+                                        value="#{multaController.fechaInicio}"
+                                        placeholder="Fecha Ini"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha de inicio"
+                                        maxdate="#{multaController.validarFecha()}"
+                                        pattern="yyyy/MM/dd HH:mm" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" 
+                                        listener="#{multaController.getByDateRange()}"
+                                        update="MultaListForm:datalist,MultaListForm:msgs"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate"
+                                        value="#{multaController.fechaFin}"
+                                        placeholder="Fecha Fin"
+                                        maxdate="#{multaController.validarFecha()}"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha final"
+                                        pattern="yyyy/MM/dd HH:mm" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" 
+                                        listener="#{multaController.getByDateRange()}"
+                                        update="MultaListForm:datalist,MultaListForm:msgs"/>
+                            </p:calendar>&#160;&#160;&#160;&#160;
+                            <p:commandButton id="createButton"
+                                             icon="fa fa-plus"  
+                                             class="cssWhite"
+                                             value="Nueva" 
+                                             immediate="true"
+                                             actionListener="#{multaController.prepareCreate(true,null)}"
+                                             update="MultaCreateForm,datalist" oncomplete="PF('MultaCreateDialog').show()">
+                                <p:resetInput target="MultaCreateForm:display"/>
+                            </p:commandButton>
+                            <p:commandButton id="viewButton"  
+                                             icon="fa fa-search"
+                                             title="Visualizar datos de la multa"
+                                             value="Visualizar"
+                                             class="OrangeButton cssWhite"
+                                             update=":MultaViewForm" 
+                                             oncomplete="PF('MultaViewDialog').show()" 
+                                             disabled="#{multaController.selected.idMulta eq null}"/>
+                            <p:commandButton id="editButton" 
+                                             icon="fa fa-pencil"
+                                             value="Editar"
+                                             title="Editar multa"
+                                             class="cssWhite GreenButton"
+                                             process="@this"
+                                             actionListener="#{multaController.cargarEditar()}"
+                                             update=":MultaEditForm"
+                                             oncomplete="PF('MultaEditDialog').show()"
+                                             disabled="#{multaController.selected.idMulta eq null}">
+                            </p:commandButton>
+                            <p:commandButton id="deleteButton" 
+                                             icon="fa fa-retweet" 
+                                             class="cssWhite"
+                                             actionListener="#{multaController.destroy}"
+                                             update="datalist,msgs" 
+                                             disabled="true">
+                                <p:confirm header="Confirmación" message="Seguro quiere cambiar el estado?" 
+                                           icon="fa fa-exclamation-triangle" />
+                            </p:commandButton>
+                            <p:commandButton value="Seguimiento" 
+                                             id="seguiMulta"
+                                             class="cssWhite"
+                                             actionListener="#{multaSeguimientoController.cargar(multaController.cargarIdMulta())}"
+                                             rendered="false"
+                                             icon="fa fa-calendar-plus-o"
+                                             oncomplete="PF('seguimientoMultaDig').show();"
+                                             update="MultaSeguimientoListDlg,MultaSeguimientoCreateForm,datalist"
+                                             >
+                            </p:commandButton>
+                            <p:commandButton value="Documentos"
+                                             id="docuMulta"
+                                             class="cssWhite"
+                                             rendered="false"
+                                             icon="fa fa-folder"
+                                             update=":MultaDocumentosListForm:datalist"
+                                             actionListener="#{multaDocumentosController.cargarIdMulta(multaController.cargarIdMulta())}"
+                                             oncomplete="PF('documentoMultaDig').show();"
+                                             />
+
+                        </div>
+                    </f:facet>
+
+                    <p:ajax event="rowSelect"   update="botones" listener="#{multaController.cargarIdMulta}"/>
+                    <p:ajax event="rowUnselect" update="botones" listener="#{multaController.cargarIdMulta}"/>
+                    <p:column >
+                        <f:facet name="header">
+                            <h:outputText value="Fecha y hora"/>
+                        </f:facet>
+                        <h:outputText value="#{item.fechaHora}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.idPrgTc.idRuta.name}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Servicio"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idPrgTc.idRuta.name}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idPrgTc.idTaskType.tarea}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Linea"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idPrgTc.idTaskType.tarea}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idPrgTc.tabla}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Tabla"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idPrgTc.tabla}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Vehículo"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idVehiculo.codigo}"/>
+                    </p:column>
+                    <p:column styleClass="#{item.procede gt 0 ? 'cssGreen': item.procede eq 0 ? 'cssRed' : ''}">
+                        <f:facet name="header">
+                            <h:outputText value="Procede"/>
+                        </f:facet>
+                        <h:outputText value="Sí" class="cssWhite" 
+                                      rendered="#{item.procede == 1}" />
+                        <h:outputText value="No" class="cssWhite" 
+                                      rendered="#{item.procede == 0}" />
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{item.idEmpleado.codigoTm} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Empleado">
+                        <h:outputText value="#{item.idEmpleado.codigoTm}" class="cssBlack"/>
+                        <h:outputText value=" #{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Empleado">
+                        <h:outputText value=" #{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idMultaClasificacion}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Clasificación"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idMultaClasificacion.codigo}"
+                                      title="#{item.idMultaClasificacion.descripcion}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idMultaReportadoPor.nombres}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Repotado por"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idMultaReportadoPor.nombres}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idMultaTipo.tipo}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Tipo multa"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idMultaTipo.tipo}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idPatio.nombrePatio}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Patio"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idPatio.nombrePatio}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idMultaClasificacion.metros}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Metros"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idMultaClasificacion.metros}"/>
+                    </p:column>
+                    <p:column class="cortar">
+                        <f:facet name="header">
+                            <h:outputText value="Descrición"/>
+                        </f:facet>
+                        <h:outputText value="#{item.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        <div align="right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="datalist" fileName="multa #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="datalist" fileName="multa #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="datalist" fileName="multa #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+        <ui:include src="View.xhtml"/>
+        <ui:include src="../multaSeguimiento/List.xhtml"/>
+        <ui:include src="../multaDocumentos/List.xhtml"/>
+    </ui:define>
+</ui:composition>

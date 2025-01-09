@@ -1,0 +1,234 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="crear_turno_id_dialog"
+              widgetVar="crear_turno_wv_dialog"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_50 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Nueva Jornada " class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('crear_turno_wv_dialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form_turno">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5 ">
+                        <p:outputLabel for="CFechaNct" value="Fecha"/>
+                        <p:calendar id="CFechaNct" required="true"
+                                    value="#{genCtrlJornadaMB.genericaJornadaNew.fecha}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true">
+                            <p:ajax event="dateSelect" process="CFechaNct"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-9 ui-lg-9 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="codigo_operador" value="Empleado"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:inputText id="codigo_operador" 
+                                         required="true"
+                                         readonly="true"
+                                         value="#{genCtrlJornadaMB.nombreEmpleado}" />
+                            <div class="botonFloat" >
+                                <p:commandButton title="Listar Empleados"
+                                                 icon="fa fa-list"
+                                                 class="cssWhite"
+                                                 style="margin: 0px"
+                                                 process="@this"
+                                                 update="msgs"
+                                                 actionListener="#{genCtrlJornadaMB.findEmplActivos()}">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:outputLabel value="H. Ini Turno" for="hora-ini-real"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:inputMask id="hora-ini-real"
+                                         mask="99:99:99"
+                                         value="#{genCtrlJornadaMB.genericaJornadaNew.realTimeOrigin}"
+                                         required="true"
+                                         requiredMessage="Hora Inicial Turno 1 es requerido">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                                <p:ajax event="blur" process="@this" update="form_turno:orden_tbj_div,msgs,@this" 
+                                        listener="#{genCtrlJornadaMB.validarOrdenTrabajo()}"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:outputLabel value="H. Fin Turno" for="hora-fin-real"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:inputMask id="hora-fin-real"
+                                         mask="99:99:99"
+                                         value="#{genCtrlJornadaMB.genericaJornadaNew.realTimeDestiny}"
+                                         required="true"
+                                         requiredMessage="Hora Fin Turno 1 es requerida">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                                <p:ajax event="blur" update="form_turno:orden_tbj_div"  
+                                        listener="#{genCtrlJornadaMB.validarOrdenTrabajo()}"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 " jsf:id="orden_tbj_div">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:outputLabel value="Orden de Trabajo" 
+                                           for="id_orden_tbj" 
+                                           rendered="#{genCtrlJornadaMB.b_orden_tbj}"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:inputText id="id_orden_tbj"
+                                         rendered="#{genCtrlJornadaMB.b_orden_tbj}"
+                                         maxlength="15"
+                                         value="#{genCtrlJornadaMB.ordenTrabajo}">
+                            </p:inputText>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:outputLabel value="H. Ini Turno 2" for="id_h_ini_turno2" rendered="false"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:inputMask id="id_h_ini_turno2"
+                                         rendered="false"
+                                         mask="99:99:99"
+                                         value="#{genCtrlJornadaMB.genericaJornadaNew.hiniTurno2}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:outputLabel value="H. Fin Turno 2" for="id_h_fin_turno2" rendered="false"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:inputMask id="id_h_fin_turno2"
+                                         rendered="false"
+                                         mask="99:99:99"
+                                         value="#{genCtrlJornadaMB.genericaJornadaNew.hfinTurno2}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:outputLabel value="H. Ini Turno 3" for="id_h_ini_turno3" rendered="false"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:inputMask id="id_h_ini_turno3"
+                                         rendered="false"
+                                         mask="99:99:99"
+                                         value="#{genCtrlJornadaMB.genericaJornadaNew.hiniTurno3}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:outputLabel value="H. Fin Turno 3" for="id_h_fin_turno3" rendered="false"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:inputMask id="id_h_fin_turno3"
+                                         rendered="false"
+                                         mask="99:99:99"
+                                         value="#{genCtrlJornadaMB.genericaJornadaNew.hfinTurno3}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel value="Motivo del registro" for="motivo"/>
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0 ">
+                            <p:selectOneMenu id="motivo" 
+                                             value="#{genCtrlJornadaMB.i_genericaJornadaMotivo}" 
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             required="true"
+                                             requiredMessage="Motivo es requerido">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{genCtrlJornadaMB.genericaJornadaMotivoList}" 
+                                               var="items"
+                                               itemLabel="#{items.descripcion}"
+                                               itemValue="#{items.idGenericaJornadaMotivo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1"  style="padding: 0px;">
+                            <p:commandButton title="Actualizar Motivos"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{genCtrlJornadaMB.cargarMotivos()}"
+                                             update="form_turno:motivo"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="observacion" value="Observación"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding0 ">
+                            <p:inputTextarea id="observacion" 
+                                             required="true" 
+                                             maxlength="2000"
+                                             style="width: 100%; height: 150px; max-height: 150px"
+                                             value="#{genCtrlJornadaMB.genericaJornadaNew.observaciones}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             process="@this,
+                             form_turno:hora-ini-real,
+                             form_turno:hora-fin-real,
+                             form_turno:motivo,
+                             form_turno:observacion,
+                             form_turno:orden_tbj_div"
+                             action="#{genCtrlJornadaMB.guardarTurno()}"
+                             update="form_turno,formcontroljornada:serconlist,:formcontroljornada:cj-grow,msgs_turno"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarT" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

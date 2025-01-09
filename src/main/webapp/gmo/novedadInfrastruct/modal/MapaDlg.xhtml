@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="gmapDialog" 
+              widgetVar="dlgMap" 
+              modal="true" 
+              class="mr1024_50 mr500_90"
+              closable="false" 
+              position="center top"
+              appendTo="@(body)"
+              responsive="true">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="MAPA" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('dlgMap').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <p:gmap id="gmap" center="#{gmoNovInfrastructBean.latitud}, #{gmoNovInfrastructBean.logitud}" 
+                zoom="18" 
+                type="HYBRID" 
+                styleClass="mapClass"
+                model="#{gmoNovInfrastructBean.simpleModel}" >
+            <p:ajax event="pointSelect" 
+                    listener="#{gmoNovInfrastructBean.onPointSelect}" 
+                    update="msgs,gmap,:nov_novedad_infra_form:latitud,:nov_novedad_infra_form:longitud" />
+        </p:gmap>
+
+        <f:facet name="footer">
+            <div align="right">
+                <p:commandButton value="Seleccionar" onclick="PF('dlgMap').hide();"/>
+            </div>
+        </f:facet>
+
+    </p:dialog>
+</ui:composition>

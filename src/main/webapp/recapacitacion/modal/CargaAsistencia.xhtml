@@ -1,0 +1,169 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="CargarAsistenciaDlg" widgetVar="CargarAsistenciaDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Carga Asistencia, Evaluación, Fotos"
+              class="mr1024_50 mr1024_90" fitViewport="true" closeOnEscape="true"
+              position="center top">
+        <h:form id="frmPrincipalAsistente">
+            <p:dataTable 
+                paginator="true"
+                rows="10"
+                filterDelay="1000"
+                reflow="true"
+                currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                rowSelectMode="checkbox"
+                emptyMessage="No existen novedades encontrados"
+                id="dtAsistenteRecap" var="recap" 
+                scrollable="true"
+                widgetVar="wlVdtAsistenteRecap"
+                rowKey="#{recap.idRecapacitacionMaestro}"
+                selection="#{recapacitacionBean.lstRecapacitacionSelected}" 
+                value="#{recapacitacionBean.lstAsistente}">
+
+
+
+                <f:facet name="header">
+                    <p:ajax event="rowSelect" update="este" />
+                    <p:ajax event="rowUnselect" update="este" />
+                    <div align="right" style="display: flex; gap: 10px; align-items: center; justify-content: flex-end;">
+                        <h:outputText value="Fechas: " title="Fecha Inicio" style="margin-right: 5px;" />
+
+                        <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                    value="#{recapacitacionBean.fechaInicio}"
+                                    placeholder="Fecha Ini"
+                                    navigator="true"
+                                    readonlyInput="true"
+                                    pattern="dd-MM-yyyy" locale="es"
+                                    style="margin-right: 10px;">
+                        </p:calendar>
+
+                        <p:commandButton
+                            icon="fa fa-search"
+                            value="Buscar"
+                            class="cssWhite"
+                            style="margin-right: 15px; background-color: #4CAF50; color: white;"
+                            actionListener="#{recapacitacionBean.findAsistente()}"
+                            update="dtAsistenteRecap"
+                            />
+
+                        <p:commandButton oncomplete="PF('novedadDocumentos').show();"
+                                         id="este"
+                                         title="Agregar nuevo documento de asistencia" 
+                                         icon="fa fa-file-text"
+                                         class="cssWhite CyanButton" 
+                                         value="Doc. Asistencia"
+                                         update="frmNuevoDocumento"
+                                         actionListener="#{recapacitacionBean.preCargarDocs(1)}"
+                                         disabled="#{recapacitacionBean.lstRecapacitacionSelected == null or recapacitacionBean.lstRecapacitacionSelected.isEmpty()}"
+
+                                         />
+
+                        <p:commandButton oncomplete="PF('AddFilesListDialog').show();"
+                                         title="Agregar nuevo documento de evaluación" 
+                                         icon="fa fa-check-circle"
+                                         class="cssWhite CyanButton" 
+                                         value="Doc. Evaluación"
+                                         update="frmAddFiles"
+                                         actionListener="#{recapacitacionBean.preCargarDocs(2)}"
+                                         disabled="#{recapacitacionBean.lstRecapacitacionSelected == null or recapacitacionBean.lstRecapacitacionSelected.isEmpty()}"
+                                         />
+
+                        <p:commandButton oncomplete="PF('AddFilesListDialog').show();"
+                                         title="Agregar nuevo documento de fotos" 
+                                         icon="fa fa-camera"
+                                         class="cssWhite CyanButton" 
+                                         value="Doc. Fotos"
+                                         update="frmAddFiles"
+                                         actionListener="#{recapacitacionBean.preCargarDocs(3)}"
+                                         disabled="#{recapacitacionBean.lstRecapacitacionSelected == null or recapacitacionBean.lstRecapacitacionSelected.isEmpty()}"
+                                         />
+                    </div>
+
+                </f:facet>
+
+                <p:column selectionMode="multiple" style="width:50px;text-align:center "/>
+
+                <p:ajax event="rowSelectCheckbox" update="@form"/>
+                <p:ajax event="rowUnselectCheckbox" update="@form"/>
+                <p:ajax event="toggleSelect" update="@form" process="@this"/>
+
+
+
+                <p:column headerText="Fecha Novedad" 
+                          filterBy="#{recap.idNovedad.fecha}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{recap.idNovedad.fecha}" >
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Fecha Inoperable" 
+                          filterBy="#{recap.fechaInoperable}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{recap.fechaInoperable}">
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Código" 
+                          filterBy="#{recap.idEmpleado.codigoTm}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{recap.idEmpleado.codigoTm}" />
+                </p:column>
+
+                <p:column headerText="Cedula" 
+                          filterBy="#{recap.idEmpleado.identificacion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{recap.idEmpleado.identificacion}" />
+                </p:column>
+
+                <p:column headerText="Nombre" 
+                          filterBy="#{recap.idEmpleado.nombres}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{recap.idEmpleado.nombres}" />
+                </p:column>
+
+                <p:column headerText="Apellidos" 
+                          filterBy="#{recap.idEmpleado.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{recap.idEmpleado.apellidos}" />
+                </p:column>
+
+                <p:column headerText="Arch. Asistencia" styleClass="#{recap.pathAsistencia == null or recap.pathAsistencia.isEmpty() ? 'cssRed' : 'cssGreen'}">
+                    <h:outputText value="#{recap.pathAsistencia == null or recap.pathAsistencia.isEmpty() ? 'No' : 'Sí'}" 
+                                  style="color: white"/>
+                </p:column>
+
+                <p:column headerText="Arch. Evaluación" styleClass="#{recap.pathEvaluacion == null or recap.pathEvaluacion.isEmpty() ? 'cssRed' : 'cssGreen'}">
+                    <h:outputText value="#{recap.pathEvaluacion == null or recap.pathEvaluacion.isEmpty() ? 'No' : 'Sí'}" 
+                                  style="color: white"/>
+                </p:column>
+
+                <p:column headerText="Arch. Fotos" styleClass="#{recap.pathPhotos == null or recap.pathPhotos.isEmpty() ? 'cssRed' : 'cssGreen'}" >
+                    <h:outputText value="#{recap.pathPhotos == null or recap.pathPhotos.isEmpty() ? 'No' : 'Sí'}" 
+                                  style="color: white"/>
+                </p:column>
+
+
+
+                <f:facet name="footer">
+                    En total existen #{recapacitacionBean.lstAsistente.size()} registros.
+                    <div style="float: right;padding-bottom: 5px">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="dtAsistenteRecap" 
+                                            fileName="Procesos disciplinarios"/>
+                        </h:commandLink>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+    <ui:include src="CreateDocumento.xhtml"/>
+</ui:composition>

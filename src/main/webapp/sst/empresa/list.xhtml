@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            @media screen and (max-width: 500px ) {
+                .texto-blanco {
+                    color: white !important;
+                    font-weight: bolder !important;
+                }
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Registro de Empresas">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtEmpresas" var="empresa" 
+                             scrollable="true"
+                             widgetVar="dtEmpresas"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rowKey="#{empresa.idSstEmpresa}"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{sstEmpresaBean.lstSstEmpresas}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{sstEmpresaBean.nuevo()}"
+                                oncomplete="PF('wlvEmpresas').show();"
+                                class="cssWhite"
+                                update="dtEmpresas,:empresa,:frmEmpresa"
+                                >
+                                <p:resetInput target=":frmEmpresa:pGridDatos"/>
+                            </p:commandButton>   
+                            <p:spacer width="10"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtEmpresas" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column  headerText="NIT/Cédula">
+                        <h:outputText value="#{empresa.nitCedula}"/>
+                    </p:column>    
+                    <p:column headerText="Razón social"
+                              filterBy="#{empresa.razonSocial}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{empresa.razonSocial}"/>
+                    </p:column> 
+                    <p:column style="text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="Tipo de empresa"/>
+                        </f:facet>
+                        <h:outputText value="#{empresa.idSstEmpresaTipo.nombre.toUpperCase()}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Doc Representante">
+                        <h:outputText value="#{empresa.idSstTipoIdentificacionRepresentante.nombre}"/>
+                    </p:column>    
+                    <p:column headerText="Número Doc Representante" visible="false">
+                        <h:outputText value="#{empresa.numeroDocRepresentante}"/>
+                    </p:column>    
+                    <p:column headerText="Nombre Representante" visible="false">
+                        <h:outputText value="#{empresa.nombreRepresentante}"/>
+                    </p:column>    
+                    <p:column headerText="Representante Legal" 
+                              exportable="false"
+                              filterBy="#{empresa.numeroDocRepresentante} #{empresa.nombreRepresentante}">
+                        <h:outputText 
+                            value="#{empresa.numeroDocRepresentante} - "
+                            styleClass="cssBlack"
+                            />
+                        <h:outputText value="#{empresa.nombreRepresentante}"/>
+                    </p:column>  
+                    <p:column headerText="Dirección empresa">
+                        <h:outputText value="#{empresa.direccionEmpresa}"/>
+                    </p:column>    
+                    <p:column headerText="Teléfono empresa">
+                        <h:outputText value="#{empresa.telefonoEmpresa}"/>
+                    </p:column>    
+                    <p:column headerText="Email empresa" styleClass="text-word-wrap">
+                        <h:outputText value="#{empresa.emailEmpresa}"/>
+                    </p:column>    
+                    <p:column headerText="Tipo Doc Responsable">
+                        <h:outputText value="#{empresa.idSstTipoIdentificacionResponsable.nombre}"/>
+                    </p:column>    
+                    <p:column headerText="Número Doc Responsable" visible="false">
+                        <h:outputText value="#{empresa.numeroDocResponsable}"/>
+                    </p:column>    
+                    <p:column headerText="Nombre responsable" visible="false">
+                        <h:outputText value="#{empresa.nombreResponsable}"/>
+                    </p:column>
+                    <p:column headerText="Responsable SST" 
+                              filterBy="#{empresa.numeroDocResponsable} #{empresa.nombreResponsable}"
+                              filterMatchMode="contains"
+                              exportable="false">
+                        <h:outputText 
+                            value="#{empresa.numeroDocResponsable} - "
+                            styleClass="cssBlack"
+                            />
+                        <h:outputText value="#{empresa.nombreResponsable}"/>
+                    </p:column>
+                    <p:column headerText="Teléfono fijo Responsable">
+                        <h:outputText value="#{empresa.telefonoFijoResponsable}"/>
+                    </p:column>    
+                    <p:column headerText="Teléfono móvil responsable">
+                        <h:outputText value="#{empresa.telefonoMovilResponsable}"/>
+                    </p:column>    
+                    <p:column headerText="E-mail Responsable" styleClass="text-word-wrap">
+                        <h:outputText value="#{empresa.emailResponsable}"/>
+                    </p:column>    
+                    <p:column headerText="Nombre Usuario Empresa">
+                        <h:outputText value="#{empresa.usrNombre}"/>
+                    </p:column>    
+                    <p:column headerText="ARL" styleClass="text-center">
+                        <h:outputText value="#{empresa.idSstArl.nombre}"/>
+                    </p:column>    
+
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{sstEmpresaBean.editar()}"
+                                                 process="@this"
+                                                 update=":empresa,:frmEmpresa"
+                                                 oncomplete="PF('wlvEmpresas').show();"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{empresa}" target="#{sstEmpresaBean.selected}"/>
+                                    <p:resetInput target=":frmEmpresa:pGridDatos"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <p:commandButton styleClass="cssWhite OrangeButton"
+                                                 title="Ver listado de documentos"
+                                                 process="@this"
+                                                 update=":empresaDocumentos,:frmEmpresaDocs:dtDoc"
+                                                 oncomplete="PF('wlvEmpresaDocumentos').show();"
+                                                 icon="fa fa-file-text-o">
+                                    <f:setPropertyActionListener value="#{empresa}" target="#{sstEmpresaBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{sstEmpresaBean.lstSstEmpresas.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtEmpresas" 
+                                                fileName="Listado de empresas"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+        <ui:include src="modal/vistaDocumento.xhtml"/>
+        <ui:include src="modal/modalDocumentos.xhtml"/>
+    </ui:define>
+
+</ui:composition>

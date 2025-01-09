@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="NovedadesListDlg" widgetVar="NovedadesListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de Novedades"
+              class="mr1024_50 mr500_90" fitViewport="true" closeOnEscape="true"
+              position="center top">
+        <h:form id="frmNovedadesList">
+            <p:dataTable id="dtNovedades" 
+                         widgetVar="wdtNovedades"
+                         var="novedad" value="#{recapacitacionBean.lstNovedades}"
+                         paginator="true"
+                         rows="10"
+                         filterDelay="1000"
+                         reflow="true"
+                         selection="#{recapacitacionBean.lstNovedadesSeleccionadas}" 
+                         rowKey="#{novedad.idNovedad}"
+                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                         rowSelectMode="checkbox"
+                         emptyMessage="No existen novedades encontrados">
+
+                <f:facet name="header">
+                    <div align="right" jsf:id="botones">
+                        <h:outputText value="Fechas: " title="Fecha Inicio"
+                                      style="right: 300px"/>
+                        <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                    value="#{recapacitacionBean.fechaInicio}"
+                                    placeholder="Fecha Ini"
+                                    showOn="button"
+                                    navigator="true"
+                                    readonlyInput="true"
+                                    maxdate="today"
+                                    pattern="dd-MM-yyyy" locale="es"
+                                    style="right: 300px">
+                        </p:calendar>
+                        -
+                        <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                    value="#{recapacitacionBean.fechaFin}"
+                                    readonlyInput="true"
+                                    showOn="button"
+                                    navigator="true"
+                                    placeholder="Fecha Fin"
+                                    maxdate="today"
+                                    pattern="dd-MM-yyyy" locale="es"
+                                    style="right: 300px">
+                        </p:calendar>
+                        <p:spacer width="10"/>
+                        <p:commandButton
+                            icon="fa fa-search"
+                            value="Buscar"
+                            actionListener="#{recapacitacionBean.cargarListadoNovedad()}"
+                            class="cssWhite"
+                            update="dtNovedades"
+                            >
+                        </p:commandButton>    
+                    </div>
+                </f:facet>
+
+                <p:column selectionMode="multiple" style="width:50px;text-align:center "/>
+                
+                <p:column headerText="Fecha Novedad" 
+                          filterBy="#{novedad.fecha}" 
+                          filterMatchMode="startsWith"
+                          styleClass="text-center">
+
+                    <f:facet name="filter">
+                        <p:calendar id="search1" pattern="yyyy-MM-dd" 
+                                    locale="es"
+                                    autocomplete="off"
+                                    required="false"
+                                    navigator="true" showTodayButton="true"
+                                    inputStyle="width: 100%;"
+                                    placeholder="Fecha"
+                                    onkeyup="PF('wdtNovedades').filter()"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }">
+                            <p:ajax event="dateSelect" oncomplete="PF('wdtNovedades').filter()" update="dtNovedades"/>
+                        </p:calendar> 
+                    </f:facet>
+
+                    <h:outputText value="#{novedad.fecha}">
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Tipo Novedad" filterBy="#{novedad.idNovedadTipo.nombreTipoNovedad}">
+                    <h:outputText value="#{novedad.idNovedadTipo.nombreTipoNovedad}" />
+                </p:column>
+
+                <p:column id="detTipoNovedad" filterBy="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+                    <f:facet name="header">
+                        <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                    </f:facet>
+                    <h:outputText value="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}" 
+                                  title="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                                  rendered="#{novedad.idNovedadDano eq null and novedad.idMulta eq null}" />
+
+                    <h:outputText value="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                                  title="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                                  rendered="#{novedad.idNovedadTipoDetalle.idNovedadTipoDetalle gt 0 and novedad.idMulta.idMulta gt 0}" />
+
+                    <h:outputText value="#{novedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}" 
+                                  title="#{novedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}"
+                                  rendered="#{novedad.idNovedadDano.idNovedadDano gt 0}"/>
+
+                    <h:outputText value="#{novedad.idMulta.idMultaTipo.tipo}" 
+                                  title="#{novedad.idMulta.idMultaTipo.tipo}"
+                                  rendered="#{novedad.idMulta.idMulta gt 0 and novedad.idNovedadTipoDetalle eq null}"/>
+                </p:column>
+
+                <p:column exportable="false" filterBy="#{novedad.idEmpleado.codigoTm} #{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}"
+                          filterMatchMode="contains"
+                          headerText="Operador">
+                    <h:outputText value="#{novedad.idEmpleado.codigoTm}" class="cssBlack"/>
+                    <h:outputText value=" #{novedad.idEmpleado.nombres.concat(' ').concat(novedad.idEmpleado.apellidos)}"/>
+                </p:column>
+
+                <p:column headerText="Observaciones" class="cortar">
+                    <h:outputText value="#{novedad.observaciones}" />
+                </p:column>
+                <f:facet name="footer">
+                    <p:commandButton class="cssWhite"
+                                     icon="fa fa-check" 
+                                     value="Seleccionar"
+                                     update=":frmRecapMaestro:dtRecapMaestroDetalle,:msgs,:frmRecapMaestro"
+                                     action="#{recapacitacionBean.crearListaDetalles()}">
+                    </p:commandButton>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+    
+</ui:composition>

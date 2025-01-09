@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <h:form id="frmListaTipoDocu">
+        <p:dialog id="TipoDocuListDlg" 
+                  closeOnEscape="true" 
+                  class="responsive_modal"
+                  fitViewport="true"
+                  widgetVar="TipoDocuListDialog" modal="true" 
+                  position="top"
+                  resizable="false" appendTo="@(body)" height="400" width="700">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Un click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="emplTD" id="tablaTD" value="#{emplDocJSFMB.listEmplTipoDoc}"  
+                         selectionMode="single" selection="#{emplDocJSFMB.emplTDoc}"                       
+                         rowIndexVar="nroFila"
+                         rows="5"
+                         filterDelay="1000"
+                         paginator="true"
+                         reflow="true"
+                         rowKey="#{emplTD.idEmpleadoTipoDocumento}"
+                         emptyMessage="No existen Tipos de Documentos registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{emplDocJSFMB.onRowDblClckSelectTD}"
+                        update="msgs"
+                        global="false" />
+                <p:column headerText="#" style="width: 10%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column  headerText="Nombre"
+                           filterMatchMode="contains"
+                           filterBy="#{emplTD.nombreTipoDocumento}">
+                    <h:outputText  value="#{emplTD.nombreTipoDocumento}" />
+                </p:column>
+                <p:column headerText="Descripción"
+                          filterMatchMode="contains"
+                          filterBy="#{emplTD.descripcionTipoDocumento}">
+                    <h:outputText value="#{emplTD.descripcionTipoDocumento}" />
+
+                </p:column>
+            </p:dataTable>
+        </p:dialog>
+    </h:form>
+</ui:composition>

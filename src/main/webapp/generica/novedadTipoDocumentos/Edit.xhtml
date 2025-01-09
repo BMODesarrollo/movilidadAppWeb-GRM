@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <p:dialog id="NovedadTipoDocumentosEditDlg" 
+              widgetVar="NovedadTipoDocumentosEditDialog" 
+              closeOnEscape="true"
+              modal="true" resizable="false" appendTo="@(content)" 
+              header="Modificar Tipo de Documento">
+        <h:form id="NovedadTipoDocumentosEditForm">
+            <p:growl id="growl"   life="3000" /> 
+            <h:panelGroup id="display">
+                <h:panelGrid cellpadding="5" columns="1" rendered="#{genericaTipoDocumentosController.selected != null}">
+
+                    <p:fieldset  legend="Tipo de Documento" >
+                        <p:inputText style="width:400px"  maxlength="45" id="nombreTipoDocumento" value="#{genericaTipoDocumentosController.selected.nombreTipoDocumento}" title="Registrar Tipo Deocumento" required="true" requiredMessage="Debe Ingresar Tipo de Documento">
+                            <f:validateLength minimum="1" /></p:inputText>
+                    </p:fieldset>
+
+                    <p:fieldset  legend="Descripción" >
+                        <p:inputTextarea 
+                            counter="displa"
+                            counterTemplate="{0} caracteres restantes."
+                            style="width: 400px"
+                            maxlength="100" 
+                            id="descripcionTipoDocumento" 
+                            value="#{genericaTipoDocumentosController.selected.descripcionTipoDocumento}" 
+                            title="#{bundle.CreateNovedadTipoDocumentosTitle_descripcionTipoDocumento}" />
+                        <br/>
+                        <h:outputText id="displa" />
+                    </p:fieldset>
+                </h:panelGrid>
+                <p:messages id="msgs" />  
+
+                <p:spacer  height="40" width="10" />
+                <p:commandButton 
+                    actionListener="#{genericaTipoDocumentosController.update}" 
+                    value="Guardar" update="display,:NovedadTipoDocumentosListForm:datalist,@form" 
+                    />
+                <p:commandButton
+                    value="#{bundle.Cancel}" 
+                    action="#{genericaTipoDocumentosController.reset()}"
+                    update=":NovedadTipoDocumentosListForm:datalist"
+                    oncomplete="PF('NovedadTipoDocumentosEditDialog').hide();" 
+                    />
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>
+

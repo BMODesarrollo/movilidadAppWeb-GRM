@@ -1,0 +1,91 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dataTable var="reporte"
+                 id="dtReporteConsulta"
+                 reflow="true"
+                 paginator="true"
+                 scrollable="true"
+                 scrollHeight="600"
+                 filterDelay="1700"
+                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                 rowsPerPageTemplate="10,50,100"
+                 emptyMessage="No se han encontrado registos."
+                 rowStyleClass="TexAlCenter"
+                 value="#{reporteConsultaProgramacionBean.lstPrgTcs}" 
+                 rowIndexVar="idx" rows="20">
+        <p:column headerText="Fecha">
+            <h:outputText value="#{reporte.fecha}" >
+                <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="Hora Inicio"
+                  sortable="true"
+                  sortBy="#{reporte.timeOrigin}">
+            <h:outputText value="#{reporte.timeOrigin}" />
+        </p:column>
+        <p:column headerText="Hora Fin"
+                  sortable="true"
+                  sortBy="#{reporte.timeOrigin}">
+            <h:outputText value="#{reporte.timeDestiny}" />
+        </p:column>
+        <p:column headerText="Lugar Inicio">
+            <h:outputText value="#{reporte.fromStop.name}" />
+        </p:column>
+        <p:column headerText="Lugar Fin">
+            <h:outputText value="#{reporte.toStop.name}" />
+        </p:column>
+        <p:column headerText="Tarea" filterBy="#{reporte.idTaskType.tarea}" 
+                  filterMatchMode="contains">
+            <h:outputText value="#{reporte.idTaskType.tarea}" />
+        </p:column>
+        <p:column headerText="Tabla" filterBy="#{reporte.tabla}" 
+                  filterMatchMode="contains">
+            <h:outputText value="#{reporte.tabla}" />
+        </p:column>
+        <p:column headerText="Servbus">
+            <h:outputText value="#{reporte.servbus}" />
+        </p:column>
+        <p:column headerText="Bus" 
+                  filterBy="#{reporte.idVehiculo.codigo}" 
+                  filterMatchMode="contains">
+            <h:outputText value="#{reporte.idVehiculo.codigo}" />
+        </p:column>
+        <p:column headerText="Sercon" 
+                  filterBy="#{reporte.sercon}" 
+                  filterMatchMode="contains">
+            <h:outputText value="#{reporte.sercon}" />
+        </p:column>
+        <p:column exportable="false" filterBy="#{reporte.idEmpleado.nombres} #{reporte.idEmpleado.apellidos}"
+                  filterMatchMode="contains"
+                  headerText="Operador">
+            <h:outputText value=" #{reporte.idEmpleado.nombres.concat(' ').concat(reporte.idEmpleado.apellidos)}"/>
+        </p:column>
+
+        <p:column visible="false" headerText="Código">
+            <h:outputText value="#{reporte.idEmpleado.codigoTm}" rendered="#{reporte.idEmpleado != null}"/>
+            <h:outputText value="N/A" rendered="#{reporte.idEmpleado eq null}"/>
+        </p:column>
+        <p:column visible="false" 
+                  headerText="Nombre Operador" 
+                  filterMatchMode="contains">
+            <h:outputText value="#{reporte.idEmpleado.nombres} #{reporte.idEmpleado.apellidos}" rendered="#{reporte.idEmpleado != null}"/>
+        </p:column>
+        <f:facet name="footer">
+            En total existen #{reporteConsultaProgramacionBean.lstPrgTcs.size()} registrados.
+            <div style="float: right;padding-bottom: 5px" align="center">
+                <h:commandLink>
+                    <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                         alt="excel" style="width: 24px;height: 24px"/>
+                    <p:dataExporter type="xlsx" target="dtReporteConsulta" fileName="Reporte Consulta de programación individual"/>
+                </h:commandLink>
+            </div>
+        </f:facet>
+    </p:dataTable>
+
+</ui:composition>     

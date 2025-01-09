@@ -1,0 +1,164 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <ui:define name="head">
+        <style>
+            .ui-chips-token .ui-chips-token-icon {
+                cursor: pointer;
+                margin-top: -9px;
+                position: absolute;
+                right: .2em;
+                top: 50%;
+                background-color: black;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Bitácora Infraestructura">
+                <p:dataTable id="datalist" 
+                             value="#{actividadInfraDiariaJSF.listActividadInfraDiaria}"
+                             var="actD"
+                             filterDelay="2000"
+                             paginator="true"
+                             rowKey="#{rwVar + 1}"
+                             rowIndexVar="rwVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             emptyMessage="No existen registros">
+
+                    <f:facet name="header">
+                        <div style="float: right">
+                            <p:commandButton id="toggle" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify"  
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="datalist" trigger="toggle" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px" exportable="false">
+                        <p:outputLabel value="#{rwVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Fecha">
+                        <h:outputText value="#{actD.fechaHora}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Estación o Línea" 
+                              filterBy="#{actD.idEstacion.nombre} #{actD.idPilona.nombre}" filterMatchMode="contains">
+                        <h:outputText value="#{actD.idEstacion.nombre} "
+                                      title="#{actD.idEstacion.codigo}" 
+                                      rendered="#{actD.idEstacion != null}"/>
+                        <h:outputText value="#{actD.idPilona.nombre}" 
+                                      title="#{actD.idPilona.codigo}"
+                                      rendered="#{actD.idPilona != null}"/>
+                    </p:column>
+                    <p:column headerText="Hora Inicio">
+                        <h:outputText value="#{actD.horaInicio}">
+                            <f:convertDateTime pattern="HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Finalización">
+                        <h:outputText value="#{actD.horaFin}">
+                            <f:convertDateTime pattern="HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo Actividad" 
+                              filterBy="#{actD.idActividadInfraTipo.nombre}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{actD.idActividadInfraTipo.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Actividad Det" 
+                              filterBy="#{actD.idActividadInfraTipoDet.nombre}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{actD.idActividadInfraTipoDet.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Empleados" class="cortar" width="20%">
+                        <h:outputText value="#{actD.nombresEmpleados}"/>
+                    </p:column>
+                    <p:column headerText="Descripción" class="cortar" width="20%">
+                        <h:outputText value="#{actD.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Usuario" visible="false">
+                        <h:outputText value="#{actD.username}"/>
+                    </p:column>
+                    <p:column headerText="Acciones" style="width: 70px;text-align: center" exportable="false">
+                        <p:commandButton id="editButton"   
+                                         update="dial-modal" 
+                                         icon="fa fa-pencil" 
+                                         title="Editar"
+                                         actionListener="#{actividadInfraDiariaJSF.onActividadInfraDiaria(actD)}"
+                                         class="cssWhite GreenButton"
+                                         oncomplete="PF('modalDlg').show()">
+                            <p:resetInput target="form-modal"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:calendar id="ini" 
+                                        value="#{actividadInfraDiariaJSF.dInicio}" 
+                                        locale="es"
+                                        title="Fecha inicio"
+                                        inputStyle="width: 120px"
+                                        pattern="yyyy-MM-dd" 
+                                        mask="true" >
+                                <p:ajax event="dateSelect" listener="#{actividadInfraDiariaJSF.buscar()}" 
+                                        update="datalist,:form:msg" 
+                                        process="@this,ini,fin" />
+                            </p:calendar>
+                            <p:calendar id="fin" 
+                                        value="#{actividadInfraDiariaJSF.dFin}" 
+                                        locale="es"
+                                        title="Fecha fin"
+                                        inputStyle="width: 120px"
+                                        pattern="yyyy-MM-dd" 
+                                        mask="true" >
+                                <p:ajax event="dateSelect" listener="#{actividadInfraDiariaJSF.buscar()}" 
+                                        update="datalist,:form:msg" 
+                                        process="@this,ini,fin" />
+                            </p:calendar>
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             actionListener="#{actividadInfraDiariaJSF.prepareGuardar()}" 
+                                             update="dial-modal" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             oncomplete="PF('modalDlg').show()">
+                                <p:resetInput target="form-modal"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="bitacora actividad diaria #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="bitacora actividad diaria #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="bitacora actividad diaria #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/administracion.xhtml"/>
+        <ui:include src="modal/estacion.xhtml"/>
+        <ui:include src="modal/pilona.xhtml"/>
+        <ui:include src="modal/ListaEmpleados.xhtml"/>
+    </ui:define>
+</ui:composition>

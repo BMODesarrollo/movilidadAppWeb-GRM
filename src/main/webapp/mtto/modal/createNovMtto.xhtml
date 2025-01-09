@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog header="Nueva Novedad Mantenimiento #{novedadMttoMB.tcVehiculo.idVehiculo.codigo}" 
+              id="dlgNovMttoID" 
+              closeOnEscape="true" widgetVar="dlgNovMttoWV"
+              closable="false"
+              class="mr1024_90 mr500_90"
+              appendTo="@(body)" position="top" responsive="true" 
+              modal="true" resizable="false">
+        <h:form id="formCreateNovMtto">
+            <p:messages id="mttoNovMsgs" showDetail="true"/>
+            <div class="ui-fluid " >
+                <div class="ui-g ">
+                    <ui:repeat value="#{novedadMttoMB.listCompontes}" var="comp">
+                        <div class="ui-g-6 ui-md-3 ui-lg-2 Padding1" style="text-align: center !important">
+                            <p:commandLink value="#{comp.descripcion}" style="color: black;" 
+                                           action="#{novedadMttoMB.getComponentesView(comp)}"
+                                           oncomplete="PF('componentesFallasWv').show()" 
+                                           update="componentesFallasDlg"
+                                           process="@this">
+                                <div style="#{novedadMttoMB.mttoNovAbiertasByIdComp(comp.idMttoComponente) eq 1? 'background-color: yellow;' : 'background-color: white;'}border-radius: 5px;">
+                                    <h:graphicImage name="#{comp.icono}" width="50" library="sentinel-layout"/>
+                                </div>
+                            </p:commandLink>
+                        </div>
+                    </ui:repeat>
+                </div>
+            </div>
+
+            <p:dataTable  id="tblNovMtto" var="nov"
+                          value="#{novedadMttoMB.listNovedadMtto}"
+                          rows="5"
+                          reflow="true"
+                          paginatorPosition="bottom"
+                          rowIndexVar="index"
+                          paginator="true"
+                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                          {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                          rowsPerPageTemplate="5,10">
+
+                <p:column headerText="#" width="10%">
+                    <h:outputText value="#{index+1}" />
+                </p:column>
+                <p:column headerText="Componente">
+                    <h:outputText value="#{nov.idMttoComponente.nombre}" />
+                </p:column>
+
+                <p:column headerText="Comp. Falla">
+                    <h:outputText value="#{nov.idMttoComponenteFalla.falla}"/>
+                </p:column>
+
+                <p:column headerText="Observación">
+                    <h:outputText value="#{nov.observaciones}"/>
+                </p:column>
+
+                <p:column style="width:7%;" >
+
+                    <p:commandButton icon="fa fa-close"
+                                     id="deleteService_id"
+                                     process="@this"
+                                     action="#{novedadMttoMB.onDeleteNovMtto(index)}"
+                                     class="RedButton cssWhite"
+                                     update="tblNovMtto"
+                                     title="Eliminar">
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             process="@this,formCreateNovMtto"
+                             action="#{novedadMttoMB.guardarNovMtto()}"
+                             update="formCreateNovMtto,msgs,mttoNovMsgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton id="btnGuardarNovMtto" 
+                                 icon="fa fa-save" value="Guardar" 
+                                 class="cssWhite GreenButton" onclick="rc()"/>
+                <p:commandButton id="btnCerar" 
+                                 icon="fa fa-times" value="Cerrar" 
+                                 oncomplete="PF('dlgNovMttoWV').hide()" class="cssWhite RedButton" />
+            </div>
+        </f:facet>
+
+    </p:dialog>
+    <ui:include src="modal/componentesFallas.xhtml"/>
+</ui:composition>
+

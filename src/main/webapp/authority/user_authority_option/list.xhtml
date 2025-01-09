@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="AUTHORITY OPTIONS">
+            <h:form id="frmCheckList">
+                <p:dataTable id="dtCheckLists" 
+                             var="autOption" 
+                             reflow="true"
+                             paginator="true"
+                             rows="20"
+                             selectionMode="single" 
+                             selection="#{userAuthorityOptBean.selected}" 
+                             rowKey="#{autOption.idUserAuthorityOption}"
+                             filterDelay="1700"
+                             emptyMessage="No se encontraron registros!!"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             widgetVar="dtCheckList"
+                             value="#{userAuthorityOptBean.lstUserAuthorityOptions}">
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton value="Editar"
+                                             rendered="#{userAuthorityOptBean.selected != null}"
+                                             styleClass="GreenButton cssWhite"
+                                             action="#{userAuthorityOptBean.editar()}" 
+                                             update=":checklistEdit,:frmCheckListEdit" 
+                                             icon="fa fa-pencil">
+                                <p:resetInput target=":frmCheckListEdit:pGridDatos"/>
+                            </p:commandButton>
+                            <p:spacer width="10"/>
+                            <p:commandButton oncomplete="PF('checklistDlg').show()"
+                                             action="#{userAuthorityOptBean.nuevo()}"
+                                             update=":checklist,:frmCheckListAdd,dtCheckLists"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmCheckListAdd:pGridDatos"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    
+                    <p:ajax event="rowSelect" update="botones" />
+                    
+                    <p:column headerText="Rol" styleClass="text-center"
+                              filterBy="#{autOption.idUserAuthority.authority}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{autOption.idUserAuthority.authority}" />
+                    </p:column>
+
+                    <p:column headerText="Menú" styleClass="text-center"
+                              filterBy="#{autOption.idOpcion.descripcion}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{autOption.idOpcion.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="Opción" styleClass="text-center"
+                              filterBy="#{autOption.idOpcion.nameop}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{autOption.idOpcion.nameop}" />
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{userAuthorityOptBean.lstUserAuthorityOptions.size()} registro(s).
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtCheckLists" fileName="LISTADO"
+                                                />
+                            </h:commandLink>
+                            <h:commandLink rendered="false">
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 34px;height: 34px"/>
+                                <p:dataExporter type="pdf" target="dtCheckLists" fileName="LISTADO"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+                <p:contextMenu for="dtCheckLists">
+                    <p:menuitem value="Editar" action="#{userAuthorityOptBean.editar()}" 
+                                update=":checklistEdit,:frmCheckListEdit" icon="fa fa-pencil">
+                        <p:resetInput target=":frmCheckListEdit:pGridDatos"/>
+                    </p:menuitem>
+                </p:contextMenu>
+            </h:form>
+        </p:panel>
+        <ui:include src="child/create.xhtml"/>
+        <ui:include src="child/edit.xhtml"/>
+    </ui:define>
+
+</ui:composition>

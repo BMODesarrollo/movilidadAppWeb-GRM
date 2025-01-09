@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="cabinaMd" 
+              closeOnEscape="true" 
+              widgetVar="cabinaDlg"
+              modal="true"
+              header="CABINAS"
+              resizable="false" 
+              class="mr1024_50 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal-cab">
+            <p:dataTable id="tabla-cabina"
+                         var="cab" 
+                         value="#{novedadMttoDiariaJSF.listCableCabina}"  
+                         paginator="true"
+                         filterDelay="2000"
+                         rows="10"
+                         rowsPerPageTemplate="10,20,50"
+                         reflow="true"
+                         rowIndexVar="nroFila"
+                         selectionMode="single"
+                         rowKey="#{cab.idCableCabina}"
+                         widgetVar="wvCab"
+                         emptyMessage="No existen registros">
+
+                <p:ajax event="rowSelect" 
+                        process="@this"
+                        update=":form-modal:cabina"
+                        listener="#{novedadMttoDiariaJSF.onGetCabina}" />
+
+                <f:facet name="paginatorTopRight">
+                    <p:commandButton id="null"   
+                                     value="Null"
+                                     title="Volver Cabina null"
+                                     actionListener="#{novedadMttoDiariaJSF.onNullCabina()}" 
+                                     icon="fa fa-check" 
+                                     process="@this"
+                                     update=":form-modal:cabina"
+                                     class="cssWhite RedButton" />
+                </f:facet>
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Nombre" filterBy="#{cab.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{cab.nombre}" />
+                </p:column>
+                <p:column headerText="Código" filterBy="#{cab.codigo}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{cab.codigo}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

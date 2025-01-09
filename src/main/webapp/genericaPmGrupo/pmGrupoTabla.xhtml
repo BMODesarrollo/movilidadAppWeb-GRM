@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <ui:define name="content">
+        <p:panel header="PM Grupos" > 
+            <h:form id="formTablaGenPmGrupos" >
+                <p:dataTable id="tblOPkM" var="item"  editable="true" 
+                             value="#{genPmGrupoJSF.listGenPmGrup}" rows="15"
+                             paginator="true"
+                             widgetVar="tblOPkMWVNew"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             filterDelay="1000"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15,25">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="btnAdd"
+                                             value="Nuevo"
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             oncomplete="PF('genPmGrupoDialog').show()"
+                                             process="@this"
+                                             update="frmGenPmgrupoCreate"
+                                             actionListener="#{genPmGrupoJSF.openDialog()}">
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#"  style="width: 10%">
+                        <h:outputText value="#{nroFila+1}"/>
+                    </p:column>
+                    <p:column headerText="Nombre" filterBy="#{item.nombreGrupo}" 
+                              filterMatchMode="contains"
+                              width="180">
+                        <h:outputText value="#{item.nombreGrupo}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idEmpleado.identificacion}"
+                              filterMatchMode="contains"
+                              headerText="Master">
+                        <h:outputText  value="#{item.idEmpleado.identificacion}-
+                                       #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.descripcion}"
+                              filterMatchMode="contains"
+                              headerText="Descripción">
+                        <h:outputText value="#{item.descripcion}" styleClass="cortar"/>
+                    </p:column>
+                    <p:column filterBy="#{genPmGrupoJSF.nOpe(item)}"
+                              filterMatchMode="contains"
+                              headerText="# Empleados">
+                        <h:outputText value="#{genPmGrupoJSF.nOpe(item)}"/>
+                    </p:column>
+                    <p:column headerText="Opciones" width="10%" 
+                              styleClass="text-center">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         update="frmGenPmgrupoCreate"
+                                         process="@this"
+                                         oncomplete="PF('genPmGrupoDialog').show();"
+                                         actionListener="#{genPmGrupoJSF.editar(item)}"
+                                         title="Modificar" 
+                                         disabled="#{item.estadoReg==1}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/pmgrupoCreate.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+
+

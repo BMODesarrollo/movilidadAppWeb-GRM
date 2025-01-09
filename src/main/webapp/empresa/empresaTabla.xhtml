@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content" >
+        <p:panel header="Empresas" > 
+            <h:form id="formEmpresaTabla">
+                <div align="right">
+                    <p:commandButton id="btnAdd"
+                                     value="Agregar"
+                                     icon="fa fa-plus"
+                                     class="cssWhite"
+                                     process="@this"
+                                     action="#{emprJSFMB.openDialog()}"
+                                     update="formEmpresa,dialogid"
+                                     oncomplete="PF('dialogE').show();">
+                        <p:resetInput target="dialogid" />
+                    </p:commandButton>
+                    <p:spacer width="2"/>
+                    <p:commandButton id="toggler" type="button" 
+                                     title="Columnas" style="float:right" 
+                                     icon="fa fa-align-justify" 
+                                     class="OrangeButton cssWhite"/>
+                    <p:columnToggler datasource="formTablaEmpresa:tblE" trigger="toggler" />
+                </div>
+            </h:form>
+            <h:form id="formTablaEmpresa">
+                <p:dataTable id="tblE" var="emprs"  editable="true" 
+                             value="#{emprJSFMB.listaEmpresas}" rows="10"
+                             paginator="true"
+                             filterDelay="1000"
+                             rowIndexVar="nroFila"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column filterBy="#{emprs.nit}"
+                              filterMatchMode="contains"
+                              headerText="#NIT">
+                        <h:outputText value="#{emprs.nit}"/>
+                    </p:column>
+                    <p:column filterBy="#{emprs.sigla}"
+                              filterMatchMode="contains"
+                              headerText="Sigla">
+                        <h:outputText value="#{emprs.sigla}"/>
+                    </p:column>
+                    <p:column filterBy="#{emprs.nombreCorto}"
+                              filterMatchMode="contains"
+                              headerText="Nombre Corto">
+                        <h:outputText value="#{emprs.nombreCorto}"/>
+                    </p:column>
+                    <p:column filterBy="#{emprs.razonSocial}"
+                              filterMatchMode="contains"
+                              headerText="Razón Social">
+                        <h:outputText value="#{emprs.razonSocial}"/>
+                    </p:column>
+                    <p:column filterBy="#{emprs.contacto}"
+                              filterMatchMode="contains"
+                              headerText="Nombre Contacto">
+                        <h:outputText value="#{emprs.contacto}"/>
+                    </p:column>
+                    <p:column filterBy="#{emprs.telefono}"
+                              filterMatchMode="contains"
+                              headerText="Teléfono">
+                        <h:outputText value="#{emprs.telefono}"/>
+                    </p:column>
+
+
+
+                    <p:column headerText="Opciones" style="width:15%; text-align: center" exportable="false">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         update="formEmpresa,dialogid"
+                                         oncomplete="PF('dialogE').show();"
+                                         action="#{emprJSFMB.editar(emprs)}"
+                                         title="Modificar" 
+                                         disabled="#{emplDept.estadoReg==1}"/>
+
+                    </p:column>
+                    <f:facet name="footer">
+                        <div align="right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="tblE" fileName="empresa #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="tblE" fileName="empresa #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="tblE" fileName="empresa #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/empresa.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+
+

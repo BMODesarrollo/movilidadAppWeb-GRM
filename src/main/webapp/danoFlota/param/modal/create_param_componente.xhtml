@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="id_create_dlg" 
+              class="modalResponsivoGS"
+              closable="false"
+              widgetVar="wv_create_dlg" modal="true" 
+              position="center top" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Parametrización componentes daño a flota" class="cssWhite"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="form_create_dlg_severidad">
+            <p:messages showDetail="true" id="msgs_create_dlg">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:outputLabel value="Grupo" for="@next"/>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:selectOneMenu  
+                        required="true"
+                        requiredMessage="Debe seleccionar el tipo de vehículo para el grupo"
+                        filter="true"
+                        style="width: 80%"
+                        value="#{danoFlotaComponenteJSF.idGrupo}">
+                        <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}" />
+                        <f:selectItems 
+                            var="tipo"
+                            value="#{danoFlotaComponenteJSF.listGrupo}"
+                            itemLabel="#{tipo.grupo}"
+                            itemValue="#{tipo.idComponenteGrupo}"
+                            />
+                    </p:selectOneMenu>
+                </div>
+            </div>
+            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:outputLabel value="Nombre" for="@next"/>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:inputText required="true" 
+                                 requiredMessage="Debe ingresar el nombre del componente" value="#{danoFlotaComponenteJSF.danoFlotaComponente.nombre}" />
+                </div>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:outputLabel value="Descripción" for="@next"/>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:inputTextarea autoResize="false"
+                                     style="width: 100%;"
+                                     value="#{danoFlotaComponenteJSF.danoFlotaComponente.descripcion}"
+                                     required="true"
+                                     requiredMessage="Debe ingresar la descripción"/>
+                </div>
+
+            </div>
+
+            <p:remoteCommand name="rc"
+                             process="@this,form_create_dlg_severidad,"
+                             rendered="#{danoFlotaComponenteJSF.idComponente==0}"
+                             update="msgs,
+                             msgs_create_dlg,
+                             frm_principal:dt_param_severidad,
+                             form_create_dlg_severidad" 
+                             action="#{danoFlotaComponenteJSF.guardar()}" />
+            <p:remoteCommand name="rc_upd"
+                             process="@this,form_create_dlg_severidad,"
+                             rendered="#{danoFlotaComponenteJSF.idComponente!=0}"
+                             update="msgs,
+                             msgs_create_dlg,
+                             frm_principal:dt_param_severidad,
+                             form_create_dlg_severidad" 
+                             action="#{danoFlotaComponenteJSF.editarTransactional(danoFlotaComponenteJSF.danoFlotaComponente)}" />
+        </h:form>
+        <f:facet name="footer">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 0px">
+                        <center>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6" style="padding: 0px">
+                                <p:commandButton id="btnGuardar" 
+                                                 rendered="#{danoFlotaComponenteJSF.idComponente==0}"
+                                                 icon="fa fa-save" value="Guardar" 
+                                                 class="cssWhite" onclick="rc()">
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6" style="padding: 0px">
+                                <p:commandButton id="btnActualizar" 
+                                                 rendered="#{danoFlotaComponenteJSF.idComponente!=0}"
+                                                 icon="fa fa-save" value="Actualizar" 
+                                                 class="cssWhite" onclick="rc_upd()">
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6" style="padding: 0px">
+                                <p:commandButton value="Cerrar" icon="fa fa-times" action="#{danoFlotaComponenteJSF.cerrar()}"
+                                                 class="cssWhite RedButton" onclick="PF('wv_create_dlg').hide()"  >
+                                </p:commandButton>
+                            </div>
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+
+
+

@@ -1,0 +1,125 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="crear_audi_pregunta_dialog"
+              widgetVar="crear_audi_pregunta_dialog_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_60 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Pregunta Para Auditoría"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('crear_audi_pregunta_dialog_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="crear_audi_pregunta_dialog_form">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                        <p:outputLabel for="input_numero" value="Número"/>
+                        <p:spinner id="input_numero"
+                                   required="true"
+                                   requiredMessage="Digite un valor numerico entero"
+                                   value="#{audiPreguntaJSFMB.audiPregunta.numero}" 
+                                   min="0" 
+                                   max="999" />
+                    </div>
+                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                        <p:outputLabel for="input_codigo" value="Código"/>
+                        <p:inputText id="input_codigo" maxlength="8" required="true" requiredMessage="Digite un código."
+                                     value="#{audiPreguntaJSFMB.audiPregunta.codigo}" />
+                    </div>
+                    <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5">
+
+                        <p:outputLabel for="select_tipo_respuesta" value="Tipo Respuesta" />
+                        <p:selectOneMenu id="select_tipo_respuesta" 
+                                         value="#{audiPreguntaJSFMB.i_tipoRespuesta}" 
+                                         filter="true"
+                                         required="true"
+                                         filterMatchMode="contains">
+                            <p:ajax global="false"/>
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{audiPreguntaJSFMB.listTipoRespuesta}" 
+                                           var="tipoRespuesta"
+                                           itemDescription="#{audiPreguntaJSFMB.tipoRespuestaDesc(tipoRespuesta)}"
+                                           itemLabel="#{tipoRespuesta.nombre}"
+                                           itemValue="#{tipoRespuesta.idAuditoriaTipoRespuesta}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                        <p:outputLabel for="label_req" value="Requerida"/>
+                        <p:selectBooleanButton 
+                            id="label_req" 
+                            value="#{audiPreguntaJSFMB.audiPregunta.req}" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            onLabel="Sí" 
+                            offLabel="No">
+                            <p:ajax process="@this" global="false"/>
+                        </p:selectBooleanButton>
+                        <p:tooltip id="toolTip_label_req" 
+                                   for="label_req" 
+                                   value="Ideal para indicar si la respuesta requiere una respuesta. Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="input_enunciado" value="Enunciado"/>
+                        <p:inputText id="input_enunciado" required="true" maxlength="150" 
+                                     requiredMessage="Digite un enunciado."
+                                     value="#{audiPreguntaJSFMB.audiPregunta.enunciado}" />
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{audiPreguntaJSFMB.guardar()}"
+                             rendered="#{audiPreguntaJSFMB.audiPregunta.idAuditoriaPregunta==null}"
+                             process="@this,input_enunciado,input_codigo,input_numero,select_tipo_respuesta"
+                             update="msgs,
+                             audi_pregunta:datalist,crear_audi_pregunta_dialog_form"/>
+            <p:remoteCommand name="rcc" 
+                             class="cssWhite"
+                             action="#{audiPreguntaJSFMB.edit()}"
+                             rendered="#{audiPreguntaJSFMB.audiPregunta.idAuditoriaPregunta!=null}"
+                             process="@this,input_enunciado,input_codigo,input_numero"
+                             update="msgs,crear_audi_pregunta_dialog_form,
+                             audi_pregunta:datalist"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarL" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             rendered="#{audiPreguntaJSFMB.audiPregunta.idAuditoriaPregunta==null}"
+                             onclick="rc()"/>
+            <p:commandButton id="btnGuardarLC" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{audiPreguntaJSFMB.audiPregunta.idAuditoriaPregunta!=null}"
+                             value="Actualizar" 
+                             onclick="rcc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

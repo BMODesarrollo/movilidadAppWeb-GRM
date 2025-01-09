@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <ui:define name="content">
+        <p:panel header="Parametrizador motivo reporte semana actual.">
+            <h:form id="frm_principal">
+                <p:dataTable var="item" value="#{semanaActualBean.listMotivos}"
+                             id="dt_motivo"
+                             scrollable="true"
+                             scrollHeight="600"
+                             widgetVar="dt_motivo_WV"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1700"
+                             paginator="true"
+                             rowKey="#{item.idMotivo}"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen datos registrados">
+                    <p:cache disabled="true"/>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton value="Nuevo" 
+                                             id="btnNueno_id"
+                                             title="Nuevo motivo"
+                                             class="cssWhite"
+                                             icon="fa fa-plus"                                             
+                                             update="id_create_dlg,form_create_dlg"
+                                             oncomplete="PF('wv_create_dlg').show();">
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#" width="7%" 
+                              exportable="false">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Motivo">
+                        <h:outputText value="#{item.motivo}"/>
+                    </p:column>
+                    <p:column headerText="Activo" width="7%" styleClass="#{item.activo eq 1 ? 'cssGreen' : 'cssRed'}" >
+                        <h:outputText value="Sí" rendered="#{item.activo == 1}" class="cssWhite" />
+                        <h:outputText value="No" rendered="#{item.activo == 0}" class="cssWhite" />
+                    </p:column> 
+                    <p:column headerText="Creado por">
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column headerText="Fecha creación">
+                        <h:outputText value="#{item.creado}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column width="10%" headerText="Acción" exportable="false">
+                        <p:commandButton actionListener="#{semanaActualBean.activarDesactivar(item,1)}"
+                                         icon="fa fa-thumbs-up"
+                                         rendered="#{item.activo==0}"
+                                         class="cssWhite"
+                                         update="frm_principal:dt_motivo,msgs"
+                                         title="Activar">
+                            <p:confirm header="Confirmación" message="Está seguro que desea activar este registro?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                        <p:spacer width="3"/>
+                        <p:commandButton actionListener="#{semanaActualBean.activarDesactivar(item,0)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite RedButton" 
+                                         update="frm_principal:dt_motivo,msgs"
+                                         rendered="#{item.activo==1}"
+                                         title="Desactivar">
+                            <p:confirm header="Confirmación" message="Está seguro que desea desactivar este registro?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="dt_motivo" fileName="bitacora #{now}"/>
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="dt_motivo" fileName="bitacora #{now}"  />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="dt_motivo" fileName="bitacora #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>

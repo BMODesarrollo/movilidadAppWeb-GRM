@@ -1,0 +1,146 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <p:dialog id="borrar_id_dialog"
+              widgetVar="borrar_wv_dialog"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" 
+              header="">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Borrar Jornada Masiva " class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('borrar_wv_dialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form_borrar_masivo">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="CFechaDesde" value="Desde"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="CFechaDesde" required="true"
+                                        value="#{genCtrlJornadaMB.fechaDesdeBM}"
+                                        navigator="true"
+                                        locale="es"
+                                        pattern="dd/MM/yyyy"
+                                        mask="99/99/9999"
+                                        placeholder="DD/MM/AAAA"
+                                        showOtherMonths="true">
+                                <p:ajax event="dateSelect" process="CFechaDesde"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="CFechaHasta" value="Hasta"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="CFechaHasta" required="true"
+                                        value="#{genCtrlJornadaMB.fechaHastaBM}"
+                                        navigator="true"
+                                        locale="es"
+                                        pattern="dd/MM/yyyy"
+                                        mask="99/99/9999"
+                                        placeholder="DD/MM/AAAA"
+                                        showOtherMonths="true">
+                                <p:ajax event="dateSelect" process="CFechaHasta"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:outputLabel value="Empleado"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                            <p:inputText id="codigo_operador" readonly="true"
+                                         value="#{genCtrlJornadaMB.nombreEmpleado}"/>
+                            <div class="botonFloat" >
+                                <p:commandButton title="Listar Empleados"
+                                                 icon="fa fa-list"
+                                                 style="margin: 0px"
+                                                 class="cssWhite"
+                                                 process="@this"
+                                                 update="msgs"
+                                                 actionListener="#{genCtrlJornadaMB.findEmplActivos()}">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel value="Motivo del registro" />
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0 ">
+                            <p:selectOneMenu id="motivo" 
+                                             value="#{genCtrlJornadaMB.i_genericaJornadaMotivo}" 
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             required="true"
+                                             requiredMessage="Motivo es requerido">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{genCtrlJornadaMB.genericaJornadaMotivoList}" 
+                                               var="items"
+                                               itemLabel="#{items.descripcion}"
+                                               itemValue="#{items.idGenericaJornadaMotivo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0">
+                            <p:commandButton title="Actualizar Motivos"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{genCtrlJornadaMB.cargarMotivos()}"
+                                             update="form_borrar_masivo:motivo"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <p:outputLabel for="observacion" value="Observación"/>
+                        <p:inputTextarea id="observacion" 
+                                         required="true" 
+                                         maxlength="2000"
+                                         value="#{genCtrlJornadaMB.observacionesBM}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             process="@this,
+                             form_borrar_masivo:motivo,
+                             form_borrar_masivo:observacion"
+                             action="#{genCtrlJornadaMB.guardarBMAndConsultar()}"
+                             update="formcontroljornada:serconlist,msgs,
+                             form_borrar_masivo:msgs_turno"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarBorradoMasivo" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

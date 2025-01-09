@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog header="Leer Qr TP" widgetVar="fotoDialogTp" id="tp_tomar_foto_dialog_id" modal="true" position="center top"
+              class="mr1024_50 mr500_90" resizable="false">
+        <h:form id="form_tomar_foto">
+            <h:inputHidden id="code_qr_id" value="#{tecnicoPatioController.qr_code}"/>
+            <body>
+                <div id="main">
+                    <div id="mainbody">
+                        <table border="0" width="100%">
+                            <tr>
+                                <td valign="top" align="center" width="50%">
+                                    <table border="0">
+                                        <tr>
+                                            <td colspan="2" align="center">
+                                                <div id="outdiv" >
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" align="center">
+                                    <div id="result"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <canvas id="qr-canvas" hidden="true" width="800" height="600"></canvas>
+            </body>
+            <p:remoteCommand name="get_qr"
+                             process="@this,form_tomar_foto,code_qr_id"
+                             actionListener="#{tecnicoPatioController.procesarValorQr()}" 
+                             update="msgs"/>
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                <center>
+                    <p:commandButton value="Entrada"
+                                     icon="fa fa-save"
+                                     onclick="rc_entrada_qr()"
+                                     id="btnGuardarEntrada"
+                                     class="cssWhite"
+                                     update=":formTp,modalEntradaSalida"
+                                     rendered="true">
+                        <p:confirm header="Confirmación"
+                                   message="Está seguro que desea realizar la confirmación de entrada?" 
+                                   icon="fa fa-exclamation-triangle"/>
+                    </p:commandButton>
+                    <p:commandButton value="Salida"
+                                     icon="fa fa-save"
+                                     onclick="rc_salida_qr()"
+                                     id="btnGuardarSalida"
+                                     class="cssWhite"
+                                     update=":formTp,modalEntradaSalida"
+                                     rendered="true">
+                        <p:confirm header="Confirmación"
+                                   message="Está seguro que desea realizar la confirmación de salida?" 
+                                   icon="fa fa-exclamation-triangle"/>
+                    </p:commandButton>
+                    <p:commandButton value="Asignar servbus"
+                                     icon="fa fa-save"
+                                     onclick="rc_asignar_qr()"
+                                     id="btnAsignar"
+                                     class="cssWhite"
+                                     update=":formTp,modalEntradaSalida"
+                                     rendered="true">
+                        <p:confirm header="Confirmación"
+                                   message="Está seguro que desea continuar al proceso de asignación?" 
+                                   icon="fa fa-exclamation-triangle"/>
+                    </p:commandButton>
+                    <p:remoteCommand name="rc_entrada_qr"
+                                     process="@this,frmEntradaSalida"
+                                     update=":formTp,:msgs,modalEntradaSalida"
+                                     action="#{tecnicoPatioController.Guardar(1,0,1)}"
+                                     rendered="true"/>
+                    <p:remoteCommand name="rc_salida_qr"
+                                     process="@this,frmEntradaSalida"
+                                     update=":formTp,:msgs,modalEntradaSalida"
+                                     action="#{tecnicoPatioController.Guardar(0,0,1)}"
+                                     rendered="true"/>
+                    <p:remoteCommand name="rc_asignar_qr"
+                                     process="@this,frmEntradaSalida"
+                                     update=":formTp,:msgs,modalEntradaSalida"
+                                     action="#{tecnicoPatioController.asignar()}"
+                                     rendered="true"/>
+                </center>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

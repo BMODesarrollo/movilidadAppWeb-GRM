@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition template="../WEB-INF/template.xhtml">
+
+        <ui:define name="content">
+            <h:form id="SncTipoListForm">
+                <p:panel header="#{bundle.ListSncTipoTitle}">
+                    <p:dataTable id="datalist" value="#{sncTipoController.items}" var="item"
+                                 selectionMode="single" selection="#{sncTipoController.selected}"
+                                 paginator="true"
+                                 rowKey="#{item.idSncTipo}"
+                                 rows="10"
+                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 >
+
+                        <p:ajax event="rowSelect"   update="createButton viewButton editButton deleteButton"/>
+                        <p:ajax event="rowUnselect" update="createButton viewButton editButton deleteButton"/>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListSncTipoTitle_codigo}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.codigo}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListSncTipoTitle_descripcion}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.descripcion}"/>
+                        </p:column>
+                        <f:facet name="footer">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="datalist" fileName="#{bundle.ListSncTipoTitle}"/>
+                            </h:commandLink>
+                        </f:facet>
+                        <f:facet name="header">
+                            <div align="right">
+                                <p:commandButton class="cssWhite"
+                                                 id="createButton" 
+                                                 icon="fa fa-plus"  
+                                                 value="#{bundle.Create}"
+                                                 actionListener="#{sncTipoController.prepareCreate}"
+                                                 update=":SncTipoCreateForm,SncTipoCreateDlg"
+                                                 oncomplete="PF('SncTipoCreateDialog').show()">
+                                    <p:resetInput target="SncTipoCreateDlg" />
+                                </p:commandButton>
+                                <p:commandButton id="viewButton" 
+                                                 class="cssWhite"  
+                                                 rendered="false"
+                                                 icon="fa fa-search" 
+                                                 value="#{bundle.View}" 
+                                                 update=":SncTipoViewForm" 
+                                                 oncomplete="PF('SncTipoViewDialog').show()" 
+                                                 disabled="#{empty sncTipoController.selected.idSncTipo}"/>
+                                <p:commandButton id="editButton" 
+                                                 class="GreenButton cssWhite"  
+                                                 icon="fa fa-pencil" 
+                                                 value="#{bundle.Edit}" 
+                                                 update="SncTipoCreateDlg" 
+                                                 oncomplete="PF('SncTipoCreateDialog').show()" 
+                                                 disabled="#{empty sncTipoController.selected.idSncTipo}">
+                                    <p:resetInput target="SncTipoCreateDlg" />
+                                </p:commandButton>
+                                <p:commandButton id="deleteButton" rendered="false" class="RedButton cssWhite" icon="fa fa-trash"  value="#{bundle.Delete}" actionListener="#{sncTipoController.destroy}" update="datalist" disabled="#{empty sncTipoController.selected.idSncTipo}">
+                                    <p:confirm header="Confirmación" message="Estas seguro?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+
+            <ui:include src="Create.xhtml"/>
+            <ui:include src="View.xhtml"/>
+        </ui:define>
+    </ui:composition>
+
+</html>

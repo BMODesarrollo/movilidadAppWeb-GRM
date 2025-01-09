@@ -1,0 +1,265 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <p:dialog widgetVar="nov_novedad_infra_wv" id="nov_novedad_infra_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top"
+              class="mr1024_40 mr500_90"
+              height="auto" header="Gestión Maestro PQR">
+        <h:form id="pqr_form">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g" >
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="false" legend="Información Radicado">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                <p:outputLabel value="Radicado:" />
+                                <p:inputText value="#{maestroPqrBean.pqrMaestro.radicado}"
+                                             autocomplete="off" maxlength="50" >
+                                </p:inputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                                <p:outputLabel for="fechar" value="Fecha Radicado:" />
+                                <p:calendar id="fechar" 
+                                            pattern="yyyy/MM/dd" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Fecha Radicado requerido"
+                                            title="año/mes/día"
+                                            readonlyInput="true"
+                                            navigator="true"
+                                            showOn="button"
+                                            maxdate="today"
+                                            value="#{maestroPqrBean.pqrMaestro.fecha_radicado}"  >
+                                    <p:ajax event="dateSelect" process="@this"/>
+                                </p:calendar>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                                <p:outputLabel for="fechae" value="Fecha Evento:" />
+                                <p:calendar id="fechae" 
+                                            pattern="yyyy/MM/dd" 
+                                            locale="es"
+                                            title="año/mes/día"
+                                            readonlyInput="true"
+                                            navigator="true"
+                                            showOn="button"
+                                            maxdate="today"
+                                            value="#{maestroPqrBean.pqrMaestro.fecha_evento}"  >
+                                    <p:ajax event="dateSelect" process="@this"/>
+                                </p:calendar>
+                            </div>
+
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <p:outputLabel value="Vehículo:" />
+                                <p:selectOneMenu id="vehiculo"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains" filter="true"
+                                                 value="#{maestroPqrBean.i_Vehicle}">
+                                    <f:selectItem itemLabel="Seleccione uno" noSelectionOption="true"/>
+                                    <f:selectItems value="#{maestroPqrBean.listaVehicles}"
+                                                   var="r" itemLabel="#{r.codigo}"
+                                                   itemValue="#{r.idVehiculo}" />
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <p:outputLabel value="Ruta:" />
+                                <p:selectOneMenu id="ruta"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains" filter="true"
+                                                 value="#{maestroPqrBean.i_Route}">
+                                    <f:selectItem itemLabel="Seleccione uno" noSelectionOption="true"/>
+                                    <f:selectItems value="#{maestroPqrBean.listaRoutes}"
+                                                   var="r" itemLabel="#{r.name}"
+                                                   itemValue="#{r.idPrgRoute}" />
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <p:outputLabel value="Franja Horaria:" />
+                                <p:selectOneMenu id="fhoraria"
+                                                 style="width: 99.9999%"
+                                                 value="#{maestroPqrBean.i_PqrFranjaHoraria}">
+                                    <f:selectItem itemLabel="Seleccione uno" noSelectionOption="true"/>
+                                    <f:selectItems value="#{maestroPqrBean.listaFranjaHoraria}"
+                                                   var="fh" itemLabel="#{fh.nombre}"
+                                                   itemValue="#{fh.idPqrFHoraria}" />
+                                </p:selectOneMenu>
+
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <p:outputLabel value="Paradero:" />
+                                <p:inputText value="#{maestroPqrBean.pqrMaestro.paradero}" 
+                                             autocomplete="off" maxlength="100" >
+                                </p:inputText>
+                            </div>
+
+
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="pnlInfoTipo">
+                        <p:fieldset toggleable="true" legend="Información Tipo PQR">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                                <p:outputLabel for="@next" value="Tipo PQR:"/>
+                                <p:selectOneMenu id="tipoPqr"
+                                                 style="width: 99.9999%"
+                                                 required="true"
+                                                 requiredMessage="Debe seleccionar un tipo de PQR"
+                                                 filterMatchMode="contains" filter="true"
+                                                 value="#{maestroPqrBean.i_PqrTipo}">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{maestroPqrBean.lstTipos}"
+                                                   var="tipo" itemLabel="#{tipo.nombre}"
+                                                   itemDescription="#{tipo.descripcion}"
+                                                   itemValue="#{tipo.idPqrTipo}" />
+                                    <p:ajax listener="#{maestroPqrBean.consultarTipoPqr()}"
+                                            process="@this" update="pnlInfoTipo,msgs"/>
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                                <p:outputLabel for="@next" value="Medio Reporte:"/>
+                                <p:selectOneMenu id="medioReporte"
+                                                 style="width: 99.9999%"
+                                                 required="true"
+                                                 requiredMessage="Debe seleccionar un medio"
+                                                 filterMatchMode="contains" filter="true"
+                                                 value="#{maestroPqrBean.i_PqrMedioRep}">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{maestroPqrBean.lstMedios}"
+                                                   var="medio" itemLabel="#{medio.nombre}"
+                                                   itemDescription="#{medio.descripcion}"
+                                                   itemValue="#{medio.idPqrMedioReporte}" />
+                                </p:selectOneMenu>
+                            </div>
+
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:separator/>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Clasificación:" />
+                                </div>
+                                <h:outputText value="#{maestroPqrBean.clasificacionTipo} ." styleClass="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Responsable:" />
+                                </div>
+                                <h:outputText value="#{maestroPqrBean.responsableTipo} " styleClass="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Tiempo Respuesta:" />
+                                </div>
+                                <h:outputText value="#{maestroPqrBean.tiempoRespuesta} " styleClass="cssBlack"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset id="reportadoId" toggleable="true" legend="Reportado por">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Origen de la información Anonimo" for="@next"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectBooleanButton value="#{maestroPqrBean.b_oligatorio}" 
+                                                       onLabel="Sí" offLabel="No" 
+                                                       onIcon="fa fa-check" 
+                                                       offIcon="fa fa-times"
+                                                       styleClass="cssWhite">
+                                    <p:ajax update="reportadoId"/>
+                                </p:selectBooleanButton>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:rendered="#{!maestroPqrBean.b_oligatorio}">
+                                <p:outputLabel value="Cédula:" />
+                                <p:inputNumber  value="#{maestroPqrBean.pqrMaestro.rpCedula}"
+                                                autocomplete="off" decimalPlaces="0" maxValue="999999999999999">
+                                </p:inputNumber>
+                            </div>
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5" jsf:rendered="#{!maestroPqrBean.b_oligatorio}">
+                                <p:outputLabel value="Nombre:" />
+                                <p:inputText value="#{maestroPqrBean.pqrMaestro.rpNombre}"
+                                             autocomplete="off" maxlength="100" >
+                                </p:inputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:rendered="#{!maestroPqrBean.b_oligatorio}">
+                                <p:outputLabel value="Dirección:" />
+                                <p:inputText value="#{maestroPqrBean.pqrMaestro.rpDireccion}"
+                                             autocomplete="off" maxlength="100" >
+                                </p:inputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" jsf:rendered="#{!maestroPqrBean.b_oligatorio}">
+                                <p:outputLabel value="Teléfono:" />
+
+
+                                <p:inputNumber  value="#{maestroPqrBean.pqrMaestro.rpTelefono}"
+                                                autocomplete="off" decimalPlaces="0" maxValue="999999999999999">
+                                </p:inputNumber>
+                            </div>
+                            <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5" jsf:rendered="#{!maestroPqrBean.b_oligatorio}">
+                                <p:outputLabel value="E- mail:" />
+                                <p:inputText value="#{maestroPqrBean.pqrMaestro.rpEmail}"
+                                             autocomplete="off" maxlength="100" >
+                                </p:inputText>
+                            </div>
+                        </p:fieldset>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset id="id_peticion" toggleable="true" legend="Petición">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                <p:outputLabel  value="Peticion:" />
+                                <p:inputTextarea id="id_txt_peticion" 
+                                                 value="#{maestroPqrBean.pqrMaestro.reporte}"
+                                                 />
+                            </div>
+                        </p:fieldset>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Agregar documento(s) a PQR (IMÁGEN Ó PDF)" collapsed="false">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{maestroPqrBean.handleFileUpload}"
+                                              id="archivos"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="4000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG|pdf|PDF|xlsx|XLSX)$/"
+                                              update="@this"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG,.pdf,.PDF,.xlsx,.XLSX"
+                                              process="@this"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 4mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+
+                </div>
+
+
+
+            </div>
+            <p:remoteCommand name="rc_save" 
+                             class="cssWhite"
+                             actionListener="#{maestroPqrBean.guardar()}"  
+                             value="Guardar" 
+                             process="pqr_form"
+                             update="form_novedad_infra:dt_pqr,:msgs,messages"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnEditNov" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc_save()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

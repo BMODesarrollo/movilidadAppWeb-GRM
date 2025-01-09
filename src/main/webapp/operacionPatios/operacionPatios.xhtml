@@ -1,0 +1,262 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .mapClass {
+                width: 100%;
+                height: 500px;
+            }
+        </style>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDX8EfDI5P5RUJkl3G1F1sBKwQCaYVfV4"></script>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Operación Patios" > 
+            <h:form id="formOpPatios">
+                <p:dialog header="Gestión patios" id="dialogid" widgetVar="dialogOPP"
+                          responsive="true" 
+                          class="mr1024_60 mr500_90"
+                          closeOnEscape="true"
+                          modal="true" height="auto" minimizable="true"
+                          position="center top">
+                    <div class="ui-fluid" >
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="empresaId" value="Empresa: " />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu title="Empresa dueña del patio" id="empresaId"
+                                                     style="width: 99.9999%"
+                                                     required="true" requiredMessage="Debe seleccionar la Empresa"
+                                                     value="#{operPatJSFMB.i_idEmpresa}" >
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                        <f:selectItems value="#{operPatJSFMB.listEmpresas}"
+                                                       var="empresaDialog"
+                                                       itemLabel="#{empresaDialog.nombreCorto}" itemValue="#{empresaDialog.idEmpresa}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtCodigo"  value="Código: "/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtCodigo"
+                                                 title="Código para el patio" 
+                                                 required="true" maxlength="45" 
+                                                 requiredMessage="Debe ingresar el Código" 
+                                                 value="#{operPatJSFMB.opPatios.codigoPatio}">
+                                    </p:inputText>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtnombre"  value="Nombre: "/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtnombre" title="Nombre para el patio" required="true" maxlength="45"  requiredMessage="Debe ingresar 
+                                                 el Nombre" 
+                                                 value="#{operPatJSFMB.opPatios.nombrePatio}">
+
+
+                                    </p:inputText>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                <div class="ui-g-3 ui-md-4 ui-lg-4 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="s" style="visibility: hidden" />
+                                    </div>
+                                    <p:commandButton id="direccion" 
+                                                     global="false"
+                                                     update="gmap"
+                                                     title="Coordenadas"
+                                                     oncomplete="PF('dlgMap').show();"
+                                                     icon="fa fa-map-marker"
+                                                     class="cssWhite OrangeButton"/>
+                                </div>
+                                <div class="ui-g-9 ui-md-8 ui-lg-8 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="s" style="visibility: hidden" />
+                                    </div>
+                                    <p:commandButton id="btnAddDialog"
+                                                     rendered="#{operPatJSFMB.opPatios.idOperacionPatios==null}"
+                                                     icon="fa fa-plus"
+                                                     value="Agregar"
+                                                     class="GreenButton cssWhite"
+                                                     actionListener="#{operPatJSFMB.agregar()}"
+                                                     update="tblOPDialog,txtCodigo,txtnombre,msgs" />
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+
+                                <p:dataTable rendered="#{operPatJSFMB.opPatios.idOperacionPatios==null}" id="tblOPDialog" var="opPatDialog"
+                                             value="#{operPatJSFMB.listOperacionPatiosDialog}"
+                                             rows="5"
+                                             reflow="true"
+                                             filterDelay="1000"
+                                             paginatorPosition="bottom"
+                                             rowIndexVar="index"
+                                             paginator="true"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             rowsPerPageTemplate="5,10">
+
+                                    <p:column headerText="#">
+                                        <h:outputText value="#{index+1}" />
+                                    </p:column>
+                                    <p:column headerText="Empresa">
+                                        <h:outputText value="#{opPatDialog.idEmpresa.nombreCorto}" />
+                                    </p:column>
+
+                                    <p:column headerText="Código">
+                                        <h:outputText value="#{opPatDialog.codigoPatio}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Nombre">
+                                        <h:outputText value="#{opPatDialog.nombrePatio}"/>
+                                    </p:column>
+                                    <p:column headerText="Coordenadas">
+                                        <h:outputText value="#{opPatDialog.latitud} ,  #{opPatDialog.longitud}"/>
+                                    </p:column>
+                                    <p:column style="width:7%;" >
+
+                                        <p:commandButton icon="fa fa-close"
+                                                         id="CBEliminarDialog"
+                                                         process="@this"
+                                                         action="#{operPatJSFMB.eliminarListaDialog(opPatDialog)}"
+                                                         class="RedButton cssWhite"
+                                                         update="tblOPDialog"
+                                                         title="Eliminar">
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </div>
+                    </div>
+                    <f:facet name="footer">
+
+                        <p:commandButton id="btnGuardar" 
+                                         rendered="#{operPatJSFMB.opPatios.idOperacionPatios==null}"
+                                         icon="fa fa-save" value="Guardar" 
+                                         process="@this"
+                                         class="cssWhite"
+                                         actionListener="#{operPatJSFMB.guardar()}"
+                                         update="formTablaOpPatios:tblOP,msgs,tblOPDialog"/>
+                        <p:commandButton id="btnEditar" 
+                                         rendered="#{operPatJSFMB.opPatios.idOperacionPatios!=null}"
+                                         icon="fa fa-save" value="Actualizar" 
+                                         class="cssWhite"
+                                         actionListener="#{operPatJSFMB.guardarEdit()}"
+                                         update="formTablaOpPatios:tblOP,msgs"/>
+                    </f:facet>
+                </p:dialog>
+            </h:form>
+            <p:dialog id="gmapDialog" 
+                      widgetVar="dlgMap" 
+                      modal="true" 
+                      class="mr1024_60 mr500_90"
+                      closable="true" 
+                      position="center top"
+                      appendTo="@(body)"
+                      responsive="true">
+                <p:gmap id="gmap" center="#{operPatJSFMB.cLatitud}, #{operPatJSFMB.cLogitud}" 
+                        zoom="18" 
+                        type="HYBRID" 
+                        styleClass="mapClass"
+                        model="#{operPatJSFMB.simpleModel}" >
+                    <p:ajax event="pointSelect" 
+                            listener="#{operPatJSFMB.onPointSelect}" 
+                            update="msgs,gmap" />
+                </p:gmap>
+            </p:dialog>
+            <h:form id="formTablaOpPatios" >
+                <p:dataTable id="tblOP" var="opPatios"  editable="true" 
+                             value="#{operPatJSFMB.listOperacionPatios}" rows="10"
+                             paginator="true"
+                             rowIndexVar="nroFila"
+                             filterDelay="1000"
+                             reflow="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="btnAdd"
+                                             value="Nuevo"
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             process="@this"
+                                             action="#{operPatJSFMB.openDialog()}"
+                                             update="formOpPatios:dialogid,gmapDialog"
+                                             oncomplete="PF('dialogOPP').show();">
+                                <p:resetInput target="formOpPatios:dialogid" />
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column filterBy="#{opPatios.idEmpresa.nombreCorto}"
+                              filterMatchMode="contains"
+                              headerText="Empresa">
+                        <h:outputText value="#{opPatios.idEmpresa.nombreCorto}"/>
+                    </p:column>
+                    <p:column filterBy="#{opPatios.codigoPatio}"
+                              filterMatchMode="contains"
+                              headerText="Código">
+                        <h:outputText value="#{opPatios.codigoPatio}"/>
+                    </p:column>
+                    <p:column filterBy="#{opPatios.nombrePatio}"
+                              filterMatchMode="contains"
+                              headerText="Nombre">
+                        <h:outputText value="#{opPatios.nombrePatio}"/>
+                    </p:column>
+                    <p:column headerText="Coordenadas">
+                        <h:outputText value="#{opPatios.latitud} ,  #{opPatios.longitud}"/>
+                    </p:column>
+                    <p:column headerText="Opciones" style="width:15%; text-align: center" exportable="false">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         update=":formOpPatios:dialogid,gmapDialog"
+                                         oncomplete="PF('dialogOPP').show();"
+                                         action="#{operPatJSFMB.editar(opPatios)}"
+                                         title="Modificar" 
+                                         disabled="#{opPatios.estadoReg==1}"/>
+
+                    </p:column>
+                    <f:facet name="footer">
+                        <div align="right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="tblOP" fileName="Ope-Patios #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="tblOP" fileName="Ope-Patios #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="tblOP" fileName="Ope-Patios #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+
+
+

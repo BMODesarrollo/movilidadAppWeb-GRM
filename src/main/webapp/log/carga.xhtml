@@ -1,0 +1,70 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <p:panel id="panel" header="Carga de Archivos">
+            <h:form id="form-carga">
+                <p:messages id="messages" showDetail="true" closable="true" showSummary="true" >
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-fluid ui-g">
+                    <div class="ui-g-12 ui-md-2 ui-lg-3 Padding0"/>
+                    <div class="ui-g-12 ui-md-8 ui-lg-6 Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Ruta del archivo:" class="cssBlack" />
+                            </div>
+                            <p:inputText id="path" 
+                                         value="#{cargaArchivosJSF.c_ruta}" 
+                                         class="cssBlack"
+                                         style="width: 100%;margin-top: 5px" 
+                                         required="true"
+                                         requiredMessage="Ruta es requerido"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:fileUpload fileUploadListener="#{cargaArchivosJSF.handleFileUpload}" 
+                                          mode="advanced" 
+                                          dragDropSupport="false"
+                                          multiple="false" 
+                                          style="width: 100%"
+                                          fileLimit="5" 
+                                          label="Seleccionar"
+                                          uploadLabel="Cargar"
+                                          cancelLabel="Cancelar"
+                                          update="messages" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-2 ui-lg-3 Padding0"/>
+                </div>
+                <p:remoteCommand id="cargar"
+                                 name="rc_carga_file"
+                                 update="@form"
+                                 action="#{cargaArchivosJSF.guardarArchivo()}" >
+                </p:remoteCommand>
+                <p:remoteCommand id="cancelar"
+                                 name="rc_carga_cancelar"
+                                 update="@form"
+                                 process="@this"
+                                 action="#{cargaArchivosJSF.reset()}" />
+
+            </h:form>
+            <f:facet name="footer">
+                <p:commandButton onclick="rc_carga_file();"
+                                 value="Guardar"
+                                 icon="fa fa-save"
+                                 class="cssWhite">
+                    <p:confirm header="Confirmación" message="Seguro que desea sobreescribir este archivo" icon="fa fa-exclamation-triangle" />
+                </p:commandButton>
+
+                <p:commandButton onclick="rc_carga_cancelar();"
+                                 value="Cancelar"
+                                 icon="fa fa-times"
+                                 class="cssWhite RedButton"/>
+            </f:facet>
+        </p:panel>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,307 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Carga Red de Transporte"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="config_freeway_id" 
+                                                 value="#{selectConfigFreewayBean.idConfigFreeway}" 
+                                                 filter="true"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains"
+                                                 required="true"
+                                                 requiredMessage="unidad funcional es requerido">
+                                    <p:ajax process="@this" listener="#{selectConfigFreewayBean.findIdConfigFreeway()}"
+                                            update="frmPrincipal:valid_red_transporte,
+                                            frmPrincipal:tab_prg_route,
+                                            frmPrincipal:btn_consumir_route,
+                                            frmPrincipal:btn_consumir_stop"/>
+                                    <f:selectItem itemLabel="Seleccione Unidad Funcional" itemValue="#{0}"/>
+                                    <f:selectItems value="#{selectConfigFreewayBean.listConfigFreeway}" 
+                                                   var="items"
+                                                   itemLabel="#{items.idGopUnidadFuncional.nombre}"
+                                                   itemValue="#{items.idConfigFreeway}"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <p:messages id="messages" showDetail="true" closable="true"  />   
+                <div align="right">
+                    <p:commandButton title="Consumir StopPoints" 
+                                     icon="fa fa-plus"
+                                     id="btn_consumir_stop"
+                                     disabled="true"
+                                     class="cssWhite"
+                                     process="@this"
+                                     update="msgs,
+                                     messages,
+                                     frmPrincipal:valid_red_transporte,
+                                     frmPrincipal:tab_prg_route,
+                                     frmPrincipal:btn_consumir_route,
+                                     frmPrincipal:btn_consumir_stop"
+                                     action="#{prgRouteMB.consumeStopPoints()}" 
+                                     value="Consumir StopPoints">
+                    </p:commandButton>
+                    <p:commandButton title="Consumir Routes" 
+                                     icon="fa fa-plus"
+                                     id="btn_consumir_route"
+                                     disabled="true"
+                                     update="msgs,
+                                     messages,
+                                     frmPrincipal:valid_red_transporte,
+                                     frmPrincipal:tab_prg_route,
+                                     frmPrincipal:btn_consumir_route,
+                                     frmPrincipal:btn_consumir_stop"
+                                     class="cssWhite"
+                                     action="#{prgRouteMB.consumeRoutes()}" 
+                                     value="Consumir Routes">
+                    </p:commandButton>
+                    <p:commandButton title="Consumir Pattern" 
+                                     icon="fa fa-plus"
+                                     disabled="true"
+                                     class="cssWhite"
+                                     action="#{prgRouteMB.consumePattern()}" 
+                                     value="Consumir Pattern">
+                    </p:commandButton>
+                    <p:commandButton title="Validar Red de Transporte" 
+                                     id="valid_red_transporte"
+                                     icon="fa fa-plus"
+                                     class="cssWhite"
+                                     update="msgs,
+                                     messages,
+                                     frmPrincipal:valid_red_transporte,
+                                     frmPrincipal:tab_prg_route,
+                                     frmPrincipal:btn_consumir_route,
+                                     frmPrincipal:btn_consumir_stop"
+                                     disabled="#{prgRouteMB.verificarRedTransporte()}"
+                                     action="#{prgRouteMB.validateAllNet()}" 
+                                     value="Validar Red de Transporte">
+                    </p:commandButton>
+                </div>
+
+                <p:tabView dynamic="true" cache="true" effect="fold" id="tab_prg_route">
+
+                    <p:tab title="Stop Points">
+                        <div aling="rigth">
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtStop" trigger="toggler" />
+                        </div>
+                        <p:dataTable var="stop" value="#{prgRouteMB.listStop}"
+                                     id="dtStop"
+                                     rowIndexVar="nroFila"
+                                     reflow="true"
+                                     rows="20"
+                                     filterDelay="1000"
+                                     paginatorPosition="top"
+                                     paginator="true"
+                                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="20,30,50"
+                                     emptyMessage="No existen StopPoints registrados">
+                            <p:column headerText="#" style="width: 30px">
+                                <h:outputText value="#{nroFila+1}" />
+                            </p:column>
+                            <p:column headerText="Stop Point" filterBy="#{ruta.name}">
+                                <h:outputText value="#{stop.name}" />
+                            </p:column>
+                            <p:column headerText="Code" filterBy="#{ruta.line}" style="text-align: center">
+                                <h:outputText value="#{stop.code}" />
+                            </p:column>
+                            <p:column headerText="Description">
+                                <h:outputText value="#{stop.description}" />
+                            </p:column>
+                            <p:column headerText="IsActive" style="text-align: center">
+                                <h:outputText value="#{stop.isActive}" />
+                            </p:column>
+                            <p:column headerText="IsFuelAvaible" style="text-align: center">
+                                <h:outputText value="#{stop.isFuelAvaible}" />
+                            </p:column>
+                            <p:column headerText="IsRelayPossible" style="text-align: center">
+                                <h:outputText value="#{stop.isRelayPosible}" />
+                            </p:column>
+                            <p:column headerText="Unidad Funcional" style="text-align: center">
+                                <h:outputText value="#{stop.idGopUnidadFuncional.codigo}" />
+                            </p:column>
+
+                            <f:facet name="footer">
+                                En total existen #{prgRouteMB.listStop.size()} Paradas.
+                                <div align="right">
+                                    <h:commandLink>
+                                        <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="dtStop" fileName="Paradas #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                             alt="pdf" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="pdf" target="dtStop" fileName="Paradas #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                             alt="csv" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="csv" target="dtStop" fileName="Paradas #{now}"  />
+                                    </h:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+
+                    <p:tab title="Routes">
+                        <div aling="rigth">
+                            <p:commandButton id="togglerR" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="togglerR" />
+                        </div>
+                        <p:dataTable var="ruta" value="#{prgRouteMB.listRoutes}"
+                                     id="dtTipo"
+                                     rowIndexVar="nroFila"
+                                     reflow="true"
+                                     rows="20"
+                                     paginator="true"
+                                     filterDelay="1000"
+                                     paginatorPosition="top"
+                                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="20,30,50"
+                                     emptyMessage="No existen documentos de vehículos registrados">
+
+                            <p:column headerText="#" style="width: 30px">
+                                <h:outputText value="#{nroFila+1}" />
+                            </p:column>
+                            <p:column headerText="Nombre Ruta" filterBy="#{ruta.name}">
+                                <h:outputText value="#{ruta.name}" />
+                            </p:column>
+                            <p:column headerText="Línea" filterBy="#{ruta.line}" style="text-align: center">
+                                <h:outputText value="#{ruta.line}" />
+                            </p:column>
+                            <p:column headerText="Code" filterBy="#{ruta.code}" style="text-align: center">
+                                <h:outputText value="#{ruta.code}" />
+                            </p:column>
+                            <p:column headerText="FromStopPoint">
+                                <h:outputText value="#{ruta.idPrgFromStoppoint.name}" />
+                            </p:column>
+                            <p:column headerText="ToStopPoint">
+                                <h:outputText value="#{ruta.idPrgToStoppoint.name}" />
+                            </p:column>
+                            <p:column headerText="IsActive" style="text-align: center">
+                                <h:outputText value="#{ruta.isActive}" />
+                            </p:column>
+                            <p:column headerText="Unidad Funcional" style="text-align: center">
+                                <h:outputText value="#{ruta.idGopUnidadFuncional.codigo}" />
+                            </p:column>
+                            <f:facet name="footer">
+                                En total existen #{prgRouteMB.listRoutes.size()} Rutas.
+                                <div align="right">
+                                    <h:commandLink>
+                                        <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="dtTipo" fileName="Rutas #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                             alt="pdf" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="pdf" target="dtTipo" fileName="Rutas #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                             alt="csv" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="csv" target="dtTipo" fileName="Rutas #{now}"  />
+                                    </h:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+
+                    <p:tab title="Pattern Detail">
+                        <div aling="rigth">
+                            <p:commandButton id="togglerP" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtPattern" trigger="togglerP" />
+                        </div>
+                        <p:dataTable var="pattern" value="#{prgRouteMB.listPattern}"
+                                     id="dtPattern"
+                                     rowIndexVar="nroFila"
+                                     reflow="true"
+                                     filterDelay="1000"
+                                     paginatorPosition="top"
+                                     rows="20"
+                                     paginator="true"
+                                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="20,30,50"
+                                     emptyMessage="No existe Pattern Detail registrado">
+
+                            <p:column headerText="#" style="width: 30px">
+                                <h:outputText value="#{nroFila+1}" />
+                            </p:column>
+                            <p:column headerText="Nombre Ruta" filterBy="#{pattern.idPrgRoute.name}">
+                                <h:outputText value="#{pattern.idPrgRoute.name}" />
+                            </p:column>
+                            <p:column headerText="Secuencia" filterBy="#{pattern.secuenceNumber}" style="text-align: center">
+                                <h:outputText value="#{pattern.secuenceNumber}" styleClass="text-align: center" />
+                            </p:column>
+                            <p:column headerText="StopPoint">
+                                <h:outputText value="#{pattern.idPrgStoppoint.name}"/>
+                            </p:column>
+                            <p:column headerText="Distance">
+                                <h:outputText value="#{pattern.distance}" style="float:right" >
+                                    <f:convertNumber locale="es-CO" maxFractionDigits="2"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="IsActive" style="text-align: center">
+                                <h:outputText value="#{pattern.isActive}" />
+                            </p:column>
+                            <p:column headerText="Unidad Funcional" style="text-align: center">
+                                <h:outputText value="#{pattern.idGopUnidadFuncional.codigo}" />
+                            </p:column>
+                            <f:facet name="footer">
+                                En total existen #{prgRouteMB.listRoutes.size()} Rutas.
+                                <div align="right">
+                                    <h:commandLink>
+                                        <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="dtPattern" fileName="Pattern Detail #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                             alt="pdf" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="pdf" target="dtPattern" fileName="Pattern Detail #{now}" />
+                                    </h:commandLink>
+                                    <h:commandLink>
+                                        <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                             alt="csv" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="csv" target="dtPattern" fileName="Pattern Detail #{now}"  />
+                                    </h:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

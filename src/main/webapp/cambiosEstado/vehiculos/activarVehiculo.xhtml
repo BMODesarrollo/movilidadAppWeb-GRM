@@ -1,0 +1,78 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="activarVehiculo" 
+              id="modalActivarVehiculo" 
+              header="Activar vehículo"
+              modal="true" 
+              class="modalResponsivo"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              appendTo="@(body)"
+              position="center top">
+        <p:ajax event="close" listener="#{cambioVehiculoBean.setSelected(null)}"
+                update=":frmPrincipal:dtvehiculoInactivo,frmActivarVehiculo:pGrid"/>
+        <h:form id="frmActivarVehiculo">
+            <div class="ui-fluid" id="panel">
+                <p:fieldset legend="Detalle" style="margin-bottom:20px">
+                    <div align="center">
+                        <h:panelGrid columns="2" cellpadding="5">
+                            <p:outputLabel for="vehiculo" value="Vehículo"/>
+                            <p:outputLabel id="vehiculo" value="#{cambioVehiculoBean.s_codVehiculo}"/>
+
+                            <p:outputLabel for="desde" value="Desde:" />
+                            <p:outputLabel id="desde" value="#{cambioVehiculoBean.selected.fromDate}" >
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="hasta" value="Hasta:" />
+                            <p:outputLabel id="hasta" value="#{cambioVehiculoBean.selected.toDate}" >
+                                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                            </p:outputLabel>
+
+                            <p:outputLabel for="estado" value="Estado: " />
+                            <p:outputLabel id="estado" value="#{cambioVehiculoBean.selected.idVehiculoEstado.nombreTipoEstado}" />
+
+                            <p:outputLabel for="descripcion" value="Descripción:" />
+                            <p:outputLabel id="descripcion" value="#{cambioVehiculoBean.selected.descripcion}" />
+                        </h:panelGrid>
+                    </div>
+                </p:fieldset>
+                <div class="Padding3" jsf:id="pGrid">
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding3">
+                            <p:outputLabel for="observaciones" value="Observaciones:" />
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="observaciones" 
+                                             rows="4"
+                                             value="#{cambioVehiculoBean.selected.observaciones}"
+                                             placeholder="Ingrese observaciones acerca de la activación"
+                                             required="true" 
+                                             requiredMessage="Debe ingresar una descripción"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand id="activarVeh"
+                             name="actVeh"
+                             process=":frmActivarVehiculo,@this"
+                             action="#{cambioVehiculoBean.activarVehiculo()}"
+                             update=":frmPrincipal:dtvehiculoInactivo,
+                             :frmActivarVehiculo:pGrid,:messages"
+                             rendered="#{cambioVehiculoBean.selected != null }" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Activar"
+                             icon="fa fa-thumbs-up"
+                             class="cssWhite"
+                             onclick="actVeh()"
+                             rendered="#{cambioVehiculoBean.selected != null }" />
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

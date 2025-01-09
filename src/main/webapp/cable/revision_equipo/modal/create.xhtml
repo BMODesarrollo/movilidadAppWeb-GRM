@@ -1,0 +1,79 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="cableRevisionEquipo"
+              widgetVar="wlvCableRevisionEquipo" 
+              modal="true" 
+              class="mr1024_30 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{cableRevisionEquipoBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{cableRevisionEquipoBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmCableRevisionDiaHorario">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Nombre"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true"
+                                requiredMessage="Debe ingresar un nombre"
+                                value="#{cableRevisionEquipoBean.nombre}"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Descripción"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea autoResize="false"
+                                             value="#{cableRevisionEquipoBean.cableRevisionEquipo.descripcion}"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmCableRevisionDiaHorario,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtCableRevisionEquipo" 
+                             action="#{cableRevisionEquipoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmCableRevisionDiaHorario,@this"
+                             update=":msgs,:frmPrincipal:dtCableRevisionEquipo"
+                             action="#{cableRevisionEquipoBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{cableRevisionEquipoBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{cableRevisionEquipoBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

@@ -1,0 +1,179 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form id="carga-info-bienestar"  enctype="multipart/form-data">
+            <p:panel header="Carga Registros Bienestar"
+                     toggleable="true" 
+                     toggleSpeed="500" 
+                     closeSpeed="500"  
+                     collapsed="true"
+                     widgetVar="panel" 
+                     style="margin-bottom:20px">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <h:panelGrid columns="2" style="text-align: center; margin: 0 auto">
+                    <p:fileUpload fileUploadListener="#{plaRecuBienestarBean.cargarBienestar}" mode="advanced" dragDropSupport="false"
+                                  update="messages" sizeLimit="2000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/" 
+                                  label="Buscar archivo" uploadLabel="Cargar" cancelLabel="Cancelar carga"
+                                  invalidFileMessage="Debe cargar un archivo excel válido"
+                                  invalidSizeMessage="El archivo no debe ser mayor a 2mb"
+                                  oncomplete="PF('w_bienestarList').clearFilters(); PF('w_bienestarList').filter();"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+        <h:form id="formBienestar">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Bienestar">
+
+                <p:dataTable id="bienestarList" 
+                             value="#{plaRecuBienestarBean.listPlaRecuBienestar}" 
+                             var="item"
+                             rowKey="#{item.idPlaRecuBienestar}"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             tableStyle="table-layout:fixed"
+                             reflow="true"
+                             filterDelay="1000"
+                             rows="25"
+                             selectionMode="single"
+                             widgetVar="w_bienestarList"
+                             rowsPerPageTemplate="25,50,100,200,500">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="bienestarList" fileName="Bienestar"/>
+                        </h:commandLink>
+                    </f:facet>
+
+                    <f:facet name="header">       
+                        <div align="right">
+                            <p:outputLabel value="Semana a Programar " class="cssWhite" for="desde" />
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{plaRecuBienestarBean.desde}"
+                                        pattern="yyyy-MM-dd"
+                                        style="width: 100px;margin-left: 5px;">
+                                <p:ajax event="dateSelect" listener="#{plaRecuBienestarBean.consultar()}" 
+                                        update="bienestarList"></p:ajax>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{plaRecuBienestarBean.hasta}"
+                                        pattern="yyyy-MM-dd"
+                                        style="width: 100px;">
+                                <p:ajax event="dateSelect" listener="#{plaRecuBienestarBean.consultar()}" 
+                                        update="bienestarList"></p:ajax>
+                            </p:calendar>
+
+                            <h:outputText value="Unidad Funcional" class="cssWhite" style="margin-left: 5px;"/>
+                            <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                             filter="true" 
+                                             rendered="#{uniFuncSessionBean.filtradoUF}"
+                                             style="width: 150px;margin-left: 5px;"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                               var="uniFunc" 
+                                               itemLabel="#{uniFunc.nombre}"
+                                               itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                <p:ajax process="@this"
+                                        event="change"
+                                        listener="#{plaRecuBienestarBean.filtrarPorUF()}"
+                                        update="formBienestar:bienestarList"/>
+                            </p:selectOneMenu>
+
+                            <p:commandButton id="plantalla_id"
+                                             value="Plantilla"
+                                             icon="fa fa-download"
+                                             ajax="false"
+                                             style="margin-left: 5px;"
+                                             class="cssWhite GreenButton"
+                                             actionListener="#{plaRecuBienestarBean.prepDownloadLocal('PLANTILLA_CARGA_RECURSOS_BIENESTAR')}">
+                                <p:fileDownload value="#{viewDocuJSFMB.download}" />
+                            </p:commandButton>
+                            <p:commandButton id="crear_bienestar"
+                                             icon="fa fa-plus"
+                                             value="Bienestar"
+                                             title="Crear nuevo registro de 'Bienestar'"
+                                             update="dlgPlaRecuBienestar"
+                                             actionListener="#{plaRecuBienestarBean.preGestionar()}"
+                                             class="cssWhite"
+                                             style="margin-left: 5px; width: 160px;"
+                                             oncomplete="PF('wvPlaRecuBienestar').show()" />
+
+
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Código TM" filterBy="#{item.empleado.codigoTm}" filterMatchMode="contains">
+                        <h:outputText  value="#{item.empleado.codigoTm}" />
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.identificacion}"
+                              filterMatchMode="contains"
+                              headerText="Cédula">
+                        <h:outputText value="#{item.empleado.identificacion}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.nombres}"
+                              filterMatchMode="contains"
+                              headerText="Nombres">
+                        <h:outputText value="#{item.empleado.nombres}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Apellidos">
+                        <h:outputText value="#{item.empleado.apellidos}" />
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.idEmpleadoCargo.nombreCargo}"
+                              filterMatchMode="contains"
+                              headerText="Cargo">
+                        <h:outputText value="#{item.empleado.idEmpleadoCargo.nombreCargo}"/>
+                    </p:column>
+                    <p:column headerText="F. Inicio" filterBy="#{item.fechaInicio}" filterMatchMode="contains">
+                        <h:outputText value="#{item.fechaInicio}" title="Fecha de inicio de la restricción por Bienestar">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>    
+                    </p:column>
+                    <p:column headerText="F. Fin" filterBy="#{item.fechaFin}" filterMatchMode="contains">
+                        <h:outputText value="#{item.fechaFin}" title="Fecha de finalización de la restricción por Bienestar">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>    
+                    </p:column>
+                    <p:column headerText="H. Inicio" filterBy="#{item.idPlaRecuTurno.idPlaRecuTurno == 1 ? item.horaInicio : item.idPlaRecuTurno.horaInicio }" filterMatchMode="contains">
+                        <h:outputText value="#{item.idPlaRecuTurno.idPlaRecuTurno == 1 ? item.horaInicio : item.idPlaRecuTurno.horaInicio}" title="Hora inicio de la restricción por Bienestar"/>
+                    </p:column>
+                    <p:column headerText="H. Fin"  filterBy="#{item.idPlaRecuTurno.idPlaRecuTurno == 1 ? item.horaFin : item.idPlaRecuTurno.horaFin}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idPlaRecuTurno.idPlaRecuTurno == 1 ? item.horaFin : item.idPlaRecuTurno.horaFin}" title="Hora finalización de la restricción por Bienestar"/>
+                    </p:column>
+                    <p:column headerText="Turno"  filterBy="#{item.idPlaRecuTurno.turno}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idPlaRecuTurno.turno}"/>
+                    </p:column>
+                    <p:column headerText="Motivo"  filterBy="#{item.idPlaRecuMotivo.motivo}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idPlaRecuMotivo.motivo}" title="Indica la causal del registro"/>
+                    </p:column>
+                    <p:column headerText="Vigencia"  filterBy="#{item.vigencia}" filterMatchMode="contains">
+                        <h:outputText value="#{item.vigencia}" title="Vigencia de Bienestar"/>
+                    </p:column>
+                    <p:column headerText="Opción">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite" 
+                                         title="Modificar Registro" 
+                                         process="@this"
+                                         actionListener="#{plaRecuBienestarBean.editar(item)}"
+                                         update="dlgPlaRecuBienestar"
+                                         oncomplete="PF('wvPlaRecuBienestar').show()"
+                                         disabled="#{emple.estadoReg==1}"> 
+                        </p:commandButton>          
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/create.xhtml"/>
+        <ui:include src="modal/listaErrores.xhtml"/>
+    </ui:define>
+</ui:composition>

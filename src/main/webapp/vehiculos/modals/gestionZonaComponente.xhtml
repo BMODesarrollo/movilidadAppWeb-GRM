@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="mtipo" id="modal" modal="true" 
+              class="mr1024_30 mr500_90"
+              resizable="false"
+              position="center top"
+              closeOnEscape="true" responsive="true">
+        <c:if test="#{vehiculoComponenteZonaBean.selected == null }">
+            <f:facet name="header">
+                Nueva zona de componente
+            </f:facet>
+        </c:if>
+        <c:if test="#{vehiculoComponenteZonaBean.selected != null }">
+            <f:facet name="header">
+                Editar zona de componente: #{vehiculoComponenteZonaBean.selected.nombre.toUpperCase()}
+            </f:facet>
+        </c:if>
+
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             onclick="rc_save_zc();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoComponenteZonaBean.selected == null }">
+            </p:commandButton>
+            <p:commandButton value="Actualizar" 
+                             onclick="rc_update_zc();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoComponenteZonaBean.selected != null }"/>
+        </f:facet>
+        <h:form id="frmNuevoTipo">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <p:remoteCommand name="rc_save_zc" action="#{vehiculoComponenteZonaBean.guardar()}" 
+                             update="frmPrincipalVhclCompZona:dtTipo,frmNuevoTipo,messages,msgs"
+                             rendered="#{vehiculoComponenteZonaBean.selected == null }"/>
+            <p:remoteCommand name="rc_update_zc" action="#{vehiculoComponenteZonaBean.actualizar()}" 
+                             update=":frmPrincipalVhclCompZona:dtTipo,messages,msgs"
+                             rendered="#{vehiculoComponenteZonaBean.selected != null }"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Nombre:" for="nombre"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:inputText id="nombre" value="#{vehiculoComponenteZonaBean.vehiculoComponenteZona.nombre}"
+                                         required="true" requiredMessage="Debe ingresar un nombre"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel for="grupoCte" value="Grupo componente: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:selectOneMenu id="grupoCte" value="#{vehiculoComponenteZonaBean.vehiCompGrupo.idVehiculoComponenteGrupo}"
+                                             filter="true" filterMatchMode="startsWith"
+                                             style="width: 99.9999%"
+                                             required="true" requiredMessage="Debe seleccionar un grupo de componente">
+                                <f:selectItem itemLabel="Seleccione grupo componente" itemValue="" />
+                                <f:selectItems value="#{vehiculoComponenteZonaBean.lstCteGrupo}"
+                                               var="item" itemLabel="#{item.nombre}"  itemValue="#{item.idVehiculoComponenteGrupo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Descripción:" for="descripcion"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding0">
+                            <p:inputTextarea id="descripcion" 
+                                             required="true" 
+                                             maxlength="100"
+                                             value="#{vehiculoComponenteZonaBean.vehiculoComponenteZona.descripcion}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+    </p:dialog>  
+</ui:composition>

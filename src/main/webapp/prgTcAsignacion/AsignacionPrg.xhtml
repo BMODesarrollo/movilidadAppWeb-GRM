@@ -1,0 +1,251 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <!--update="datalist,:DlgCsvDg" -->
+    <ui:define name="content">
+        <div class="ui-fluid Padding0">
+            <div class="ui-g Padding0">
+                <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0 cssBlack">
+                    ASIGNACIÓN DE VEHÍCULOS A SERVICIOS.
+                </div>
+                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                    <h:form id="form-uf">
+                        <div class="Wid100" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                            <ui:include src="../zComponent/selectUnidadFuncional.xhtml" />
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+        <h:form id="formAsig">
+            <p:growl id="upAsig" showDetail="true" showSummary="true" life="6000"/>
+            <p:tabView id="tab" class="Padding0" activeIndex="#{prgTcAsigna.activeIndex}">
+                <p:tab title="PreCarga">
+                    <f:facet name="actions">
+                        <p:commandButton id="btn-up-file"
+                                         icon="fa fa-arrow-circle-o-up"
+                                         class="cssWhite GreenButton"
+                                         process="@this"
+                                         actionListener="#{prgTcAsigna.reset()}"
+                                         value="Cargar Archivo"
+                                         oncomplete="PF('upCsv').show()" 
+                                         />
+                    </f:facet>
+                    <p:dataTable id="datalistPreC" 
+                                 value="#{prgTcAsigna.listPreCarga}" 
+                                 paginator="true"
+                                 rows="50"
+                                 var="preCarga"
+                                 rowsPerPageTemplate="50,100,150"
+                                 emptyMessage="No se han realizado asignación para el día de hoy"
+                                 reflow="true"
+                                 >
+                        <p:column headerText="Fecha">
+                            <h:outputText value="#{preCarga.fecha}">
+                                <f:convertDateTime  parent="yyyy-MM-dd"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="ServBus">
+                            <h:outputText value="#{preCarga.servbus}"/>
+                        </p:column>
+                        <p:column headerText="Vehículo">
+                            <h:outputText value="#{preCarga.vehiculo.codigo}"/>
+                        </p:column>
+                        <p:column headerText="TimeOrigin">
+                            <h:outputText value="#{preCarga.timeOrigin}"/>
+                        </p:column>
+                        <p:column headerText="TimeDestiny">
+                            <h:outputText value="#{preCarga.timeDestiny}"/>
+                        </p:column>
+                        <p:column headerText="Tarea">
+                            <h:outputText value="#{preCarga.mttoTarea.nombreMttoTarea}"/>
+                        </p:column>
+                        <f:facet name="paginatorTopRight">
+                            <p:commandButton id="btn-programar"
+                                             icon="fa fa-arrow-circle-o-up"
+                                             class="cssWhite OrangeButton"
+                                             process="@this"
+                                             disabled="#{(not empty prgTcAsigna.listErrores) or (empty prgTcAsigna.listPreCarga)}"
+                                             actionListener="#{prgTcAsigna.programar()}"
+                                             update="@form,:msgs"
+                                             value="Realizar asignación" >
+                                <p:confirm header="Realizar asignación" message="¿Está seguro de asignar la programación?" 
+                                           icon="fa fa-exclamation-triangle" class="cssWhite" />
+                            </p:commandButton>
+                        </f:facet>
+                        <f:facet name="paginatorTopLeft">
+                            <p:commandButton id="btn-info"
+                                             icon="fa fa-info-circle"
+                                             type="button"
+                                             onclick="PF('infoDlg').show();"
+                                             class="cssWhite OrangeButton"
+                                             title="Antes de realizar la asignación, click aquí" >
+                            </p:commandButton>
+                        </f:facet>
+                        <f:facet name="footer">
+                            En total existen #{prgTcAsigna.listPreCarga.size()} registros correctos
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Errores">
+                    <f:facet name="actions">
+                        <p:commandButton 
+                            icon="fa fa-arrow-circle-o-up"
+                            class="cssWhite GreenButton"
+                            process="@this"
+                            actionListener="#{prgTcAsigna.reset()}"
+                            value="Cargar Archivo"
+                            oncomplete="PF('upCsv').show()" 
+                            />
+                    </f:facet>
+                    <p:dataTable id="datalistErrs" 
+                                 value="#{prgTcAsigna.listErrores}" 
+                                 paginator="true"
+                                 rows="50"
+                                 filterDelay="1500"
+                                 var="errores"
+                                 rowsPerPageTemplate="50,100,150"
+                                 emptyMessage="No existen Errores"
+                                 reflow="true" >
+                        <p:column headerText="Fecha">
+                            <h:outputText value="#{errores.fecha}">
+                                <f:convertDateTime pattern="yyyy-MM-dd"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Servbus" 
+                                  filterBy="#{errores.servbus}" 
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{errores.servbus}" />
+                        </p:column>
+                        <p:column headerText="Vehículo"
+                                  filterBy="#{errores.bus}" 
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{errores.bus}" />
+                        </p:column>
+                        <p:column headerText="Errores">
+                            <h:outputText value="#{errores.error}" />
+                        </p:column>
+                        <f:facet name="paginatorTopLeft">
+                            <p:commandButton id="btn-info"
+                                             icon="fa fa-info-circle"
+                                             type="button"
+                                             onclick="PF('infoDlg').show();"
+                                             class="cssWhite OrangeButton"
+                                             title="Antes de realizar la asignación, click aquí" >
+                            </p:commandButton>
+                        </f:facet>
+                        <f:facet name="footer">
+                            En total existen #{prgTcAsigna.listErrores.size()} Error(es)
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="datalistErrs" fileName="Errores-Programacion #{now}" />
+                                </h:commandLink>
+                                <h:commandLink>
+                                    <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                         alt="pdf" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="pdf" target="datalistErrs" fileName="Errores-Programacion #{now}"  />
+                                </h:commandLink>
+                                <h:commandLink>
+                                    <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                         alt="csv" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="csv" target="datalistErrs" fileName="Errores-Programacion #{now}"  />
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Aplicada">
+                    <p:dataTable id="datalist" 
+                                 value="#{prgTcAsigna.listAsignacion}" 
+                                 var="item"
+                                 paginator="true"
+                                 rowKey="#{item.idPrgAsignacion}"
+                                 rows="50"
+                                 rowsPerPageTemplate="50,100,150"
+                                 emptyMessage="No se han realizado asignación para el día de hoy"
+                                 reflow="true"
+                                 >
+                        <p:column headerText="Fecha">
+                            <h:outputText value="#{item.fecha}">
+                                <f:convertDateTime pattern="yyyy-MM-dd"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column filterBy="#{item.servbus}"
+                                  headerText="Serv Bus"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.servbus}"/>
+                        </p:column>
+                        <p:column headerText="Vehículo">
+                            <h:outputText value="#{item.idVehiculo.codigo}"/>
+                        </p:column>
+                        <p:column headerText="TimeOrigin">
+                            <h:outputText value="#{item.timeOrigin}"/>
+                        </p:column>
+                        <p:column headerText="TimeDestiny">
+                            <h:outputText value="#{item.timeDestiny}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.idMttoTarea.nombreMttoTarea}"
+                                  headerText="Tarea"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.idMttoTarea.nombreMttoTarea}"/>
+                        </p:column>
+                        <f:facet name="footer">
+                            En total existen #{prgTcAsigna.listAsignacion.size()} registros cargados.
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+        <ui:include src="../prgTcAsignacion/modal/modalUpFile.xhtml"/>
+        <p:dialog header="INFORMACIÓN" 
+                  widgetVar="infoDlg" 
+                  resizable="false" 
+                  draggable="false" 
+                  responsive="true" 
+                  modal="true" 
+                  closable="true"
+                  focus="btn-cerrar" >
+            <h:outputText value="La asignación se debe realizar por 
+                          el usuario permitido, y con un conocimiento 
+                          previo de como se realiza este proceso " /><br/>
+            <h:outputText value="Tenga en cuenta: "/> <br/>
+            <h:outputText value="La aplicación recibe un archivo csv 
+                          (.csv) el cual debe estar con el formato 
+                          separado por coma (,) y las fechas deben 
+                          estar con el formato (año-mes-día)." />  
+            <div class="cssBlack">
+                Nota: si el documento no viene con los formatos permitidos (los mensionados anteriormente) 
+                no realizará la asignación de los vehículos a los servicios.
+            </div>
+            <p:separator />
+            <div class="cssBlack">
+                Siga estos pasos para solucionar el problema del cambio de (;) a (,):<br/><br/>
+                1. Haga clic con el botón derecho en el archivo y abrirlo con el Bloc de notas.<br/>
+                2. Haga clic en el menú Edición y seleccione Reemplazar.<br/>
+                3. En el cuadro Buscar escriba un símbolo de punto y coma (;).<br/>
+                4. En el cuadro Reemplazar con tipo en una coma (,).<br/>
+                5. Haga clic en el botón Reemplazar.<br/>
+                6. Cierre la ventana Reemplazar.<br/>
+                7. Guarde el archivo.
+            </div>
+            <f:facet name="footer">
+                <p:commandButton id="btn-cerrar"
+                                 value="Cerrar"
+                                 icon="fa fa-times"
+                                 class="cssWhite"
+                                 onclick="PF('infoDlg').hide();" />
+
+            </f:facet>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+
+

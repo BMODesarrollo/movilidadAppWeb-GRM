@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+            .text-mayus{
+                text-transform: uppercase;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="NO LAVADO">
+            <h:form id="frmNoLavadoList">
+                <p:dataTable id="dtNoLavado" var="lavadoNO"
+                             rowIndexVar="nroFila"
+                             paginator="true"
+                             rows="20"
+                             filterDelay="1700"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             widgetVar="noLavadoDlg"
+                             value="#{lavadoBean.lstNOLavados}"
+                             selectionMode="single" 
+                             selection="#{lavadoBean.selectedNO}" 
+                             rowKey="#{lavadoNO.idLavadoNO}"
+                             reflow="true"
+                             emptyMessage="No se encontraron registros!!">
+                    <p:ajax event="rowSelect" listener="#{lavadoBean.onRowSelect}" update="editButton" />
+                    <p:ajax event="rowUnselect" listener="#{lavadoBean.reset()}" update="dtNoLavado" />
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:outputLabel value="Fecha " class="cssWhite Fs20" for="desde"></p:outputLabel>
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{lavadoBean.fechaDesde}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" listener="#{lavadoBean.consultar()}" 
+                                        update="dtNoLavado"></p:ajax>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{lavadoBean.fechaHasta}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" listener="#{lavadoBean.consultar()}" 
+                                        update="dtNoLavado"></p:ajax>
+                            </p:calendar>
+                            
+                            <p:commandButton oncomplete="PF('noLavadoDlg').show()"
+                                             action="#{lavadoBean.nuevo()}"
+                                             update="dtNoLavado :noLavado,:frmNoLavado"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmNoLavado:pGridDatos"/>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"   
+                                             value="Editar" 
+                                             action="#{lavadoBean.editarNOLavado()}"
+                                             update=":editNoLavado, :frmEditNoLavado"
+                                             icon="fa fa-pencil" 
+                                             disabled="#{empty lavadoBean.selectedNO.idLavadoNO}"
+                                             class="cssWhite GreenButton"
+                                             oncomplete="PF('editNoLavadoDlg').show()">
+                                <p:resetInput target="frmNoLavado"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha-Hora"
+                              filterBy="#{lavadoNO.fechaHora}"
+                              filterMatchMode="startsWith"
+                              width="250"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:calendar id="popup"
+                                        autocomplete="off"
+                                        locale="es" pattern="yyyy/MM/dd - HH:mm"
+                                        placeholder="Ingrese fecha - hora y presione ENTER"
+                                        title="Ingrese fecha - hora (año/mes/día - Hora:minutos) y presione ENTER"
+                                        maxdate="#{lavadoBean.validarFecha(1)}"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    PF('noLavadoDlg').filter();
+                                                    return false;
+                                                }"
+                                        onkeyup="if (event.keyCode === 8) {
+                                                    PF('noLavadoDlg').clearFilters();
+                                                    return false;
+                                                }"
+                                        showOn="button"
+                                        timeInput="true"
+                                        >
+                            </p:calendar>
+                        </f:facet>
+                        <h:outputText value="#{lavadoNO.fechaHora}">
+                            <f:convertDateTime pattern="yyyy/MM/dd - HH:mm" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Vehículo"
+                              filterBy="#{lavadoNO.idVehiculo.codigo}"
+                              width="150"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{lavadoNO.idVehiculo.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Motivo"
+                              filterBy="#{lavadoNO.idLavadoMotivo}"
+                              filterMatchMode="contains"
+                              styleClass="text-center text-mayus">
+                        <h:outputText value="#{lavadoBean.obtenerMotivo(lavadoNO.idLavadoMotivo)}"/>
+                    </p:column>
+                    <p:column headerText="Observación"
+                              filterBy="#{lavadoNO.observacion}"
+                              filterMatchMode="contains"
+                              styleClass="text-center text-mayus">
+                        <h:outputText value="#{lavadoNO.observacion}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{lavadoBean.lstNOLavados.size()} registro(s).
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 34px;height: 34px"/>
+                                <p:dataExporter type="xlsx" target="dtNoLavado" fileName="LISTADO DE LAVADOS"
+                                                />
+                            </h:commandLink>
+                            <h:commandLink rendered="false">
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="dtNoLavado" fileName="LISTADO DE LAVADOS"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+                <p:contextMenu for="dtNoLavado">
+                    <p:menuitem value="Editar" action="#{lavadoBean.editar()}" 
+                                update="" icon="fa fa-pencil">
+                        <p:resetInput target=""/>
+                    </p:menuitem>
+                </p:contextMenu>
+            </h:form>
+        </p:panel>
+        <ui:include src="noLavado/create.xhtml"/>
+        <ui:include src="noLavado/edit.xhtml"/>
+    </ui:define>
+
+</ui:composition>

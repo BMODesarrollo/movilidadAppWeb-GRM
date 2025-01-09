@@ -1,0 +1,119 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html" 
+                xmlns:p="http://primefaces.org/ui" 
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <p:dialog id="idAdicionarVacioDlg" closeOnEscape="true" 
+              widgetVar="AdicionarVacioDialog" modal="true" 
+              resizable="false"
+              class="mr1024_30 mr500_90"
+              closable="false"
+              position="center top"
+              appendTo="@(body)" height="auto" width="auto">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Adicionar Vacio" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('AdicionarVacioDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="formAdicionarVacio">
+            <p:messages showDetail="true" id="msgsAddService" closable="true">
+                <p:effect type="pulsate" event="load" delay="500"/>
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="idTipoVacio" value="Tipo:"/>
+                        <p:selectOneRadio id="idTipoVacio" value="#{prgTcJSFMB.tipoVacio}">
+                            <f:selectItem itemLabel="VAC" itemValue="2"/>
+                            <f:selectItem itemLabel="VACCOM" itemValue="3"/>
+                        </p:selectOneRadio>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="txtDestino" value="Parada destino:"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText id="txtDestino" 
+                                             placeholder="Nombre parada" 
+                                             value="#{prgTcJSFMB.destinoVacio}" 
+                                             maxlength="12"
+                                             onkeypress="if (event.keyCode == 13) {
+                                                         findDestinoAddService();
+                                                         return false;
+                                                     }"> 
+                                </p:inputText>
+                                <p:remoteCommand name="findDestinoAddService" 
+                                                 process="@this,txtDestino" 
+                                                 action="#{prgTcJSFMB.findDestino(0)}" 
+                                                 update="txtDestino,msgs,formAdicionarVacio:msgsAddService"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Consultar Destino Final" 
+                                                     icon="fa fa-search" class="cssWhite" 
+                                                     process="@this,txtDestino" 
+                                                     style="margin: 0px"
+                                                     action="#{prgTcJSFMB.findDestino(0)}" 
+                                                     update="txtDestino,msgs,formAdicionarVacio:msgsAddService"> 
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="txtResponsabel" value="Operador para vacio: "/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="txtResponsabel" 
+                                             placeholder="Codígo Tm" 
+                                             value="#{prgTcJSFMB.codigoTmVac}"
+                                             maxlength="12" readonly="#{prgTcJSFMB.flagOpkmCl}"
+                                             onkeypress="if (event.keyCode == 13) {
+                                                         findOperadorByCodCreateVaioAddService();
+                                                         return false;
+                                                     }"> 
+                                </p:inputText>
+                                <p:remoteCommand name="findOperadorByCodCreateVaioAddService"
+                                                 process="@this,txtResponsabel" 
+                                                 action="#{prgTcJSFMB.findOperadorByCodCreateVaio()}" 
+                                                 update="txtResponsabel,formAdicionarVacio:msgsAddService"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Consultar y agregar empleado" 
+                                                     icon="fa fa-search" class="cssWhite" 
+                                                     process="@this,txtResponsabel" 
+                                                     style="margin: 0px"
+                                                     action="#{prgTcJSFMB.findOperadorByCodCreateVaio()}" 
+                                                     update="txtResponsabel,formAdicionarVacio:msgsAddService">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p:remoteCommand name="guardarVacio" 
+                             process="@this,formAdicionarVacio,idTipoVacio" 
+                             update=":formGestionPrgTc:msgsGestionPrgTc,formAdicionarVacio:msgsAddService" 
+                             action="#{prgTcJSFMB.preGuardarVacio()}"/>
+            <p:remoteCommand name="cancelarVacio" 
+                             process="@this" 
+                             update="msgs,:formGestionPrgTc:msgsGestionPrgTc" 
+                             action="#{prgTcJSFMB.cancelar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnAdicionarVacio" icon="fa fa-save" value="Agregar" class="cssWhite" onclick="guardarVacio()"/>
+            <p:commandButton id="btnCancelarVacio" icon="fa fa-times" value="Cancelar"  class="cssWhite RedButton" onclick="cancelarVacio()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

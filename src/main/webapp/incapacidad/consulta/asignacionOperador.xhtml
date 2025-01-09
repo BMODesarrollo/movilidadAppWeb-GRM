@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="wlVAsignacionOperador" 
+              id="asignacionOperador" 
+              modal="true" closeOnEscape="true"
+              responsive="true" closable="false"
+              resizable="false" appendTo="@(body)"
+              class="mr1024_80 mr500_90" position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Asignar operador" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wlVAsignacionOperador').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmAsignacionAusentismo">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true"/>
+
+            <div class="ui-fluid">
+                <div class="ui-g">
+
+                    <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5" jsf:id="pnlDatosSercon">
+                        <ui:include src="modal/datosSercon.xhtml" />
+                    </div>
+                    <div class="ui-g-12 ui-md-7 ui-lg-7 Padding5">
+                        <ui:include src="modal/operadoresDisponibles.xhtml" />
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="asignar_op"
+                             process="@this"
+                             update=":msgs,frmAsignacionAusentismo"
+                             action="#{consultaAusentismoAsignacionBean.asignarOperador()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             id="btnGuardarNovedadPM"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             onclick="asignar_op()">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro de asignar el operador #{consultaAusentismoAsignacionBean.nombreEmpleado} al SERCON #{consultaAusentismoAsignacionBean.sercon} ?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

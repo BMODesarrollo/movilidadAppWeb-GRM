@@ -1,0 +1,211 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <!-- Estilos para el SVG -->
+    <style>
+        polygon {
+            fill: white; /* Color por defecto */
+        }
+
+        .selectedPiece {
+            fill: red !important; /* Color para el polígono seleccionado */
+        }
+    </style>
+
+    <!-- JavaScript para la selección de polígonos -->
+    <script type="text/javascript">
+        // Array para almacenar los IDs de las piezas seleccionadas
+        let selectedPiecesPadron = [];
+
+        function initVectorSelectionPadron() {
+            selectedPiecesPadron = [];
+            const svg = document.getElementById('MapPadron');
+            if (!svg) {
+                console.error('SVG element not found');
+                return;
+            }
+
+            // Seleccionar tanto polígonos como círculos
+            const polygons = svg.querySelectorAll('polygon');
+            const circles = svg.querySelectorAll('circle');
+
+            // Función para manejar la selección de un elemento
+            function handleSelection(element) {
+                element.addEventListener('click', function () {
+                    if (this.classList.contains('selectedPiece')) {
+                        // Si ya está seleccionado, remover la selección
+                        this.classList.remove('selectedPiece');
+                        const selectedPieceId = this.id;
+                        selectedPiecesPadron = selectedPiecesPadron.filter(id => id !== selectedPieceId);
+                    } else {
+                        // Si no está seleccionado, añadir la clase de selección
+                        this.classList.add('selectedPiece');
+                        const selectedPieceId = this.id;
+                        selectedPiecesPadron.push(selectedPieceId);
+                    }
+                    console.log('Piezas seleccionadas:', selectedPiecesPadron);
+                });
+            }
+
+            // Agregar el evento a cada polígono y círculo
+            polygons.forEach(handleSelection);
+            circles.forEach(handleSelection);
+        }
+        function updateSelectedPiecesPadron() {
+            // Convierte el array a una cadena JSON
+            const selectedPiecesJSON = JSON.stringify(selectedPiecesPadron);
+            console.log("Selected pieces JSON:", selectedPiecesJSON);
+
+            // Llama al remoteCommand y pasa selectedPiecesJSON como parámetro
+            sendSelectedPieces([{name: 'selectedPiecesJSON', value: selectedPiecesJSON}]);
+        }
+
+        // Function to clear selected pieces
+        function clearSelectedPieces() {
+            // Remove all elements from selectedPiecesPadron
+            selectedPiecesPadron = [];
+            console.log('Piezas seleccionadas limpiadas:', selectedPiecesPadron);
+        }
+    </script>
+
+    <p:dialog widgetVar="PadronDanoVectorDialog" 
+              id="modalVectorPadron"
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_60 mr500_90"
+              closable="false"
+              responsive="true"
+              position="center top"
+              resizable="false" 
+              appendTo="@(body)"
+              onShow="setTimeout(initVectorSelectionPadron, 100)"> 
+        <f:facet name="header">
+
+            <div class="ui-fluid">
+                Padron
+                <!-- Header content omitted for brevity -->
+            </div>
+        </f:facet>
+        <h:form id="frmDanoP">
+            <div class="ui-fluid" jsf:id="pGrid">
+                <div class="ui-g">
+                    <ui:include src="vectors/PadronSvg.xhtml"/>
+                </div>
+            </div>
+
+            <!-- Remote Command para enviar datos al bean -->
+            <p:remoteCommand name="sendSelectedPieces"
+                             action="#{novedadDanoBean.processSelectedPieces}"
+                             process="@this">
+                <f:param name="selectedPiecesJSON" value="" />
+            </p:remoteCommand>
+
+            <!-- Botón para enviar la selección al backend -->
+            <center>
+                <p:commandButton icon="fa fa-check" value="Enviar Selección de piezas" onclick="updateSelectedPiecesPadron();" update="tbl_buseton" />
+            </center>
+
+            <!-- Aquí va el SVG u otros elementos de la página -->
+
+            <p:dataTable var="componente" 
+                         id="tbl_buseton"
+                         value="#{novedadDanoBean.danoFlotaComponente}"
+                         widgetVar="dtBuseton"
+                         rowIndexVar="nroFila"
+                         reflow="true"
+                         rows="20"
+                         filterDelay="1500"
+                         paginator="true"
+                         sortBy="#{novedadDano.fecha}"
+                         sortOrder="descending"
+                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="20,50,100,200"
+                         emptyMessage="No existen novedades de daño registradas">
+                <p:column headerText="Nombre"
+                          toggleable="false" exportable="false">
+                    <h:outputText value="#{componente.nombre}" />
+                </p:column>
+                <p:column headerText="Descripción"                         toggleable="false" exportable="false">
+                    <h:outputText value="#{componente.descripcion}" />
+                </p:column>
+                <p:column headerText="Solución">
+                    <p:selectOneMenu  
+                        required="true"
+                        requiredMessage="Seleccione solución"
+                        filter="true"
+                        style="width: 90%"
+                        value="#{componente.danoFlotaSolucionValor.idSolucionValor}">
+                        <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}" />
+                        <f:selectItems 
+                            var="solucion"
+                            value="#{novedadDanoBean.getSolucionesPorComponente(componente.idDanoComponente)}"
+                            itemLabel="#{solucion.descripcion}"
+                            itemValue="#{solucion.idSolucionValor}"
+                            />
+                        <p:ajax listener="#{novedadDanoBean.onSolucionChange(componente)}"
+                                update="@this, tbl_buseton"
+                                process="@this">
+                            <f:param name="componente" value="#{componente}" />
+                            <f:param name="solucion" value="#{solucion}" />
+                        </p:ajax>
+                    </p:selectOneMenu></p:column>
+                <p:column id="valorColumn" headerText="Valor">
+                    <h:outputText value="#{componente.danoFlotaSolucionValor.costo}">
+                        <f:convertNumber currencySymbol="$" type="currency" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Acción" rendered="#{novedadDanoBean.selected!=null}">
+                    <p:commandButton icon="fa fa-close"
+                                     class="cssWhite RedButton"
+                                     title="Eliminar registro"
+                                     action="#{novedadDanoBean.eliminarPieza(componente)}"
+                                     update="tbl_buseton" />
+                </p:column>
+            </p:dataTable>
+            <p:remoteCommand name="rc_save_pieces_p"
+                             process="@this"
+                             update=":frmDano"
+                             action="#{novedadDanoBean.preSavePieces()}"/>
+            <p:remoteCommand name="rc_update_pieces_p"
+                             process="@this"
+                             update=":frmDano"
+                             action="#{novedadDanoBean.updateSavePieces()}"/>
+            <center>
+                <p:commandButton value="Guardar"
+                                 id="btnGuardarNovedadPMP"
+                                 rendered="#{novedadDanoBean.selected==null}"
+                                 icon="fa fa-save"
+                                 class="cssWhite"
+                                 onclick="rc_save_pieces_p(), clearSelectedPieces()">
+                    <p:confirm header="Confirmación"
+                               message="Ésta seguro de guardar las piezas?"
+                               icon="fa fa-exclamation-triangle"/>
+                </p:commandButton>
+
+                <p:commandButton value="Actualizar"
+                                 id="btnActualizarPiezasP"
+                                 rendered="#{novedadDanoBean.selected!=null}"
+                                 icon="fa fa-save"
+                                 class="cssWhite"
+                                 onclick="rc_update_pieces_p(), clearSelectedPieces()">
+                    <p:confirm header="Confirmación"
+                               message="Ésta seguro de guardar las piezas nuevas? ESTA OPERACIÓN NO SE PUEDE DESHACER."
+                               icon="fa fa-exclamation-triangle"/>
+                </p:commandButton>
+                <p:commandButton value="Cerrar" icon="fa fa-times"
+                                 class="cssWhite RedButton" action="#{novedadDanoBean.cerrarEdit()}" onclick="PF('PadronDanoVectorDialog').hide(), clearSelectedPieces()"  >
+                </p:commandButton>
+            </center>
+        </h:form>
+        <f:facet name="footer">
+
+        </f:facet>
+    </p:dialog>
+</ui:composition>

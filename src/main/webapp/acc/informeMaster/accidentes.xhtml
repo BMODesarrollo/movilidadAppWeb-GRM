@@ -1,0 +1,119 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="list-accidente-master">
+        <p:growl id="msg" showDetail="true" showSummary="true" life="6000" />
+        <p:panel id="panel-busqueda" header="Busqueda - Informe Master" toggleable="true" style="width: 100%" rendered="#{empty accInformeMasterJSF.accInformeMaster.idAccidente}">
+            <p:panel>
+                <div class="ui-fluid ui-g ">
+                    <div class="ui-g-6 ui-md-2 ui-lg-2">
+                        <p:calendar id="fechaIni" 
+                                    value="#{accidenteJSF.fechaIni}" 
+                                    pattern="yyyy/MM/dd"
+                                    title="Fecha de Inicio"
+                                    mask="true"
+                                    locale="es"
+                                    navigator="true"
+                                    showOn="button"/>
+                    </div>
+                    <div class="ui-g-6 ui-md-2 ui-lg-2">
+                        <p:calendar id="fechaFin" 
+                                    value="#{accidenteJSF.fechaFin}" 
+                                    pattern="yyyy/MM/dd"
+                                    mask="true"
+                                    locale="es"
+                                    navigator="true"
+                                    title="Fecha Fin"
+                                    showOn="button"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4">
+                        <p:selectOneMenu id="t-even" value="#{accidenteJSF.i_auxNovDet}"
+                                         style="width: 99.9999%">
+                            <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                            <f:selectItems value="#{accidenteJSF.listNovedadTipoDetalles}" 
+                                           var="listntd" 
+                                           itemLabel="#{listntd.tituloTipoNovedad}" 
+                                           itemDescription="#{listntd.descripcionTipoNovedad}"
+                                           itemValue="#{listntd.idNovedadTipoDetalle}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-6 ui-md-2 ui-lg-2">
+                        <p:inputNumber id="cod-ope"
+                                       value="#{accidenteJSF.i_codOpe}" 
+                                       placeholder="Código de Operador"
+                                       title="Código Operador" />
+                    </div>
+                    <div class="ui-g-6 ui-md-2 ui-lg-2">
+                        <p:inputText id="cod-veh"
+                                     value="#{accidenteJSF.c_codVeh}" 
+                                     placeholder="Código de Vehiculo"
+                                     title="Código Vehículo"
+                                     maxlength="10"/>
+                    </div>
+                </div>
+                <f:facet name="footer">
+                    <div class="ui-fluid ui-g">
+                        <div class="ui-g-12 ui-md-6 ui-lg-8"/>
+                        <div class="ui-g-6 ui-md-3 ui-lg-2">
+                            <p:commandButton id="buscar"
+                                             actionListener="#{accidenteJSF.buscarAccidente(1)}"
+                                             icon="fa fa-search"
+                                             value="Buscar"
+                                             class="cssWhite GreenButton"
+                                             update="@form"
+                                             process="@form" />
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-2">
+                            <p:commandButton id="limpiar"
+                                             actionListener="#{accidenteJSF.limpiar()}"
+                                             icon="fa fa-remove"
+                                             value="Limpiar"
+                                             class="cssWhite"
+                                             update="@form"
+                                             process="@this" />
+                        </div>
+                    </div>
+                </f:facet>
+            </p:panel>
+
+            <p:dataTable id="table-accidente" 
+                         var="acc" 
+                         value="#{accidenteJSF.listAccidente}" 
+                         selectionMode="single" 
+                         rows="5"
+                         rowIndexVar="rowIdx"
+                         style="margin-top: 10px"
+                         paginator="true"
+                         emptyMessage="No exiten registros"
+                         reflow="true"
+                         rowKey="#{acc.idAccidente}">
+                <f:facet name="header">
+                    Registros encontrados: #{accidenteJSF.listAccidente.size()}
+                </f:facet>
+                <p:ajax event="rowSelect" listener="#{accInformeMasterJSF.cargarAccidente}" update="@form,:form-info-master" />
+                <p:column headerText="#">
+                    <h:outputText value="#{rowIdx + 1}" />
+                </p:column>
+                <p:column headerText="Tipo Evento">
+                    <h:outputText value="#{acc.idNovedadTipoDetalle.tituloTipoNovedad}" class="Fs21" style="color: red;font-weight: bold"/>
+                </p:column>
+                <p:column headerText="Vehículo">
+                    <h:outputText value="#{acc.idVehiculo.codigo}" style="font-weight: bold" />
+                </p:column>
+                <p:column headerText="Código Ope">
+                    <h:outputText value="#{acc.idEmpleado.codigoTm}" 
+                                  title="#{acc.idEmpleado.nombres.concat(' ').concat(acc.idEmpleado.apellidos)}" 
+                                  style="font-weight: bold"/>
+                </p:column>
+                <p:column headerText="Fecha">
+                    <h:outputText value="#{acc.fechaAcc}" style="font-weight: bold">
+                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+    </h:form> 
+</ui:composition>

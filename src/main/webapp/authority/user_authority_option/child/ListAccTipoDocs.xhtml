@@ -1,0 +1,43 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="AccTipoDocsDlg" 
+              closeOnEscape="true" widgetVar="AccTipoDocsListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de opciones"
+              width="70%" responsive="true" position="center top">
+        <p:cache disabled="true"/>
+        <h:form id="frmAccTipoDocsList">
+            <p:dataTable var="opcion" value="#{userAuthorityOptBean.lstOpcionesAux}"
+                         id="dtAccTipoDocs" widgetVar="dtAccTipoDoc"
+                         selectionMode="single" selection="#{userAuthorityOptBean.opcion}"                       
+                         rowIndexVar="nroFila"
+                         liveScroll="true"
+                         reflow="true"
+                         filterDelay="1700"
+                         paginator="true"
+                         rows="6"
+                         rowKey="#{opcion.id}"
+                         emptyMessage="No existen registros"
+                         styleClass="ui-fluid">
+                <p:ajax event="rowSelect" 
+                        listener="#{userAuthorityOptBean.onRowOpcionClckSelect}"
+                        update=":frmCheckListAdd:dtAccDocumentos"
+                        oncomplete="PF('AccTipoDocsListDialog').hide()" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Menú" 
+                          filterBy="#{opcion.descripcion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{opcion.descripcion}" />
+                </p:column>
+                <p:column headerText="Opción" filterBy="#{opcion.nameop}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{opcion.nameop}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

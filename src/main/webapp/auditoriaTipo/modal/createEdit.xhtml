@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="crear_audi_turno_id_dialog"
+              widgetVar="crear_audi_turno_dialog_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Tipo de Auditoría"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('crear_audi_turno_dialog_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="create_edit_dialog_form">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="label_nombre" value="Nombre"/>
+                        <p:inputText id="label_nombre" 
+                                     maxlength="45"
+                                     value="#{audiTipoJSFMB.auditoriaTipo.nombre}" />
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <p:outputLabel for="descripcion" value="Descripción"/>
+                        <p:inputTextarea id="descripcion" 
+                                         required="true" 
+                                         maxlength="100"
+                                         value="#{audiTipoJSFMB.auditoriaTipo.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{audiTipoJSFMB.guardar()}"
+                             rendered="#{audiTipoJSFMB.auditoriaTipo.idAuditoriaTipo==null}"
+                             process="@this,create_edit_dialog_form:descripcion,label_nombre"
+                             update="msgs,
+                             audi_tipo_form:datalist,create_edit_dialog_form"/>
+            <p:remoteCommand name="rcc" 
+                             class="cssWhite"
+                             action="#{audiTipoJSFMB.edit()}"
+                             rendered="#{audiTipoJSFMB.auditoriaTipo.idAuditoriaTipo!=null}"
+                             process="@this,create_edit_dialog_form:descripcion,label_nombre"
+                             update="msgs,create_edit_dialog_form,
+                             audi_tipo_form:datalist"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarL" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             rendered="#{audiTipoJSFMB.auditoriaTipo.idAuditoriaTipo==null}"
+                             onclick="rc()"/>
+            <p:commandButton id="btnGuardarLC" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{audiTipoJSFMB.auditoriaTipo.idAuditoriaTipo!=null}"
+                             value="Actualizar" 
+                             onclick="rcc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

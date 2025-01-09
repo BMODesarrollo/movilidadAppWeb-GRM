@@ -1,0 +1,133 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{pqrTipoJSF.pqrTipo.idPqrTipo != null ? 'EDITAR PQR TIPO' : 'NUEVA PQR TIPO'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid Padding0">
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Nombre *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputText id="nombre"
+                                     maxlength="45"
+                                     required="true"
+                                     requiredMessage="Nombre es requerido"
+                                     value="#{pqrTipoJSF.pqrTipo.nombre}" />
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:outputLabel value="Pqr Clasificación *" />
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:selectOneMenu id="s-clasifciacion" 
+                                     value="#{pqrTipoJSF.idPrgClasificacion}" 
+                                     style="width: 99.999%" 
+                                     required="true"
+                                     filterMatchMode="contains" filter="true"
+                                     requiredMessage="Pqr Clasificación es requerido">
+                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                        <f:selectItems value="#{pqrClasificacionJSF.listPqrClasificacion}" 
+                                       var="pqCla" 
+                                       itemLabel="#{pqCla.nombre}" 
+                                       itemDescription="#{pqCla.descripcion}"
+                                       itemValue="#{pqCla.idPqrClasificacion}" />
+                    </p:selectOneMenu>
+                </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Pqr Responsable *" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:selectOneMenu id="s-responsable" 
+                                         value="#{pqrTipoJSF.idPrgResponsable}" 
+                                         style="width: 99.999%" 
+                                         required="true"
+                                         filterMatchMode="contains" filter="true"
+                                         requiredMessage="Pqr Responsable es requerido">
+                            <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                            <f:selectItems value="#{pqrResponsableJSF.listPqrResponsable}" 
+                                           var="pqResp" 
+                                           itemLabel="#{pqResp.responsable}" 
+                                           itemDescription="#{pqResp.responsable}"
+                                           itemValue="#{pqResp.idPqrResponsable}" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Tiempo Respuesta (Días) *" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputNumber id="tiempoRespuesta"
+                                     required="true"
+                                     decimalPlaces="0"
+                                     requiredMessage="Tiempo Respuesta es requerido"
+                                     value="#{pqrTipoJSF.pqrTipo.tiempoRespuesta}" />
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Tiempo Respuesta Real (Días) *" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputNumber id="obj_dato_time_real"
+                                     required="true"
+                                     decimalPlaces="0"
+                                     requiredMessage="Tiempo Respuesta es requerido"
+                                     value="#{pqrTipoJSF.pqrTipo.obj_time_real}" />
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Descripción *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputTextarea id="descripcion"
+                                         maxlength="255"
+                                         required="true"
+                                         requiredMessage="Descripción es requerido"
+                                         value="#{pqrTipoJSF.pqrTipo.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="@form" 
+                             rendered="#{empty pqrTipoJSF.pqrTipo.idPqrTipo}"
+                             update=":form,@form"
+                             actionListener="#{pqrTipoJSF.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             rendered="#{not empty pqrTipoJSF.pqrTipo.idPqrTipo}"
+                             process="@form,@this"
+                             update=":form,@form"
+                             actionListener="#{pqrTipoJSF.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" 
+                             icon="fa fa-save"
+                             rendered="#{empty pqrTipoJSF.pqrTipo.idPqrTipo}"
+                             class="cssWhite" 
+                             onclick="guardar()"/>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-save"
+                             rendered="#{not empty pqrTipoJSF.pqrTipo.idPqrTipo}"
+                             class="cssWhite" 
+                             onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="mdSupervisores"
+              widgetVar="wvSupervisor" 
+              modal="true" 
+              header="Operadores"
+              class="modalResponsivo"
+              closeOnEscape="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              style="position: absolute"
+              position="center top">
+        <h:form id="formSupervisor">
+            <p:dataTable id="tabla-emple"
+                         var="emp" 
+                         value="#{cableAccInformeRespondienteJSF.listEmpleados}"  
+                         paginator="true"
+                         filterDelay="2000"
+                         rows="10"
+                         rowsPerPageTemplate="10,20,50"
+                         reflow="true"
+                         rowIndexVar="nroFila"
+                         rowKey="#{nroFila + 1}"
+                         widgetVar="wvEmp"
+                         emptyMessage="No existen operadores registrados">
+
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código" filterBy="#{emp.codigoInterno}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{emp.codigoInterno}" />
+                </p:column>
+                <p:column headerText="Cédula" filterBy="#{emp.identificacion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{emp.identificacion}" />
+                </p:column>
+                <p:column headerText="Nombre Completo" filterBy="#{emp.nombres} #{emp.apellidos}"
+                          filterMatchMode="contains">
+                    <br/>
+                    <h:outputText value="#{emp.nombres} #{emp.apellidos}" />
+                </p:column>
+                <p:column headerText="Télefono" filterBy="#{emp.telefonoMovil}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{emp.telefonoMovil}" />
+                </p:column>
+                <p:column headerText="Acciones" style="width: 100px">
+                    <p:commandButton id="btn-sel"
+                                     icon="fa fa-check"
+                                     class="cssWhite"
+                                     title="Seleccionar Operador"
+                                     update=":formRespuesta:supervisor"
+                                     oncomplete="PF('wvSupervisor').hide();"
+                                     actionListener="#{cableAccInformeRespondienteJSF.cableAccInformeRespondiente.setIdEmpleadoSupervisor(emp)}"
+                                     process="@this" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

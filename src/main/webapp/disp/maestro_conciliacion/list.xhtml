@@ -1,0 +1,447 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+
+            .ui-confirm-dialog {
+                top: 50% !important;
+            }
+
+            .cssPendiente{
+                background-color: #F25C05;
+            }
+
+            .menu .ui-selectonemenu-label { 
+                background: blue;
+            }
+
+            .panel .ui-selectonemenu-items-wrapper .ui-selectonemenu-items > li:hover { 
+                color: #27AAE1 !important;
+            }
+
+            .panelConciliado .ui-selectonemenu-list { 
+                background: green;
+            }
+            .panelNoConciliado .ui-selectonemenu-list { 
+                background: red;
+            }
+
+            @media only screen and (max-width: 600px) {
+                .texto-blanco {
+                    color: white !important;
+                    font-weight: bolder !important;
+                }
+            }
+        </style>
+        <script>
+
+            function agregarColor(clase, id) {
+                
+                const userItem = document.getElementById(id);
+
+                if (clase === "cssPendiente") {
+                    userItem.classList.add('cssPendiente');
+                    userItem.style.color = "white";
+                    userItem.setAttribute('title','Existen conciliaciones PENDIENTES ó NO CONCILIADAS');
+                    userItem.style.fontWeight = "bolder";
+                }
+                if (clase === "cssGreen") {
+                    userItem.classList.add('cssGreen');
+                    userItem.style.color = "white";
+                    userItem.style.fontWeight = "bolder";
+                }
+                if (clase === "cssRed") {
+                    userItem.classList.add('cssRed');
+                    userItem.style.color = "white";
+                    userItem.style.fontWeight = "bolder";
+                }
+
+
+            }
+
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <h:form id="form_busqueda">
+                        <p:remoteCommand 
+                            name="cargarColoresSelect"
+                            action="#{rConciliacionMaestroBean.colocarFondoSelectConciliaciones()}"
+                            update="flagConciliado"/>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-7 ui-lg-7 Padding0" align="left" jsf:id="txtDatosConciliacion">
+                                <p:outputLabel value="Reporte Conciliación (Disponibilidad de flota) - "
+                                               class="cssWhite"/>
+                                <p:outputLabel value="#{rConciliacionMaestroBean.conciliacion.fechaHora}"
+                                               rendered="#{rConciliacionMaestroBean.conciliacion != null}"
+                                               class="cssWhite">
+                                    <f:convertDateTime type="both" pattern="YYYY-MM-dd HH:mm"/>
+                                </p:outputLabel>
+                                <p:outputLabel value="N/A" 
+                                               rendered="#{rConciliacionMaestroBean.conciliacion eq null}"
+                                               class="cssWhite"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-5 ui-lg-5 Padding0" align="right">
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 TexAlLeft">
+                                        <h:outputText value="Fecha:"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:calendar value="#{rConciliacionMaestroBean.fecha}"
+                                                    id="fecha"
+                                                    style="width: 90px"
+                                                    readonlyInput="true"
+                                                    showOn="button"
+                                                    timeInput="true"
+                                                    pattern="yyyy-MM-dd"
+                                                    locale="es">
+                                            <p:ajax event="dateSelect" 
+                                                    process="@this"
+                                                    global="false"
+                                                    listener="#{rConciliacionMaestroBean.buscarPorConciliado(false)}"
+                                                    update="listaConciliacion,:msgs"
+                                                    />
+                                        </p:calendar>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 TexAlLeft">
+                                        <h:outputText value="Conciliado"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="flagConciliado">
+                                        <p:selectOneMenu 
+                                            styleClass="custom-filter" 
+                                            filter="true" 
+                                            style="width: 99.999%"
+                                            value="#{rConciliacionMaestroBean.flagConciliado}"
+                                            filterMatchMode="contains">
+                                            <f:selectItem itemLabel="Seleccione opción..." 
+                                                          itemDescription="Seleccione Uno.."
+                                                          itemValue="#{null}"/>
+                                            <f:selectItem itemLabel="SI" itemValue="#{1}"/>
+                                            <f:selectItem itemLabel="NO" itemValue="#{0}"/>
+                                            <p:ajax process="@this"
+                                                    listener="#{rConciliacionMaestroBean.buscarPorConciliado(true)}"
+                                                    update=":form_conciliacion,
+                                                    txtDatosConciliacion,listaConciliacion,:msgs"
+                                                    />
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+
+
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 TexAlLeft">
+                                        <h:outputText value="AA" style="visibility: hidden"/>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="listaConciliacion">
+                                        <p:selectOneMenu  panelStyleClass="panel"
+                                                          id="concialiaciones"
+                                                          filter="true" 
+                                                          style="width: 99.999%"
+                                                          value="#{rConciliacionMaestroBean.idConciliacion}"
+                                                          filterMatchMode="contains"  title="Seleccione conciliación..">
+                                            <f:selectItem itemLabel="Seleccione conciliación" itemDescription="Seleccione Uno.."/>
+                                            <f:selectItems value="#{rConciliacionMaestroBean.lstConciliaciones}" id="conc_fecha"
+                                                           var="con" itemLabel="#{rConciliacionMaestroBean.formatearFecha(con.fechaHora)}"
+                                                           itemValue="#{con.idDispConciliacion}">
+                                            </f:selectItems>
+                                            <p:ajax update=":msgs,:form_conciliacion,txtDatosConciliacion,listaConciliacion" 
+                                                    global="false"
+                                                    listener="#{rConciliacionMaestroBean.buscarConciliacionPorId()}"
+                                                    process="@this"/>
+                                        </p:selectOneMenu>
+
+                                        <ui:fragment>
+                                            <script type="text/javascript">$(function () {
+                                                    var items = document.querySelectorAll('.panel .ui-selectonemenu-items-wrapper .ui-selectonemenu-items > li');
+
+                                                    items.forEach(function (userItem, index) {
+                                                        if (index > 0) {
+                                                            const fechaSelect = userItem.getAttribute('data-label');
+
+                                                            const id = userItem.getAttribute('id');
+
+                                                            cargarColoresSelect([{name: 'fecha', value: fechaSelect}, {name: 'id', value: id}]);
+
+
+                                                        }
+                                                    });
+
+                                                });</script>
+                                        </ui:fragment>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>    
+                    </h:form>        
+                </div>    
+            </f:facet>
+            <h:form id="form_conciliacion">
+                <p:dataTable id="dt_disp_conciliacion_res" var="res" 
+                             scrollable="true"
+                             widgetVar="wlVdt_disp_conciliacion_res"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             emptyMessage="No existen registros"
+                             value="#{rConciliacionMaestroBean.lstResumen}">
+
+                    <p:column headerText="Unidad Funcional" 
+                              filterBy="#{res.idGopUnidadFuncional.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{res.idGopUnidadFuncional.nombre}" />
+                    </p:column>
+                    <p:column headerText="Total Vehículos Operativos" 
+                              styleClass="text-center">
+                        <h:outputText value="#{res.totalVehiculosOperativos}" />
+                    </p:column>
+                    <p:column headerText="Total Vehículos Inoperativos" 
+                              styleClass="text-center">
+                        <h:outputText value="#{res.totalVehiculosInoperativos}" />
+                    </p:column>
+
+                    <p:column headerText="Generado por" styleClass="text-center"
+                              exportable="false">
+                        <h:outputText value="#{res.generadoPor}" />
+                    </p:column>
+
+                    <p:column width="10%" styleClass="#{res.aprobado == 1 ? 'cssGreen texto-blanco text-center' : res.aprobado == 2 ? 'cssRed texto-blanco text-center' : res.aprobado == 0 ? 'cssPendiente texto-blanco text-center' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Estado conciliación"/>
+                        </f:facet>
+                        <h:outputText value="Conciliado" class="cssWhite" rendered="#{res.aprobado == 1}"/>
+                        <h:outputText value="NO Conciliado" class="cssWhite" rendered="#{res.aprobado == 2}"/>
+                        <h:outputText value="Pendiente" class="cssWhite" rendered="#{res.aprobado == 0}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha Conciliación"
+                              styleClass="text-center">
+                        <h:outputText value="#{res.fechaHoraAprobacion}" 
+                                      rendered="#{res.aprobado == 1}">
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Turno conciliación"
+                              styleClass="text-center">
+                        <h:outputText value="#{res.fechaHoraAprobacion}" 
+                                      rendered="#{res.aprobado == 1}">
+                            <f:convertDateTime type="date" pattern="a" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Usuario Operaciones" styleClass="text-center"
+                              exportable="false">
+                        <h:outputText value="#{res.usrOperaciones}" />
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{rConciliacionMaestroBean.lstResumen.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dt_disp_conciliacion_res" 
+                                                fileName="Resumen Conciliación (Disponibilidad de flota)"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+
+                <p:dataTable id="dt_disp_conciliacion" var="item" 
+                             scrollable="true"
+                             widgetVar="wlVdt_disp_conciliacion"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{rConciliacionMaestroBean.lstDetalles}">
+
+                    <p:column headerText="Vehiculo" 
+                              filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Placa Vehiculo" 
+                              filterBy="#{item.idVehiculo.placa}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idVehiculo.placa}" />
+                    </p:column>
+                    <p:column headerText="Estado" 
+                              filterBy="#{item.idVehiculoTipoEstado.nombreTipoEstado}"
+                              filterMatchMode="exact"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlVdt_disp_conciliacion').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: auto" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="Todos" 
+                                              itemDescription="Seleccione Uno.." 
+                                              itemValue="#{null}"/>
+                                <f:selectItems value="#{rConciliacionMaestroBean.lstTipoEstado}"
+                                               class=""
+                                               var="vt" itemLabel="#{vt.nombreTipoEstado}"
+                                               itemValue="#{vt.nombreTipoEstado}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idVehiculoTipoEstado.nombreTipoEstado}" />
+                    </p:column>
+                    <p:column headerText="Estado detalle" 
+                              filterBy="#{item.idVehiculoTipoEstadoDet.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idVehiculoTipoEstadoDet.nombre}" />
+                    </p:column>
+                    <p:column headerText="Unidad funcional" 
+                              filterBy="#{item.idGopUnidadFuncional.codigo}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idGopUnidadFuncional.codigo}" />
+                    </p:column>
+                    <p:column headerText="Sistema" 
+                              filterBy="#{item.idDispSistema.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idDispSistema.nombre}" />
+                    </p:column>
+                    <p:column headerText="Casusa entrada" 
+                              rendered="#{rConciliacionMaestroBean.b_input_causa_estrada}"
+                              filterBy="#{item.idDispCausaEntrada.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idDispCausaEntrada.nombre}" />
+                    </p:column>
+                    <p:column headerText="Estado pendiente actual" 
+                              filterBy="#{item.idDispEstadoPendActual.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idDispEstadoPendActual.nombre}" />
+                    </p:column>
+                    <p:column headerText="Fecha Habilitación"
+                              filterBy="#{item.fechaHabilitacion}" 
+                              filterMatchMode="startsWith"
+                              style="width: 7%" >
+                        <f:facet name="filter">
+                            <p:calendar id="search_i" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdt_disp_conciliacion').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdt_disp_conciliacion').filter()" update="dt_disp_conciliacion"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.fechaHabilitacion}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Ult. Act."
+                              filterBy="#{item.fecha}" 
+                              filterMatchMode="startsWith"
+                              style="width: 7%" >
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdt_disp_conciliacion').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdt_disp_conciliacion').filter()" update="dt_disp_conciliacion"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Hora Ult. Act." 
+                              styleClass="text-center">
+                        <h:outputText value="#{item.hora}" />
+                    </p:column>
+                    <p:column headerText="Usuario Ult. Act." 
+                              styleClass="text-center">
+                        <h:outputText value="#{item.usuarioReporta}" />
+                    </p:column>
+
+                    <p:column headerText="Ubicación" 
+                              filterBy="#{item.ubicacion}"
+                              filterMatchMode="exact"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlVdt_disp_conciliacion').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: auto" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="Todos" 
+                                              itemDescription="Seleccione Uno.." 
+                                              itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Patio"  itemValue="#{0}"/>
+                                <f:selectItem itemLabel="En vía" itemValue="#{1}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="Patio" 
+                                      rendered="#{item.ubicacion eq 0}"/>
+                        <h:outputText value="En vía" 
+                                      rendered="#{item.ubicacion eq 1}"/>
+                    </p:column>
+
+
+                    <f:facet name="footer">
+                        En total existen #{rConciliacionMaestroBean.lstDetalles.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dt_disp_conciliacion" 
+                                                fileName="Reporte Conciliación (Detalles)"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

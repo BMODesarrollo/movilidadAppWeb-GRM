@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:form id="form-emp-list">
+        <p:dataTable id="tabla-emple"
+                     var="emp" 
+                     value="#{novedadBalanceConsJSF.listEmpleado}"  
+                     paginator="true"
+                     filterDelay="2000"
+                     rows="10"
+                     rowsPerPageTemplate="10,20,50"
+                     reflow="true"
+                     scrollable="true"
+                     scrollHeight="500"
+                     rowIndexVar="nroFila"
+                     rowKey="#{nroFila + 1}"
+                     widgetVar="wvEmp"
+                     emptyMessage="No existen empleados registrados">
+
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Operadores
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+
+                            <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                             filter="true" 
+                                             rendered="#{uniFuncSessionBean.filtradoUF}"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                               var="uniFunc" 
+                                               itemLabel="#{uniFunc.nombre}"
+                                               itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                <p:ajax update="tabla-emple" 
+                                        oncomplete="PF('wvEmp').getPaginator().setPage(0);"
+                                        listener="#{novedadBalanceConsJSF.cargarEmpleados()}"
+                                        process="@this"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <p:column headerText="#" style="width: 30px">
+                <h:outputText value="#{nroFila+1}" />
+            </p:column>
+            <p:column headerText="Código Tm" filterBy="#{emp.codigoTm}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{emp.codigoTm}" />
+            </p:column>
+            <p:column headerText="Cédula" filterBy="#{emp.identificacion}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{emp.identificacion}" />
+            </p:column>
+            <p:column headerText="Nombre Completo" filterBy="#{emp.nombres} #{emp.apellidos}"
+                      filterMatchMode="contains">
+                <br/>
+                <h:outputText value="#{emp.nombres} #{emp.apellidos}" />
+            </p:column>
+            <p:column headerText="Télefono" filterBy="#{emp.telefonoMovil}"
+                      filterMatchMode="contains">
+                <h:outputText value="#{emp.telefonoMovil}" />
+            </p:column>
+            <p:column headerText="Acciones" style="width: 100px;text-align: center">
+                <p:commandButton id="btn-sel-emp"
+                                 icon="fa fa-check"
+                                 class="cssWhite"
+                                 title="Seleccionar"
+                                 process="@this"
+                                 update=":form:cod-ope"
+                                 actionListener="#{novedadBalanceConsJSF.setEmpleado(emp)}" />
+            </p:column>
+        </p:dataTable>
+    </h:form>
+</ui:composition>

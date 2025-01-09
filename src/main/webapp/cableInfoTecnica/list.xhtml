@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="content">
+        <p:panel header="Info Técnica">
+            <h:form id="form_aseo_bano">
+                <div class="ui-g">
+                    <p:dataTable id="dt_aseo_bano_id" var="intoTecnico" 
+                                 scrollable="true"
+                                 widgetVar="wlVdt_aseo_bano_id"
+                                 scrollHeight="600"
+                                 disabledTextSelection="false"
+                                 reflow="true"
+                                 rows="10"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,50,100"
+                                 emptyMessage="No existen registros"
+                                 value="#{cableInfoTecnicaJSFMB.list}">
+
+                        <f:facet name="header">
+                            <div align="right" jsf:id="botones">
+                                <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                                <p:calendar id="fecha_desde" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{cableInfoTecnicaJSFMB.fechaDesde}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{cableInfoTecnicaJSFMB.consultar()}"
+                                            update="dt_aseo_bano_id"/>
+                                </p:calendar>
+                                <p:calendar id="fecha_hasta" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{cableInfoTecnicaJSFMB.fechaHasta}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{cableInfoTecnicaJSFMB.consultar()}"
+                                            update="dt_aseo_bano_id"/>
+                                </p:calendar>
+                                <p:commandButton
+                                    icon="fa fa-plus"
+                                    value="Nuevo"
+                                    actionListener="#{cableInfoTecnicaJSFMB.nuevo()}"
+                                    class="cssWhite"
+                                    update="msgs,info_tecnica_form"/>   
+                            </div>
+                        </f:facet>
+
+
+                        <p:column headerText="Fecha" width="9%" styleClass="text-center">
+                            <h:outputText value="#{intoTecnico.fecha}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Temp. Motor Panel" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.temReductorPanel}" />
+                        </p:column>
+                        <p:column headerText="Temp. Cuarto Variador" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.tempCuartoVariador}" />
+                        </p:column>
+                        <p:column headerText="Temp. Reductor" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.temReductor}" />
+                        </p:column>
+                        <p:column headerText="Temp. Reductor Panel" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.temReductorPanel}" />
+                        </p:column>
+                        <p:column headerText="Par%" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.par}" />
+                        </p:column>
+                        <p:column headerText="Presión fs bar" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.presionFsBar}" />
+                        </p:column>
+                        <p:column headerText="Presión fe bar" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.presionFeBar}" />
+                        </p:column>
+                        <p:column headerText="Carro Tensor 1" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.carroTensor1}" />
+                        </p:column>
+                        <p:column headerText="Carro Tensor 2" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.carroTensor2}" />
+                        </p:column>
+                        <p:column headerText="Logitud Linea" width="7%" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.longitudLinea}" />
+                        </p:column>
+                        <p:column headerText="Viento P06" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.vientoP06}" />
+                        </p:column>
+                        <p:column headerText="Viento P16" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.vientoP16}" />
+                        </p:column>
+                        <p:column headerText="Viento P23" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.vientoP23}" />
+                        </p:column>
+                        <p:column headerText="Viento P06 Final" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.vientoP06Final}" />
+                        </p:column>
+                        <p:column headerText="Viento P16 Final" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.vientoP16Final}" />
+                        </p:column>
+                        <p:column headerText="Viento P23 Final" styleClass="text-word-wrap">
+                            <h:outputText value="#{intoTecnico.vientoP23Final}" />
+                        </p:column>
+                        <p:column headerText="Registró" width="10%" styleClass="text-word-wrap"
+                                  filterMatchMode="contains"
+                                  filterBy="#{intoTecnico.empleado.identificacion} - #{intoTecnico.empleado.nombres} #{intoTecnico.empleado.apellidos}">
+                            <h:outputText value="#{intoTecnico.empleado.identificacion} - #{intoTecnico.empleado.nombres} #{intoTecnico.empleado.apellidos}" />
+                        </p:column>
+
+                        <p:column headerText="Acciones" styleClass="text-center"
+                                  exportable="false">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                    <p:commandButton styleClass="cssWhite GreenButton"
+                                                     title="Editar"
+                                                     action="#{cableInfoTecnicaJSFMB.editar(intoTecnico)}"
+                                                     process="@this"
+                                                     update="info_tecnica_dialog_id,info_tecnica_form"
+                                                     icon="fa fa-pencil">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </p:column>
+
+                        <f:facet name="footer">
+                            En total existen #{cableInfoTecnicaJSFMB.list.size()} registros.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="dt_aseo_bano_id" 
+                                                    fileName="Informacion Técnica"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>

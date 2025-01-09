@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+
+    <ui:define name="content" id="contenido">   
+        <p:panel >
+            <f:facet name="header">
+                <div class="ui-fluid" >
+                    <div class="ui-g ">
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Usuarios"/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-5 ui-lg-4 Padding0">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <h:form id="uf">
+                                    <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                     filter="true" 
+                                                     rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                     autoWidth="true"
+                                                     filterMatchMode="contains">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                       var="uniFunc" 
+                                                       itemLabel="#{uniFunc.nombre}"
+                                                       itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                        <p:ajax process="@this"
+                                                event="change"
+                                                listener="#{protegerPrgSFMB.validarPrg()}"
+                                                oncomplete="consultarTiempoCierre()"
+                                                update="frmBloquear:mensaje,
+                                                frmBloquear:btnBloquear"/>
+                                    </p:selectOneMenu>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <p:remoteCommand action="#{ParamTiempoCierreBean.consultar()}"
+                             update="ptc_form:param_time_cierre"
+                             name="consultarTiempoCierre"/>
+            <h:form id="frmBloquear">
+                <p:messages id="mensaje" showDetail="true"/>
+                <div class="ui-fluid" >
+                    <div class="ui-g ">
+                        <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Fecha a Proteger: "/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:calendar id="fechaDerecha" 
+                                            pattern="yyyy-MM-dd"
+                                            value="#{protegerPrgSFMB.fecha}"
+                                            showOn="button" 
+                                            maxdate="today"
+                                            placeholder="Seleccione fecha"
+                                            locale="es"
+                                            readonlyInput="true"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha"
+                                            showTodayButton="true"
+                                            navigator="true">
+                                    <p:ajax update="mensaje,frmBloquear:btnBloquear" event="dateSelect"
+                                            listener="#{protegerPrgSFMB.validarPrg()}"/>
+                                </p:calendar>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="-" style="visibility: hidden"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:commandButton icon=" #{protegerPrgSFMB.flag==1? 'fa fa-close':protegerPrgSFMB.flag==2?'fa fa-check':'fa fa-close'}" class="#{protegerPrgSFMB.flag==1? 'RedButton':protegerPrgSFMB.flag==2?'GreenButton':'RedButton'} cssWhite" 
+                                                 value="#{protegerPrgSFMB.flag==1? 'Bloquear':protegerPrgSFMB.flag==2?'Desbloquear':'Bloquear'}"
+                                                 id="btnBloquear"
+                                                 actionListener="#{protegerPrgSFMB.bloquear()}"
+                                                 update="frmBloquear:btnBloquear,frmBloquear:mensaje"
+                                                 disabled="#{protegerPrgSFMB.flag==0}">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+        <p:panel header="Parametro Tiempo Cierre">
+            <h:form id="ptc_form">
+                <p:dataTable id="param_time_cierre" 
+                             value="#{ParamTiempoCierreBean.listGopParamTiempoCierre}" 
+                             var="item"
+                             emptyMessage="No existen registros"
+                             paginator="false"
+                             reflow="true"
+                             filterDelay="1000"
+                             rowKey="#{item.idGopParamTiempoCierre}"
+                             widgetVar="param_time_cierre_wv">
+                    <f:facet name="header" >
+                        <div align="right">
+                            <p:commandButton value="Nuevo"
+                                             rendered="#{empty ParamTiempoCierreBean.listGopParamTiempoCierre}"
+                                             action="#{ParamTiempoCierreBean.prepareNuevo()}"
+                                             class="cssWhite"
+                                             icon="fa fa-plus"
+                                             update="form_create_dlg"/>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Tiempo(Min)">
+                        <h:outputText value="#{item.tiempo}"/>
+                    </p:column>
+                    <p:column headerText="Descripción" width="40%">
+                        <h:outputText value="#{item.descripcion}"/>
+                    </p:column>
+                     <p:column headerText="Unidad Funcional"
+                              filterBy="#{item.idGopUnidadFuncional.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idGopUnidadFuncional.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column headerText="Acción" width="10%">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="cssWhite GreenButton"
+                                         process="@this"
+                                         update="form_create_dlg"
+                                         action="#{ParamTiempoCierreBean.prepareEditar(item)}"/>
+                    </p:column>
+
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>

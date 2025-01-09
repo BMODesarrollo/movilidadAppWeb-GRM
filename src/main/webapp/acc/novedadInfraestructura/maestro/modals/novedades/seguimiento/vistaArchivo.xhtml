@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <style>
+        .ui-galleria-caption  {
+            width: 973.98px;
+            height: 40px;
+            visibility: hidden  
+        }
+        .ui-galleria-filmstrip-wrapper {
+            overflow: hidden;
+            margin: 5px auto;
+            position: fixed;
+        }
+        .ui-galleria {
+            overflow: initial;
+            visibility: hidden;
+            position: relative;
+        }
+    </style>
+
+    <p:dialog id="DocumentoListSegDlg" widgetVar="DocumentoListSegDialog" modal="true" 
+              resizable="false" appendTo="@(body)" closable="false"
+              closeOnEscape="true" responsive="true" position="center top"
+              class="mr1024_70 mr500_90"
+              >
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            #{archivosBean.modalHeader}
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('DocumentoListSegDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="frmDocumentoSeg">
+            <div align="center">
+                <p:galleria var="img_"
+                            value="#{accNovedadInfraestrucBean.fotosAccNovedadInfraestruces}"
+                            showCaption="true" autoPlay="false" rendered="#{!empty(accNovedadInfraestrucBean.fotosAccNovedadInfraestruces) and archivosBean.extension != 'pdf'}">
+                    <p:graphicImage cache="false" style="width: 100%"  value="#{archivosBean.galeriaImagenes}">
+                        <f:param name="nombre_imagen" value="#{img_}"/>
+                    </p:graphicImage>
+                </p:galleria>
+                <p:graphicImage cache="false"  value="#{archivosBean.imagenCompleta}"
+                                rendered="#{archivosBean.extension != 'pdf' and empty(accNovedadInfraestrucBean.fotosAccNovedadInfraestruces)}">
+                </p:graphicImage>
+            </div>
+            <p:media value="#{archivosBean.documento}"
+                     cache="false" player="pdf" width="100%"
+                     style="height: 90vh"
+                     rendered="#{archivosBean.extension.contains('pdf')}"/>
+
+            <p:outputLabel value="El documento ó imágen a cargar no existe"
+                           rendered="#{accNovedadInfraestrucBean.fotosAccNovedadInfraestruces.size() eq 0 and archivosBean.documento eq null}"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>

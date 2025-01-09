@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="VehiculoListDlg" widgetVar="VehiculoListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" closable="false"
+              closeOnEscape="true"
+              position="center top"
+              class="mr1024_40 mr500_90" responsive="true">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Listado de vehículos
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('VehiculoListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="frmPrincipalListVehiculo">
+            <p:cache disabled="true"/>
+            <p:dataTable var="vht" value="#{gestionDanoNovPuntBean.lstVehiculos}"
+                         id="dtVehiculos"
+                         widgetVar="wvVehiculoListDialog"
+                         selectionMode="single" selection="#{gestionDanoNovPuntBean.vehiculo}"                       
+                         rowIndexVar="nroFila"
+                         filterDelay="1000"
+                         paginator="true"
+                         rows="8"
+                         rowKey="#{vht.idVehiculo}"
+                         emptyMessage="No existen vehículos registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{gestionDanoNovPuntBean.onRowDblClckSelect}"
+                        update="msgs,gestion_dano_form:vehiculo"
+                        oncomplete="PF('VehiculoListDialog').hide()" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código" filterBy="#{vht.codigo}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.codigo}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

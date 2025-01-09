@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <h:form id="frmPrincipal">
+            <p:hotkey bind="ctrl+shift+q" 
+                      update="frmPrincipal:servbusesList,
+                      frmPrincipal:fechaIni" 
+                      action="#{prgServbusesMB.clearFiltersOperador()}"/>
+            <p:panel>
+                <f:facet name="header">
+                    <h:commandLink>
+                        <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                        <p:dataExporter type="xlsx" target="servbusesList" 
+                                        fileName="Servbuses #{prgServbusesMB.fecha}"
+                                        postProcessor="#{prgServbusesMB.postProcessXLSOp}"/>
+                    </h:commandLink>
+                </f:facet>
+                <p:panelGrid  columns="3" style="width: 100%;"
+                              columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4,ui-grid-col-4" 
+                              layout="grid" styleClass="ui-panelgrid-blank ui-fluid">
+                    <p:outputLabel value="Seleccione fecha: " for="fechaIni"></p:outputLabel>
+                    <p:calendar id="fechaIni" label="Fecha de Consulta" 
+                                value="#{prgServbusesMB.fecha}"
+                                locale="es"
+                                maxdate="today"
+                                navigator="true">
+                        <p:ajax event="dateSelect"
+                                listener="#{prgServbusesMB.obtenerServbuses()}" 
+                                update="servbusesList"
+                                />
+                    </p:calendar>
+                </p:panelGrid>
+                <p:panel header="Servbuses">
+                    <p:dataTable id="servbusesList" value="#{prgServbusesMB.lstPrgServbuses}" 
+                                 var="item" widgetVar="dtservbusesList"
+                                 emptyMessage="No hay registros que mostrar!!"
+                                 paginator="true"
+                                 rows="100"
+                                 rowsPerPageTemplate="100,200,500" filterDelay="1000">
+
+                        <p:column >
+                            <f:facet name="header">
+                                <h:outputText value="Fecha"/>
+                            </f:facet>
+                            <h:outputText  value="#{item.fecha}">
+                                <f:convertDateTime pattern="dd-MM-yyyy" type="date"></f:convertDateTime>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column filterBy="#{item.servbus}"
+                                  filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Servbus"/>
+                            </f:facet>
+                            <h:outputText value="#{item.servbus}"/>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="FromDepot"/>
+                            </f:facet>
+                            <h:outputText value="#{item.fromDepot.name}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="ToDepot"/>
+                            </f:facet>
+                            <h:outputText value="#{item.toDepot.name}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="TimeOrigin"/>
+                            </f:facet>
+                            <h:outputText value="#{item.timeOrigin}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="TimeDestiny"/>
+                            </f:facet>
+                            <h:outputText value="#{item.timeDestiny}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="DistanciaComercial" style="text-align: right" >
+                            <h:outputText  value="#{item.comercialDistance}"/>
+                        </p:column>
+
+                        <p:column headerText="DistanciaHlp" style="text-align: right">
+                            <h:outputText value="#{item.hlpDistance }"/>
+                        </p:column>
+
+                        <p:column headerText="DistanciaProduccion" style="text-align: right">
+                            <h:outputText value="#{item.productionDistance}" />
+                        </p:column>
+
+                    </p:dataTable>
+                </p:panel>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

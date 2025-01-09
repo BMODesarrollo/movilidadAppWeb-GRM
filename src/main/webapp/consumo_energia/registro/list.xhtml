@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Registro Consumo Energía">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtConsumoEnergia" var="consumo" 
+                             scrollable="true"
+                             widgetVar="wlVdtConsumoEnergia"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             sortBy="#{consumo.fechaHora}"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{consumoEnergiaBean.lstConsumoEnergias}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+
+                            <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                            <p:calendar id="fecha_desde" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{consumoEnergiaBean.fechaInicio}"
+                                        locale="es"
+                                        maxdate="today"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" 
+                                        listener="#{consumoEnergiaBean.consultar()}"
+                                        update="dtConsumoEnergia"/>
+                            </p:calendar>
+                            <p:calendar id="fecha_hasta" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{consumoEnergiaBean.fechaFin}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        readonlyInput="true"
+                                        maxdate="today"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" 
+                                        listener="#{consumoEnergiaBean.consultar()}"
+                                        update="dtConsumoEnergia"/>
+                            </p:calendar>
+
+                            <p:spacer width="10"/>
+
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{consumoEnergiaBean.nuevo()}"
+                                oncomplete="PF('wlvConsumoEnergia').show();"
+                                class="cssWhite"
+                                update="dtConsumoEnergia,:consumoEnergia,:frmConsumoEnergia"
+                                >
+                                <p:resetInput target=":frmConsumoEnergia:pGridDatos"/>
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha" styleClass="text-center">
+                        <h:outputText value="#{consumo.fechaHora}" >
+                            <f:convertDateTime type="both" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Día" styleClass="text-center">
+                        <h:outputText value="#{consumoEnergiaBean.retornarDiaSemana(consumo.fechaHora)}" />
+                    </p:column>
+
+                    <p:column headerText="Lectura 1" 
+                              styleClass="text-center">
+                        <h:outputText value="#{consumo.lecturaUno}" >
+                            <f:convertNumber pattern="###.###"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Lectura 2" 
+                              styleClass="text-center">
+                        <h:outputText value="#{consumo.lecturaDos}" >
+                            <f:convertNumber pattern="###.###"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Velocidad m/s" 
+                              styleClass="text-center">
+                        <h:outputText value="#{consumo.velocidad}" >
+                            <f:convertNumber pattern="###.#"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Estado"
+                              filterBy="#{consumo.idConsumoEnergiaEstado.nombre}"
+                              filterMatchMode="exact"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlVdtConsumoEnergia').filter()" 
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{consumoEnergiaBean.lstConsumoEnergiaEstados}"
+                                               var="estado" 
+                                               itemLabel="#{estado.nombre}"
+                                               itemValue="#{estado.nombre}"
+                                               />
+                            </p:selectOneMenu>
+                        </f:facet>
+
+                        <h:outputText value="#{consumo.idConsumoEnergiaEstado.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{consumoEnergiaBean.editar()}"
+                                                 process="@this"
+                                                 update=":consumoEnergia,:frmConsumoEnergia"
+                                                 oncomplete="PF('wlvConsumoEnergia').show();"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{consumo}" target="#{consumoEnergiaBean.selected}"/>
+                                    <p:resetInput target=":frmConsumoEnergia:pGridDatos"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{consumoEnergiaBean.lstConsumoEnergias.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtConsumoEnergia" 
+                                                fileName="Dias horario"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>

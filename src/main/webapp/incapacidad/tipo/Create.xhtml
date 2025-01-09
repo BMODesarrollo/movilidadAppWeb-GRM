@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="tipoIncapacidad" id="modalTipoIncapacidad" modal="true" closeOnEscape="true"
+              responsive="true" resizable="false" 
+              appendTo="@(body)" position="center,top" closable="false"
+              class="mr1024_30 mr500_90" fitViewport="true">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{tipoIncapacidadBean.selected == null }">
+                                Nuevo tipo de incapacidad
+                            </c:if>
+                            <c:if test="#{tipoIncapacidadBean.selected != null }">
+                                Editar tipo de incapacidad
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('tipoIncapacidad').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmIncapacidad">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid" >
+                <div class="ui-g" jsf:id="pGrid">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Descripción: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText value="#{tipoIncapacidadBean.incapacidadTipo.descripcion}"
+                                         id="descripcion"
+                                         autocomplete="off"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"
+                                         />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p:remoteCommand name="guardar"
+                             action="#{tipoIncapacidadBean.guardar()}"
+                             update=":frmIncapacidadTipo:dtIncapacidadTipo,pGrid,messages,:msgs"/>
+            <p:remoteCommand name="actualizar"
+                             action="#{tipoIncapacidadBean.actualizar()}"
+                             update=":frmIncapacidadTipo:dtIncapacidadTipo,:msgs"/>
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             onclick="guardar()"
+                             rendered="#{tipoIncapacidadBean.selected == null }"
+                             >
+            </p:commandButton>
+            <p:commandButton value="Actualizar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             onclick="actualizar()"
+                             rendered="#{tipoIncapacidadBean.selected != null }"
+                             />
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

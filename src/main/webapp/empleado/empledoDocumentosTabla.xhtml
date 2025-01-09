@@ -1,0 +1,232 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel  > 
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-12 ui-lg-6 Padding0">
+                            <h:outputText value="Documentos Empleados"/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-2 Padding0"/>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-4 Padding0">
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax process="@this"
+                                            event="change"
+                                            listener="#{emplDocJSFMB.consultar()}"
+                                            update="formTablaDocu:tblED"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="formTablaDocu" enctype="multipart/form-data">
+                <p:dataTable id="tblED" var="emplDoc"  editable="true"
+                             value="#{emplDocJSFMB.listEmplDeparts}" rows="10"
+                             paginator="true"
+                             widgetVar="tblEDWV"
+                             filterDelay="1000"
+                             rowIndexVar="nroFila"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header"> 
+                        <div align="right">
+                            <p:commandButton id="btnAdd"
+                                             value="Nuevo"
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update="EmpleadoDocuGestionForm,EmpledoGestionDlg"
+                                             actionListener="#{emplDocJSFMB.prepareCreate()}"
+                                             oncomplete="PF('EmpleadoGestionDlg_wv').show();">
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="formTablaDocu:tblED" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+                    <f:facet name="footer">
+                        En total existen #{emplDocJSFMB.listEmplDeparts.size()} documento(s) registrado(s).
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="tblED" fileName="Documentos empleados"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" width="7%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column filterBy="#{emplDoc.idEmpleadoTipoDocumento.nombreTipoDocumento}"
+                              sortBy="#{emplDoc.idEmpleadoTipoDocumento.nombreTipoDocumento}"
+                              filterMatchMode="contains"
+                              headerText="Tipo Documento">
+                        <h:outputText value="#{emplDoc.idEmpleadoTipoDocumento.nombreTipoDocumento}"/>
+                    </p:column>
+                    <p:column filterBy="#{emplDoc.numero}"
+                              sortBy="#{emplDoc.numero}"
+                              filterMatchMode="contains"
+                              headerText="Número">
+                        <h:outputText value="#{emplDoc.numero}"/>
+                    </p:column>
+                    <p:column filterBy="#{emplDoc.idEmpleado.codigoTm}"
+                              sortBy="#{emplDoc.idEmpleado.codigoTm}"
+                              filterMatchMode="contains"
+                              headerText="Empleado">
+                        <h:outputText value="#{emplDoc.idEmpleado.codigoTm}" class="cssBlack"/>
+                        <h:outputText value=" - #{emplDoc.idEmpleado.nombres.concat(' ').concat(emplDoc.idEmpleado.apellidos)}"/>
+
+                    </p:column>
+                    <p:column filterBy="#{emplDoc.radicado}"
+                              sortBy="#{emplDoc.radicado}"
+                              filterMatchMode="contains"
+                              headerText="Radicado">
+                        <h:outputText value="#{emplDoc.radicado}"/>
+                        <h:outputText value="N/A" rendered="#{emplDoc.radicado == null}"/>
+                    </p:column>
+                    <p:column filterBy="#{emplDoc.idGopUnidadFuncional.nombre}"
+                              filterMatchMode="contains"
+                              headerText="Unidad Funcional">
+                        <h:outputText value="#{emplDoc.idGopUnidadFuncional.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Fecha Radicado" filterBy="#{emplDoc.fechaRadicado}" 
+                              filterMatchMode="startsWith">
+                        <f:facet name="filter">
+
+                            <p:calendar id="searchFR" pattern="MM/dd/yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        placeholder="Seleccione fecha"
+                                        onkeyup="PF('tblEDWV').filter()"
+                                        showOn="button"
+                                        inputStyle="width: 99.9999%"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('tblEDWV').filter()" update="tblED"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{emplDoc.fechaRadicado}" >
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Vigente Desde" filterBy="#{emplDoc.vigenteDesde}" 
+                              filterMatchMode="startsWith">
+                        <f:facet name="filter">
+
+                            <p:calendar id="searchVD" pattern="MM/dd/yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        placeholder="Seleccione fecha"
+                                        inputStyle="width: 99.9999%"
+                                        onkeyup="PF('tblEDWV').filter()"
+                                        showOn="button"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('tblEDWV').filter()" update="tblED"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{emplDoc.vigenteDesde}" >
+                            <f:convertDateTime pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Vigente Hasta" filterBy="#{emplDoc.vigenteHasta}" 
+                              filterMatchMode="startsWith">
+                        <f:facet name="filter">
+
+                            <p:calendar id="searchVH" pattern="MM/dd/yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        placeholder="Seleccione fecha"
+                                        inputStyle="width: 99.9999%"
+                                        onkeyup="PF('tblEDWV').filter()"
+                                        showOn="button"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('tblEDWV').filter()" update="tblED"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{emplDoc.vigenteHasta}" >
+                            <f:convertDateTime pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{emplDoc.activo}" 
+                              exportable="false"
+                              headerText="Activo"
+                              styleClass="#{emplDoc.activo ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('tblEDWV').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{true}" itemLabel="Si" />
+                                <f:selectItem itemValue="#{false}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{emplDoc.activo ? 'Sí' : 'No'}" />
+                    </p:column>
+                    <p:column headerText="Opciones" style="width:15%; text-align: center" 
+                              exportable="false">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         update="EmpleadoDocuCreateForm,EmpledoCreateDlg"
+                                         rendered="#{emplDoc.activo}"
+                                         action="#{emplDocJSFMB.editar(emplDoc)}"
+                                         title="Modificar" 
+                                         disabled="#{emplDoc.estadoReg==1}"/>
+
+                        <p:commandButton 
+                            icon="fa fa-eye"
+                            class="cssWhite"
+                            update="frmVistaDocumento"
+                            actionListener="#{emplDocJSFMB.prepDownloadLocal(emplDoc.pathDocumento)}"
+                            oncomplete="PF('VistaDocumentoDialog').show();">
+                        </p:commandButton>
+                        <p:commandButton title="Descargar Archivo" icon="fa fa-download"
+                                         ajax="false" class="OrangeButton cssWhite"
+                                         actionListener="#{emplDocJSFMB.prepDownloadLocal(emplDoc.pathDocumento)}">
+                            <p:fileDownload value="#{viewDocuJSFMB.download}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+
+        <ui:include src="documento/gestion.xhtml"/>
+        <ui:include src="modal/vistaDocumento.xhtml"/>
+        <ui:include src="documento/create.xhtml"/>
+    </ui:define>
+</ui:composition>

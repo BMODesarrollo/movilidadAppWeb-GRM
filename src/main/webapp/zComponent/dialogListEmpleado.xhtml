@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dialog_empl" 
+              widgetVar="dialog_empl_wv"
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)" 
+              class="mr1024_50 mr500_100" 
+              closeOnEscape="true" 
+              responsive="true"
+              closable="false"
+              position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Listado de empleados" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('dialog_empl_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="dialog_empl_form">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Hacer click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="vht" value="#{emplListJSFMB.listEmpls}" 
+                         id="dialog_empl_dt"
+                         widgetVar="dialog_empl_dt_wv"
+                         selectionMode="single" selection="#{emplListJSFMB.empleado}"
+                         paginator="true"
+                         paginatorPosition="bottom"
+                         rows="10"
+                         filterDelay="1000"
+                         rowIndexVar="nroFila"
+                         rowKey="#{vht.idEmpleado}"
+                         emptyMessage="No existen empleados registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{emplListJSFMB.onRowDblClckSelect}"
+                        update="msgs"
+                        oncomplete="PF('dialog_empl_wv').hide()"
+                        global="false" />
+                <p:column headerText="Código_TM" 
+                          filterBy="#{vht.codigoTm}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.codigoTm}" />
+                </p:column>
+                <p:column headerText="Identificación" 
+                          filterBy="#{vht.identificacion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.identificacion}" />
+                </p:column>
+                <p:column headerText="Nombre completo" 
+                          width="50%"
+                          filterBy="#{vht.nombres} #{vht.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.nombres} #{vht.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

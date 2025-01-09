@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <p:dialog id="turno_jornada_id_dialog"
+              widgetVar="turno_jornada_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="true"
+              class="mr1024_90 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" 
+              header="Genérica Turno Jornada">
+        <h:form id="form_jornada_t_dialog">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Motivo del registro" />
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:selectOneMenu id="tipo_jornada_id" 
+                                             value="#{genTurnoJornadaMB.idGenericaJornadaTipo}" 
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             required="true"
+                                             requiredMessage="Motivo es requerido">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{genTurnoJornadaMB.listJornadaTipo}" 
+                                               var="item"
+                                               itemDescription="#{item.hiniT1}-#{item.hfinT1}"
+                                               itemLabel="#{item.descripcion}"
+                                               itemValue="#{item.idGenericaJornadaTipo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0">
+                            <p:commandButton title="Actualizar Motivos"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{genTurnoJornadaMB.cargarTiposJornada()}"
+                                             update="form_jornada_t_dialog:tipo_jornada_id"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5">
+                        <p:outputLabel value="#Empleados Día habil" />
+                        <p:inputNumber decimalPlaces="0" id="dia_habil" required="true" placeholder="#Empleados Día habil"
+                                     value="#{genTurnoJornadaMB.genericaTurnoJornada.diaHabil}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5">
+                        <p:outputLabel value="#Empleados Día Feriado" />
+                        <p:inputNumber id="dia_feriado" decimalPlaces="0" required="true" placeholder="#Empleados Día Feriado"
+                                     value="#{genTurnoJornadaMB.genericaTurnoJornada.diaFeriado}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                        <p:outputLabel value="Prioridad" />
+                        <p:inputNumber id="prioridad" decimalPlaces="0" required="true" requiredMessage="Falta Prioridad" validatorMessage="Error al ingresar prioridad" placeholder="Prioridad"
+                                     value="#{genTurnoJornadaMB.genericaTurnoJornada.prioridad}"  />
+                    </div>
+                    <div class="ui-g-11 ui-md-11 ui-lg-11 Padding5" >
+                        <h:outputText value="Color: " />
+                        <p:colorPicker required="true" styleClass="rotateColorPicker" id="color_picker" value="#{genTurnoJornadaMB.genericaTurnoJornada.color}" mode="inline" />
+
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             process="@this,form_jornada_t_dialog"
+                             rendered="#{genTurnoJornadaMB.genericaTurnoJornada.idGenericaTurnoJornada==null}"
+                             action="#{genTurnoJornadaMB.guardar()}"
+                             update="msgs,form_jornada_t_dialog,turno_jornada_form:turno_jornada_id_dt"/>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             process="@this,form_jornada_t_dialog"
+                             rendered="#{genTurnoJornadaMB.genericaTurnoJornada.idGenericaTurnoJornada!=null}"
+                             action="#{genTurnoJornadaMB.actualizar()}"
+                             update="msgs,turno_jornada_form:turno_jornada_id_dt"/>
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarT" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             rendered="#{genTurnoJornadaMB.genericaTurnoJornada.idGenericaTurnoJornada==null}"
+                             onclick="rc()"/>
+            <p:commandButton id="btnEditT" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Actualizar" 
+                             rendered="#{genTurnoJornadaMB.genericaTurnoJornada.idGenericaTurnoJornada!=null}"
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

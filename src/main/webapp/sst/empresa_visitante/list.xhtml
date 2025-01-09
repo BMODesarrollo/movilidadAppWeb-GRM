@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            @media only screen and (max-width: 600px) {
+                .texto-blanco {
+                    color: white !important;
+                    font-weight: bolder !important;
+                }
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Registro de Visitantes">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtVisitantes" var="visitante" 
+                             scrollable="true"
+                             widgetVar="wlVisitante"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             rowKey="#{visitante.idSstEmpresaVisitante}"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{sstEmpresaVisitanteBean.lstSstEmpresaVisitante}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{sstEmpresaVisitanteBean.nuevo()}"
+                                oncomplete="PF('wlvVisitante').show();"
+                                class="cssWhite"
+                                update="dtVisitantes,:visitante,:frmEmpresaVisitante"
+                                >
+                                <p:resetInput target=":frmEmpresaVisitante:pGridDatos"/>
+                            </p:commandButton>   
+                            <p:spacer width="10"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtVisitantes" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column  headerText="Empresa"
+                               filterBy="#{visitante.idSstEmpresa.razonSocial}"
+                               filterMatchMode="contains">
+                        <h:outputText value="#{visitante.idSstEmpresa.razonSocial}"/>
+                    </p:column>    
+                    <p:column headerText="Tipo Documento">
+                        <h:outputText value="#{visitante.idSstTipoIdentificacion.nombre}"/>
+                    </p:column>    
+                    <p:column headerText="Número Documento" visible="false">
+                        <h:outputText value="#{visitante.numeroDocumento}"/>
+                    </p:column>    
+                    <p:column headerText="Nombres" visible="false">
+                        <h:outputText value="#{visitante.nombre}"/>
+                    </p:column>    
+                    <p:column headerText="Apellidos" visible="false">
+                        <h:outputText value="#{visitante.apellidos}"/>
+                    </p:column>    
+                    <p:column headerText="Visitante" 
+                              exportable="false"
+                              filterBy="#{visitante.numeroDocumento} #{visitante.nombre} #{visitante.apellidos}"
+                              filterMatchMode="contains">
+                        <h:outputText 
+                            value="#{visitante.numeroDocumento} - "
+                            styleClass="cssBlack"
+                            />
+                        <h:outputText value="#{visitante.nombre} #{visitante.apellidos}"/>
+                    </p:column>  
+                    <p:column headerText="Tipo Labor" 
+                              filterBy="#{visitante.idSstTipoLabor.tipoLabor}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{visitante.idSstTipoLabor.tipoLabor}"/>
+                    </p:column>
+                    <p:column headerText="Nivel Riesgo ARL">
+                        <h:outputText value="#{visitante.nivelRiesgoArl}"/>
+                    </p:column>    
+                    <p:column headerText="Tipo de sangre" styleClass="text-center">
+                        <h:outputText value="#{visitante.tipoSangre}"/>
+                    </p:column>    
+                    <p:column headerText="Nombre Contacto">
+                        <h:outputText value="#{visitante.nombreContactoEmergencia}"/>
+                    </p:column>    
+                    <p:column headerText="Teléfono fijo contacto">
+                        <h:outputText value="#{visitante.telefonoFijoContactoEmergencia}"/>
+                    </p:column>    
+                    <p:column headerText="Teléfono móvil contacto">
+                        <h:outputText value="#{visitante.telefonoMovilContactoEmergencia}"/>
+                    </p:column>    
+                    <p:column headerText="EPS">
+                        <h:outputText value="#{visitante.idSstEps.nombre}"/>
+                    </p:column>    
+                    <p:column headerText="Tipo Vehículo">
+                        <h:outputText value="#{visitante.idSstVehiculoTipo.tipo}" rendered="#{visitante.idSstVehiculoTipo != null}"/>
+                        <h:outputText value="N/A" rendered="#{visitante.idSstVehiculoTipo eq null}"/>
+                    </p:column>    
+                    <p:column headerText="Placa">
+                        <h:outputText value="#{visitante.placaVehiculo}" rendered="#{visitante.placaVehiculo != null}"/>
+                        <h:outputText value="N/A" rendered="#{empty(visitante.placaVehiculo)}"/>
+                    </p:column>    
+                    <p:column headerText="Marca Vehículo">
+                        <h:outputText value="#{visitante.idSstVehiculoMarca.marca}" rendered="#{visitante.idSstVehiculoMarca != null}"/>
+                        <h:outputText value="N/A" rendered="#{visitante.idSstVehiculoMarca eq null}"/>
+                    </p:column>    
+                    <p:column headerText="Color Vehículo">
+                        <h:outputText value="#{visitante.colorVehiculo}" rendered="#{visitante.colorVehiculo != null}"/>
+                        <h:outputText value="N/A" rendered="#{empty(visitante.colorVehiculo)}"/>
+                    </p:column>
+                    <p:column headerText="Estado"
+                              styleClass="#{visitante.visitanteAprobado gt 0 ? 'cssGreen texto-blanco': 'cssRed texto-blanco'}">
+                        <h:outputText value="Aprobado" 
+                                      style="color: white; font-weight: bolder"
+                                      rendered="#{visitante.visitanteAprobado gt 0}"/>
+                        <h:outputText value="No aprobado" 
+                                      style="color: white; font-weight: bolder"
+                                      rendered="#{visitante.visitanteAprobado eq 0}"/>
+                    </p:column>
+
+                    <p:column headerText="Code Qr" exportable="false">
+                        <p:barcode value="#{visitante.hashString}" width="100%" type="qr"/>
+                    </p:column>
+
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              exportable="false" width="10%">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{sstEmpresaVisitanteBean.editar()}"
+                                                 process="@this"
+                                                 update=":visitante,:frmEmpresaVisitante"
+                                                 oncomplete="PF('wlvVisitante').show();"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{visitante}" target="#{sstEmpresaVisitanteBean.selected}"/>
+                                    <p:resetInput target=":frmEmpresaVisitante:pGridDatos"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Aprobar"
+                                                 action="#{sstEmpresaVisitanteBean.aprobarVisitante()}"
+                                                 update="dtVisitantes,:msgs"
+                                                 disabled="#{visitante.visitanteAprobado == 1}"
+                                                 icon="fa fa-thumbs-up">
+                                    <f:setPropertyActionListener value="#{visitante}" target="#{sstEmpresaVisitanteBean.selected}"/>
+                                    <p:confirm header="Confirmación" 
+                                               message="Está seguro de aprobar éste visitante?" 
+                                               icon="fa fa-exclamation-triangle" />
+                                </p:commandButton> 
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite OrangeButton"
+                                                 title="Ver listado de documentos"
+                                                 process="@this"
+                                                 update=":empresaVisitanteDocumentos,:frmEmpresaVisitanteDocs:dtDoc"
+                                                 oncomplete="PF('wlvEmpresaVisitanteDocumentos').show();"
+                                                 icon="fa fa-file-text-o">
+                                    <f:setPropertyActionListener value="#{visitante}" target="#{sstEmpresaVisitanteBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{sstEmpresaVisitanteBean.lstSstEmpresas.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtVisitantes" 
+                                                fileName="Listado de visitantes"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+        <ui:include src="modal/vistaDocumento.xhtml"/>
+        <ui:include src="modal/modalDocumentos.xhtml"/>
+    </ui:define>
+
+</ui:composition>

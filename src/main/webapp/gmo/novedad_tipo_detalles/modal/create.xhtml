@@ -1,0 +1,140 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="novedadTipoDetalleInfrastruc"
+              widgetVar="wlvNovedadTipoDetalleInfrastruc" 
+              modal="true" 
+              class="mr1024_50 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              closable="false"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{gmoTipoDetalleInfrastrctBean.selected == null}">
+                                NUEVO REGISTRO
+                            </c:if>
+                            <c:if test="#{gmoTipoDetalleInfrastrctBean.selected != null}">
+                                EDITAR REGISTRO
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wlvNovedadTipoDetalleInfrastruc').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNovedadTipoDetalleInfrastruc">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Novedad tipo" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="novedad_tipo"
+                                         readonly="true"
+                                         value="#{gmoTipoDetalleInfrastrctBean.novedadTipo.nombre}"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-list"
+                                                 update="msgs,frmNovedadTipo:dtNovedadTipo_id"
+                                                 action="#{gmoTipoDetalleInfrastrctBean.prepareListNovedadTipo()}"
+                                                 style="margin: 0px"
+                                                 oncomplete="PF('novedadTipoDialog_wv').show();"
+                                                 process="@this"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true" 
+                                value="#{gmoTipoDetalleInfrastrctBean.nombre}"
+                                requiredMessage="Debe ingresar un nombre"
+                                />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-3 Padding0">
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <p:outputLabel value="Notifica:" for="@next"/>
+                        </div>
+                        <p:selectBooleanButton value="#{gmoTipoDetalleInfrastrctBean.b_notifica}" 
+                                               onLabel="Sí" offLabel="No" 
+                                               onIcon="fa fa-check" 
+                                               offIcon="fa fa-times"
+                                               styleClass="cssWhite">
+                            <p:ajax update="emails" listener="#{gmoTipoDetalleInfrastrctBean.cargarEmails()}" />
+                        </p:selectBooleanButton>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-3 Padding0"/>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="emails">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{gmoTipoDetalleInfrastrctBean.b_notifica}">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                                 jsf:rendered="#{gmoTipoDetalleInfrastrctBean.b_notifica}">
+                                <p:outputLabel value=" Emails ( Si va a ingresar varios emails, separelos por cómas)" />
+                            </div>
+                            <p:inputTextarea autoResize="false"
+                                             value="#{gmoTipoDetalleInfrastrctBean.novedadTipoDetalle.emails}"
+                                             required="true"
+                                             placeholder="Ex: example1@example.com,example2@example.com"
+                                             requiredMessage="Debe ingresar al menos un email"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         value="#{gmoTipoDetalleInfrastrctBean.novedadTipoDetalle.descripcion}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmNovedadTipoDetalleInfrastruc,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtNovedadTipoDetallesInfrastruc" 
+                             action="#{gmoTipoDetalleInfrastrctBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmNovedadTipoDetalleInfrastruc,@this"
+                             update=":msgs,:frmPrincipal:dtNovedadTipoDetallesInfrastruc"
+                             action="#{gmoTipoDetalleInfrastrctBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{gmoTipoDetalleInfrastrctBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{gmoTipoDetalleInfrastrctBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListaNovedadTipo.xhtml"/>
+</ui:composition>     

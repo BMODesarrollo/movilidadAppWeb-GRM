@@ -1,0 +1,349 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <div class="ui-fluid">
+        <div class="ui-g" jsf:id="tap-view">
+            <p:tabView id="tap-acc"
+                       rendered="#{buscadorAccidenteJSF.accidente != null}" 
+                       class="Wid100">
+                <p:tab id="info-caso" title="Información del caso">
+                    <h:form id="form-info-caso">
+                        <div class="ui-g-12 ui-md-12 ui-lg-6 Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Evento" class="cssBlack" />
+                                <br/>
+                                <h:outputText value="#{buscadorAccidenteJSF.accidente.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Clasificación" class="cssBlack" />
+                                <br/>
+                                <h:outputText value="#{buscadorAccidenteJSF.accidente.idClase.clase}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Día de semana" class="cssBlack" />
+                                <br/>
+                                <h:outputText value="#{buscadorAccidenteJSF.accidente.fechaAcc}" style="text-transform: uppercase">
+                                    <f:convertDateTime pattern="EEEE" />
+                                </h:outputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Fecha del accidente" class="cssBlack" />
+                                <br/>
+                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                <h:outputText value="#{buscadorAccidenteJSF.accidente.fechaAcc}">
+                                    <f:convertDateTime pattern="yyyy-MMM-dd HH:mm" />
+                                </h:outputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Cierre del caso" class="cssBlack" />
+                                <br/>
+                                <i class="fa fa-calendar-times-o" aria-hidden="true"></i>
+                                <h:outputText value="#{buscadorAccidenteJSF.accidente.fechaCierre}">
+                                    <f:convertDateTime pattern="yyyy-MMM-dd HH:mm" />
+                                </h:outputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Vehículo involucrado" class="cssBlack" />
+                                <br/>
+                                <i class="fa fa-bus" aria-hidden="true"></i>
+                                <h:outputText value="#{buscadorAccidenteJSF.accidente.idVehiculo.codigo}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Conductor involucrado" class="cssBlack" />
+                                <br/>
+                                <h:outputText value="#{buscadorAccidenteJSF.accidente.idEmpleado.codigoTm}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Primer responsable" class="cssBlack" />
+                                <br/>
+                                <h:outputText value="#{buscadorAccidenteJSF.accidente.idMaster != null ? buscadorAccidenteJSF.accidente.idMaster.getNombresApellidosCodigo() : 'NA'}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Servicio" class="cssBlack" />
+                                <br/>
+                                <h:outputText value="#{buscadorAccidenteJSF.accidente.idPrgTc.idTaskType.tarea}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                                <h:outputText value="Hora asistencia" class="cssBlack" />
+                                <br/>
+                                <p:calendar id="fechaHoraCierreRecocomo" 
+                                            value="#{buscadorAccidenteJSF.accidente.fechaAsistencia}" 
+                                            showOn="button"
+                                            navigator="true"
+                                            timeControlType="select"
+                                            locale="es"
+                                            pattern="yyyy-MM-dd HH:mm" 
+                                            mask="true" >
+                                    <p:ajax process="@this" global="false" />
+                                </p:calendar>
+                            </div>
+                            <!--Conciliacion-->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                                    <h:outputText value="Cierre de caso en vía" class="cssBlack" />
+                                    <br/>
+                                    <p:selectOneMenu id="tp-atn-via" 
+                                                     value="#{accidenteRecomotoJSF.idAccAtencionVia}" 
+                                                     style="width: 99.999%" 
+                                                     filter="true"
+                                                     filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{accAtencionViaJSF.listAccAtencionVia}" 
+                                                       var="tpAtn" 
+                                                       itemLabel="#{tpAtn.nombre}" 
+                                                       itemDescription="#{tpAtn.descripcion}"
+                                                       itemValue="#{tpAtn.idAccAtencionVia}" />
+                                        <p:ajax listener="#{accidenteRecomotoJSF.guardarCierreCasoVia()}"
+                                                process="tp-atn-via" update=":msgs" />
+                                    </p:selectOneMenu>
+                                </div>
+                                
+                                <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                                    <h:outputText value="Valor conciliado" class="cssBlack" />
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText id="num-conci" 
+                                                     maxlength="11"
+                                                     value="#{buscadorAccidenteJSF.accidente.valorConciliado}" 
+                                                     placeholder="$" >
+                                            <p:keyFilter regEx="/[0-9]/i"/> 
+                                        </p:inputText>
+                                        <div class="botonFloat" >
+                                            <p:commandButton id="btn-cancel-doc"   
+                                                             value="Conciliar" 
+                                                             actionListener="#{accidenteRecomotoJSF.guardarConciliacion()}" 
+                                                             update=":msgs,:tap-view,:form-busqu-acc"
+                                                             process=":tap-acc:form-info-caso:num-conci,@this"
+                                                             icon="fa fa-check" 
+                                                             class="cssWhite" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3" style="max-width: 200px">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-6 Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                <h:outputText value="Descripción" class="cssBlack" />
+                                <br/>
+                                <p:inputTextarea id="t-des" 
+                                                 rows="12" 
+                                                 value="#{buscadorAccidenteJSF.accidente.descripcion}"
+                                                 autoResize="false"
+                                                 readonly="true"/>
+                            </div>
+                        </div>
+                    </h:form>
+                </p:tab>
+                <p:tab id="veh-invo" title="Vehículos Involucrados">
+                    <p:dataTable id="veh-inv-tabla"
+                                 value="#{accidenteRecomotoJSF.listAccidenteVehiculo}"
+                                 var="vehVar"
+                                 rowIndexVar="indexVar"
+                                 rows="5"
+                                 rowsPerPageTemplate="5,10,20"
+                                 paginator="true"
+                                 reflow="true">
+                        <p:column headerText="Vehículo Número" class="TexAlCenter">
+                            <p:outputLabel value="#{indexVar + 1}" />
+                        </p:column>
+                        <p:column headerText="Placa" class="TexAlCenter">
+                            <p:outputLabel value="#{vehVar.placa}" />
+                        </p:column>
+                        <p:column headerText="Código" class="TexAlCenter">
+                            <p:outputLabel value="#{vehVar.codigoVehiculo}" />
+                        </p:column>
+                        <p:column headerText="Tipo Vehículo" class="TexAlCenter">
+                            <p:outputLabel value="#{vehVar.idAccTipoVehiculo.tipoVehiculo}" />
+                        </p:column>
+                        <p:column headerText="Inmovilizado" class="TexAlCenter">
+                            <p:outputLabel value="#{vehVar.idAccInmovilizado.inmovilizado}" />
+                        </p:column>
+                        <p:column headerText="Fecha Inmovilización" class="TexAlCenter">
+                            <p:outputLabel value="#{vehVar.fechaSalidaInmovilizado}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column headerText="Empresa Operadora" class="TexAlCenter">
+                            <p:outputLabel value="#{vehVar.idAccEmpresaOperadora.empresaOperadora}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab id="cond-invo" title="Conductores Involucrados">
+                    <p:dataTable id="cond-invol-tabla"
+                                 value="#{accidenteRecomotoJSF.listAccidenteConductor}"
+                                 rows="5"
+                                 var="codVar"
+                                 rowIndexVar="numRow"
+                                 rowsPerPageTemplate="5,10,20"
+                                 paginator="true"
+                                 reflow="true">
+                        <p:column headerText="#" style="width: 40px">
+                            <p:outputLabel value="#{numRow+1}" />
+                        </p:column>
+                        <p:column headerText="Nombre" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.nombres}" />
+                        </p:column>
+                        <p:column headerText="Apellidos" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.apellidos}" />
+                        </p:column>
+                        <p:column headerText="Código TM" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.centroAsistencial}" />
+                        </p:column>
+                        <p:column headerText="Condición" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.idAccCondicion.condicion}" />
+                        </p:column>
+                        <p:column headerText="Victima" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.victima == 1 ? 'SI' : 'NO'}" />
+                        </p:column>
+                        <p:column headerText="Diagnostico" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.observacion}" />
+                        </p:column>
+                        <p:column headerText="Télefono/Celular" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.telefono} / #{codVar.celular}" />
+                        </p:column>
+                        <p:column headerText="Vehículo" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.idAccidenteVehiculo.placa}" />
+                        </p:column>
+                        <p:column headerText="Tipo de Vehículo" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.idAccidenteVehiculo.idAccTipoVehiculo.tipoVehiculo}" />
+                        </p:column>
+                        <p:column headerText="Versión Operador" class="TexAlCenter">
+                            <p:outputLabel value="#{codVar.version}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab id="documentos" title="Documentos">
+                    <h:form id="form-docs">
+                        <div class="ui-g" jsf:rendered="#{accidenteRecomotoJSF.accidenteDocumento != null}" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding0"></div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <h:outputText value="Tipo de documento" class="cssBlack" />
+                                    <br/>
+                                    <p:selectOneMenu id="tp-docs" 
+                                                     value="#{accidenteRecomotoJSF.idAccTipoDocs}" 
+                                                     style="width: 99.999%" 
+                                                     filter="true" 
+                                                     filterMatchMode="contains"
+                                                     required="true"
+                                                     requiredMessage="Tipo de Documento es requerido">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                        <f:selectItems value="#{accTipoDocsJSF.listAccTipoDocs}" 
+                                                       var="tpDoc" 
+                                                       itemLabel="#{tpDoc.tipoDocs}" 
+                                                       itemDescription="#{tpDoc.descripcion}"
+                                                       itemValue="#{tpDoc.idAccTipoDocs}" />
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <p:commandButton id="documento-cargar" 
+                                                     value="Cargar Archivo" 
+                                                     class="cssWhite OrangeButton"
+                                                     type="button" 
+                                                     onclick="PF('documentoDlg').show()"
+                                                     icon="fa fa-arrow-circle-o-up" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <h:outputText value="Descripción" class="cssBlack" /> <br/>
+                                    <p:inputTextarea id="documento-obser"
+                                                     value="#{accidenteRecomotoJSF.accidenteDocumento.descripcion}"
+                                                     required="true"
+                                                     requiredMessage="Descrpción es requerido"
+                                                     maxlength="65000"
+                                                     rows="7"
+                                                     autoResize="false"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                        <p:commandButton id="btn-new-doc"   
+                                                         value="Cancelar" 
+                                                         actionListener="#{accidenteRecomotoJSF.resetDocumento()}" 
+                                                         update="@form"
+                                                         process="@this"
+                                                         icon="fa fa-times" 
+                                                         class="cssWhite RedButton" />
+                                    </div>
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                        <p:commandButton id="btn-cancel-doc"   
+                                                         value="Guardar" 
+                                                         actionListener="#{accidenteRecomotoJSF.guardarDocumento()}" 
+                                                         update=":msgs,@form"
+                                                         process="@form"
+                                                         icon="fa fa-check" 
+                                                         class="cssWhite" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding0">
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" jsf:id="panel-doc-tabla">
+                            <p:dataTable id="documentos-tabla"
+                                         value="#{accidenteRecomotoJSF.listAccidenteDocumento}"
+                                         var="item"
+                                         rowIndexVar="rowIndex"
+                                         rowKey="#{item.idAccidenteDocumento}"
+                                         rows="5"
+                                         rowsPerPageTemplate="5,10,20"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         reflow="true">
+                                <f:facet name="header">
+                                    Documentos
+                                </f:facet>
+                                <f:facet name="paginatorTopRight">
+                                    <p:commandButton id="btn-new-doc"   
+                                                     value="Nuevo" 
+                                                     actionListener="#{accidenteRecomotoJSF.prepareGuardar()}" 
+                                                     update=":msgs,@form"
+                                                     process="@this"
+                                                     icon="fa fa-plus" 
+                                                     class="cssWhite" />
+                                </f:facet>
+                                <p:column headerText="#" style="width: 40px; ">
+                                    <h:outputText value="#{rowIndex + 1}" />
+                                </p:column>
+                                <p:column headerText="Fecha">
+                                    <h:outputText value="#{item.fecha}">
+                                        <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Tipo de Documento">
+                                    <h:outputText value="#{item.idAccTipoDocs.tipoDocs}" title="#{item.descripcion}" />
+                                </p:column>
+                                <p:column headerText="Descripción">
+                                    <h:outputText value="#{item.descripcion}" />
+                                </p:column>
+                                <p:column headerText="Acciones" exportable="false">
+                                    <div class="ui-g">
+                                        <div class="ui-g-3 ui-md-3 ui-lg-3" style="text-align: center">
+                                            <p:commandButton id="file-master-test" 
+                                                             ajax="false" 
+                                                             icon="fa fa-external-link" 
+                                                             onclick="target = '_blank'"
+                                                             class="OrangeButton cssWhite">
+                                                <p:fileDownload value="#{accidenteRecomotoJSF.prepDownloadLocal(item.path)}" 
+                                                                contentDisposition="inline"/>
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </h:form>
+                </p:tab>
+            </p:tabView>
+        </div>
+    </div>
+
+</ui:composition>

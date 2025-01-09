@@ -1,0 +1,62 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="editNoConforme"
+              widgetVar="editNoConformeDlg" 
+              modal="true" 
+              closable="true"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+
+        <f:facet name="header">
+            EDITAR LAVADO NO CONFORME
+        </f:facet>
+        <p:ajax event="close" update="frmNoConforme,:frmNoConformeList:dtNoConforme" listener="#{lavadoBean.handleClose}" />
+
+        <h:form id="frmEditNoConforme" styleClass="full-width-form">
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <h:panelGrid columns="4" style="width: 100%;">
+                <h:outputLabel for="menuAct" value="Actividades" />
+                <p:selectCheckboxMenu id="menuAct" value="#{lavadoBean.lstActividadesPreseleccionadas}" label="--Actividad--" 
+                                      filter="true" filterMatchMode="contains" panelStyle="width:250px" >
+                    <f:selectItems value="#{lavadoBean.lstActividades}" />
+                </p:selectCheckboxMenu>
+
+                <h:outputLabel for="menuResp" value="Responsables" />
+                <p:selectCheckboxMenu id="menuResp" value="#{lavadoBean.lstResponsablePreseleccionadas}" label="--Responsable--"
+                                      filter="true" filterMatchMode="contains" panelStyle="width:250px">
+                    <f:selectItems value="#{lavadoBean.lstResponsable}" />
+                </p:selectCheckboxMenu>
+
+                <h:outputLabel for="menuVeh" value="Vehículos" />
+                <p:selectCheckboxMenu id="menuVeh" value="#{lavadoBean.lstVehiculosPreseleccionadas}" label="-- Vehículo --"
+                                      filter="true" filterMatchMode="contains" panelStyle="width:250px"
+                                       >
+                    <f:selectItems value="#{lavadoBean.lstVehiculos}" />
+                </p:selectCheckboxMenu>
+            </h:panelGrid>
+            <h:panelGrid columns="1" style="width: 100%;">
+                <p:outputLabel for="@next" value="Observación:" />
+                <p:inputTextarea value="#{lavadoBean.lavadoNoConforme.observacion}" style="width: 100%;"/>
+            </h:panelGrid>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs"
+                             action="#{lavadoBean.actualizarNoConforme()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{lavadoBean.selectedNoConforme != null}"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

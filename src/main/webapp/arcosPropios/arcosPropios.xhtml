@@ -1,0 +1,252 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <style>
+            @media screen and (max-width: 500px ) {
+                .responsive_modal { width: 90% !important;} }
+
+            @media screen and (min-width: 1024px ) {
+                .responsive_modal { width: 30% !important; }
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Arcos"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="config_freeway_id" 
+                                                 value="#{selectConfigFreewayBean.idConfigFreeway}" 
+                                                 filter="true"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains"
+                                                 required="true"
+                                                 requiredMessage="unidad funcional es requerido">
+                                    <p:ajax process="@this" listener="#{selectConfigFreewayBean.findIdConfigFreeway()}"
+                                            update="frmArcospropios:tabArcos:tblPar,frmArcospropios:tabArcos:tblDis"/>
+                                    <f:selectItem itemLabel="Seleccione Unidad Funcional" itemValue="#{0}"/>
+                                    <f:selectItems value="#{selectConfigFreewayBean.listConfigFreeway}" 
+                                                   var="items"
+                                                   itemLabel="#{items.idGopUnidadFuncional.nombre}"
+                                                   itemValue="#{items.idConfigFreeway}"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <p:growl id="messages" showDetail="true" />
+            <h:form id="frmArcospropios">
+                <p:tabView id="tabArcos">
+                    <p:tab title="Paradas" id="idParadas">
+                        <div class="ui-fluid" >
+                            <div class="ui-g ">
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="txtnombre"  value="Nombre:"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:inputText id="txtnombre" required="true" maxlength="45"
+                                                     requiredMessage="Debe ingresar el nombre" 
+                                                     value="#{arcosPropiosJSFMB.nombreParada}">
+                                        </p:inputText>
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5" jsf:id="idBtns">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="-" style="visibility: hidden" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:commandButton id="btnGuardar" 
+                                                         icon="fa fa-save" value="Guardar" 
+                                                         actionListener="#{arcosPropiosJSFMB.guardarParada()}"
+                                                         class="cssWhite"
+                                                         rendered="#{!arcosPropiosJSFMB.flagEditarParada}"
+                                                         update="tblPar,messages,msgs,txtnombre"/>
+                                        <p:commandButton id="btnEditar" 
+                                                         icon="fa fa-save" value="Actualizar" 
+                                                         actionListener="#{arcosPropiosJSFMB.editarParada()}"
+                                                         class="cssWhite"
+                                                         rendered="#{arcosPropiosJSFMB.flagEditarParada}"
+                                                         update="msgs,txtnombre,frmArcospropios:tabArcos:idBtns,tblPar"/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                    <p:dataTable id="tblPar" var="parada"  editable="true" 
+                                                 value="#{arcosPropiosJSFMB.listParadas}" rows="10"
+                                                 paginator="true"
+                                                 filterDelay="1000"
+                                                 rowIndexVar="nroFila"
+                                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                                                 {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                 rowsPerPageTemplate="5,10,15">
+                                        <p:column headerText="#" style="width: 10%">
+                                            <h:outputText value="#{nroFila+1}" />
+                                        </p:column>
+                                        <p:column filterBy="#{parada.name}"
+                                                  filterMatchMode="contains"
+                                                  headerText="Nombre" >
+                                            <h:outputText value="#{parada.name}"/>
+                                        </p:column>
+                                        <p:column filterBy="#{parada.idGopUnidadFuncional.nombre}"
+                                                  filterMatchMode="contains"
+                                                  headerText="Unidad Funcional" >
+                                            <h:outputText value="#{parada.idGopUnidadFuncional.nombre}"/>
+                                        </p:column>
+                                        <p:column headerText="Opciones" style="width:15%; text-align: center">
+                                            <p:commandButton icon="fa fa-pencil" 
+                                                             class="GreenButton cssWhite"
+                                                             action="#{arcosPropiosJSFMB.prepareEditParada(parada)}" 
+                                                             title="Modificar" 
+                                                             update="frmArcospropios:tabArcos:txtnombre,frmArcospropios:tabArcos:idBtns"
+                                                             process="@this"
+                                                             disabled="#{parada.estadoReg==1}"/>
+
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>
+                            </div>
+                        </div>
+                    </p:tab>
+                    <p:tab title="Distancias" id="idDistancia">
+                        <div class="ui-fluid" >
+                            <div class="ui-g ">
+                                <div class="ui-g-6 ui-md-6 ui-lg-2 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="id_pi" value="Punt-Ini" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:inputText id="id_pi" placeholder="Punt-Ini"
+                                                     value="#{arcosPropiosJSFMB.punto_inicioString}"  maxlength="12" >
+                                        </p:inputText>
+                                        <div class="botonFloat">
+                                            <p:commandButton title="Consultar punto inicio"
+                                                             icon="fa fa-search"
+                                                             id="btnBp"
+                                                             style="margin: 0px"
+                                                             class="cssWhite"
+                                                             process="@this,id_pi"
+                                                             action="#{arcosPropiosJSFMB.findDestino(1)}"
+                                                             update="msgs,id_pi">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-2 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="id_pf" value="Punt-Fin" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:inputText id="id_pf" placeholder="Punt-Fin" 
+                                                     value="#{arcosPropiosJSFMB.punto_finString}"  maxlength="12" >
+                                        </p:inputText>
+                                        <div class="botonFloat">
+                                            <p:commandButton title="Consultar punto fin"
+                                                             icon="fa fa-search"
+                                                             class="cssWhite"
+                                                             id="btnBpp"
+                                                             style="margin: 0px"
+                                                             process="@this,id_pf"
+                                                             action="#{arcosPropiosJSFMB.findDestino(2)}"
+                                                             update="msgs,id_pf">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-2 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="id_dista" value="Distancia" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:inputNumber id="id_dista" placeholder="Distancia" 
+                                                       value="#{arcosPropiosJSFMB.distancia}" 
+                                                       maxValue="99999" >
+                                        </p:inputNumber>
+                                    </div>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-2 Padding5" jsf:id="idBtnsD">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="-" style="visibility: hidden" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:commandButton id="btnGuardarD" 
+                                                         icon="fa fa-save" value="Guardar" 
+                                                         actionListener="#{arcosPropiosJSFMB.guardarDistancia()}"
+                                                         class="cssWhite"
+                                                         process="@this,id_pi,id_pf,id_dista"
+                                                         rendered="#{!arcosPropiosJSFMB.flagEditarDistancia}"
+                                                         update="tblDis,messages,msgs,id_pi,id_pf,id_dista"/>
+                                        <p:commandButton id="EditD" 
+                                                         icon="fa fa-save" value="Actualizar" 
+                                                         actionListener="#{arcosPropiosJSFMB.editDistancia()}"
+                                                         class="cssWhite"
+                                                         rendered="#{arcosPropiosJSFMB.flagEditarDistancia}"
+                                                         process="@this,id_pi,id_pf,id_dista"
+                                                         update="tblDis,messages,msgs,id_pi,id_pf,id_dista,frmArcospropios:tabArcos:idBtnsD"/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                    <p:dataTable id="tblDis" var="distance"  editable="true" 
+                                                 value="#{arcosPropiosJSFMB.listDistance}" rows="10"
+                                                 paginator="true"
+                                                 filterDelay="1000"
+                                                 rowIndexVar="nroFila"
+                                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                                                 {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                 rowsPerPageTemplate="5,10,15">
+                                        <p:column headerText="#" style="width: 10%">
+                                            <h:outputText value="#{nroFila+1}" />
+                                        </p:column>
+                                        <p:column filterBy="#{distance.idPrgFromStop.name}"
+                                                  filterMatchMode="contains"
+                                                  headerText="Punto Inicio" >
+                                            <h:outputText value="#{distance.idPrgFromStop.name}"/>
+                                        </p:column>
+                                        <p:column filterBy="#{distance.idPrgToStop.name}"
+                                                  filterMatchMode="contains"
+                                                  headerText="Punto Fin" >
+                                            <h:outputText value="#{distance.idPrgToStop.name}"/>
+                                        </p:column>
+                                        <p:column filterBy="#{distance.distance}"
+                                                  filterMatchMode="contains"
+                                                  headerText="Distancia" >
+                                            <h:outputText value="#{distance.distance}"/>
+                                        </p:column>
+                                        <p:column filterBy="#{distance.idGopUnidadFuncional.nombre}"
+                                                  filterMatchMode="contains"
+                                                  headerText="Unidad Funcional" >
+                                            <h:outputText value="#{distance.idGopUnidadFuncional.nombre}"/>
+                                        </p:column>
+                                        <p:column headerText="Opciones" style="width:15%; text-align: center">
+                                            <p:commandButton icon="fa fa-pencil" 
+                                                             class="GreenButton cssWhite"
+                                                             action="#{arcosPropiosJSFMB.prepareEditDistancia(distance)}" 
+                                                             title="Modificar" 
+                                                             process="@this"
+                                                             update="frmArcospropios:tabArcos:id_pi,frmArcospropios:tabArcos:id_pf,frmArcospropios:tabArcos:id_dista,frmArcospropios:tabArcos:idBtnsD"
+                                                             disabled="#{distance.estadoReg==1}"/>
+
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>
+                            </div>
+                        </div>
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/listaParadas.xhtml"/>
+    </ui:define>
+</ui:composition>

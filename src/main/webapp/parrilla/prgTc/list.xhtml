@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .ui-filter-column .ui-column-customfilter .custom-filter {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        </style>
+    </ui:define>
+
+
+    <p:dialog widgetVar="serv-veh-wv" 
+              id="id-serv-veh-dlg" 
+              modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              header="Servicios Vehículo"
+              class="mr1024_60 mr500_90"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <h:form id="form-services-veh">
+            <p:dataTable id="tblPrgTc" 
+                         var="prgtc" 
+                         widgetVar="tblPrgTcWV"
+                         style="border: none;padding: 0"
+                         reflow="true"
+                         scrollable="true" 
+                         selectionMode="single"
+                         selection="#{prgTcByVehiculoJSF.prgTcSelect}"
+                         scrollHeight="200"
+                         rowIndexVar="nroFila"
+                         rowKey="#{prgtc.idPrgTc}"
+                         value="#{prgTcByVehiculoJSF.listPrgTc}">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:calendar id="fecha" 
+                                    value="#{prgTcByVehiculoJSF.fecha}" 
+                                    pattern="yyyy/MM/dd" 
+                                    navigator="true"
+                                    title="Fecha"
+                                    mask="true"
+                                    locale="es"
+                                    style="right: 0"
+                                    mindate="today-1"
+                                    rendered="false"
+                                    showOn="button"
+                                    required="true"
+                                    requiredMessage="Fecha es requerido"/>
+                        <p:inputText id="cod-veh"
+                                     value="#{prgTcByVehiculoJSF.codigoVehiculo}" 
+                                     style="right: 0"
+                                     placeholder="Código Vehículo"/>
+                        <p:commandButton value="Buscar" 
+                                         icon="fa fa-search"
+                                         class="cssWhite"
+                                         style="right: 0"
+                                         actionListener="#{prgTcByVehiculoJSF.consultarServiciosVehiculo()}"
+                                         process="@this,cod-veh,fecha"
+                                         update="msgs,@form"
+                                         />
+                    </div>
+                </f:facet>
+                <p:ajax event="rowSelect" 
+                        listener="#{prgTcByVehiculoJSF.onRowSelect}"
+                        process="@this"
+                        update="msgs" />
+                <p:ajax event="rowUnselect" 
+                        listener="#{prgTcByVehiculoJSF.setPrgTcSelect(null)}"
+                        process="@this"
+                        update="msgs,tblPrgTc" />
+                <p:column class="#{prgTcServbusBuscarJSF.alarStyleClass(prgtc)} "  headerText="Servicios">
+
+                    <ui:fragment rendered="#{prgTcServbusBuscarJSF.enEjecucion(prgtc)}" >
+                        <script type="text/javascript">$(function () {
+                                document.getElementById('#{prgtc.idPrgTc}').scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center',
+                                    inline: 'center'
+                                });
+                            });</script>
+                    </ui:fragment>
+                    <span class="ui-fluid" id="#{prgtc.idPrgTc}">
+                        <div class="ui-fluid">
+                            <div class="ui-g">
+                                <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                                    <span class="Fs12">#{prgtc.timeOrigin}</span>
+                                    <br/>
+                                    <span class="Fs12">#{prgtc.timeDestiny}</span>
+                                </span>
+                                <span class="ui-g-12 ui-md-12 ui-lg-4 Padding5 TexAlCenter" >
+                                    <span class="Fs12 cssBlack" >#{prgtc.toStop.name}</span>
+                                    <br/>
+                                    desde
+                                    <br/>
+                                    <span class="Fs12 cssBlack">#{prgtc.fromStop.name}</span>
+                                </span>
+                                <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                                    <span class="Fs12 cssBlack">Servbus</span>
+                                    <br/>
+                                    <span class="Fs12">#{prgtc.servbus}</span>
+                                </span>
+                                <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                                    <span class="Fs12 cssBlack" jsf:id="emp">
+                                        Operador
+                                    </span>
+                                    <p:tooltip id="tooltip"
+                                               value="#{prgtc.idEmpleado.getNombresApellidos()}"
+                                               position="top"
+                                               for=":form-services-veh:tblPrgTc:#{nroFila}:emp" />
+                                    <br/>
+                                    <span class="Fs12">#{prgtc.idEmpleado.codigoTm}</span>
+                                </span>
+                                <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter" >
+                                    <span class="Fs12 cssBlack">Vehículo</span>
+                                    <br/>
+                                    <span class="Fs12">#{prgtc.idVehiculo.codigo}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </span>
+                </p:column>
+            </p:dataTable>
+            <span class="ui-fluid Padding5">
+                <span class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nuevo Vehículo: *"/>
+
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="vehRemp"
+                                         value="#{cambioVehiculoJSF.vehChgDTO.newVehiculo}" 
+                                         maxlength="10"
+                                         required="true"
+                                         requiredMessage="Nuevo vehículo es requerido"
+                                         />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                        <ui:include src="/zComponent/selectDistSistema.xhtml"/>
+                    </div>
+                </span>
+                <span class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Observación *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputTextarea  id="observacion" 
+                                          maxlength="65000" 
+                                          class="cssBlack"
+                                          value="#{cambioVehiculoJSF.vehChgDTO.observacion}" 
+                                          required="true" 
+                                          requiredMessage="Descripción es requerido"/>
+                    </div>
+                </span>
+            </span>
+            <p:remoteCommand name="procesar" 
+                             actionListener="#{cambioVehiculoJSF.procesarCambioVehiculo()}" 
+                             process="@this,@form"
+                             update="msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-proc"
+                             value="Actualizar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             onclick="procesar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

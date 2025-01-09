@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="dial-emple" closeOnEscape="true" widgetVar="listEmpDlg" modal="true" width="90%" height="90%"
+              resizable="false" appendTo="@(body)" position="center top" 
+              responsive="true" closable="false">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Lista de Empleados
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('listEmpDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="form-emp-list">
+            <p:dataTable id="tabla-emple"
+                         var="emp" 
+                         value="#{accidenteJSF.listEmpleados}"  
+                         paginator="true"
+                         filterDelay="2000"
+                         rows="10"
+                         rowsPerPageTemplate="10,20,50"
+                         reflow="true"
+                         scrollable="true"
+                         scrollHeight="500"
+                         rowIndexVar="nroFila"
+                         rowKey="#{nroFila + 1}"
+                         widgetVar="wvEmp"
+                         emptyMessage="No existen empleados registrados">
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código Tm" filterBy="#{emp.codigoTm}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{emp.codigoTm}" />
+                </p:column>
+                <p:column headerText="Cédula" filterBy="#{emp.identificacion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{emp.identificacion}" />
+                </p:column>
+                <p:column headerText="Nombre Completo" filterBy="#{emp.nombres} #{emp.apellidos}"
+                          filterMatchMode="contains">
+                    <br/>
+                    <h:outputText value="#{emp.nombres} #{emp.apellidos}" />
+                </p:column>
+                <p:column headerText="Télefono" filterBy="#{emp.telefonoMovil}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{emp.telefonoMovil}" />
+                </p:column>
+                <p:column headerText="Acciones" style="width: 100px">
+                    <p:commandButton id="btn-sel-emp"
+                                     icon="fa fa-check"
+                                     class="cssWhite GreenButton"
+                                     title="Seleccionar"
+                                     process="@this"
+                                     update="tabView:form-info-caso:param-master,accidente-form:msg"
+                                     actionListener="#{accidenteJSF.onSelectEmpleado(emp)}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

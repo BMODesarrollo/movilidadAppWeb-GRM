@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel >
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="hora de entrada y salida real del personal  activo de la organización y las diferencias con el horario de turno programado"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Una unidad funcional" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax global="false"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="form_entrada_salida_jornadas">
+                <p:dataTable id="db_entrada_salida_jornada_id" 
+                             var="item" 
+                             widgetVar="wlVdb_entrada_salida_jornada_id"
+                             filterDelay="700"
+                             tableStyle="table-layout:auto"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             rowStyleClass="text-center"
+                             rows="50"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="50,100,200"
+                             value="#{rIRPT12Bean.list}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                            <p:calendar id="fecha_desde" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{rIRPT12Bean.desde}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:calendar id="fecha_hasta" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{rIRPT12Bean.hasta}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Consultar"
+                                action="#{rIRPT12Bean.consultar()}"
+                                class="cssWhite"
+                                oncomplete="PF('wlVdb_entrada_salida_jornada_id').clearFilters()"
+                                update="msgs,form_entrada_salida_jornadas:db_entrada_salida_jornada_id"/>   
+                        </div>
+                    </f:facet>
+                    <p:column headerText="FECHA" width="10%" styleClass="text-center">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="UNIODAD FUNCIONAL"
+                              filterable="true"
+                              rendered="#{uniFuncSessionBean.filtradoUF}"
+                              filterMatchMode="contains"
+                              filterBy="#{item.nombreUf}">
+                        <h:outputText value="#{item.nombreUf}" />
+                    </p:column>
+                    <p:column headerText="IDENTIFICACIÓN"
+                              filterable="true"
+                              filterMatchMode="contains"
+                              filterBy="#{item.identificacion}">
+                        <h:outputText value="#{item.identificacion}" />
+                    </p:column>
+                    <p:column headerText="CÓDIGO"
+                              filterable="true"
+                              filterMatchMode="contains"
+                              filterBy="#{item.codigoTm}">
+                        <h:outputText value="#{item.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="NOMBRE OPERADOR"
+                              filterable="true"
+                              width="15%"
+                              filterMatchMode="contains"
+                              filterBy="#{item.nombreOperador}">
+                        <h:outputText value="#{item.nombreOperador}" />
+                    </p:column>
+
+                    <p:column headerText="HORA DE INGRESO PROGRAMADA">
+                        <h:outputText value="#{item.horaIngresoPrg}" />
+                    </p:column>
+
+                    <p:column filterBy="#{item.presentacionMymovil}" 
+                              exportable="false"
+                              headerText="REGISTRO EN MY MOVIL"
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('wlVdb_entrada_salida_jornada_id').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText  value="#{item.presentacionMymovil==1 ? 'Sí': item.presentacionMymovil==null ? 'No': 'No'}" />
+                    </p:column>
+
+
+                    <p:column headerText="HORA DE INGRESO EN PRESENTACIÓN">
+                        <h:outputText value="#{item.horaIngresoPresentacion}" />
+                    </p:column>
+                    <p:column headerText="HORA DE SALIDA PROGRAMADA">
+                        <h:outputText value="#{item.horaSalidaPrg}" />
+                    </p:column>
+
+                    <p:column filterBy="#{item.salidaMymovil}" 
+                              exportable="false"
+                              headerText="CIERRE DE TURNO MY MOVIL"
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('wlVdb_entrada_salida_jornada_id').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText  value="#{item.salidaMymovil==1 ? 'Sí': item.salidaMymovil==null ? 'No': 'No'}" />
+                    </p:column>
+
+
+                    <p:column headerText="HORA DE SALIDA REGISTRADA">
+                        <h:outputText value="#{item.horaSalidaRegistrada}" />
+                    </p:column>
+                    <p:column headerText="TIEMPO EXTRA REGISTRADO" >
+                        <h:outputText value="#{rIRPT12Bean.getTiempoExtraRegistrado(item)}" title="Diferencia en tiempo entre hora de salida registrada y hora programada"/>
+                    </p:column>
+                    <p:column headerText="Ruta">
+                        <h:outputText value="#{item.ultimaRuta}" />
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{rIRPT12Bean.list.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="db_entrada_salida_jornada_id" 
+                                                fileName="Entrada Salida Jornadas"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

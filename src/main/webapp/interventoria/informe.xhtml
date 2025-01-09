@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+            .capitalized {
+                text-transform: capitalize;
+            }
+            .ui-datepicker .ui-monthpicker .ui-monthpicker-month {
+                color: #333;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            INFORME INTERVENTORIA
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmInfoControl:dtInterventoria,:msgs" 
+                                            listener="#{informeInterventoriaBean.generarReporte()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmInfoControl">
+
+                <p:dataTable var="informe" value="#{informeInterventoriaBean.lstInforme}"
+                             id="dtInterventoria" widgetVar="wlVInterventoria"
+                             emptyMessage="No se han encontrado registros"
+                             rowStyleClass="text-center" rows="30"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             filterDelay="1500"
+                             reflow="true" paginator="true">
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:datePicker id="month" 
+                                          locale="es"
+                                          placeholder="Seleccione mes y año"
+                                          view="month" 
+                                          value="#{informeInterventoriaBean.fechaMes}" 
+                                          pattern="MM/yyyy" 
+                                          yearNavigator="true" yearRange="2019:2050" />
+                            <p:spacer width="15"/>
+                            <p:commandButton value="Buscar" icon="fa fa-search"
+                                             update="dtInterventoria,:msgs"
+                                             class="cssWhite"
+                                             actionListener="#{informeInterventoriaBean.generarReporte()}">
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha"
+                              width="250"
+                              >
+                        <h:outputText value="#{informe.fecha_registro}" 
+                                      styleClass="capitalized"/>
+                    </p:column>
+
+                    <p:column headerText="Código_TM" 
+                              filterBy="#{informe.codigo_tm}"
+                              filterMatchMode="contains"
+                              width="150">
+                        <h:outputText value="#{informe.codigo_tm}" />
+                    </p:column>
+
+                    <p:column headerText="Cargo" filterBy="#{informe.nombre_cargo}"
+                              width="305">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlVInterventoria').filter()"
+                                             rendered="#{informeInterventoriaBean.lstInforme.size() gt 0}">
+                                <f:selectItem itemLabel="Seleccione cargo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{informeInterventoriaBean.cargos}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{informe.nombre_cargo}" />
+                    </p:column>
+
+                    <p:column headerText="Tiempo Total">
+                        <h:outputText value="#{informe.tiempoTotal}" />
+                    </p:column>
+                    <p:column headerText="Comercial">
+                        <h:outputText value="#{informe.comercial}" />
+                    </p:column>
+                    <p:column headerText="Vacío">
+                        <h:outputText value="#{informe.vacio}" />
+                    </p:column>
+                    <p:column headerText="Quejas" sortBy="#{informe.quejas}">
+                        <h:outputText value="#{informe.quejas}" />
+                    </p:column>
+                    <p:column headerText="Multas" sortBy="#{informe.multas}">
+                        <h:outputText value="#{informe.multas}" />
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{informeInterventoriaBean.lstInforme.size()} registro(s).
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtInterventoria" fileName="interventoria #{now}"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

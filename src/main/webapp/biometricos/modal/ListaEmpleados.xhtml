@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="EmpleadoListDlg" widgetVar="EmpleadoListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de empleados"
+              width="550px" closeOnEscape="true" responsive="true">
+        <h:form id="frmEmpleadoList">
+            <p:dataTable var="vht" value="#{novedadDanoBean.lstEmpleados}"  
+                         selectionMode="single" selection="#{novedadDanoBean.empleado}"
+                         paginator="true"
+                         filterDelay="1000"
+                         rows="8"
+                         reflow="true"
+                         rowIndexVar="nroFila"
+                         rowKey="#{vht.idEmpleado}"
+                         emptyMessage="No existen empleados registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{novedadDanoBean.onRowDblClckSelect}"
+                        update=":frmNuevoTipo:operador"
+                        oncomplete="PF('EmpleadoListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código_TM" filterBy="#{vht.codigoTm}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.codigoTm}" />
+                </p:column>
+                <p:column headerText="Nombre completo" filterBy="#{vht.nombres} #{vht.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.nombres} #{vht.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

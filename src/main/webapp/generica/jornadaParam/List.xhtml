@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="title">
+        <h:outputText value="Genérica Jornada Param"></h:outputText>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="GenericaJornadaParamListForm">
+            <p:panel>
+                <f:facet name="header">
+                    Genérica Jornada Param
+                    <h:commandLink>
+                        <img src="../../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                        <p:dataExporter type="xlsx" target="datalist" fileName="Genérica Jornada Param"/>
+                    </h:commandLink>
+                </f:facet>
+                <p:dataTable id="datalist" value="#{genericaJornadaParamBean.lstGenericaJornadaParams}" var="item"
+                             selectionMode="single" selection="#{genericaJornadaParamBean.selected}"
+                             paginator="true"
+                             reflow="true"
+                             emptyMessage="No se han encontrado registros"
+                             widgetVar="novTD"
+                             rowKey="#{item.idGenericaJornadaParam}"
+                             rows="10"
+                             filterDelay="2000"
+                             rowsPerPageTemplate="10,20,30,40,50">
+
+                    <p:ajax event="rowSelect"   update="createButton editButton"/>
+                    <p:ajax event="rowUnselect" update="createButton editButton"/>
+
+                    <p:column style="text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="Área"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idParamArea.area}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              styleClass="#{item.ctrlCambioJornada == 1 ? 'cssGreen' : item.ctrlCambioJornada == 0 ? 'cssRed' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Cambio Jornada"/>
+                        </f:facet>
+                        <h:outputText value="Si" style="color: white;" rendered="#{item.ctrlCambioJornada == 1}"/>
+                        <h:outputText value="No" style="color: white;" rendered="#{item.ctrlCambioJornada == 0}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              styleClass="#{item.ctrlAutorizarExtensionJornada == 1 ? 'cssGreen' : item.ctrlAutorizarExtensionJornada == 0 ? 'cssRed' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Autorizar Extensión Jornada"/>
+                        </f:facet>
+                        <h:outputText value="Si" style="color: white;" rendered="#{item.ctrlAutorizarExtensionJornada == 1}"/>
+                        <h:outputText value="No" style="color: white;" rendered="#{item.ctrlAutorizarExtensionJornada == 0}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              styleClass="#{item.ctrlAprobarExtrasFeriadas == 1 ? 'cssGreen' : item.ctrlAprobarExtrasFeriadas == 0 ? 'cssRed' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Aprobar Extras Feriadas"/>
+                        </f:facet>
+                        <h:outputText value="Si" style="color: white;" rendered="#{item.ctrlAprobarExtrasFeriadas == 1}"/>
+                        <h:outputText value="No" style="color: white;" rendered="#{item.ctrlAprobarExtrasFeriadas == 0}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              styleClass="#{item.requerirOrdenTrabajo == 1 ? 'cssGreen' : item.requerirOrdenTrabajo == 0 ? 'cssRed' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Requerir Orden Trabajo" title="Requerir Orden Trabajo"/>
+                        </f:facet>
+                        <h:outputText value="Si" style="color: white;" rendered="#{item.requerirOrdenTrabajo == 1}"/>
+                        <h:outputText value="No" style="color: white;" rendered="#{item.requerirOrdenTrabajo == 0}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              styleClass="#{item.validarDescansoDominical == 1 ? 'cssGreen' : item.validarDescansoDominical == 0 ? 'cssRed' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Valida Descanso Dominical" title="Valida Descanso Dominical"/>
+                        </f:facet>
+                        <h:outputText value="Si" style="color: white;" rendered="#{item.validarDescansoDominical == 1}"/>
+                        <h:outputText value="No" style="color: white;" rendered="#{item.validarDescansoDominical == 0}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              styleClass="#{item.notifica == 1 ? 'cssGreen' : item.notifica == 0 ? 'cssRed' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Notifica" title="Notifica"/>
+                        </f:facet>
+                        <h:outputText value="Si" style="color: white;" rendered="#{item.notifica == 1}"/>
+                        <h:outputText value="No" style="color: white;" rendered="#{item.notifica == 0}"/>
+                    </p:column>
+                    <p:column style="text-align: center;" styleClass="text-word-wrap">
+                        <f:facet name="header">
+                            <h:outputText value="Emails" title="Emails"/>
+                        </f:facet>
+                        <h:outputText value="#{item.emails}" rendered="#{item.notifica == 1}"/>
+                        <h:outputText value="SIN CORREOS" rendered="#{item.notifica != 1}"/>
+                    </p:column>
+                    <p:column style="text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="Días Descanso Dominical"/>
+                        </f:facet>
+                        <h:outputText value="#{item.nroDiasDescansoDominical}"/>
+                    </p:column>
+                    <p:column style="text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="Horas Extras Semanales"/>
+                        </f:facet>
+                        <h:outputText value="#{item.horasExtrasSemanales lt 0 ? 'N/A' : item.horasExtrasSemanales}"/>
+                    </p:column>
+                    <p:column style="text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="Horas Extras Mensuales"/>
+                        </f:facet>
+                        <h:outputText value="#{item.horasExtrasMensuales lt 0 ? 'N/A' : item.horasExtrasMensuales}"/>
+                    </p:column>
+                    <f:facet name="header">
+                        <div aling="left">
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="datalist" trigger="toggler" />
+                        </div>
+                        <div align="right">
+                            <p:commandButton id="createButton" icon="fa fa-plus" value="#{bundle.Create}"
+                                             class="cssWhite"
+                                             actionListener="#{genericaJornadaParamBean.nuevo()}" 
+                                             disabled="#{not(genericaJornadaParamBean.flagBtnNuevo)}"
+                                             update="GenericaJornadaParamCreateForm,datalist" 
+                                             oncomplete="PF('GenericaJornadaParamCreateDialog').show()"/>
+
+                            <p:commandButton id="editButton" icon="fa fa-pencil" value="#{bundle.Edit}" 
+                                             actionListener="#{genericaJornadaParamBean.editar()}"
+                                             class="GreenButton cssWhite"
+                                             update="GenericaJornadaParamCreateForm,GenericaJornadaParamCreateDlg" 
+                                             oncomplete="PF('GenericaJornadaParamCreateDialog').show()"
+                                             disabled="#{empty genericaJornadaParamBean.selected or not(genericaJornadaParamBean.flagBtnNuevo)}"/>
+                        </div>
+
+                    </f:facet>
+                    <f:facet name="footer">
+                        <div align="right">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="datalist" fileName="generica-jornada-param #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="datalist" fileName="generica-jornada-param #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="datalist" fileName="generica-jornada-param #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <ui:include src="Create.xhtml"/>
+    </ui:define>
+</ui:composition>

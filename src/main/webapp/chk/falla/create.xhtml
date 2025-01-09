@@ -1,0 +1,179 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="chkComponente"
+              widgetVar="wlgChkComponenteFalla" 
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{chkComponenteFallaBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{chkComponenteFallaBean.selected != null}">
+            <f:facet name="header">
+                EDITAR DATOS
+            </f:facet>
+        </c:if>
+        <h:form id="frmChkComponenteFalla">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true" 
+                                value="#{chkComponenteFallaBean.nombre}"
+                                requiredMessage="Debe ingresar nombre"
+                                />
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Componente" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu 
+                                styleClass="custom-filter" 
+                                filter="true" 
+                                value="#{chkComponenteFallaBean.idComponente}"
+                                filterMatchMode="contains" 
+                                required="true"
+                                requiredMessage="Debe seleccionar un componente"
+                                style="width: 99.999%" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="Seleccione falla" 
+                                              itemValue="#{null}"
+                                              itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{chkComponenteFallaBean.lstComponentes}"
+                                               var="cte" itemLabel="#{cte.nombre}"
+                                               itemValue="#{cte.idChkComponente}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <br/>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding3">
+                            <p:outputLabel value="¿Afecta Disponibilidad?" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding3">
+                            <p:selectBooleanButton value="#{chkComponenteFallaBean.b_afectaDisponibilidad}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   id="afectaDispo"
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   styleClass="cssWhite">
+                                <p:ajax update="novedad_tipo,
+                                        novedad_tipo_detalle,sistema_grp" 
+                                        global="false" />
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" jsf:id="novedad_tipo">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{chkComponenteFallaBean.b_afectaDisponibilidad}">
+                            <p:outputLabel for="novedad_tipo" value="Tipo de novedad: *"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText placeholder="Seleccione tipo de novedad"
+                                             value="#{novTipoAndDetBean.novedadTipo.nombreTipoNovedad}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+
+                                    <p:commandButton title="Cargar tipo de novedad"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipo()}"
+                                                     oncomplete="PF('dialog_nov_tipo_wv').show()"
+                                                     >
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" jsf:id="novedad_tipo_detalle">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{chkComponenteFallaBean.b_afectaDisponibilidad}">
+                            <p:outputLabel for="novedad_tipo_detalle" value="Detalle de tipo novedad:*"/> 
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione detalle tipo de novedad"
+                                             value="#{novTipoAndDetBean.novedadTipoDet.tituloTipoNovedad != null? novTipoAndDetBean.novedadTipoDet.tituloTipoNovedad : ''}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }">
+                                </p:inputText>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar detalle tipo de novedad"
+                                                     id="novedad_tipo_detalleBtn"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     disabled="#{not(novTipoAndDetBean.novedadTipo.idNovedadTipo gt 0) or
+                                                                 novTipoAndDetBean.novedadTipo.nombreTipoNovedad eq 'Daño' }"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipoDetalle()}"
+                                                     oncomplete="PF('dialog_nov_tipo_det_wv').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" jsf:id="sistema_grp">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{novTipoAndDetBean.novedadTipoDet.afectaDisponibilidad==1}">
+                            <ui:include src="../../zComponent/selectDistSistema.xhtml" />
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea autoResize="false"
+                                             value="#{chkComponenteFallaBean.falla.descripcion}"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update=":msgs,pGridDatos,:frmPrincipal:dtComponenteFallas" 
+                             action="#{chkComponenteFallaBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmPrincipal:dtComponenteFallas"
+                             action="#{chkComponenteFallaBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{chkComponenteFallaBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{chkComponenteFallaBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="../../zComponent/dialogListNovedadTipo.xhtml" />
+    <ui:include src="../../zComponent/dialogListNovedadTipoDet.xhtml" />
+</ui:composition>     

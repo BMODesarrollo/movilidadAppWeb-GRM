@@ -1,0 +1,43 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dialog_empleados_liq" closeOnEscape="true" 
+              widgetVar="empleado_list_liq_wv" modal="true" 
+              resizable="false" appendTo="@(body)" 
+              class="mr1024_70 mr500_90"
+              header="Empleados" position="top" >
+        <h:form id="formEmpleados_liq">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Un click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="item" id="tabla" value="#{genLiqJornadaMB.listaEmpleados}"  
+                         selectionMode="single" selection="#{genLiqJornadaMB.emplPrgSercon}"                       
+                         rowIndexVar="nroFila"
+                         rows="15"
+                         filterDelay="1000"
+                         paginatorPosition="top"
+                         paginator="true"
+                         rowKey="#{item.idGenericaJornada}"
+                         emptyMessage="No existen empleados registrados"       >
+                <p:ajax event="rowSelect" 
+                        listener="#{genLiqJornadaMB.onRowDblClckSelect}"
+                        global="false" />
+                <p:column headerText="#" style="width: 10%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column  headerText="Identificación"
+                           filterMatchMode="contains"
+                           filterBy="#{item.idEmpleado.identificacion}">
+                    <h:outputText  value="#{item.idEmpleado.identificacion}" />
+                    <p:tooltip  value="Hacer doble click para seleccionar" trackMouse="true"/>
+                </p:column>
+                <p:column headerText="Nombre"
+                          filterMatchMode="contains"
+                          filterBy="#{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}">
+                    <h:outputText value="#{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

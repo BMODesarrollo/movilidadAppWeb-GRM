@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Primeras salidas"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Una unidad funcional" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax global="false"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="form_primeros_servicios">
+                <p:dataTable id="db_primeros_servicios_id" 
+                             widgetVar="wlVdb_primeros_servicios_id"
+                             var="item" 
+                             paginator="true"
+                             filterDelay="700"
+                             tableStyle="table-layout:auto"
+                             emptyMessage="No existen registros"
+                             rows="50"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             rowStyleClass="text-center"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="50,100,200"
+                             value="#{primerosServiciosBean.list}">
+
+                    <f:facet name="header">
+                        <div align="right" >
+                            <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                            <p:calendar id="fecha_desde" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{primerosServiciosBean.fecha}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Consultar"
+                                action="#{primerosServiciosBean.consultar()}"
+                                class="cssWhite"
+                                update="msgs,form_primeros_servicios:db_primeros_servicios_id"/>   
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha" width="10%" styleClass="text-center">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Unidad Funcional"
+                              rendered="#{uniFuncSessionBean.filtradoUF}"
+                              filterable="true"
+                              filterMatchMode="contains"
+                              filterBy="#{item.nombreUf}">
+                        <h:outputText value="#{item.nombreUf}" />
+                    </p:column>
+                    <p:column headerText="Hora salida"
+                              filterable="true"
+                              filterMatchMode="contains"
+                              filterBy="#{item.horaSalida}">
+                        <h:outputText value="#{item.horaSalida}" />
+                    </p:column>
+                    <p:column headerText="Patio Salida"
+                              filterable="true"
+                              width="10%"
+                              filterMatchMode="contains"
+                              filterBy="#{item.lugarSalida}">
+                        <h:outputText value="#{item.lugarSalida}" />
+                    </p:column>
+                    <p:column headerText="Pir"
+                              filterable="true"
+                              width="10%"
+                              filterMatchMode="contains"
+                              filterBy="#{item.pir}">
+                        <h:outputText value="#{item.pir}" />
+                    </p:column>
+                    <p:column headerText="Tipo de tabla"
+                              filterable="true"
+                              visible="false"
+                              filterMatchMode="contains"
+                              filterBy="#{item.tipoTabla}">
+                        <h:outputText value="#{item.tipoTabla}" />
+                    </p:column>
+                    <p:column filterBy="#{item.tipoTabla}" 
+                              exportable="false"
+                              headerText="Tipo de tabla"
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('wlVdb_primeros_servicios_id').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{'Partida'}" itemLabel="Partida"/>
+                                <f:selectItem itemValue="#{'Larga'}" itemLabel="Larga"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.tipoTabla}" />
+                    </p:column>
+                    <p:column headerText="Sercon"
+                              filterable="true"
+                              filterMatchMode="contains"
+                              filterBy="#{item.sercon}">
+                        <h:outputText value="#{item.sercon}" />
+                    </p:column>
+                    <p:column headerText="Codigo TM"
+                              filterable="true"           
+                              filterMatchMode="contains"
+                              filterBy="#{item.codigoTm}">
+                        <h:outputText value="#{item.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Nombres"
+                              filterable="true"     
+                              width="15%"
+                              filterMatchMode="contains"
+                              filterBy="#{item.nombreOperador} #{item.apellidoOperador}">
+                        <h:outputText value="#{item.nombreOperador} #{item.apellidoOperador}" />
+                    </p:column>
+                    <p:column headerText="Servbus"
+                              filterable="true"                            
+                              filterMatchMode="contains"
+                              filterBy="#{item.servbus}">
+                        <h:outputText value="#{item.servbus}" />
+                    </p:column>
+                    <p:column headerText="Vehículo"
+                              filterable="true"                              
+                              filterMatchMode="contains"
+                              filterBy="#{item.vehiculo}">
+                        <h:outputText value="#{item.vehiculo}" />
+                    </p:column>
+                    <p:column headerText="Ruta"
+                              filterable="true"                              
+                              filterMatchMode="contains"
+                              filterBy="#{item.ruta}">
+                        <h:outputText value="#{item.ruta}" />
+                    </p:column>
+                    <p:column headerText="Tabla"
+                              filterable="true"                            
+                              filterMatchMode="exact"
+                              filterBy="#{item.tabla}">
+                        <h:outputText value="#{item.tabla}" />
+                    </p:column>
+                    <p:column headerText="HORA REAL DE SALIDA">
+                        <h:outputText value="#{item.horaRealSalida}" />
+                    </p:column>
+                    <p:column headerText="DESVIACIÓN ENTRADA PROGRAMADA VS HORA REAL">
+                        <h:outputText value="#{item.desviacion}" />
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{primerosServiciosBean.list.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="db_primeros_servicios_id" 
+                                                fileName="Primeras Salidas"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

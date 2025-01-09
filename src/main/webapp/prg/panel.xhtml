@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf='http://xmlns.jcp.org/jsf'
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content" id="contenido">
+        <p:panel header="Interfaz de Carga Tabla Control * Freeway - Rigel">
+            <h:form id="frmPrincipal">
+                <p:messages id="messages" showDetail="true" closable="true"  />    
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <p:panel header="Parámetros de Carga" class="ui-g-12 ui-md-3 ui-lg-3">
+                            <div class="ui-g-6 ui-md-12 ui-lg-12 Padding5">
+                                <p:outputLabel for="fromDate" value="Fecha Desde" >
+                                </p:outputLabel>
+                                <p:calendar id="fromDate" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{prgControlTableMB.fromDate}" 
+                                            showOn="button" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha"
+                                            showTodayButton="true">
+                                    <p:ajax event="dateSelect"
+                                            global="false"
+                                            update="toDate"/>
+                                </p:calendar>
+                            </div>
+                            <div class="ui-g-6 ui-md-12 ui-lg-12 Padding5">
+                                <p:outputLabel for="toDate" value="Fecha Hasta" >
+                                </p:outputLabel>
+                                <p:calendar id="toDate" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{prgControlTableMB.toDate}" 
+                                            showOn="button" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha"
+                                            showTodayButton="true"                       
+                                            mindate="#{prgControlTableMB.fromDate}"                                        
+                                            >
+                                    <p:ajax event="dateSelect" 
+                                            global="false"
+                                            process="@this"/>
+                                </p:calendar>
+                            </div>              
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:outputLabel value="Unidad Funcional" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:selectOneMenu id="config_freeway_id" 
+                                                     value="#{selectConfigFreewayBean.idConfigFreeway}" 
+                                                     filter="true"
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains"
+                                                     disabled="#{selectConfigFreewayBean.disabled}"
+                                                     required="true"
+                                                     requiredMessage="unidad funcional es requerido">
+                                        <p:ajax process="@this" listener="#{selectConfigFreewayBean.findIdConfigFreeway()}"/>
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{selectConfigFreewayBean.listConfigFreeway}" 
+                                                       var="items"
+                                                       itemLabel="#{items.idGopUnidadFuncional.nombre}"
+                                                       itemValue="#{items.idConfigFreeway}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+
+                            <div jsf:id="pGridBtn">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                    <p:commandButton title="Obtener TablaControl" 
+                                                     icon="fa fa-plus"
+                                                     action="#{prgControlTableMB.consumeControlTable()}" 
+                                                     process="@this,frmPrincipal:fromDate,
+                                                     frmPrincipal:toDate,frmPrincipal:config_freeway_id"
+                                                     value="Obtener"
+                                                     class="cssWhite"
+                                                     disabled="#{!prgControlTableMB.obtener}"
+                                                     update="tabResumen:dtTcResumen,validarTc,@this,messages"
+                                                     id="getTC">
+                                    </p:commandButton>                              
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                    <p:commandButton title="Validar TablaControl" 
+                                                     icon="fa fa-check-square"
+                                                     action="#{prgControlTableMB.validateControlTable()}" 
+                                                     process="@this"
+                                                     value="Validar"
+                                                     class="cssWhite"
+                                                     disabled="#{!prgControlTableMB.validar}"
+                                                     update="getTC,
+                                                     @this,
+                                                     processTc,
+                                                     tabResumen,
+                                                     tabResumen:listErrores,
+                                                     messages,
+                                                     frmPrincipal:config_freeway_id"
+                                                     id="validarTc">
+                                    </p:commandButton>                          
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                    <p:commandButton title="Procesar TablaControl" 
+                                                     icon="fa fa-spinner"
+                                                     action="#{prgControlTableMB.load2Db()}" 
+                                                     process="@this"
+                                                     value="Procesar"
+                                                     class="cssWhite"
+                                                     disabled="#{!prgControlTableMB.procesar}"
+                                                     update="getTC,@this,processTc,tabResumen,messages,
+                                                     frmPrincipal:config_freeway_id"
+                                                     id="processTc">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </p:panel>
+
+                        <p:panel header="Resúmen de Carga"  class="ui-g-12 ui-md-9 ui-lg-9">
+
+                            <p:tabView id="tabResumen" dynamic="true" cache="true" activeIndex="#{prgControlTableMB.activeIndex}">
+                                <p:tab title="Tabla Control Resumen">
+                                    <p:dataTable var="tcResumen" value="#{prgControlTableMB.listTcResumen}"
+                                                 id="dtTcResumen"
+                                                 rowIndexVar="nroFila"
+                                                 reflow="true"
+                                                 rows="7"
+                                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                                 emptyMessage="No existe Tabla Control para las fechas indicadas">
+                                        <p:column headerText="#" style="width: 30px">
+                                            <h:outputText value="#{nroFila+1}" />
+                                        </p:column>
+                                        <p:column headerText="Fecha" >
+                                            <h:outputText value="#{tcResumen.fecha}" >
+                                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Operadores" style="text-align: center">
+                                            <h:outputText value="#{tcResumen.operadoresPrg}" />
+                                        </p:column>
+                                        <p:column headerText="ServBus" style="text-align: center">
+                                            <h:outputText value="#{tcResumen.serviciosPrg}" />
+                                        </p:column>
+                                        <p:column headerText="Comerciales">
+                                            <h:outputText value="#{tcResumen.mcomPrg}" style="float:right" >
+                                                <f:convertNumber locale="es-CO" maxFractionDigits="2"/>
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="HLP"  >
+                                            <h:outputText value="#{tcResumen.mhlpProg}" style="float:right" >
+                                                <f:convertNumber locale="es-CO" maxFractionDigits="2"/>
+                                            </h:outputText>
+                                        </p:column>
+
+                                        <f:facet name="footer">
+                                            En total existen #{prgControlTableMB.listTcResumen.size()} registros.
+                                        </f:facet>
+                                    </p:dataTable>
+                                </p:tab>
+                                <p:tab title="Errores" titleStyle="color:red;" >
+                                    <div aling="right">
+                                        <p:commandButton id="toggler" type="button" 
+                                                         title="Columnas" style="float:right" 
+                                                         icon="fa fa-align-justify" 
+                                                         class="OrangeButton cssWhite"/>
+                                        <p:columnToggler datasource="listErrores" trigger="toggler" />
+                                    </div>
+                                    <p:dataTable var="error" value="#{prgControlTableMB.listError}"
+                                                 id="listErrores"
+                                                 rowIndexVar="nroFila"
+                                                 reflow="true"
+                                                 rows="15"
+                                                 paginator="true"
+                                                 emptyMessage="No existen errores" >
+                                        <p:column headerText="#" style="width:30px;">
+                                            <h:outputText value="#{nroFila+1}" />
+                                        </p:column>
+                                        <p:column headerText="Fecha" >
+                                            <h:outputText value="#{error.fecha}">
+                                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Sercon"  >
+                                            <h:outputText value="#{error.sercon}" />
+                                        </p:column>
+                                        <p:column headerText="CodeDriver" >
+                                            <h:outputText value="#{error.driverCode}" />
+                                        </p:column>
+                                        <p:column headerText="Operador" >
+                                            <h:outputText value="#{error.driver}" />
+                                        </p:column>
+                                        <p:column headerText="TaskType" >
+                                            <h:outputText value="#{error.task_type}" />
+                                        </p:column>
+                                        <p:column headerText="fromStop" >
+                                            <h:outputText value="#{error.fromStop}" />
+                                        </p:column>
+                                        <p:column headerText="toStop" >
+                                            <h:outputText value="#{error.toStop}" />
+                                        </p:column>
+                                        <p:column headerText="Servbus" >
+                                            <h:outputText value="#{error.servbus}" />
+                                        </p:column>
+                                        <p:column headerText="Route" >
+                                            <h:outputText value="#{error.route}" />
+                                        </p:column>
+                                        <p:column headerText="Error(es)" >
+                                            <h:outputText value="#{error.error}" />
+                                        </p:column>
+
+                                        <f:facet name="footer">
+                                            En total existen #{prgControlTableMB.listError.size()} registros.
+                                            <div align="right">
+                                                <h:commandLink>
+                                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                         alt="excel" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="xlsx" target="listErrores" fileName="tabla-control #{now}"/>
+                                                </h:commandLink>
+                                                <h:commandLink>
+                                                    <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                                         alt="pdf" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="pdf" target="listErrores" fileName="tabla-control #{now}" />
+                                                </h:commandLink>
+                                                <h:commandLink>
+                                                    <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                                         alt="csv" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="csv" target="listErrores" fileName="tabla-control #{now}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </f:facet>
+                                    </p:dataTable>
+                                </p:tab>
+                            </p:tabView>
+                        </p:panel>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

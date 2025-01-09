@@ -1,0 +1,143 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="head">
+        <style>
+            .ui-progressbar-value {
+                background-color: #c7ffd0;
+            }
+            .low-progress .ui-progressbar-value {
+                background-color: #ff5722;
+            }
+
+            .medium-progress .ui-progressbar-value {
+                background-color: #ffc107;
+            }
+
+            .high-progress .ui-progressbar-value {
+                background-color: #4caf50;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form-list"  enctype="multipart/form-data">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="PROCESO PROGRAMACIÓN DE OPERADORES"
+                     style="margin-bottom:20px">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <p:dataTable id="dt_CheckList" var="item"
+                             widgetVar="w_CheckList"
+                             disabledTextSelection="false"
+                             selection="#{planRecuProcesoProBean.listProcesoProDet}"
+                             rows="120"
+                             filterDelay="1700"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,60,150"
+                             emptyMessage="No existen registros"
+                             value="#{planRecuProcesoProBean.listProcesoProDet}" >
+
+                    <f:facet name="header">
+                        <div style="align-items: center;">
+                            <p:outputLabel value="AVANCE GENERAL" class="cssWhite Fs20" />
+                            <p:columnGroup type="header">
+                                <p:progressBar 
+                                    id="progressBarGeneral"
+                                    styleClass="#{planRecuProcesoProBean.getProgressBarClass(planRecuProcesoProBean.calcularPromedioDuracion())}"
+                                    value="#{planRecuProcesoProBean.calcularPromedioDuracion()}"
+                                    labelTemplate="#{planRecuProcesoProBean.formatProgreso(planRecuProcesoProBean.calcularPromedioDuracion())}" 
+                                    style="width:80%;margin-left: auto; margin-right: auto;" />
+                            </p:columnGroup>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <p:outputLabel value="Nuevo" class="cssWhite Fs20" />
+                                <p:commandButton icon="pi pi-plus" 
+                                                 value="Agregar Detalle"
+                                                 onclick="PF('dlgNuevoDetalle').show();"
+                                                 styleClass="ui-button-success"
+                                                 process="@this"
+                                                 update="formNuevoDetalle" />
+                            </div>
+                        </div>
+
+                    </f:facet>
+
+                    <p:column headerText="Etapa"
+                              filterBy="#{item.idPlaRecuProcesoPro.descripcion}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idPlaRecuProcesoPro.descripcion}">
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Detalle"
+                              filterBy="#{item.descripcion}"
+                              filterMatchMode="contains"
+                              styleClass="text-center"
+                              style="width: 35%;">
+                        <h:outputText value="#{item.descripcion}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Porcentaje" styleClass="text-center" visible="false">
+                        <h:outputText value="#{(item.duracion * 100.0) / planRecuProcesoProBean.getTotalDuracionPorEtapa(item.idPlaRecuProcesoPro.descripcion)}" />
+                    </p:column>
+
+                    <p:column headerText="Suma por etapa" styleClass="text-center" style="width: 8%;" visible="false">
+                        <h:outputText value="#{planRecuProcesoProBean.getTotalDuracionPorEtapa(item.idPlaRecuProcesoPro.descripcion)}" />
+                    </p:column>
+
+                    <p:column headerText="Valor Duración" styleClass="text-center" style="width: 8%;" visible="false">
+                        <h:outputText value="#{item.duracion}" />
+                    </p:column>
+
+                    <p:column headerText="Progreso total por etapa" styleClass="text-center" visible="false">
+                        <h:outputText value="#{not empty planRecuProcesoProBean.progresoTotalPorEtapa[item.idPlaRecuProcesoPro.descripcion] ? planRecuProcesoProBean.progresoTotalPorEtapa[item.idPlaRecuProcesoPro.descripcion] : 0}" />
+                    </p:column>
+
+                    <p:column headerText="Progreso" styleClass="text-center">
+                        <p:progressBar id="progressBarClient"
+                                       labelTemplate="#{planRecuProcesoProBean.formatProgreso(planRecuProcesoProBean.progresoTotalPorEtapa[item.idPlaRecuProcesoPro.descripcion])}"
+                                       value="#{not empty planRecuProcesoProBean.progresoTotalPorEtapa[item.idPlaRecuProcesoPro.descripcion] ? planRecuProcesoProBean.progresoTotalPorEtapa[item.idPlaRecuProcesoPro.descripcion] : 0}"
+                                       widgetVar="pbClient" style="width:300px" />
+                    </p:column>
+
+                    <p:column headerText="User create" filterBy="#{item.usernameCreate}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.usernameCreate}" title="nombre del usuario que creó el registro"/>
+                    </p:column>
+                    <p:column headerText="Date create" filterBy="#{item.creado}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.creado}" title="Fecha de creación del registro">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="User modify" filterBy="#{item.usernameEdit}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.usernameEdit}" title="nombre del último usuario que modifica el registro"/>
+                    </p:column>
+                    <p:column headerText="Date modify" filterBy="#{item.modificado}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.modificado}" title="Fecha de la última modificación del registro">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Check" style="width: 10%;text-align: center;">
+                        <p:commandButton icon="#{item.isChecked ? 'fa fa-check' : 'fa fa-times'}"
+                                         class="GreenButton cssWhite" 
+                                         styleClass="#{item.isChecked ? 'GreenButton cssWhite' : 'RedButton cssWhite'}"
+                                         process="@this"
+                                         style="display: inline-block; margin: auto;"
+                                         actionListener="#{planRecuProcesoProBean.cambiarCheck(item)}"
+                                         update=":form-list:dt_CheckList"
+                                         > 
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/Create.xhtml"/>
+    </ui:define>
+</ui:composition>

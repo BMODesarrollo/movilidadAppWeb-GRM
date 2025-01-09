@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="VehiculoDanoServeridadListDlg" widgetVar="VehiculoDanoServeridadDialog" modal="true"
+              position="center top"
+              resizable="false" appendTo="@(body)" closable="false" closeOnEscape="true"
+              class="mr1024_40 mr500_90" responsive="true">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Severidades de daño
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('VehiculoDanoServeridadDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="frmVehiculoDanoServeridadList">
+            <p:cache disabled="true"/>
+            <p:dataTable var="vht" value="#{gestionDanoNovPuntBean.lstVehiculoDanoSeveridad}"  
+                         selectionMode="single" selection="#{gestionDanoNovPuntBean.vehiculoDanoSeveridad}"                       
+                         rowIndexVar="nroFila"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         rowKey="#{vht.idVehiculoDanoSeveridad}"
+                         emptyMessage="No existen vehículos registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{gestionDanoNovPuntBean.onRowDblClckSelect}"
+                        update="msgs,gestion_dano_form:severidadDano"
+                        oncomplete="PF('VehiculoDanoServeridadDialog').hide()" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Severidad" filterBy="#{vht.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.nombre}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

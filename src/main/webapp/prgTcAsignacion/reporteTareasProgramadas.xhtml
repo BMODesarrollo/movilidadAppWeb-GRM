@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            REPORTE DE TAREAS PROGRAMADAS MTTO
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="form-uf">
+                                <div class="Wid100" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <ui:include src="../zComponent/selectUnidadFuncional.xhtml" />
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtReporteTareas" var="tareaProgramada" 
+                             scrollable="true"
+                             widgetVar="wlVdtReporteTareas"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{tareasProgramadasBean.lstPrgAsignacion}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                            <p:calendar id="fecha_desde" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{tareasProgramadasBean.desde}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                            </p:calendar>
+                            <p:calendar id="fecha_hasta" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{tareasProgramadasBean.hasta}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                            </p:calendar>
+                            <p:commandButton icon="fa fa-search"
+                                             title="Buscar..."
+                                             styleClass="cssWhite"
+                                             actionListener="#{tareasProgramadasBean.consultar()}"
+                                             update="dtReporteTareas"/>
+
+                            <p:spacer width="10"/>
+
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtReporteTareas" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="UF" 
+                              rendered="#{uniFuncSessionBean.filtradoUF}"
+                              style="width: 30px" 
+                              class="TexAlCenter">
+                        <p:outputLabel value="#{tareaProgramada.idGopUnidadFuncional.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Fecha"
+                              styleClass="text-center">
+
+                        <h:outputText value="#{tareaProgramada.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Servbus" 
+                              filterBy="#{tareaProgramada.servbus}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{tareaProgramada.servbus}" />
+                    </p:column>
+
+                    <p:column headerText="Vehículo"
+                              filterBy="#{tareaProgramada.idVehiculo.codigo}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{tareaProgramada.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Placa Vehículo"
+                              filterBy="#{tareaProgramada.idVehiculo.placa}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{tareaProgramada.idVehiculo.placa}" />
+                    </p:column>
+
+                    <p:column headerText="Tarea"
+                              filterBy="#{tareaProgramada.idMttoTarea.nombreMttoTarea}"
+                              filterMatchMode="exact"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlVdtReporteTareas').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: 99.999%" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.." 
+                                              itemValue="#{null}"/>
+                                <f:selectItems value="#{tareasProgramadasBean.lstMttoTareas}"
+                                               var="item" itemLabel="#{item.nombreMttoTarea}" 
+                                               itemValue="#{item.nombreMttoTarea}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{tareaProgramada.idMttoTarea.nombreMttoTarea}" />
+                    </p:column>
+
+                    <p:column headerText="Hora Inicio" 
+                              styleClass="text-center">
+                        <h:outputText value="#{tareaProgramada.timeOrigin}" />
+                    </p:column>
+
+                    <p:column headerText="Hora Fin" 
+                              styleClass="text-center">
+                        <h:outputText value="#{tareaProgramada.timeDestiny}" />
+                    </p:column>
+
+
+
+                    <f:facet name="footer">
+                        En total existen #{tareasProgramadasBean.lstPrgAsignacion.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtReporteTareas" 
+                                                fileName="Reporte tareas programadas"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

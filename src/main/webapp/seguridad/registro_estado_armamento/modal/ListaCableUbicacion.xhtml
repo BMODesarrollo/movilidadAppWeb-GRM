@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="cableUbicacion" widgetVar="wlvCableUbicacion" modal="true" 
+              resizable="false" appendTo="@(body)" header="Ubicaciones"
+              class="mr1024_40 mr500_90" closeOnEscape="true" responsive="true" position="center top">
+        <h:form id="frmCableUbicacion">
+            <p:dataTable var="ubicacion" value="#{registroEstadoArmamentoBean.lstCableUbicacion}" 
+                         id="dtCableUbicacion"
+                         widgetVar="wlVdtCableUbicacion"
+                         selectionMode="single" 
+                         selection="#{registroEstadoArmamentoBean.cableUbicacion}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         rowIndexVar="nroFila"
+                         rowKey="#{ubicacion.idCableUbicacion}"
+                         emptyMessage="No existen ubicaciones registradas">
+                <p:ajax event="rowSelect" 
+                        listener="#{registroEstadoArmamentoBean.onRowCableUbicacionClckSelect}"
+                        update=":frmRegistroEstadoArmamento:nomUbicacion,
+                        :frmRegistroEstadoArmamento:armamento"
+                        oncomplete="PF('wlvCableUbicacion').hide()"
+                        global="false" />
+                <p:column headerText="Estación"
+                          filterBy="#{ubicacion.idCableEstacion.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{ubicacion.idCableEstacion.nombre}" styleClass="cssBlack"/>
+                </p:column>    
+                <p:column  headerText="Código"
+                           filterBy="#{ubicacion.codigo}"
+                           filterMatchMode="contains">
+                    <h:outputText value="#{ubicacion.codigo}"/>
+                </p:column>    
+                <p:column headerText="Nombre"
+                          filterBy="#{ubicacion.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{ubicacion.nombre}"/>
+                </p:column>    
+                <p:column headerText="Descripción" styleClass="text-word-wrap">
+                    <h:outputText value="#{ubicacion.descripcion}"/>
+                </p:column>    
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

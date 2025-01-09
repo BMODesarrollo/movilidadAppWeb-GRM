@@ -1,0 +1,485 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="idAdicionServicioDlg"  
+              widgetVar="AdicionServicioDialog" 
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              responsive="true" 
+              appendTo="@(body)"
+              class="mr1024_70 mr500_100"
+              closeOnEscape="true" position="top" height="auto" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Servicio/Vuelta Adicional" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('AdicionServicioDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <p:ajax event="close" global="false" process="@this" listener="#{prgTcJSFMB.setFlagAddServicios(false)}"/>
+        <h:form id="formAdicionServicio">
+            <p:messages id="msgsNewService" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="100" />
+            </p:messages>
+
+            <p:remoteCommand name="findVehiculoByCodNewService"
+                             process="@this,txtCodigoBusC"
+                             action="#{prgTcJSFMB.findVehiculoByCodNewService}"
+                             update="txtCodigoBusC,txtServBusNewService,msgsNewService"/>
+
+            <p:remoteCommand name="findOperadorByCodNewService"
+                             process="@this,txtCodigoTmNewService" 
+                             update="txtCodigoTmNewService,txtSerconNewService,msgsNewService,
+                             formAdicionServicio:jornadaUno"
+                             actionListener="#{prgTcJSFMB.findOperadorByCodNewService}"/>
+
+            <p:remoteCommand name="findDestinoUno"
+                             process="@this,addServ_pIniByLinea" 
+                             actionListener="#{prgTcJSFMB.findDestino(1)}"
+                             update="msgsNewService,addServ_pIniByLinea"/>
+            <p:remoteCommand name="findDestinoDos"
+                             process="@this,addServ_pFinByLinea,SBBPropia" 
+                             actionListener="#{prgTcJSFMB.findDestino(2)}"
+                             update="msgsNewService,addServ_pFinByLinea"/>
+            <p:remoteCommand 
+                name="onAddServicio"
+                process="@this,addServ_linea,
+                addServ_pIni,addServ_pFin,
+                addServ_hIni,addServ_hFin,
+                idResponsable,txtTablaNewService" 
+                update="msgsNewService,msgs,
+                tblPrgTcAddNewService,
+                addServ_hIni,addServ_hFin,
+                addServ_pFinByLinea,addServ_pIniByLinea,idResponsable"
+                action="#{prgTcJSFMB.onAddServicio()}"/>
+            <div class="ui-fluid" jsf:rendered="#{prgTcJSFMB.flagAddServicios}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-9 ui-lg-9 Padding5"  >
+                        <div class="ui-g-6 ui-md-3 ui-lg-3 Padding5" >
+                            <p:outputLabel for="SOMTipoNovedad1"  value="Tipo de Novedad" />
+                            <p:selectOneMenu  id="SOMTipoNovedad1" filterMatchMode="contains" filter="true"
+                                              style="width: 99.9999%"
+                                              required="true"
+                                              requiredMessage="Se debe seleccionar un tipo de novedad"
+                                              value="#{prgTcJSFMB.i_tipoNovedad}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems  value="#{prgTcJSFMB.listNovedadT}" var="nov" 
+                                                itemValue="#{nov.idNovedadTipo}" itemLabel="#{nov.nombreTipoNovedad}" 
+                                                itemDescription="#{nov.descripcionTipoNovedad}"/>
+                                <p:ajax listener="#{prgTcJSFMB.findById}"  update="SOMTipoNovedadDet1"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-6 ui-md-4 ui-lg-4 Padding5" >
+                            <p:outputLabel for="SOMTipoNovedadDet1"  value="Det. Tipo Novedad" />
+                            <p:selectOneMenu id="SOMTipoNovedadDet1" filterMatchMode="contains" filter="true" 
+                                             style="width: 99.9999%"
+                                             value="#{prgTcJSFMB.i_tipoNovedaDet}"
+                                             requiredMessage="Se debe seleccionar un detalle de tipo de novedad."
+                                             required="true">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems  value="#{prgTcJSFMB.listNovedadTDet}"
+                                                var="novDet" itemLabel="#{novDet.tituloTipoNovedad}"
+                                                itemValue="#{novDet.idNovedadTipoDetalle}" 
+                                                itemDescription="#{novDet.descripcionTipoNovedad}"/>
+                                <p:ajax listener="#{prgTcJSFMB.setTipoNovedadDet()}" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-3 Padding5" >
+                            <p:outputLabel for="idResponsable" value="Responsable" />
+                            <p:selectOneMenu id="idResponsable"
+                                             value="#{prgTcJSFMB.i_codResponsable}"
+                                             style="width: 99.9999%"
+                                             effect="fade" filter="true" 
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un responsable"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione responsable" itemValue="#{null}"  />
+                                <f:selectItems value="#{prgTcJSFMB.lstResponsable}" 
+                                               var="res" itemLabel="#{res.responsable}" 
+                                               itemValue="#{res.idPrgTcResponsable}" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5">
+                            <p:outputLabel for="" value="Cod TM" />
+                            <p:inputText id="idCodTm" 
+                                         value="#{prgTcJSFMB.codTMPrgTc}"
+                                         maxlength="15"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Wid100 Padding5">
+                            <p:outputLabel for="ITDescripcionPrgNewService"  
+                                           value="Descripción:"/>
+                            <p:inputTextarea id="ITDescripcionPrgNewService" 
+                                             required="true" 
+                                             style="width: 100%;max-height: 100px;font-size: 16px"
+                                             value="#{prgTcJSFMB.observacionesNewService}"  />
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-3 Padding5"  >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="txtCodigoBusC"  value="Vehículo *"/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:inputText id="txtCodigoBusC" placeholder="Codígo Bus"
+                                                 value="#{prgTcJSFMB.codigoV}" 
+                                                 maxlength="12"
+                                                 readonly="#{!prgTcJSFMB.flagFromService}" 
+                                                 onkeypress="if (event.keyCode == 13) {
+                                                             findVehiculoByCodNewService();
+                                                             return false;
+                                                         }"/>
+                                    <div class="botonFloat" >
+                                        <p:commandButton title="Consultar Vehiculo"
+                                                         icon="fa fa-search"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         disabled="#{!prgTcJSFMB.flagFromService}"
+                                                         process="@this,txtCodigoBusC"
+                                                         action="#{prgTcJSFMB.findVehiculoByCodNewService}"
+                                                         update="txtCodigoBusC,txtServBusNewService,msgsNewService">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5" >
+                            <p:outputLabel for="txtServBusNewService"  value="ServBus *"/>
+                            <p:inputText id="txtServBusNewService" 
+                                         value="#{prgTcJSFMB.servbusString}"
+                                         readonly="true"  maxlength="12"/>
+                        </div>
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5" >
+                            <p:outputLabel for="txtTablaNewService"  value="Tabla"/>
+                            <p:inputText id="txtTablaNewService" placeholder="Tabla"
+                                         value="#{prgTcJSFMB.tabla}" required="true" maxlength="5"/>
+                        </div>
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5" >
+                            <h:outputLabel for="SBBPropia" value="Propia" />
+                            <p:selectBooleanButton id="SBBPropia"
+                                                   offIcon="fa fa-close" 
+                                                   onIcon="fa fa-check"
+                                                   disabled="#{prgTcJSFMB.flagPropia}"
+                                                   class="cssWhite"
+                                                   onLabel="Sí" offLabel="No" value="#{prgTcJSFMB.propia}">
+                                <p:ajax process="@this" global="false"/>
+                            </p:selectBooleanButton>
+
+                        </div>
+                        <div class="ui-g-6 ui-md-3 ui-lg-3 Padding5">
+                            <p:outputLabel for="addServ_linea" value="Linea *"/>
+                            <p:selectOneMenu id="addServ_linea" value="#{prgTcJSFMB.i_idTarea}"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains" filter="true">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{prgTcJSFMB.listPrgTarea}" 
+                                               var="linea"  itemLabel="#{linea.tarea}" 
+                                               itemValue="#{linea.idPrgTarea}" />
+                                <p:ajax listener="#{prgTcJSFMB.onOffRuta()}" process="@this" 
+                                        global="false"
+                                        update="addServ_ruta,SBBPropia,formAdicionServicio:update_id,formAdicionServicio:update_id_i"/>
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="ui-g-6 ui-md-3 ui-lg-3 Padding5">
+                            <p:outputLabel for="addServ_ruta" value="Ruta"/>
+                            <p:selectOneMenu id="addServ_ruta" value="#{prgTcJSFMB.i_idRuta}"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains" filter="true" 
+                                             disabled="#{prgTcJSFMB.flagRuta}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+
+                                <f:selectItems  value="#{prgTcJSFMB.listPrgRoute}" 
+                                                var="ruta" itemLabel="#{ruta.name}" 
+                                                itemValue="#{ruta.idPrgRoute}" />
+                                <p:ajax listener="#{prgTcJSFMB.findByIdRoute()}" 
+                                        global="false"
+                                        process="@this" 
+                                        update="addServ_pIni, addServ_pFin"/>
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5" jsf:id="update_id">
+                            <p:outputLabel for="addServ_pIni" value="Punt-Ini" 
+                                           rendered="#{!prgTcJSFMB.flagRuta}"/>
+                            <p:selectOneMenu id="addServ_pIni"
+                                             style="width: 99.9999%"
+                                             value="#{prgTcJSFMB.i_idPuntoIniInt}" 
+                                             rendered="#{!prgTcJSFMB.flagRuta}"
+                                             filterMatchMode="contains" filter="true" >
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+
+                                <f:selectItems value="#{prgTcJSFMB.listPrgPattern}" 
+                                               var="pattern" itemLabel="#{pattern.idPrgStoppoint.name}"
+                                               itemValue="#{pattern.idPrgStoppoint.idPrgStoppoint}" />
+                                <p:ajax listener="#{prgTcJSFMB.setObjeto(0)}" 
+                                        process="@this" 
+                                        update="addServ_pIni,addServ_pFin, msgsNewService"/>                    
+                            </p:selectOneMenu>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcJSFMB.flagRuta}">
+                                <p:outputLabel for="addServ_pIniByLinea"
+                                               value="Punt-Ini" />
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:inputText id="addServ_pIniByLinea" placeholder="Punt-Ini"
+                                                 value="#{prgTcJSFMB.punto_inicioString}"  maxlength="12" 
+                                                 onkeypress="if (event.keyCode == 13) {
+                                                             findDestinoUno();
+                                                             return false;
+                                                         }"/>
+                                    <div class="botonFloat" >
+                                        <p:commandButton title="Consultar Destino Final"
+                                                         icon="fa fa-search"
+                                                         style="margin: 0px"
+                                                         class="cssWhite"
+                                                         process="@this,addServ_pIniByLinea,SBBPropia"
+                                                         action="#{prgTcJSFMB.findDestino(1)}"
+                                                         update="msgsNewService,addServ_pIniByLinea">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5"  jsf:id="update_id_i">
+                            <p:outputLabel for="addServ_pFin" value="Punt-Fin" rendered="#{!prgTcJSFMB.flagRuta}"/>
+                            <p:selectOneMenu id="addServ_pFin" 
+                                             style="width: 99.9999%"
+                                             rendered="#{!prgTcJSFMB.flagRuta}"
+                                             value="#{prgTcJSFMB.i_idPuntoFinInt}" filterMatchMode="contains" filter="true">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+
+                                <f:selectItems value="#{prgTcJSFMB.listPrgPattern}" 
+                                               var="pattern" itemLabel="#{pattern.idPrgStoppoint.name}" 
+                                               itemValue="#{pattern.idPrgStoppoint.idPrgStoppoint}" />
+                                <p:ajax listener="#{prgTcJSFMB.setObjeto(1)}" process="@this" update="addServ_pIni,addServ_pFin, msgsNewService"/>   
+                            </p:selectOneMenu>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0"  jsf:rendered="#{prgTcJSFMB.flagRuta}" >
+                                <p:outputLabel for="addServ_pFinByLinea" value="Punt-Fin" />
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:inputText id="addServ_pFinByLinea" placeholder="Punt-Fin" 
+                                                 value="#{prgTcJSFMB.punto_finString}"  maxlength="12" 
+                                                 onkeypress="if (event.keyCode == 13) {
+                                                             findDestinoDos();
+                                                             return false;
+                                                         }"/>
+                                    <div class="botonFloat" >
+                                        <p:commandButton title="Consultar Destino Final"
+                                                         icon="fa fa-search"
+                                                         style="margin: 0px"
+                                                         class="cssWhite"
+                                                         process="@this,addServ_pFinByLinea,SBBPropia"
+                                                         action="#{prgTcJSFMB.findDestino(2)}"
+                                                         update="msgsNewService,addServ_pFinByLinea">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5" >
+                            <p:outputLabel for="addServ_hIni" value="Hora-Ini"/>
+                            <p:inputMask id="addServ_hIni" 
+                                         validatorMessage="Hora inicio invalida"  
+                                         value="#{prgTcJSFMB.horaInicioString}" 
+                                         requiredMessage="Hora invalida" 
+                                         mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"
+                                                 for="addServ_hIni"/>
+                            </p:inputMask>
+                        </div>
+                        <div class="ui-g-6 ui-md-2 ui-lg-2 Padding5">
+                            <p:outputLabel for="addServ_hFin" value="Hora-fin"/>
+                            <p:inputMask id="addServ_hFin" 
+                                         validatorMessage="Hora fin invalida"  
+                                         value="#{prgTcJSFMB.horaFinString}" 
+                                         requiredMessage="Hora invalida" 
+                                         mask="99:99:99"   
+                                         onkeypress="if (event.keyCode == 13) {
+                                                     onAddServicio();
+                                                     return false;
+                                                 }">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"
+                                                 for="addServ_hFin"/>
+                            </p:inputMask>
+                        </div>
+                        <div class="ui-g-1 ui-md-4 ui-lg-4 Padding5"  >
+                            <p:outputLabel style="visibility: hidden" value="-"/>
+                        </div>
+                        <div class="ui-g-10 ui-md-4 ui-lg-4 Padding5"  >
+                            <p:outputLabel style="visibility: hidden" value="-"/>
+                            <div align="center">
+                                <p:commandButton icon="fa fa-plus" 
+                                                 value="Agregar"
+                                                 class="GreenButton cssWhite"
+                                                 process="@this,addServ_linea,
+                                                 addServ_pIni,addServ_pFin,
+                                                 addServ_hIni,addServ_hFin,
+                                                 idResponsable,txtTablaNewService" 
+                                                 update="msgsNewService,msgs,
+                                                 tblPrgTcAddNewService,
+                                                 addServ_hIni,addServ_hFin,
+                                                 addServ_pFinByLinea,addServ_pIniByLinea,idResponsable"
+                                                 action="#{prgTcJSFMB.onAddServicio()}"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-1 ui-md-4 ui-lg-4 Padding5">
+                            <p:outputLabel style="visibility: hidden" value="-"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5"  >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Operador: *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3 my_shadows" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " jsf:id="jornadaUno">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding2">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 TexAlCenter">
+                                        <p:outputLabel value="#{prgTcJSFMB.prgTcForGetOperador.idEmpleado.nombres} #{prgTcJSFMB.prgTcForGetOperador.idEmpleado.apellidos}"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 TexAlCenter">
+                                        <p:graphicImage cache="false"
+                                                        style="border-radius: 3px;height: fit-content;"
+                                                        value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                        width="60%">
+                                            <f:param name="path_foto" value="#{prgTcJSFMB.prgTcForGetOperador.idEmpleado.pathFoto}" />
+                                        </p:graphicImage>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 TexAlCenter" 
+                                         jsf:id="turnoEmplFound" jsf:rendered="#{ajustJorndFromGestionServ.visible()}">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <h:outputText value="1: #{ajustJorndFromGestionServ.horaIniTurno1Found}-#{ajustJorndFromGestionServ.horaFinTurno1Found}"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <h:outputText value="2: #{ajustJorndFromGestionServ.horaIniTurno2Found}-#{ajustJorndFromGestionServ.horaFinTurno2Found}"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <h:outputText value="3: #{ajustJorndFromGestionServ.horaIniTurno3Found}-#{ajustJorndFromGestionServ.horaFinTurno3Found}"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-6 ui-md-12 ui-lg-12 Padding5" >
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                            <p:outputLabel style="visibility: hidden" value="-"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                            <p:inputText id="txtCodigoTmNewService" placeholder="Codígo Tm"
+                                                         readonly="#{!prgTcJSFMB.flagFromService}"
+                                                         value="#{prgTcJSFMB.codigoTm}"  maxlength="12"
+                                                         onkeypress="if (event.keyCode == 13) {
+                                                                     findOperadorByCodNewService();
+                                                                     return false;
+                                                                 }"/>
+
+                                            <div class="botonFloat" >
+                                                <p:commandButton title="Consultar Operador"
+                                                                 icon="fa fa-search"
+                                                                 style="margin: 0px"
+                                                                 disabled="#{!prgTcJSFMB.flagFromService}"
+                                                                 class="cssWhite"
+                                                                 process="@this,txtCodigoTmNewService,formAdicionServicio:jornadaUno"
+                                                                 action="#{prgTcJSFMB.findOperadorByCodNewService}"
+                                                                 update="txtCodigoTmNewService,txtSerconNewService,msgsNewService">
+                                                </p:commandButton>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ui-g-6 ui-md-12 ui-lg-12 Padding5" >
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0" >
+                                            <p:outputLabel for="txtSerconNewService"  value="Sercon:"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0" >
+                                            <p:inputText id="txtSerconNewService"
+                                                         value="#{prgTcJSFMB.serconString}"
+                                                         readonly="true"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{ajustJorndFromGestionServ.visible()}">
+                                        <ui:include src="../../../zComponent/selectPrgSerconMotivo.xhtml"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p:dataTable  id="tblPrgTcAddNewService" var="prgtc"
+                          value="#{prgTcJSFMB.listPrgTcAux}"
+                          rows="10"
+                          reflow="true"
+                          filterDelay="1000"
+                          paginatorPosition="bottom"
+                          rowIndexVar="index"
+                          paginator="true"
+                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                          {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                          rowsPerPageTemplate="5,10,15,20">
+
+                <p:column headerText="#">
+                    <h:outputText value="#{index+1}" />
+                </p:column>
+                <p:column headerText="Linea">
+                    <h:outputText value="#{prgtc.idTaskType.tarea}" />
+                </p:column>
+
+                <p:column headerText="Punto Inicio">
+                    <h:outputText value="#{prgtc.fromStop.name}"/>
+                </p:column>
+
+                <p:column headerText="Punto Fin">
+                    <h:outputText value="#{prgtc.toStop.name}"/>
+                </p:column>
+                <p:column headerText="Hora Inicio">
+                    <h:outputText value="#{prgtc.timeOrigin}"/>
+                </p:column>
+                <p:column headerText="Hora Fin">
+                    <h:outputText value="#{prgtc.timeDestiny}"/>
+                </p:column>
+                <p:column >
+                    <p:commandButton icon="fa fa-close"
+                                     id="deleteService_id"
+                                     process="@this"
+                                     action="#{prgTcJSFMB.onDeleteServicio(index)}"
+                                     class="RedButton cssWhite"
+                                     update="tblPrgTcAddNewService,msgs,
+                                     formAdicionServicio:msgsNewService"
+                                     title="Eliminar">
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:remoteCommand name="rc"
+                             process="@this,SOMTipoNovedad1,SOMTipoNovedadDet1,
+                             ITDescripcionPrgNewService,idResponsable"
+                             update="msgs,SOMTipoNovedad1,SOMTipoNovedadDet1,
+                             ITDescripcionPrgNewService,idResponsable" 
+                             action="#{prgTcJSFMB.guardarNewService()}" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarAdd" 
+                             icon="fa fa-save" value="Guardar" 
+                             oncomplete="habilitarBoton('btnGuardarAdd')"
+                             class="cssWhite"
+                             onclick="rc();
+                                     deshabilitarBoton('btnGuardarAdd')">   
+                <p:confirm header="Confirmación" message="Esta seguro que desea guardar los cambios"
+                           icon="fa fa-exclamation-triangle" />
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+
+
+

@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:rowExpansion>
+        <p:dataTable id="dtDocHistorico" 
+                     widgetVar="wvDtDocHistorico"
+                     rowIndexVar="i"
+                     var="doc" 
+                     reflow="true"
+                     rows="10"
+                     rowKey="#{doc.idSstEmpresaVisitanteDocs}"
+                     sortBy="${doc.hasta}"
+                     sortOrder="descending"
+                     filterDelay="1700"
+                     paginator="true"
+                     rowsPerPageTemplate="10,50,100"
+                     emptyMessage="No existen documentos registrados"
+                     value="#{sstEmpresaVisitanteBean.lstDocumentosHistorico}">
+
+            <p:column headerText="Nombre"
+                      sortBy="#{doc.idSstDocumentoTercero.tipoDocTercero}"
+                      sortable="true"
+                      filterBy="#{doc.idSstDocumentoTercero.tipoDocTercero}"
+                      filterMatchMode="contains"
+                      style="text-align: center;">
+                <h:outputText value="#{doc.idSstDocumentoTercero.tipoDocTercero}"/>
+            </p:column>
+            <p:column headerText="Número"
+                      filterBy="#{doc.numero}"
+                      filterMatchMode="contains"
+                      style="text-align: center;">
+                <h:outputText value="#{doc.numero}" 
+                              rendered="#{doc.numero != null}"/>
+                <h:outputText value="N/A" rendered="#{doc.numero == null}"/>
+            </p:column>
+            <p:column headerText="Desde"
+                      sortBy="#{doc.desde}"
+                      sortable="true"
+                      filterBy="#{doc.desde}" 
+                      styleClass="#{doc.hasta.compareTo(now) lt 0 ? 'cssRed texto-blanco': ''}"
+                      filterMatchMode="startsWith"
+                      style="text-align: center;">
+                <f:facet name="filter">
+                    <p:calendar id="search1" pattern="yyyy-MM-dd" locale="es"
+                                autocomplete="off"
+                                required="false"
+                                navigator="true" showTodayButton="true"
+                                maxdate="today"
+                                inputStyle="width: 100%;"
+                                placeholder="Desde"
+                                onkeyup="PF('wvDtDocHistorico').filter()"
+                                onkeypress="if (event.keyCode === 13) {
+                                            return false;
+                                        }">
+                        <p:ajax event="dateSelect" oncomplete="PF('wvDtDocHistorico').filter()" update="dtDocHistorico"/>
+                    </p:calendar> 
+                </f:facet>
+                <h:outputText value="#{doc.desde}" 
+                              styleClass="#{doc.hasta.compareTo(now) lt 0 ? 'cssWhite': ''}"
+                              rendered="#{doc.desde != null}" >
+                    <f:convertDateTime type="date" pattern="YYYY-MM-dd"/>
+                </h:outputText>
+                <h:outputText value="N/A" rendered="#{doc.desde == null}"/>
+            </p:column>
+            <p:column headerText="Hasta"
+                      sortBy="#{doc.hasta}"
+                      sortable="true"
+                      filterBy="#{doc.hasta}" 
+                      styleClass="#{doc.hasta.compareTo(now) lt 0 ? 'cssRed texto-blanco': ''}"
+                      filterMatchMode="startsWith"
+                      style="text-align: center;">
+                <f:facet name="filter">
+                    <p:calendar id="search2" pattern="yyyy-MM-dd" locale="es"
+                                autocomplete="off"
+                                required="false"
+                                navigator="true" showTodayButton="true"
+                                maxdate="today"
+                                inputStyle="width: 100%;"
+                                placeholder="Hasta"
+                                onkeyup="PF('wvDtDocHistorico').filter()"
+                                onkeypress="if (event.keyCode === 13) {
+                                            return false;
+                                        }">
+                        <p:ajax event="dateSelect" oncomplete="PF('wvDtDocHistorico').filter()" update="dtDocHistorico"/>
+                    </p:calendar> 
+                </f:facet>
+                <h:outputText value="#{doc.hasta}" 
+                              styleClass="#{doc.hasta.compareTo(now) lt 0 ? 'cssWhite': ''}"
+                              rendered="#{doc.hasta != null}">
+                    <f:convertDateTime type="date" pattern="YYYY-MM-dd"/>
+                </h:outputText>
+                <h:outputText value="N/A" rendered="#{doc.hasta == null}"/>
+            </p:column>
+            <p:column style="text-align: center;" styleClass="text-word-wrap">
+                <f:facet name="header">
+                    <h:outputText value="Descripción"/>
+                </f:facet>
+                <h:outputText value="#{doc.idSstDocumentoTercero.descripcion}"/>
+            </p:column>
+
+            <p:column headerText="Activo"
+                      width="10%"
+                      styleClass="#{doc.activo eq 1 ? 'cssGreen texto-blanco': 'cssRed texto-blanco'}">
+                <h:outputText value="Sí" 
+                              style="color: white; font-weight: bolder"
+                              rendered="#{doc.activo eq 1}"/>
+                <h:outputText value="No" 
+                              style="color: white; font-weight: bolder"
+                              rendered="#{doc.activo eq 0}"/>
+            </p:column>
+
+            <p:column headerText="Cargado"
+                      width="10%"
+                      styleClass="#{doc.path !=null ? 'cssGreen texto-blanco': 'cssRed texto-blanco'}">
+                <h:outputText value="Sí" 
+                              style="color: white; font-weight: bolder"
+                              rendered="#{doc.path != null}"/>
+                <h:outputText value="No" 
+                              style="color: white; font-weight: bolder"
+                              rendered="#{doc.path eq null}"/>
+            </p:column>
+
+            <p:column headerText="Acciones" style="text-align: center;"
+                      width="10%"
+                      exportable="false">
+                <div class="ui-g Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <p:commandButton id="descargar-documento" 
+                                         update=":VistaDocumentoDlg"
+                                         title="Ver documento"
+                                         rendered="#{doc.path !=null}"
+                                         oncomplete="PF('vistaDocumentoDialog').show()"
+                                         actionListener="#{sstEmpresaVisitanteBean.prepDownloadLocal(doc.path)}"
+                                         class="cssWhite OrangeButton"
+                                         icon="fa fa-eye">
+                        </p:commandButton>  
+                    </div>
+                </div>
+            </p:column>
+
+        </p:dataTable>
+    </p:rowExpansion>
+</ui:composition>

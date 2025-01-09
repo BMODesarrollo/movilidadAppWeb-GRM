@@ -1,0 +1,279 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <p:panel header="Interfaz de Carga | Freeway - Rigel">
+            <h:form id="frmPrincipal">
+
+                <p:growl id="msgs" showDetail="true" escape="false"/>
+                <p:growl id="messages" showDetail="true" />     
+                <p:cache disabled="true">
+                    <div align="right">
+                        <p:commandButton actionListener="#{prgControlTableMB.nuevo()}" 
+                                         oncomplete=""
+                                         title="Agregar nuevo documento" 
+                                         icon="fa fa-plus"
+                                         style="color: white"
+                                         value="Nuevo"
+                                         process="@this"
+                                         immediate="true"
+                                         >
+                        </p:commandButton>
+                        <p:commandButton title="Consumir TablaControl" 
+                                         icon="fa fa-plus"
+                                         style="color: white"
+                                         actionListener="#{prgControlTableMB.consumeControlTable()}" 
+                                         value="Consumir TablaControl">
+                        </p:commandButton>
+                    </div>
+                    <p:panelGrid columns="2" id="pGrid" 
+                                 columnClasses="ui-grid-col-4,ui-grid-col-8" 
+                                 layout="grid" styleClass="ui-panelgrid-blank ui-fluid">
+
+                        <p:panel header="Parámetros de Carga" >
+                            <p:panelGrid columns="1" 
+                                         layout="grid" styleClass="ui-panelgrid-blank ui-fluid">
+                                <p:outputLabel for="fromDate" value="FromDate :" >
+                                </p:outputLabel>
+                                <p:calendar id="fromDate" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{prgControlTableMB.fromDate}" 
+                                            showOn="button" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha"
+                                            showTodayButton="true"                                        
+                                            mindate="today"                                        
+                                            >
+                                    <p:ajax event="dateSelect" update="toDate"/>
+                                </p:calendar>
+                                <p:outputLabel for="toDate" value="ToDate :" >
+                                </p:outputLabel>
+                                <p:calendar id="toDate" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{prgControlTableMB.toDate}" 
+                                            showOn="button" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha"
+                                            showTodayButton="true"                       
+                                            mindate="#{prgControlTableMB.fromDate}"                                        
+                                            >
+                                    <p:ajax event="dateSelect" process="@this"/>
+                                </p:calendar>
+                                <p:outputLabel for="solucion" value="Solución : ">
+                                </p:outputLabel>
+                                <p:inputText id="solucion"
+                                             required="true"
+                                             value="#{prgControlTableMB.solucion}"
+                                             >    
+                                    <p:ajax event="change" process="@this"/>
+                                </p:inputText> 
+                            </p:panelGrid>
+
+                            <p:panelGrid columns="3" id="pGridBtn" 
+                                         columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4" 
+                                         layout="grid" styleClass="ui-panelgrid-blank ui-fluid">
+
+                                <p:commandButton title="Obtener TablaControl" 
+                                                 icon="fa fa-plus"
+                                                 style="color: white"
+                                                 actionListener="#{prgControlTableMB.consumeControlTable()}" 
+                                                 process="@this"
+                                                 value="Obtener"
+                                                 disabled="#{!prgControlTableMB.obtener}"
+                                                 update="tabResumen:dtTcResumen,validarTc,@this,messages"
+                                                 id="getTC">
+                                </p:commandButton>                              
+                                <p:commandButton title="Validar TablaControl" 
+                                                 icon="fa fa-check-square"
+                                                 style="color: white"
+                                                 actionListener="#{prgControlTableMB.validateControlTable()}" 
+                                                 process="@this"
+                                                 value="Validar"
+                                                 disabled="#{!prgControlTableMB.validar}"
+                                                 update="getTC,@this,processTc,tabResumen:listErrores,messages"
+                                                 id="validarTc">
+                                </p:commandButton>                          
+                                <p:commandButton title="Procesar TablaControl" 
+                                                 icon="fa fa-spinner"
+                                                 style="color: white"
+                                                 actionListener="#{prgControlTableMB.applyControlTable()}" 
+                                                 process="@this"
+                                                 value="Procesar"
+                                                 disabled="#{!prgControlTableMB.procesar}"
+                                                 update="messages"
+                                                 id="processTc">
+                                </p:commandButton>
+                            </p:panelGrid>
+                        </p:panel>
+
+                        <p:panel header="Resúmen de la Carga" >
+                            <p:tabView id="tabResumen" dynamic="true" cache="true"  >
+                                <p:tab title="Tabla Control Resumen">
+                                    <p:dataTable var="tcResumen" value="#{prgControlTableMB.listTcResumen}"
+                                                 id="dtTcResumen"
+                                                 rowIndexVar="nroFila"
+                                                 reflow="true"
+                                                 rows="7"
+                                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                                 emptyMessage="No existe Tabla Control para las fechas indicadas">
+                                        <p:column headerText="#" style="width: 30px">
+                                            <h:outputText value="#{nroFila+1}" />
+                                        </p:column>
+                                        <p:column headerText="Fecha" >
+                                            <h:outputText value="#{tcResumen.fecha}" >
+                                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Operadores" >
+                                            <h:outputText value="#{tcResumen.operadoresPrg}" />
+                                        </p:column>
+                                        <p:column headerText="ServBus">
+                                            <h:outputText value="#{tcResumen.serviciosPrg}" />
+                                        </p:column>
+                                        <p:column headerText="Comerciales">
+                                            <h:outputText value="#{tcResumen.mcomPrg}" >
+                                                <f:convertNumber pattern="#000.000" maxFractionDigits="2" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="HLP">
+                                            <h:outputText value="#{tcResumen.mhlpProg}" >
+                                                <f:convertNumber pattern="#000.000"  maxFractionDigits="2" />
+                                            </h:outputText>
+                                        </p:column>
+
+                                        <f:facet name="footer">
+                                            En total existen #{prgControlTableMB.listTcResumen.size()} registros.
+                                        </f:facet>
+                                    </p:dataTable>
+                                </p:tab>
+                                <p:tab title="Errores">
+                                    <p:dataTable var="error" value="#{prgControlTableMB.listError}"
+                                                 id="listErrores"
+                                                 rowIndexVar="nroFila"
+                                                 reflow="true"
+                                                 rows="7"
+                                                 emptyMessage="No existen errores">
+                                        <p:column headerText="#" style="width: 30px;font-size: 8;">
+                                            <h:outputText value="#{nroFila+1}" />
+                                        </p:column>
+                                        <p:column headerText="Fecha" >
+                                            <h:outputText value="#{error.fecha}"  style="font-size: 8;">
+                                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Sercon"  style="font-size: 8;">
+                                            <h:outputText value="#{error.sercon}"  style="font-size: 8;"/>
+                                        </p:column>
+                                        <p:column headerText="Código"  style="font-size: 8;">
+                                            <h:outputText value="#{error.driverCode}"  style="font-size: 8;"/>
+                                        </p:column>
+                                        <p:column headerText="Operador" style="font-size: 8;">
+                                            <h:outputText value="#{error.driver}"  style="font-size: 8;"/>
+                                        </p:column>
+                                        <p:column headerText="TaskType" style="font-size: 8;">
+                                            <h:outputText value="#{error.task_type}"  style="font-size: 8;"/>
+                                        </p:column>
+                                        <p:column headerText="fromStop" style="font-size: 8;">
+                                            <h:outputText value="#{error.fromStop}"  style="font-size: 8;"/>
+                                        </p:column>
+                                        <p:column headerText="toStop" style="font-size: 8;">
+                                            <h:outputText value="#{error.toStop}"  style="font-size: 8;"/>
+                                        </p:column>
+                                        <p:column headerText="Servbus" style="font-size: 8;">
+                                            <h:outputText value="#{error.servbus}"  style="font-size: 8;"/>
+                                        </p:column>
+                                        <p:column headerText="Route" style="font-size: 8;">
+                                            <h:outputText value="#{error.route}" style="font-size: 8;" />
+                                        </p:column>
+                                        <p:column headerText="Error(es)" style="font-size: 8;">
+                                            <h:outputText value="#{error.error}" style="font-size: 8;" />
+                                        </p:column>
+
+                                        <f:facet name="footer">
+                                            En total existen #{prgControlTableMB.listError.size()} registros.
+                                            <div align="right">
+                                                <h:commandLink>
+                                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                         alt="excel" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="xlsx" target="listErrores" fileName="empleados #{now}"/>
+                                                </h:commandLink>
+                                                <h:commandLink>
+                                                    <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                                         alt="pdf" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="pdf" target="listErrores" fileName="empleados #{now}" />
+                                                </h:commandLink>
+                                                <h:commandLink>
+                                                    <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                                         alt="csv" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="csv" target="listErrores" fileName="empleados #{now}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </f:facet>
+                                    </p:dataTable>
+                                </p:tab>
+                            </p:tabView>
+
+                        </p:panel>
+                    </p:panelGrid>
+
+                    <p:tabView dynamic="true" cache="true" effect="fold">
+
+                        <p:tab title="Tabla Control Cargada">
+                            <p:dataTable var="tc" value="#{prgControlTableMB.listTc}"
+                                         id="dtTcDet"
+                                         rowIndexVar="nroFila"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="5"
+                                         paginator="true"
+                                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="5,10,15"
+                                         emptyMessage="No existe Tabla Control para las fechas indicadas">
+                                <p:column headerText="#" style="width: 30px">
+                                    <h:outputText value="#{nroFila+1}" />
+                                </p:column>
+                                <p:column headerText="Fecha" filterBy="#{tc.fecha}">
+                                    <h:outputText value="#{tc.fecha}" >
+                                        <f:convertDateTime pattern="yyyy/MM/dd" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Sercon" filterBy="#{tc.sercon}">
+                                    <h:outputText value="#{tc.sercon}" />
+                                </p:column>
+                                <p:column headerText="Operador">
+                                    <h:outputText value="#{tc.idEmpleado.nombres}" />
+                                </p:column>
+                                <p:column headerText="Amplitud">
+                                    <h:outputText value="#{tc.amplitude}" />
+                                </p:column>
+                                <p:column headerText="WorkTime">
+                                    <h:outputText value="#{tc.workTime}" />
+                                </p:column>
+                                <p:column headerText="Production Distance">
+                                    <h:outputText value="#{tc.productionDistance}" />
+                                </p:column>
+
+                                <f:facet name="footer">
+                                    En total existen #{prgControlTableMB.listTc.size()} registros.
+                                </f:facet>
+                            </p:dataTable>
+                        </p:tab>
+
+                    </p:tabView>
+
+                </p:cache>
+            </h:form>
+
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="dlg-jornada-borrar" 
+              widgetVar="jornadaWV"
+              modal="true" 
+              header="Búsqueda de Jornada a Eliminar"
+              position="center top"
+              class="mr1024_30 mr500_90"
+              resizable="false"
+              responsive="true">
+        <h:form id="form-jornada">
+            <p:messages id="msgs" closable="true" showSummary="true" showDetail="true"/>  
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Fecha Desde"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="desde"
+                                        value="#{genericaJornadaGestionJSF.dDesde}"
+                                        showOn="button"
+                                        locale="es"
+                                        mask="true"
+                                        pattern="yyyy-MM-dd" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Hasta"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hasta"
+                                        value="#{genericaJornadaGestionJSF.dHasta}"
+                                        showOn="button"
+                                        locale="es"
+                                        mask="true"
+                                        pattern="yyyy-MM-dd" />
+                        </div>
+                    </div>
+                </div>
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Colaborador"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputText id = "inputEmpleado"
+                                     value="#{genericaJornadaGestionJSF.empleado.nombres} #{genericaJornadaGestionJSF.empleado.apellidos}" 
+                                     readonly="true"/>
+                        <div class="botonFloat">
+                            <p:commandButton id="btn-emp"
+                                             oncomplete="PF('empleDlg').show();"
+                                             actionListener="#{genericaJornadaGestionJSF.cargarEmpleados()}"
+                                             update=":form-list-emp"
+                                             icon="fa fa-list"
+                                             style="margin: 0px"
+                                             process="@this"
+                                             title="Listar empleados"
+                                             class="cssWhite" >
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand id="buscar"
+                             name="rcjb"
+                             action="#{genericaJornadaGestionJSF.buscarJornadas()}"
+                             update=":formBorrJornada,@form, :formBorrJornada:serconlistLiq"
+                             process="@form" />
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rcjb();" 
+                             icon="fa fa-search"
+                             value="Búscar"
+                             class="cssWhite">
+                             <p:resetInput target="form-jornada:inputEmpleado"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition> 

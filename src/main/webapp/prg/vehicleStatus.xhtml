@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf='http://xmlns.jcp.org/jsf'
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content" id="contenido">
+        <p:panel header="Interfaz de Carga Resumen Vehículos * Freeway - Rigel">
+            <h:form id="frmPrincipalVS">
+                <p:messages id="messages" showDetail="true" closable="true"  />    
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <p:panel header="Parámetros de Carga" class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="fromDate" value="Fecha Desde" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:calendar id="fromDate" 
+                                                pattern="dd-MM-yyyy"
+                                                value="#{prgResumenVehiculoMB.fromDate}" 
+                                                showOn="button" 
+                                                locale="es"
+                                                required="true"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                showTodayButton="true"                                        
+                                                mindate="today"                                        
+                                                >
+                                        <p:ajax event="dateSelect" update="toDate"/>
+                                    </p:calendar>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="toDate" value="Fecha Hasta" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:calendar id="toDate" 
+                                                pattern="dd-MM-yyyy"
+                                                value="#{prgResumenVehiculoMB.toDate}" 
+                                                showOn="button" 
+                                                locale="es"
+                                                required="true"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                showTodayButton="true"                       
+                                                mindate="#{prgResumenVehiculoMB.fromDate}"                                        
+                                                >
+                                        <p:ajax event="dateSelect" process="@this"/>
+                                    </p:calendar>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <ui:include src="../zComponent/selectConfigFreeway.xhtml"/>
+                            </div>
+                            <div  jsf:id="pGridBtn" >
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                    <p:commandButton title="Obtener" 
+                                                     icon="fa fa-plus"
+                                                     class="cssWhite"
+                                                     action="#{prgResumenVehiculoMB.consumeVehicleStatus()}" 
+                                                     process="@this,frmPrincipalVS:fromDate,
+                                                     frmPrincipalVS:toDate,
+                                                     frmPrincipalVS:config_freeway_id"
+                                                     value="Obtener"
+                                                     disabled="#{!prgResumenVehiculoMB.obtener}"
+                                                     update="frmPrincipalVS:validarTc,@this,messages"
+                                                     id="getTC">
+                                    </p:commandButton>                              
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                    <p:commandButton title="Validar" 
+                                                     icon="fa fa-check-square"
+                                                     class="cssWhite"
+                                                     action="#{prgResumenVehiculoMB.validate()}" 
+                                                     process="@this"
+                                                     value="Validar"
+                                                     disabled="#{!prgResumenVehiculoMB.validar}"
+                                                     update="frmPrincipalVS:getTC,
+                                                     @this,
+                                                     frmPrincipalVS:processTc,
+                                                     frmPrincipalVS:listErrores,
+                                                     messages,msgs
+                                                     frmPrincipalVS:config_freeway_id"
+                                                     id="validarTc">
+                                    </p:commandButton>        
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                    <p:commandButton title="Procesar" 
+                                                     icon="fa fa-spinner"
+                                                     class="cssWhite"
+                                                     action="#{prgResumenVehiculoMB.load2Db()}" 
+                                                     process="@this"
+                                                     value="Procesar"
+                                                     disabled="#{!prgResumenVehiculoMB.procesar}"
+                                                     update="frmPrincipalVS:getTC,
+                                                     @this,
+                                                     messages,msgs
+                                                     frmPrincipalVS:config_freeway_id"
+                                                     id="processTc">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </p:panel>
+
+                        <p:panel header="Resúmen de Carga" class="ui-g-12 ui-md-9 ui-lg-9 Padding5">
+                            <p:panel header="Errores" class="ui-g-12 ui-md-12 ui-lg-12">
+                                <div aling="rigth">
+                                    <p:commandButton id="toggler" type="button" 
+                                                     title="Columnas" style="float:right" 
+                                                     icon="fa fa-align-justify" 
+                                                     class="OrangeButton cssWhite"/>
+                                    <p:columnToggler datasource="listErrores" trigger="toggler" />
+                                </div>
+                                <p:dataTable var="error" value="#{prgResumenVehiculoMB.listError}"
+                                             id="listErrores"
+                                             rowIndexVar="nroFila"
+                                             reflow="true"
+                                             rows="15"
+                                             paginator="true"
+                                             emptyMessage="No existen errores" >
+                                    <p:column headerText="#" style="width:30px;">
+                                        <h:outputText value="#{nroFila+1}" />
+                                    </p:column>
+                                    <p:column headerText="Fecha" >
+                                        <h:outputText value="#{error.fecha}">
+                                            <f:convertDateTime pattern="yyyy/MM/dd" />
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="Servbus"  >
+                                        <h:outputText value="#{error.servbus}" />
+                                    </p:column>
+                                    <p:column headerText="Vehicle Type" >
+                                        <h:outputText value="#{error.vehicle_type}" />
+                                    </p:column>
+                                    <p:column headerText="Actividad" >
+                                        <h:outputText value="#{error.actividad}" />
+                                    </p:column>
+                                    <p:column headerText="fromStop" >
+                                        <h:outputText value="#{error.fromStop}" />
+                                    </p:column>
+                                    <p:column headerText="toStop" >
+                                        <h:outputText value="#{error.toStop}" />
+                                    </p:column>
+                                    <p:column headerText="TimeOrigin" >
+                                        <h:outputText value="#{error.timeOrigin}" />
+                                    </p:column>
+                                    <p:column headerText="TimeDestiny" >
+                                        <h:outputText value="#{error.timeDestiny}" />
+                                    </p:column>
+                                    <p:column headerText="Error(es)" >
+                                        <h:outputText value="#{error.error}" />
+                                    </p:column>
+
+                                    <f:facet name="footer">
+                                        En total existen #{prgResumenVehiculoMB.listError.size()} registros.
+                                    </f:facet>
+                                </p:dataTable>
+                            </p:panel>
+                        </p:panel>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmNovedadTipoDetalleListDlg" 
+              closeOnEscape="true" widgetVar="PmNovedadTipoDetalleListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de roles"
+              width="550px" responsive="true" position="center top">
+        <p:cache disabled="true"/>
+        <h:form id="frmPmNovedadTipoDetalleList">
+            <p:dataTable var="authority" value="#{userAuthorityOptBean.lstUserAuthority}"
+                         id="dtNovedadTipoDetalles" widgetVar="dtNovedadTipoDetalle"
+                         selectionMode="single" selection="#{userAuthorityOptBean.userAuthority}"                       
+                         rowIndexVar="nroFila"
+                         liveScroll="true"
+                         reflow="true"
+                         filterDelay="1000"
+                         paginator="true"
+                         rows="6"
+                         rowKey="#{authority.idUserAuthority}"
+                         emptyMessage="No existen registros"
+                         styleClass="ui-fluid">
+                <p:ajax event="rowSelect" 
+                        listener="#{userAuthorityOptBean.onRowUserAuthorityClckSelect}"
+                        update=":frmCheckListAdd:tipo_evento"
+                        oncomplete="PF('PmNovedadTipoDetalleListDialog').hide()" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Rol" 
+                          filterBy="#{authority.authority}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{authority.authority}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

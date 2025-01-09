@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="content">
+        <p:panel header="Parametrización Costos por servicio">
+            <h:form id="form_costo_servicio_list">
+                <p:dataTable id="id_dt_costo_servicio" var="item" 
+                             scrollable="true"
+                             widgetVar="wlVid_dt_costo_servicio"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             selection="#{atvCostoServicioBean.selected}"
+                             rowKey="#{item.idAtvCostoServicio}"
+                             selectionMode="single"
+                             rows="10"
+                             filterDelay="1000"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{atvCostoServicioBean.lstCostoServicios}">
+                    <p:ajax event="rowSelect" listener="#{atvCostoServicioBean.onRowSelect}" update="id_btn_editar" />
+                    <p:ajax event="rowUnselect" listener="#{atvCostoServicioBean.rowUnselect}" update="id_btn_editar"/>
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton styleClass="cssWhite GreenButton"
+                                             title="Editar"
+                                             id="id_btn_editar"
+                                             action="#{atvCostoServicioBean.editar()}"
+                                             disabled="#{atvCostoServicioBean.selected==null}"
+                                             value="Modificar"
+                                             process="@this"
+                                             update="id_dialog_costo_servicio,form_costo_servicio"
+                                             oncomplete="PF('wv_costo_servicio').show();"
+                                             icon="fa fa-pencil">
+                            </p:commandButton>
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{atvCostoServicioBean.nuevo()}"
+                                oncomplete="PF('wv_costo_servicio').show();"
+                                class="cssWhite"
+                                update="id_dialog_costo_servicio,
+                                form_costo_servicio,form_costo_servicio_list:id_dt_costo_servicio"/>  
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="id_dt_costo_servicio" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Desde" >
+                        <h:outputText  value="#{item.desde}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Hasta" >
+                        <h:outputText  value="#{item.hasta}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.idAtvPrestador.nombre}" 
+                              filterMatchMode="contains" headerText="Prestador">
+                        <h:outputText  value="#{item.idAtvPrestador.nombre}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idVehiculoTipo.nombreTipoVehiculo}" 
+                              filterMatchMode="contains"
+                              headerText="Tipo de Vehiculo">
+                        <h:outputText  value="#{item.idVehiculoTipo.nombreTipoVehiculo}"/>
+                    </p:column>
+                    <p:column headerText="Costo"
+                              filterBy="#{item.costo}"
+                              filterMatchMode="contains"
+                              sortBy="#{item.costo}"
+                              sortable="true">
+                        <h:outputText  value="#{item.costo}" />
+                    </p:column>
+                    <p:column headerText="Descripción ">
+                        <h:outputText  value="#{item.descripcion}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{atvCostoServicioBean.lstCostoServicios.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="id_dt_costo_servicio" 
+                                                fileName="Vehiculos de Atención"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>

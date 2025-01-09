@@ -1,0 +1,300 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+
+    <div class="ui-fluid" jsf:rendered="#{parrillaEstadoVehiculoBean.viewInfo}">
+        <p:remoteCommand name="atras"
+                         update="id_parrilla"
+                         process="@this"
+                         action="#{parrillaEstadoVehiculoBean.onBack()}"/>
+        <p:remoteCommand name="enPatioAction"
+                         update="id_parrilla"
+                         process="@this"
+                         action="#{parrillaEstadoVehiculoBean.onViewEnPatio()}"/>
+        <p:remoteCommand name="asigAction"
+                         update="id_parrilla"
+                         process="@this"
+                         action="#{parrillaEstadoVehiculoBean.onViewAsignado()}"/>
+        <p:remoteCommand name="varadoAction"
+                         update="id_parrilla"
+                         process="@this"
+                         action="#{parrillaEstadoVehiculoBean.onViewVarados()}"/>
+        <p:remoteCommand name="accAction"
+                         update="id_parrilla"
+                         process="@this"
+                         action="#{parrillaEstadoVehiculoBean.onViewAccidente()}"/>
+        <p:remoteCommand name="mttoPatAction"
+                         update="id_parrilla"
+                         process="@this"
+                         action="#{parrillaEstadoVehiculoBean.onViewMttoPatio()}"/>
+        <p:remoteCommand name="otroAction"
+                         update="id_parrilla"
+                         process="@this"
+                         action="#{parrillaEstadoVehiculoBean.onViewOtro()}"/>
+        <p:remoteCommand name="refrescarAction"
+                         update="id_parrilla"
+                         process="@this"
+                         action="#{parrillaEstadoVehiculoBean.cargarParrilla()}"/>
+        <p:remoteCommand name="modalEstadoFlota"
+                         update="id_parrilla"
+                         process="@this"
+                         action="#{parrillaEstadoVehiculoBean.modalEstadoFlota()}"/>
+        <div class="ui-g" jsf:id="id_parrilla">
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1"
+                 style="z-index: 1000;
+                 position: sticky;
+                 top: 0;
+                 background-color: aliceblue;
+                 border-radius: 5px;">
+                <div class="ui-g-4 ui-md-4 ui-lg-4 fa fa-arrow-left Fs30 cssMenuItem"
+                     jsf:rendered="#{not parrillaEstadoVehiculoBean.viewDetail}"
+                     onclick="atras()">
+                    <p:outputLabel value="Atras"/>
+                </div>
+                <div class="ui-g-4 ui-md-4 ui-lg-4 fa fa-refresh Fs30 cssMenuItem" 
+                     jsf:rendered="#{parrillaEstadoVehiculoBean.viewDetail}"
+                     onclick="refrescarAction()">
+                    <p:outputLabel value=" Refrescar"/>
+                </div>
+                <div class="ui-g-4 ui-md-4 ui-lg-4 Fs30 cssMenuItem TexAlRight"
+                     jsf:rendered="#{not parrillaEstadoVehiculoBean.viewDetail}">
+                    #{parrillaEstadoVehiculoBean.tituloOpcion}
+                </div>
+                <div jsf:rendered="true" class="ui-g-4 ui-md-4 ui-lg-4 fa fa-bar-chart Fs30 cssMenuItem" onclick="modalEstadoFlota()">
+                    <p:outputLabel value=" Estado flota"/>
+                </div>
+            </div>
+            <div jsf:rendered="#{parrillaEstadoVehiculoBean.viewDetail}">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1 ">
+                    <h3>Disponibles - #{parrillaEstadoVehiculoBean.servicesParrillaDTO.totalOperativos}</h3>
+                </div>
+
+
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding1 cssMenuItem" onclick="asigAction()">
+                    <div class="box cyanCard">
+                        <h3 class="texto-blanco">Asignados - #{parrillaEstadoVehiculoBean.servicesParrillaDTO.totalAsignado}</h3>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding1 cssMenuItem" onclick="enPatioAction()" >
+                    <div class="box darkgreenCard">
+                        <h3 class="texto-blanco">En Patio - #{parrillaEstadoVehiculoBean.servicesParrillaDTO.totalEnPatio}</h3>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1 ">
+                    <h3>Inoperativos - #{parrillaEstadoVehiculoBean.servicesParrillaDTO.totalInoperativos}</h3>
+                </div>
+                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding1 cssMenuItem" onclick="varadoAction()">
+                    <div class="box yellowCard">
+                        <h3 class="texto-blanco">Varados - #{parrillaEstadoVehiculoBean.servicesParrillaDTO.totalVarado}</h3>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding1 cssMenuItem" onclick="accAction()" >
+                    <div class="box purpleCard">
+                        <h3 class="texto-blanco">Accidente - #{parrillaEstadoVehiculoBean.servicesParrillaDTO.totalAccidente}</h3>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding1 cssMenuItem" onclick="mttoPatAction()" >
+                    <div class="box grayCard">
+                        <h3 class="texto-blanco">Inoperativo Patio - #{parrillaEstadoVehiculoBean.servicesParrillaDTO.totalMttoPatio}</h3>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding1 cssMenuItem" onclick="otroAction()">
+                    <div class="box blackCard">
+                        <h3 class="texto-blanco"> Inoperativo URI - #{parrillaEstadoVehiculoBean.servicesParrillaDTO.totalOtros}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <ui:repeat rendered="#{parrillaEstadoVehiculoBean.viewAsignado}" 
+                       value="#{parrillaEstadoVehiculoBean.servicesParrillaDTO.vehiculosAsignados}"
+                       var="asig">
+                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding1" >
+                    <div class="box">
+                        <h2>#{asig.codigo}</h2>
+                        <span>#{asig.tipoVehiculo}</span>
+                        <div class="Padding1" >
+                            <p:commandButton value="Info Operador" 
+                                             icon="fa fa-user"
+                                             class="cssWhite OrangeButton"
+                                             actionListener="#{parrillaEstadoVehiculoBean.verInfoOperador(asig.codigo)}"
+                                             process="@this"
+                                             update="msgs,parrilla_operador_dlg"
+                                             />
+                        </div>
+                        <div class=" Padding1" >
+                            <p:commandButton value="Ver Ubicación" 
+                                             icon="fa fa-map-marker"
+                                             class="cssWhite"
+                                             actionListener="#{parrillaEstadoVehiculoBean.verUbicacion(asig.codigo)}"
+                                             process="@this"
+                                             update="msgs,map_geo"
+                                             />
+                        </div>
+                    </div>
+                </div>
+            </ui:repeat>
+            <ui:repeat rendered="#{parrillaEstadoVehiculoBean.viewEnPatio}" 
+                       value="#{parrillaEstadoVehiculoBean.servicesParrillaDTO.vehiculosEnPatios}"
+                       var="enPat">
+                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding1" >
+                    <div class="box">
+                        <h2>#{enPat.codigo}</h2>
+                        <span>#{enPat.tipoVehiculo}</span>
+                    </div>
+                </div>
+            </ui:repeat>
+            <ui:repeat rendered="#{parrillaEstadoVehiculoBean.viewVarados}" 
+                       value="#{parrillaEstadoVehiculoBean.servicesParrillaDTO.vehiculosVarados}"
+                       var="vara">
+                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding1" >
+                    <div class="box">
+                        <h2>#{vara.vehiculo.codigo}</h2>
+                        <div>Codigo: #{vara.empleado.codigoTm}</div>
+                        <div>Operador: #{vara.empleado.nombre}</div>
+                        <div>Tel: #{vara.empleado.telefono}</div>
+                        <div>Novedad: #{vara.nombreSistema}</div>
+                        <div>Fecha/Hora Evento: #{vara.fechaHoraEvento}</div>
+                        <div class="EmptyBox10"></div>
+                        <p:commandButton value="Ver Ubicación" 
+                                         icon="fa fa-map-marker"
+                                         class="cssWhite OrangeButton"
+                                         actionListener="#{parrillaEstadoVehiculoBean.verUbicacion(vara.vehiculo.codigo)}"
+                                         process="@this"
+                                         update="msgs,map_geo"
+                                         />
+                    </div>
+                </div>
+            </ui:repeat>
+            <h:form id="frmRptAccidente" class="ui-g-12 ui-md-12 ui-lg-12 Padding1">
+                <ui:repeat rendered="#{parrillaEstadoVehiculoBean.viewAccidente}" 
+                           value="#{parrillaEstadoVehiculoBean.servicesParrillaDTO.vehiculosAccidente}"
+                           varStatus="myVarStatus"
+                           id="rptAccidente"
+                           var="acc">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding1" >
+                        <div class="box">
+                            <h2>#{acc.vehiculo.codigo}</h2>
+                            <div>Codigo: #{acc.empleado.codigoTm}</div>
+                            <div>Operador: #{acc.empleado.nombre}</div>
+                            <div>Tel: #{acc.empleado.telefono}</div>
+                            <div>Ruta: #{acc.ruta}</div>
+                            <div>Evento: #{acc.tipoEvento}</div>
+                            <div>Asistido #{acc.asistido? 'Si':'No'}</div>
+                            <div>Fecha/Hora Evento: #{acc.fechaHoraEvento}</div>
+                            <div jsf:id="scAccidente_Desplazamiento_Label">
+                                <div jsf:rendered="#{not(parrillaEstadoVehiculoBean.flagDesplazamiento)}">
+                                    Desplazamiento: #{acc.accDesplazaA.desplazaA}
+                                </div>
+                            </div>
+                            <div jsf:id="scAccidente_Desplazamiento">
+                                <div jsf:rendered="#{parrillaEstadoVehiculoBean.flagDesplazamiento}">
+                                    <div>Desplazamiento: </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1" >
+                                        <p:selectOneMenu id="idAccDesplaza" value="#{parrillaEstadoVehiculoBean.idAccDesplaza}" 
+                                                         filter="true" 
+                                                         style="width: 99.9999%"
+                                                         filterMatchMode="contains">
+                                            <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                            <f:selectItems value="#{parrillaEstadoVehiculoBean.lstAccDesplazamientos}" 
+                                                           var="desplaza" 
+                                                           itemLabel="#{desplaza.nombre}"
+                                                           itemValue="#{desplaza.idAccDesplazaA}"/>
+                                            <p:ajax event="change" process="@this"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="EmptyBox10"></div>
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding1" >
+                                        <p:commandButton value="Guardar" 
+                                                         icon="fa fa-floppy-o"
+                                                         class="cssWhite"
+                                                         process="@this,frmRptAccidente:rptAccidente:#{myVarStatus.index}:idAccDesplaza"
+                                                         actionListener="#{parrillaEstadoVehiculoBean.agregarDesplazamientoAccidente(acc)}"
+                                                         update="msgs,frmRptAccidente:rptAccidente:#{myVarStatus.index}:btnDesplazamiento,
+                                                         frmRptAccidente:rptAccidente:#{myVarStatus.index}:scAccidente_Desplazamiento,
+                                                         frmRptAccidente:rptAccidente:#{myVarStatus.index}:idAccDesplaza,
+                                                         frmRptAccidente:rptAccidente:#{myVarStatus.index}:scAccidente_Desplazamiento_Label"
+                                                         />
+                                    </div>
+                                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding1" >
+                                        <p:commandButton value="Cancelar" 
+                                                         actionListener="#{parrillaEstadoVehiculoBean.onHandleFlagDesplazamiento(acc)}"
+                                                         process="@this"
+                                                         update="frmRptAccidente:rptAccidente:#{myVarStatus.index}:btnDesplazamiento,
+                                                         frmRptAccidente:rptAccidente:#{myVarStatus.index}:scAccidente_Desplazamiento,
+                                                         frmRptAccidente:rptAccidente:#{myVarStatus.index}:scAccidente_Desplazamiento_Label"
+                                                         icon="fa fa-times"
+                                                         class="cssWhite RedButton"
+                                                         />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="EmptyBox10"></div>
+                            <p:commandButton value="Agregar Desplazamiento" 
+                                             id="btnDesplazamiento"
+                                             icon="fa fa-arrows-h"
+                                             disabled="#{parrillaEstadoVehiculoBean.flagDesplazamiento}"
+                                             actionListener="#{parrillaEstadoVehiculoBean.onHandleFlagDesplazamiento(acc)}"
+                                             process="@this"
+                                             update="@this,frmRptAccidente:rptAccidente:#{myVarStatus.index}:scAccidente_Desplazamiento,
+                                             frmRptAccidente:rptAccidente:#{myVarStatus.index}:scAccidente_Desplazamiento_Label"
+                                             class="cssWhite OrangeButton"
+                                             />
+                            <div class="EmptyBox10"></div>
+                            <p:commandButton value="Ver Ubicación" 
+                                             icon="fa fa-map-marker"
+                                             class="cssWhite"
+                                             actionListener="#{parrillaEstadoVehiculoBean.verUbicacion(acc.vehiculo.codigo)}"
+                                             process="@this"
+                                             update="msgs,map_geo"
+                                             />
+                        </div>
+                    </div>
+                </ui:repeat>
+            </h:form>
+            <ui:repeat rendered="#{parrillaEstadoVehiculoBean.viewMttoPatio}" 
+                       value="#{parrillaEstadoVehiculoBean.servicesParrillaDTO.vehiculosMttoPatio}"
+                       var="mttoPat">
+                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding1" >
+                    <div class="box">
+                        <h2>#{mttoPat.vehiculo.codigo}</h2>
+                        <div>Dias Inoperativos: #{mttoPat.diasInoperativos}</div>
+                        <div>Sistema: #{mttoPat.nombreSistema}</div>
+                        <p:commandButton value="Ver Ubicación" 
+                                         icon="fa fa-map-marker"
+                                         class="cssWhite"
+                                         actionListener="#{parrillaEstadoVehiculoBean.verUbicacion(mttoPat.vehiculo.codigo)}"
+                                         process="@this"
+                                         update="msgs,map_geo"/>
+                    </div>
+                </div>
+            </ui:repeat>
+            <ui:repeat rendered="#{parrillaEstadoVehiculoBean.viewOtro}" 
+                       value="#{parrillaEstadoVehiculoBean.servicesParrillaDTO.vehiculoOtros}"
+                       var="otro">
+                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding1" >
+                    <div class="box">
+                        <h2>#{otro.vehiculo.codigo}</h2>
+                        <div>Dias en Uri: #{otro.diasInoperativos}</div>
+                        <div jsf:rendered="false">Codigo: #{otro.empleado.codigoTm}</div>
+                        <div jsf:rendered="false">Operador: #{otro.empleado.nombre}</div>
+                        <div>Tel: #{otro.empleado.telefono}</div>
+                        <div>Evento: #{otro.tipoEvento}</div>
+                        <div>Fecha/Hora Evento: #{otro.fechaHoraEvento}</div>
+                        <div class="EmptyBox10"></div>
+                        <p:commandButton value="Ver Ubicación" 
+                                         icon="fa fa-map-marker"
+                                         class="cssWhite"
+                                         actionListener="#{parrillaEstadoVehiculoBean.verUbicacion(otro.vehiculo.codigo)}"
+                                         process="@this"
+                                         update="msgs,map_geo"
+                                         />
+                    </div>
+                </div>
+            </ui:repeat>
+        </div>
+    </div>
+        <ui:include src="../zComponent/dialogEstadoFlota.xhtml"/>
+</ui:composition>

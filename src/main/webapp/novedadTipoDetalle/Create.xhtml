@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:composition>
+        <p:dialog id="NovedadTipoDetalleCreateDlg" 
+                  closeOnEscape="true" widgetVar="NovedadTipoDetalleCreateDialog" 
+                  position="center top"
+                  closable="false"
+                  class="mr1024_60 mr500_90" modal="true" resizable="false" appendTo="@(body)" 
+                  responsive="true">
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                                <p:outputLabel value="Gestión Novedad Tipo Detalle" class="cssWhite"/>
+                            </div>
+                            <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                                <i onclick="PF('NovedadTipoDetalleCreateDialog').hide()"
+                                   title="Cerrar ventana"
+                                   style="cursor: pointer"
+                                   class="cssWhite fa fa-close Fs20"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="NovedadTipoDetalleCreateForm">
+
+                <p:growl id="msgs" showDetail="true" escape="false"/>
+                <p:growl id="messages" showDetail="true" />  
+                <div class="ui-fluid" >
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Nombre:" for="nombre"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="nombre" value="#{novedadTipoDetBean.nvd.tituloTipoNovedad}"
+                                             required="true" requiredMessage="El detalle de la novedad es obligatorio"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Tipo Novedad" for="tipoNovedad"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="tipoNovedad" value="#{novedadTipoDetBean.nvd.idNovedadTipo.nombreTipoNovedad}" 
+                                             required="true" requiredMessage="El Tipo de Novedad es obligatorio"
+                                             placeholder="Tipo de Novedad" readonly="true"/>                        
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Seleccione el Tipo de Novedad"
+                                                     icon="fa fa-list"
+                                                     style="margin: 0px"
+                                                     action="#{novedadTipoDetBean.consultarNovedaTipo()}"
+                                                     class="cssWhite"
+                                                     process="@this"
+                                                     update="frmPrincipalList:tipo_nov_dt,tipoNovedad">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:rendered="false">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Salida no conforme" for="sncDetalle"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="sncDetalle" value="#{novedadTipoDetBean.nvd.idSncDetalle.codigo}" 
+                                             placeholder="Salida No Conforme" readonly="true" 
+                                             title="#{novedadTipoDetBean.sncDetalle.nombre}" />                          
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Seleccione una SNC"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     action="#{novedadTipoDetBean.consultarSNC()}"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     update="sncDetalle,frmSncList:id_snc_dt">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:rendered="false">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Clasificación Novedad" for="clasifNovedad"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="clasifNovedad" value="#{novedadTipoDetBean.nvd.idNovedadClasificacion.nombre}" 
+                                             required="true" requiredMessage="La Clasificación es obligatoria"
+                                             placeholder="Clasif. Novedad"  readonly="true"/>                        
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Seleccione Clasificación Novedad"
+                                                     icon="fa fa-list"
+                                                     process="@this"
+                                                     action="#{novedadTipoDetBean.consultarNovedadClasif()}"
+                                                     style="margin: 0px"
+                                                     class="cssWhite"
+                                                     update="clasifNovedad,frmClasifList:id_clasf_nov_dt" >
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Requiere Fechas" for="b_fechas"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_fechas"
+                                                       title="Especifica si en la novedad a crear se va a seleccionar fechas"
+                                                       value="#{novedadTipoDetBean.b_fechas}"
+                                                       onLabel="Sí" 
+                                                       offLabel="No"
+                                                       class="cssWhite"
+                                                       onIcon="fa fa-check" 
+                                                       offIcon="fa fa-times" >
+                                    <p:ajax listener="#{novedadTipoDetBean.cambiarEstadoSumaGestor()}" 
+                                            process="@this"
+                                            update="b_sumaGestor"/>
+                                </p:selectBooleanButton>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Prevención" for="b_prevencion"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_prevencion"
+                                                       title="Prevención vial / Seguridad vial"
+                                                       value="#{novedadTipoDetBean.b_prevencion}" 
+                                                       onLabel="Sí" 
+                                                       offLabel="No" 
+                                                       class="cssWhite"
+                                                       onIcon="fa fa-check"
+                                                       offIcon="fa fa-times">
+                                </p:selectBooleanButton>
+
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Afecta Prg" for="b_afectaPrg"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_afectaPrg"
+                                                       title="Especifica si la novedad a crear afectar programación"
+                                                       value="#{novedadTipoDetBean.b_afectaProg}"
+                                                       onLabel="Sí"
+                                                       offLabel="No"
+                                                       onIcon="fa fa-check"
+                                                       offIcon="fa fa-times"
+                                                       class="cssWhite">
+                                </p:selectBooleanButton>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Afecta Programa Máster : " for="b_afecta" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_afecta" value="#{novedadTipoDetBean.b_afectaPm}" 
+                                                       onLabel="Sí" offLabel="No" onIcon="fa fa-check"
+                                                       class="cssWhite"
+                                                       offIcon="fa fa-times"  
+                                                       title="Afecta Programa Máster">
+                                    <p:ajax event="change" global="false" update="i_puntos,b_afecta" />
+                                </p:selectBooleanButton>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Puntos Programa Máster" for="i_puntos"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputNumber id="i_puntos" style="text-align: center;" 
+                                               value="#{novedadTipoDetBean.i_puntosPm}"                                      
+                                               disabled="#{!novedadTipoDetBean.b_afectaPm}"
+                                               title="Puntos Programa Máster"
+                                               minValue="0" 
+                                               maxValue="100"
+                                               decimalPlaces="0" 
+                                               emptyValue="zero" />
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Req. Soporte" for="b_soporte"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_soporte"
+                                                       title="Requiere soporte"
+                                                       value="#{novedadTipoDetBean.b_requiereSoporte}" 
+                                                       onLabel="Sí"
+                                                       offLabel="No" 
+                                                       onIcon="fa fa-check"
+                                                       offIcon="fa fa-times"
+                                                       class="cssWhite">
+                                </p:selectBooleanButton> 
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Requiere Horas" for="b_reqHoras"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_reqHoras"
+                                                       title="Especifica si la novedad a crear requiere horas"
+                                                       value="#{novedadTipoDetBean.b_reqHoras}"
+                                                       onLabel="Sí" 
+                                                       offLabel="No"
+                                                       class="cssWhite"
+                                                       onIcon="fa fa-check" 
+                                                       offIcon="fa fa-times" >
+                                </p:selectBooleanButton>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Req. Hora" for="b_ReqHora"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_ReqHora"
+                                                       title="Especifica si la novedad a crear requiere hora"
+                                                       value="#{novedadTipoDetBean.b_reqHora}" 
+                                                       onLabel="Sí" 
+                                                       offLabel="No" 
+                                                       class="cssWhite"
+                                                       onIcon="fa fa-check"
+                                                       offIcon="fa fa-times">
+                                </p:selectBooleanButton>
+
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Req. Vehículo" for="b_ReqVehiculo"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_ReqVehiculo"
+                                                       title="Especifica si la novedad a crear requiere vehículo"
+                                                       value="#{novedadTipoDetBean.b_reqVehiculo}"
+                                                       onLabel="Sí"
+                                                       offLabel="No"
+                                                       onIcon="fa fa-check"
+                                                       offIcon="fa fa-times"
+                                                       class="cssWhite">
+                                    <p:ajax update="tipoEstado" process="@this"/>
+                                </p:selectBooleanButton>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Req. Sitio" for="b_ReqSitio"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_ReqSitio"
+                                                       title="Especifica si la novedad a crear requiere sitio"
+                                                       value="#{novedadTipoDetBean.b_requiereSitio}" 
+                                                       onLabel="Sí" 
+                                                       offLabel="No" 
+                                                       class="cssWhite"
+                                                       onIcon="fa fa-check"
+                                                       offIcon="fa fa-times">
+                                </p:selectBooleanButton>
+
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Notificar" for="b_notifica"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_notifica"
+                                                       title="Especifica si al crear una novedad con éste detalle se envía una notificación vía correo electrónico"
+                                                       value="#{novedadTipoDetBean.b_notificacion}"
+                                                       onLabel="Sí"
+                                                       offLabel="No" 
+                                                       onIcon="fa fa-check" 
+                                                       offIcon="fa fa-times"
+                                                       class="cssWhite">
+                                    <p:ajax update="b_area_notifica" process="@this" global="false"/>
+                                </p:selectBooleanButton>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5"  jsf:id="b_area_notifica">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Área Notifica" for="notifProceso"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="notifProceso" 
+                                             disabled="#{!novedadTipoDetBean.b_notificacion}"
+                                             value="#{novedadTipoDetBean.nvd.idNotificacionProcesos.nombreProceso}" 
+                                             placeholder="Área Notifica" readonly="true"/>                          
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Seleccione un Proceso"
+                                                     icon="fa fa-list"
+                                                     disabled="#{!novedadTipoDetBean.b_notificacion}"
+                                                     class="cssWhite"
+                                                     process="@this"
+                                                     action="#{novedadTipoDetBean.consultarAreaNotifica()}"
+                                                     style="margin:  0px"
+                                                     update="notifProceso,frmNotificaList:id_area_noti_dt">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Novedad Nómina" for="b_novedadNomina"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_novedadNomina"
+                                                       title="Se especifica si la novedad a crear se tendrá en cuenta para el reporte de nómina "
+                                                       value="#{novedadTipoDetBean.b_novedadNomina}" 
+                                                       onLabel="Sí" 
+                                                       offLabel="No" 
+                                                       class="cssWhite"
+                                                       onIcon="fa fa-check"
+                                                       offIcon="fa fa-times">
+                                </p:selectBooleanButton>
+
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Notifica Operador" for="b_novedadNomina"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:selectBooleanButton id="b_notificaOperador"
+                                                       title="Se especifica si la novedad a crear notifica al operador"
+                                                       value="#{novedadTipoDetBean.b_notificaOperador}" 
+                                                       onLabel="Sí" 
+                                                       offLabel="No" 
+                                                       class="cssWhite"
+                                                       onIcon="fa fa-check"
+                                                       offIcon="fa fa-times">
+                                </p:selectBooleanButton>
+
+                            </div>
+                        </div>
+
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                            <p:fieldset legend="Gestión Servicios">
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Nombre Acceso Rápido" for="nombreAccesoRapido"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText id="nombreAccesoRapido" 
+                                                     maxlength="10"
+                                                     value="#{novedadTipoDetBean.nvd.nombreAccesoRapido}"
+                                                     />
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Responsable" for="responsable"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:selectOneMenu id="responsable"
+                                                         value="#{novedadTipoDetBean.i_Responsable}"
+                                                         effect="fade" filter="true" 
+                                                         style="width: 99.9999%"
+                                                         filterMatchMode="contains">
+                                            <p:ajax event="change" 
+                                                    listener="#{novedadTipoDetBean.cargarClasificacion}" 
+                                                    process="@this" global="false" update="NovedadTipoDetalleCreateForm:clasif_tipo"/>
+                                            <f:selectItem itemLabel="Seleccione responsable" itemValue="#{null}" />
+                                            <f:selectItems value="#{novedadTipoDetBean.lstResponsables}" 
+                                                           var="res" itemLabel="#{res.responsable}"     
+                                                           itemValue="#{res.idPrgTcResponsable}" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Clasificación" for="clasif_tipo"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:selectOneMenu id="clasif_tipo"
+                                                         disabled="#{novedadTipoDetBean.i_Responsable eq null}"
+                                                         value="#{novedadTipoDetBean.i_Clasificacion}"
+                                                         effect="fade" filter="true" 
+                                                         style="width: 99.9999%"
+                                                         title="Clasificación del tipo de evento"
+                                                         filterMatchMode="startsWith">
+                                            <f:selectItem itemLabel="Seleccione responsable" itemValue="#{null}"  />
+                                            <f:selectItems value="#{novedadTipoDetBean.lstClasificacion}" 
+                                                           itemDescription="#{res.descripcion}"
+                                                           var="res" itemLabel="#{res.nombre}" 
+                                                           itemValue="#{res.idPrgClasificacionMotivo}" />
+                                        </p:selectOneMenu>
+
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Descripción" for="descripcion"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText id="descripcion" 
+                                                     value="#{novedadTipoDetBean.nvd.descripcionGestionServicio}"
+                                                     />
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Sale de"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText id="txtSale" placeholder="Salida"
+                                                     value="#{novedadTipoDetBean.salida}"  
+                                                     maxlength="12" 
+                                                     onkeypress="if (event.keyCode == 13) {
+                                                                 findPuntoPPDos();
+                                                                 return false;
+                                                             }">
+                                        </p:inputText>
+                                        <p:remoteCommand name="findPuntoPPDos"
+                                                         process="@this,txtSale"
+                                                         action="#{novedadTipoDetBean.findPunto(2)}"
+                                                         update="txtSale,messages"/>
+
+                                        <div class="botonFloat"  >
+                                            <p:commandButton title="Consultar"
+                                                             icon="fa fa-search"
+                                                             class="cssWhite"
+                                                             style="margin: 0px"
+                                                             process="@this,txtSale"
+                                                             action="#{novedadTipoDetBean.findPunto(2)}"
+                                                             update="txtSale,messages">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Entra a"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText id="txtEntra" placeholder="Entrada"
+                                                     value="#{novedadTipoDetBean.entrada}"  maxlength="12" 
+                                                     onkeypress="if (event.keyCode == 13) {
+                                                                 findPuntoPPUno();
+                                                                 return false;
+                                                             }">
+                                        </p:inputText>
+                                        <p:remoteCommand name="findPuntoPPUno"
+                                                         process="@this,txtEntra"
+                                                         action="#{novedadTipoDetBean.findPunto(1)}"
+                                                         update="txtEntra,messages"/>
+
+                                        <div class="botonFloat" >
+                                            <p:commandButton title="Consultar"
+                                                             icon="fa fa-search"
+                                                             class="cssWhite"
+                                                             style="margin: 0px"
+                                                             process="@this,txtEntra"
+                                                             action="#{novedadTipoDetBean.findPunto(1)}"
+                                                             update="txtEntra,messages">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </p:fieldset>
+                        </div>
+
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                            <p:fieldset legend="Disponibilidad de flota">
+                                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Afecta Disponibilidad" for="b_AfectaDisponibilidad"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:selectBooleanButton id="b_AfectaDisponibilidad"
+                                                               value="#{novedadTipoDetBean.b_AfectaDisponibilidad}"
+                                                               onLabel="Sí"
+                                                               offLabel="No"
+                                                               onIcon="fa fa-check"
+                                                               offIcon="fa fa-times"
+                                                               class="cssWhite">
+                                            <p:ajax update="tipoEstado" process="@this"/>
+                                        </p:selectBooleanButton>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="tipoEstado">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Causa Tipo Detalle (Vehículos)" for="tipoEstadoDet"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText id="tipoEstadoDet" value="#{novedadTipoDetBean.tipoEstadoDet.nombre}"
+                                                     disabled="#{!novedadTipoDetBean.b_AfectaDisponibilidad}"
+                                                     required="#{novedadTipoDetBean.b_AfectaDisponibilidad}" 
+                                                     requiredMessage="El campo es obligatorio"
+                                                     placeholder="Causa tipo detalle" readonly="true"/>                          
+                                        <div class="botonFloat" >
+                                            <p:commandButton title="Seleccione causa tipo detalle"
+                                                             icon="fa fa-list"
+                                                             class="cssWhite"
+                                                             process="@this"
+                                                             action="#{novedadTipoDetBean.consultarEstadoVehiculoDet()}"
+                                                             disabled="#{!novedadTipoDetBean.b_AfectaDisponibilidad}"
+                                                             style="margin:  0px"
+                                                             update="tipoEstadoDet,frmTipoEstadoDet:id_est_det_vh">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="ATV" for="b_atv"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:selectBooleanButton id="b_atv"
+                                                               value="#{novedadTipoDetBean.b_atv}"
+                                                               onLabel="Sí"
+                                                               offLabel="No" 
+                                                               title="Atención en vía"
+                                                               onIcon="fa fa-check" 
+                                                               offIcon="fa fa-times"
+                                                               class="cssWhite">
+                                            <p:ajax process="@this" global="false"/>
+                                        </p:selectBooleanButton>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Mantenimiento" for="b_mantenimiento"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:selectBooleanButton id="b_mantenimiento"
+                                                               title="Especifica si la novedad a crear afecta mantenimiento"
+                                                               value="#{novedadTipoDetBean.b_mantenimiento}" 
+                                                               onLabel="Sí" 
+                                                               offLabel="No" 
+                                                               class="cssWhite"
+                                                               onIcon="fa fa-check"
+                                                               offIcon="fa fa-times">
+                                            <p:ajax update="b_ReqVehiculo"
+                                                    listener="#{novedadTipoDetBean.changeReqVehiculo()}"
+                                                    process="@this" 
+                                                    global="false"/>
+                                        </p:selectBooleanButton>
+
+                                    </div>
+                                </div>
+                            </p:fieldset>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                            <p:fieldset legend="Gestor de novedades">
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Afecta Gestor" for="b_AfectaGestor"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:selectBooleanButton id="b_AfectaGestor"
+                                                               value="#{novedadTipoDetBean.b_AfectaGestor}" 
+                                                               onLabel="Sí" 
+                                                               offLabel="No" 
+                                                               class="cssWhite"
+                                                               onIcon="fa fa-check"
+                                                               offIcon="fa fa-times">
+                                            <p:ajax update="incluirReporte" process="@this"/>
+                                        </p:selectBooleanButton>
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="incluirReporte">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Incluir en reporte" for="b_IncluirReporte"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:selectBooleanButton id="b_IncluirReporte"
+                                                               title="Especifica si el detalle se va incluir en reporte de insumo para Freeway"
+                                                               value="#{novedadTipoDetBean.b_incluyeReporte}"
+                                                               onLabel="Sí"
+                                                               offLabel="No"
+                                                               disabled="#{!novedadTipoDetBean.b_AfectaGestor}"
+                                                               onIcon="fa fa-check"
+                                                               offIcon="fa fa-times"
+                                                               class="cssWhite">
+                                        </p:selectBooleanButton>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Suma Gestor" for="b_sumaGestor"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:selectBooleanButton id="b_sumaGestor"
+                                                               title="Especifica si el detalle se va a tener en cuenta para el cálculo de OBZ para conducir"
+                                                               value="#{novedadTipoDetBean.b_sumaGestor}" 
+                                                               onLabel="Sí" 
+                                                               offLabel="No" 
+                                                               class="cssWhite"
+                                                               onIcon="fa fa-check"
+                                                               offIcon="fa fa-times">
+                                        </p:selectBooleanButton>
+
+                                    </div>
+                                </div>
+                            </p:fieldset>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5 Wid100" jsf:id="pgrid2">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="observaciones" value="Descripción: " />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                                <p:inputTextarea id="observaciones" 
+                                                 rows="5"
+                                                 value="#{novedadTipoDetBean.nvd.descripcionTipoNovedad}"
+                                                 required="true" 
+                                                 requiredMessage="Debe ingresar una descripción"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p:remoteCommand name="rc" 
+                                 class="cssWhite"
+                                 actionListener="#{novedadTipoDetBean.guardar()}"  
+                                 value="Guardar" 
+                                 update="@form,:NovedadTipoDetalleListForm:datalist,messages"/>
+            </h:form>
+            <f:facet name="footer">
+                <p:commandButton id="btnGuardarAdd" 
+                                 icon="fa fa-save" value="Guardar" 
+                                 class="cssWhite" onclick="rc()"/>
+            </f:facet>
+        </p:dialog>
+        <ui:include src="listaEntradaSalida.xhtml"/>
+        <ui:include src="../novedadTipoDetalle/ListNovedadesTipo.xhtml"/>
+        <ui:include src="../novedadTipoDetalle/novedadClasifList.xhtml"/>
+        <ui:include src="../novedadTipoDetalle/ListSnc.xhtml"/>
+        <ui:include src="../novedadTipoDetalle/ListNotifica.xhtml"/>
+        <ui:include src="../novedadTipoDetalle/ListTipoEstadoDet.xhtml"/>
+    </ui:composition>
+</html>

@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="SentidoEdit" 
+              widgetVar="sentido-editDlg" 
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_30 mr500_90" 
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top"
+              closable="false">
+        <p:ajax event="close" listener="#{accSentidoJSF.reset()}" update=":SentidoListForm:datalist" />
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Editar Sentido Accidente
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('sentido-editDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="form-sentido-edit">
+            <div class="ui-fluid">
+                <p:messages id="msgs" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Acc Sentido: *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="tipo"
+                                         value="#{accSentidoJSF.accSentido.sentido}" 
+                                         maxlength="60"
+                                         required="true"
+                                         requiredMessage="Acc Sentido es requerido"
+                                         />
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción: *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea  id="descripcion" 
+                                              maxlength="65000" 
+                                              class="cssBlack"
+                                              value="#{accSentidoJSF.accSentido.descripcion}" 
+                                              required="true" 
+                                              requiredMessage="Descripción es requerido"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="editar" 
+                             actionListener="#{accSentidoJSF.actualizar()}" 
+                             process="@this,@form"
+                             update=":SentidoListForm"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-editar"
+                             value="Actualizar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             onclick="editar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition> 

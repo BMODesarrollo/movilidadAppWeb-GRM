@@ -1,0 +1,99 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="adicionar_detalle_dialog"
+              widgetVar="adicionar_detalle_wv"
+              modal="true" 
+              resizable="false" 
+              closable="true"
+              closeOnEscape="true"
+              class="dialog-responsive-rigel"
+              style="position: absolute;"
+              fitViewport="true"
+              position="center top"
+              appendTo="@(body)" 
+              width="95%"
+              header="Ajustar Jornada">
+        <h:form id="adicionar_detalle_form"> 
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                        <p:outputLabel class="cssBlack Fs20" 
+                                       value="Cargo"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 ">
+                        <p:outputLabel class="cssBlack Fs20" 
+                                       value="# Habil"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 ">
+                        <p:outputLabel class="cssBlack Fs20" 
+                                       value="# Domingo/Feriado"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <p:scrollPanel mode="native" style="width:99%;
+                                       border-bottom: white;
+                                       border-left: white;
+                                       border-right: white;
+                                       border-top: white;">
+
+                            <p:repeat  value="#{genTurnoJornadaMB.listaDetalles}" 
+                                       var="item"
+                                       varStatus="index">
+                                <div class="ui-g"  style="#{genTurnoJornadaMB.esPar(index.index)}">
+                                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding3">
+                                        <p:outputLabel class="cssBlack" 
+                                                       style="font-size: 17px;" 
+                                                       value="#{item.idEmpleadoTipoCargo.nombreCargo}">
+                                        </p:outputLabel>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding3">
+                                        <p:inputNumber value="#{item.cantidadHabil}" 
+                                                       maxValue="99"
+                                                       decimalPlaces="0"
+                                                       placeholder="Cantidad Habil"
+                                                       required="false"
+                                                       class="cssBlack">
+                                            <p:ajax event="keyup" global="false" process="@this"/>
+                                        </p:inputNumber>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding3">
+                                        #{genTurnoJornadaMB.getEmpleadosDisponiblesHabiles(item.idEmpleadoTipoCargo.idEmpleadoTipoCargo)} / #{genTurnoJornadaMB.getEmpleadoTotalCargo(item.idEmpleadoTipoCargo.idEmpleadoTipoCargo)}
+                                    </div>
+                                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding3">
+                                        <p:inputNumber value="#{item.cantidadFeriada}" 
+                                                       maxValue="99" 
+                                                       decimalPlaces="0"
+                                                       placeholder="Cantidad Domingos/Feriados"
+                                                       required="false"
+                                                       class="cssBlack">
+                                            <p:ajax event="keyup" global="false" process="@this"/>
+                                        </p:inputNumber>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding3">
+                                        #{genTurnoJornadaMB.getEmpleadosDisponiblesFeriado(item.idEmpleadoTipoCargo.idEmpleadoTipoCargo)} / #{genTurnoJornadaMB.getEmpleadoTotalCargo(item.idEmpleadoTipoCargo.idEmpleadoTipoCargo)}
+                                    </div>
+                                </div>
+                            </p:repeat>
+                        </p:scrollPanel>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{genTurnoJornadaMB.guardarDetalle()}"
+                             process="@this"
+                             update="msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarL" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

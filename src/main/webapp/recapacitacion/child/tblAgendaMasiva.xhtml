@@ -1,0 +1,130 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dataTable  id="dtMasivaAgenda" var="agendamasiva" 
+                  scrollable="true"
+                  widgetVar="wlVdtMasivaAgenda" value="#{recapacitacionBean.lstRecapacitacionAgendaMasiva}"
+                  paginator="true"
+                  rows="10"
+                  filterDelay="1000"
+                  reflow="true"
+                  rowKey="#{agendamasiva.idRecapacitacionMaestro}"
+                  currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                  emptyMessage="No existen novedades encontrados">
+
+        <f:facet name="header" >
+            <div class="ui-g ui-fluid">
+                <div class="ui-g-3">
+                    <div class="ui-g-12 Padding0">
+                        <p:outputLabel value="Fecha Inicio" style="color: white" for="@next"/>
+                    </div>
+                    <div class="ui-g-12 Padding0">
+                        <p:calendar id="fechaDesde" 
+                                    pattern="yyyy-MM-dd" 
+                                    value="#{recapacitacionBean.fechaInicioAgendaMasiva}"
+                                    showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar una fecha"
+                                    showTodayButton="true"
+                                    navigator="true"
+                                    />
+                    </div>
+                </div>
+                <div class="ui-g-3">
+                    <div class="ui-g-12 Padding0">
+                        <p:outputLabel value="Fecha Final" style="color: white" for="@next"/>
+                    </div>
+                    <div class="ui-g-12 Padding0">
+                        <p:calendar id="fechaHasta" 
+                                    pattern="yyyy-MM-dd" 
+                                    value="#{recapacitacionBean.fechaFinAgendaMasiva}"
+                                    showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar una fecha"
+                                    showTodayButton="true"
+                                    navigator="true"/>
+                    </div>
+                </div>
+                <div class="ui-g-3">
+                    <p:commandButton
+                        icon="fa fa-search"
+                        value="Buscar"
+                        class="cssWhite"
+                        action="#{recapacitacionBean.findNoProgramadas()}"
+                        update="msg, dtMasivaAgenda"
+                        style="margin-top: 20px;"
+                        >
+                        <p:resetInput target="dtMasivaAgenda"/>
+                    </p:commandButton>  
+                </div>
+                <div class="ui-g-3">
+                    <p:commandButton
+                        rendered="#{recapacitacionBean.asignarmasivo}"
+                        icon="fa fa-check"
+                        value="Confirmar agenda"
+                        class="cssWhite OrangeButton"
+                        update="msg, :frmPrincipal:dtPdMaestro"
+                        action="#{recapacitacionBean.agendar()}"
+                        style="margin-top: 20px;"
+                        >
+                    </p:commandButton>  
+                </div>
+            </div>
+        </f:facet>
+
+        <p:column headerText="Fecha Novedad"
+                  filterBy="#{agendamasiva.idNovedad.fecha}"
+                  filterMatchMode="contains">
+            <h:outputText value="#{agendamasiva.idNovedad.fecha}" >
+                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="Tipo Novedad"
+                  filterBy="#{agendamasiva.idNovedad.idNovedadTipo.nombreTipoNovedad}"
+                  filterMatchMode="contains">
+            <h:outputText value="#{agendamasiva.idNovedad.idNovedadTipo.nombreTipoNovedad}" />
+        </p:column>
+
+
+        <p:column headerText="Tipo Det. Novedad"
+                  filterBy="#{agendamasiva.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                  filterMatchMode="contains">
+            <h:outputText value="#{agendamasiva.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}" />
+        </p:column>
+
+
+        <p:column headerText="Tipo Infracción"
+                  filterBy="#{agendamasiva.idNovedad.idNovedadTipoInfraccion.nombre}"
+                  filterMatchMode="contains">
+            <h:outputText value="#{agendamasiva.idNovedad.idNovedadTipoInfraccion.nombre}" />
+        </p:column>
+
+        <p:column headerText="Código TM"
+                  filterBy="#{agendamasiva.idEmpleado.codigoTm}"
+                  filterMatchMode="contains">
+            <h:outputText value="#{agendamasiva.idEmpleado.codigoTm}" />
+        </p:column>
+        <p:column filterBy="#{agendamasiva.idEmpleado.nombres} #{agendamasiva.idEmpleado.apellidos}"
+                  filterMatchMode="contains"
+                  headerText="Nombre Completo">
+            <h:outputText value="#{agendamasiva.idEmpleado.nombres} #{agendamasiva.idEmpleado.apellidos}"/>
+        </p:column>
+
+        <p:column headerText="Fecha citación" 
+                  filterBy="#{agendamasiva.fechaCitacion}"
+                  filterMatchMode="contains">
+            <h:outputText value="#{agendamasiva.fechaCitacion}" >
+                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+            </h:outputText>
+        </p:column>
+
+
+    </p:dataTable>
+</ui:composition>     

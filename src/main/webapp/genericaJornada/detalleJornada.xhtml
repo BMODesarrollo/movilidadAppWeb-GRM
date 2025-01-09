@@ -1,0 +1,103 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form id="form_prg_sercon_det">
+            <p:panel header="Detalle de Jornada">
+                <p:dataTable id="sercon_det_id" 
+                             value="#{genJornadaBean.listGenericaJornadaDet}" 
+                             var="item"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             scrollHeight="600"
+                             reflow="true"
+                             filterDelay="1000"
+                             rowKey="#{item.idGenericaJornadaDet}"
+                             rows="31"
+                             widgetVar="dtsercon_det_id"
+                             rowsPerPageTemplate="31,100,200,500">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="sercon_det_id" fileName="Detalles de jornada"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+
+                            <p:outputLabel value="Fecha " class="cssWhite Fs20" for="desde"></p:outputLabel>
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{genJornadaBean.desde}"
+                                        locale="es"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" global="false" process="@this"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{genJornadaBean.hasta}"
+                                        locale="es"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" global="false" process="@this"/>
+                            </p:calendar>
+                            <p:commandButton id="consultar"
+                                             value="Consultar"
+                                             icon="fa fa-search"
+                                             class="cssWhite"
+                                             update="form_prg_sercon_det:sercon_det_id"
+                                             actionListener="#{genJornadaBean.consultar()}">
+                            </p:commandButton>
+                            <p:commandButton id="toggler_id" type="button" 
+                                             title="Columnas"
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="sercon_det_id" trigger="toggler_id"/>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha">
+                        <h:outputText  value="#{item.idGenericaJornada.fecha}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.idGenericaJornada.idEmpleado.identificacion} #{item.idGenericaJornada.idEmpleado.nombres} #{item.idGenericaJornada.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              width="30%"
+                              headerText="Colaborador">
+                        <h:outputText value="#{item.idGenericaJornada.idEmpleado.identificacion}" class="cssBlack"/>
+                        <h:outputText value=" - #{item.idGenericaJornada.idEmpleado.nombres.concat(' ').concat(item.idGenericaJornada.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.timeorigin}"
+                              sortBy="#{item.timeorigin}"
+                              filterMatchMode="contains"
+                              headerText="Hr. Inicio">
+                        <h:outputText value="#{item.timeorigin}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.timedestiny}"
+                              filterMatchMode="contains"
+                              sortBy="#{item.timedestiny}"
+                              headerText="Hr. Fin">
+                        <h:outputText value="#{item.timedestiny}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.cantidad}"
+                              sortBy="#{item.cantidad}"
+                              filterMatchMode="contains"
+                              headerText="Hr. Cantidad">
+                        <h:outputText value="#{item.cantidad}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idParamReporte.concepto}"
+                              filterMatchMode="contains"
+                              headerText="Concepto">
+                        <h:outputText value="#{item.idParamReporte.concepto}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="EmpleadosDlg" widgetVar="EmpleadosDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de empleados"
+              class="mr1024_50 mr500_90" fitViewport="true" closeOnEscape="true"
+              position="center top">
+        <p:messages id="alertapdempleado" showDetail="true" showSummary="false" closable="true">
+        </p:messages>
+        <h:form id="frmEmpleadosList">
+            <p:dataTable id="dtEmpleadosPd" 
+                         widgetVar="wdtEmpleados"
+                         var="operador" value="#{pdMaestroBean.lstEmpleados}"
+                         paginator="true"
+                         rows="10"
+                         filterDelay="1000"
+                         reflow="true"
+                         selection="#{pdMaestroBean.lstEmpleadosSeleccionados}" 
+                         rowKey="#{operador.idEmpleado}"
+                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                         rowSelectMode="checkbox"
+                         emptyMessage="No existen empleados">
+
+                <p:column selectionMode="multiple" style="width:50px;text-align:center "/>
+                <p:column headerText="Código TM"
+                          filterBy="#{operador.codigoTm}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{operador.codigoTm == null ? 'N/A' : operador.codigoTm}" />
+                </p:column>
+                <p:column headerText="Cédula"
+                          filterBy="#{operador.identificacion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{operador.identificacion}" />
+                </p:column>
+
+                <p:column filterBy="#{operador.nombres}"
+                          filterMatchMode="contains"
+                          headerText="Nombres">
+                    <h:outputText value="#{operador.nombres}"/>
+                </p:column>
+                <p:column filterBy="#{operador.apellidos}"
+                          filterMatchMode="contains"
+                          headerText="Apellidos">
+                    <h:outputText value="#{operador.apellidos}"/>
+                </p:column>
+                <f:facet name="footer">
+                    <p:commandButton class="cssWhite"
+                                     icon="fa fa-check" 
+                                     value="Seleccionar"
+                                     update=":frmListaParticipantes:dtEmpleados,alertapdempleado,:msgs"
+                                     action="#{pdMaestroBean.crearListaEmpleados()}">
+                    </p:commandButton>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

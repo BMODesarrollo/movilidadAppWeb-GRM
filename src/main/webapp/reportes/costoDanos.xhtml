@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-right{
+                text-align: right;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="frmByVehiculolist">
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Costo de daños operativos a móviles
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="kmByVehiculolist" 
+                                            listener="#{costoDanosBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:panel>
+                    <f:facet name="header">
+                        <div align="center">
+                            <p:outputLabel for="@next" value="FECHA INICIO:"
+                                           styleClass="cssWhite"/>
+                            <p:spacer width="5"/>
+                            <p:calendar id="fechaIncio" label="Fecha de Consulta" 
+                                        value="#{costoDanosBean.fecha}"
+                                        pattern="dd-MM-yyyy"
+                                        locale="es"
+                                        maxdate="today"
+                                        readonlyInput="true"
+                                        showOn="button"
+                                        title="Fecha Inicio"
+                                        navigator="true">
+                                <p:ajax  event="dateSelect" process="@this"/>
+                            </p:calendar>
+                            <p:spacer width="20"/>
+                            <p:outputLabel value=" - " styleClass="cssWhite"/>
+                            <p:spacer width="20"/>
+                            <p:outputLabel for="fechaFin" value="FECHA FIN:"
+                                           styleClass="cssWhite"/>
+                            <p:spacer width="5"/>
+                            <p:calendar id="fechaFin" label="Fecha de Consulta" 
+                                        value="#{costoDanosBean.fechaFin}"
+                                        locale="es"
+                                        pattern="dd-MM-yyyy"
+                                        readonlyInput="true"
+                                        title="Fecha Fin"
+                                        maxdate="today"
+                                        showOn="button"
+                                        navigator="true">
+                                <p:ajax  event="dateSelect" process="@this"/>
+                            </p:calendar>
+                            <p:spacer width="20"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                actionListener="#{costoDanosBean.consultar()}"
+                                class="cssWhite"
+                                update="kmByVehiculolist"
+                                >
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:dataTable id="kmByVehiculolist" value="#{costoDanosBean.lista}" 
+                                 var="item" widgetVar="dtkmByVehiculolist"
+                                 emptyMessage="No hay registros que mostrar!!"
+                                 paginator="true"
+                                 rows="100"
+                                 tableStyle="table-layout:auto"
+                                 filterDelay="1500"
+                                 rowsPerPageTemplate="100,200,500"
+                                 >
+
+                        <f:facet name="paginatorTopRight">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="kmByVehiculolist" 
+                                                fileName="Costo Daños"/>
+                            </h:commandLink>
+                        </f:facet>
+
+                        <p:column headerText="Fecha" 
+                                  sortBy="#{item.idNovedadDano.fecha}"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.idNovedadDano.fecha}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column filterBy="#{item.idNovedadDano.idVehiculo.codigo}"
+                                  class="TexAlCenter"
+                                  filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Móvil"/>
+                            </f:facet>
+                            <h:outputText value="#{item.idNovedadDano.idVehiculo.codigo}"/>
+                        </p:column>
+
+                        <p:column filterBy="#{item.idNovedadDano.idVehiculoDanoSeveridad.nombre}"
+                                  class="TexAlCenter"
+                                  filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Tipo Daño"/>
+                            </f:facet>
+                            <h:outputText value="#{item.idNovedadDano.idVehiculoDanoSeveridad.nombre}"/>
+                        </p:column>
+
+                        <p:column filterBy="#{item.idNovedadDano.descripcion}"
+                                  class="cortar" style="max-width: 150px !important">
+                            <f:facet name="header">
+                                <h:outputText value="Observación"/>
+                            </f:facet>
+                            <h:outputText value="#{item.idNovedadDano.descripcion}"/>
+                        </p:column>
+
+                        <p:column styleClass="text-right" >
+                            <f:facet name="header">
+                                <h:outputText value="Costo"/>
+                            </f:facet>
+                            <h:outputText 
+                                value="#{item.costoParam}"
+                                rendered="#{item.costoAjustado eq item.costoParam }"
+                                >
+                                <f:convertNumber type="currency" />
+                            </h:outputText>
+                            <h:outputText 
+                                value="#{item.costoAjustado}"
+                                rendered="#{item.costoAjustado != item.costoParam }"
+                                >
+                                <f:convertNumber type="currency" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Código Operador" 
+                                  filterBy="#{item.idNovedadDano.idEmpleado.codigoTm}"
+                                  filterMatchMode="contains"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.idNovedadDano.idEmpleado.codigoTm}" />
+                        </p:column>
+
+                        <p:column headerText="Nombre Operador" 
+                                  filterBy="#{item.idNovedadDano.idEmpleado.nombres} #{item.idNovedadDano.idEmpleado.apellidos}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.idNovedadDano.idEmpleado.nombres} #{item.idNovedadDano.idEmpleado.apellidos}" />
+                        </p:column>
+
+                        <p:column  style="text-align: center;"
+                                   width="90"
+                                   styleClass="#{costoDanosBean.verificarAfectaBonificacion(item.idNovedadDano) gt 0 ? 'cssGreen texto-blanco' : costoDanosBean.verificarAfectaBonificacion(item.idNovedadDano) lt 1 ? 'cssRed texto-blanco' : null}">
+                            <f:facet name="header">
+                                <h:outputText value="Afecta Bonificación"/>
+                            </f:facet>
+                            <h:outputText value="#{costoDanosBean.verificarAfectaBonificacion(item.idNovedadDano) gt 0 ? 'Si':'No'}" style="color: white;"/>
+                        </p:column>
+
+                        <p:column headerText="Puntos PM"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.idNovedadDano.idVehiculoDanoSeveridad.puntosPm}"/>
+                        </p:column>
+
+                        <f:facet name="footer">
+                            <div align="center">
+                                En total existen #{costoDanosBean.lista.size()} registro(s)
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

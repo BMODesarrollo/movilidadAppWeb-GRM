@@ -1,0 +1,189 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Genérica Tipo">
+            <h:form id="frmPrincipalNvdTipo">
+                <p:dataTable var="genericaTipo" value="#{genericaTipoBean.lista}"
+                             id="dtTipo"
+                             rowIndexVar="nroFila"
+                             rows="5"
+                             reflow="true"
+                             filterDelay="1000"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                             emptyMessage="No existen tipos de novedad registrados">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton action="#{genericaTipoBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             disabled="#{genericaTipoBean.flagBtnNuevo}"
+                                             title="Agregar nuevo tipo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":frmNuevoTipo"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmNuevoTipo:pGrid" />
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#" width="30">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre" 
+                              styleClass="text-center"
+                              filterMatchMode="contains"
+                              filterBy="#{genericaTipo.nombreTipoNovedad}">
+                        <h:outputText value="#{genericaTipo.nombreTipoNovedad}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{genericaTipo.descripcionTipoNovedad}" />
+                    </p:column>
+                    <p:column headerText="Acción" 
+                              width="10%"
+                              exportable="false"
+                              styleClass="text-center">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton icon="fa fa-pencil"
+                                                 title="Editar registro"
+                                                 class="GreenButton cssWhite"
+                                                 action="#{genericaTipoBean.editar()}"
+                                                 update=":frmNuevoTipo:modal"
+                                                 oncomplete="PF('mtipo').show();"
+                                                 >
+                                    <f:setPropertyActionListener target="#{genericaTipoBean.selected}" value="#{genericaTipo}"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-6" jsf:rendered="false">
+                                <p:commandButton icon="fa fa-refresh"
+                                                 rendered="false"
+                                                 title="Cambiar estado"
+                                                 action="#{genericaTipoBean.cambiarEstado()}"
+                                                 update=":frmNuevoTipo:modal,:frmNuevoTipo:messages,dtTipo"
+                                                 disabled="true">
+                                    <f:setPropertyActionListener target="#{genericaTipoBean.selected}" value="#{genericaTipo}"/>
+                                    <p:confirm header="Confirmación" 
+                                               message="Ésta seguro de cambiar el estado?" 
+                                               icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{genericaTipoBean.lista.size()} tipo(s).
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <h:form id="frmNuevoTipo">
+                <p:dialog widgetVar="mtipo" 
+                          class="mr1024_40 mr500_90"
+                          resizable="false"
+                          responsive="true"
+                          position="center top"
+                          id="modal" 
+                          modal="true" 
+                          closeOnEscape="true">
+                    <c:if test="#{genericaTipoBean.selected == null }">
+                        <f:facet name="header">
+                            Nuevo tipo de novedad
+                        </f:facet>
+                    </c:if>
+                    <c:if test="#{genericaTipoBean.selected != null }">
+                        <f:facet name="header">
+                            Editar tipo: #{genericaTipoBean.selected.nombreTipoNovedad.toUpperCase()}
+                        </f:facet>
+                    </c:if>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar"
+                                         class="cssWhite"
+                                         actionListener="#{genericaTipoBean.guardar()}"
+                                         update=":frmPrincipalNvdTipo:dtTipo,pGrid,messages,msgs"
+                                         rendered="#{genericaTipoBean.selected == null }"
+                                         >
+                        </p:commandButton>
+                        <p:commandButton value="Actualizar" 
+                                         class="cssWhite"
+                                         actionListener="#{genericaTipoBean.actualizar()}"
+                                         update=":frmPrincipalNvdTipo:dtTipo,msgs"
+                                         rendered="#{genericaTipoBean.selected != null }"
+                                         />
+                    </f:facet>
+
+                    <div class="ui-fluid" jsf:id="pGrid">
+
+                        <p:messages id="messages" showDetail="true" closable="true">
+                            <p:effect type="pulsate" event="load" delay="500" />
+                        </p:messages>
+
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Nombre" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText id="nombre" value="#{genericaTipoBean.genericaTipo.nombreTipoNovedad}"
+                                                 required="true" requiredMessage="El nombre del tipo es obligatorio"
+                                                 counter="display1"
+                                                 counterTemplate="Quedan {0} carácteres para la el nombre del tipo"
+                                                 maxlength="45">
+                                        <f:validateLength maximum = "45" />
+                                    </p:inputText>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel id="display1"/>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 EmptyBox10 Padding5">
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Descripción" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputTextarea id="descripcion" value="#{genericaTipoBean.genericaTipo.descripcionTipoNovedad}"
+                                                     cols="30"
+                                                     maxlength="100"
+                                                     required="true" requiredMessage="La descripción del tipo es obligatoria"
+                                                     counter="display2"
+                                                     autoResize="false"
+                                                     counterTemplate="Quedan {0} carácteres para la descripción"
+                                                     >
+                                        <f:validateLength maximum = "100" />
+                                    </p:inputTextarea>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel id="display2"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p:dialog>  
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

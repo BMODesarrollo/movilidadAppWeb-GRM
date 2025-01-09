@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+
+    <p:dialog id="idEntradaSalidaListDlg"
+              closeOnEscape="true" 
+              widgetVar="wvEntradaSalidaListDialog"
+              modal="true" 
+              closable="false"
+              position="center top"
+              responsive="true"
+              resizable="false" 
+              appendTo="@(body)" header="parada"
+              class="mr1024_50 mr500_90">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Puntos" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvEntradaSalidaListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmPrincipalEntradaSalidaList">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Un click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="StopPoint" id="tablaEntradaSalida" value="#{prgTcJSFMB.listPrgStopPoint}"  
+                         selectionMode="single"                
+                         rowIndexVar="nroFila"
+                         widgetVar="tablaEntradaSalidaWV"
+                         rows="10"
+                         filterDelay="1000"
+                         paginator="true"
+                         rowKey="#{StopPoint.idPrgStoppoint}"
+                         emptyMessage="No existen Paradas registradas"       >
+                <p:ajax event="rowSelect" 
+                        listener="#{prgTcJSFMB.onRowClckSelectEntradaSalida}"
+                        process="@this" global="false"/>
+                <p:column headerText="#" style="width: 10%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column  headerText="Nombre"
+                           filterMatchMode="contains"
+                           filterBy="#{StopPoint.name}">
+                    <h:outputText  value="#{StopPoint.name}" />
+                    <p:tooltip  value="Hacer doble click para seleccionar" trackMouse="true"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,152 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="cableRevisionActividad"
+              widgetVar="wlvAccNovedadTipoDetallesInfrastruc" 
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closeOnEscape="true"
+              closable="false"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{accNovedadTipoDetallesInfrastuc.selected == null}">
+                                NUEVO REGISTRO
+                            </c:if>
+                            <c:if test="#{accNovedadTipoDetallesInfrastuc.selected != null}">
+                                EDITAR REGISTRO
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wlvAccNovedadTipoDetallesInfrastruc').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmAccNovedadTipoDetallesInfrastruc">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true" 
+                                value="#{accNovedadTipoDetallesInfrastuc.nombre}"
+                                requiredMessage="Debe ingresar un nombre"
+                                />
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo novedad" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  
+                                filter="true"
+                                style="width: 99.9999%"
+                                required="true"
+                                requiredMessage="Debe seleccionar un tipo de novedad"
+                                value="#{accNovedadTipoDetallesInfrastuc.idTipoNovedad}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="tipo"
+                                    value="#{accNovedadTipoDetallesInfrastuc.lstAccNovedadTipoInfrastrucs}"
+                                    itemLabel="#{tipo.nombre}"
+                                    itemValue="#{tipo.idAccNovedadTipoInfrastruc}"
+                                    />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Notifica" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton value="#{accNovedadTipoDetallesInfrastuc.b_notifica}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   styleClass="cssWhite">
+                                <p:ajax update="emails" listener="#{accNovedadTipoDetallesInfrastuc.cargarEmails()}" />
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+
+                    <div class="EmptyBox10"></div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="emails">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{accNovedadTipoDetallesInfrastuc.b_notifica}">
+                            <p:outputLabel value="Emails ( Si va a ingresar varios emails, separelos por cómas)" 
+                                           />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{accNovedadTipoDetallesInfrastuc.b_notifica}">
+                            <p:inputTextarea autoResize="false"
+                                             value="#{accNovedadTipoDetallesInfrastuc.accNovedadTipoDetallesInfrastruc.emails}"
+                                             required="true"
+                                             placeholder="Ex: example1@example.com,example2@example.com"
+                                             requiredMessage="Debe ingresar al menos un email"
+                                             rows="5"/>
+                        </div>
+                    </div>
+
+                    <div class="EmptyBox10"></div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea autoResize="false"
+                                             value="#{accNovedadTipoDetallesInfrastuc.accNovedadTipoDetallesInfrastruc.descripcion}"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmAccNovedadTipoDetallesInfrastruc,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtAccNovedadTipoDetallesInfrastruc" 
+                             action="#{accNovedadTipoDetallesInfrastuc.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmAccNovedadTipoDetallesInfrastruc,@this"
+                             update=":msgs,:frmPrincipal:dtAccNovedadTipoDetallesInfrastruc"
+                             action="#{accNovedadTipoDetallesInfrastuc.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{accNovedadTipoDetallesInfrastuc.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{accNovedadTipoDetallesInfrastuc.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

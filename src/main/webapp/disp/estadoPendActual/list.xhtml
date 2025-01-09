@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <ui:define name="content">
+        <p:panel header="Parametrización Estado Pendiente Actual (Clasificación Novedad)">
+            <h:form id="form_estado_pend">
+                <p:dataTable id="dt_estado_pend" var="item" 
+                             scrollable="true"
+                             widgetVar="wlVdtVehiculoTipoEstadoDet"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="500"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{estadoPendActualBean.lstDispEstadoPendActuals}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{estadoPendActualBean.nuevo()}"
+                                oncomplete="PF('wv_disp_estado_pend').show();"
+                                class="cssWhite"
+                                update="dlg_disp_estado_pend,form_disp_estado_pend">
+                                <p:resetInput target="form_disp_estado_pend"/>
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Nombre" 
+                              filterBy="#{item.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.nombre}" />
+                    </p:column>
+                    <p:column filterBy="#{item.primerEstado eq 1? 'Si':'No'}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <f:facet name="header">
+                            <div class="cortar_header">
+                                <h:outputText value="Primer Estado" />
+                            </div>
+                        </f:facet>
+                        <h:outputText value="#{item.primerEstado eq 1? 'Si':'No'}" />
+                    </p:column>
+                    <p:column headerText="Descripción" styleClass="text-word-wrap">
+                        <h:outputText value="#{item.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{estadoPendActualBean.editar()}"
+                                                 process="@this"
+                                                 update="dlg_disp_estado_pend,form_disp_estado_pend"
+                                                 oncomplete="PF('wv_disp_estado_pend').show();"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{item}" target="#{estadoPendActualBean.selected}"/>
+                                    <p:resetInput target="form_disp_estado_pend"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{estadoPendActualBean.lstDispEstadoPendActuals.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dt_estado_pend" 
+                                                fileName="parametrización Estado Pendientes (clasificación novedad)"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,53 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="parametro"
+              widgetVar="parametroDlg" 
+              modal="true" 
+              closable="true"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{lavadoTipoBean.selected == null}">
+            <f:facet name="header">
+                NUEVO TIPO DE LAVADO
+            </f:facet>
+        </c:if>
+        <c:if test="#{lavadoTipoBean.selected != null}">
+            <f:facet name="header">
+                EDITAR TIPO LAVADO
+            </f:facet>
+            <p:ajax event="close" update="frmParametro,:frmParametroList:dtParametros" listener="#{lavadoTipoBean.handleClose}" />
+        </c:if>
+        <h:form id="frmParametro">
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <h:panelGrid columns="2" id="pGridDatos">
+                <p:outputLabel for="@next" value="Tipo Lavado:" />
+                <p:inputText id="tipo_lavado" value="#{lavadoTipoBean.lavadoTipo.tipoLavado}"/>
+            </h:panelGrid>
+            <p:remoteCommand name="guardar" 
+                             update="messages,pGridDatos,:frmParametroList:dtParametros" 
+                             action="#{lavadoTipoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs"
+                             action="#{lavadoTipoBean.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                 rendered="#{lavadoTipoBean.selected == null}"
+                                 class="cssWhite" onclick="guardar()"/>
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{lavadoTipoBean.selected != null}"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

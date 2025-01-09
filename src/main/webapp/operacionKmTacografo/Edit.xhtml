@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="OperacionKmTacografoEditDlg" 
+              widgetVar="OperacionKmTacografoEditDialog"
+              modal="true" 
+              resizable="false"
+              position="center top"
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)" 
+              closeOnEscape="true"
+              header="Editar Registro Tacógrafo" >
+        <h:form id="OperacionKmTacografoEditForm">
+            <div class="ui-fluid" jsf:rendered="#{operacionKmTacografoController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha:" for="fecha" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fecha"
+                                        pattern="yyyy/MM/dd" 
+                                        value="#{operacionKmTacografoController.selected.fecha}"
+                                        required="true"
+                                        disabled="true"
+                                        locale="es"
+                                        requiredMessage="Fecha es requerido"
+                                        showOn="button"
+                                        readonly="#{facesContext.renderResponse}" >
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Kilometraje Inicial:" for="kmInicial" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="kmInicial" value="#{operacionKmTacografoController.selected.kmInicial}" 
+                                           required="true" 
+                                           maxValue="9999999"
+                                           minValue="0"
+                                           decimalPlaces="0"
+                                           symbol="Km"
+                                           symbolPosition="s"
+                                           requiredMessage="Kilometraje Inicial es requerido">
+                            </p:inputNumber>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Kilometraje Final:" for="kmFinal" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="kmFinal" value="#{operacionKmTacografoController.selected.kmFinal}"
+                                           required="true" 
+                                           maxValue="9999999"
+                                           minValue="0"
+                                           symbol="Km"
+                                           symbolPosition="s"
+                                           decimalPlaces="0"
+                                           requiredMessage="Kilometraje Final es requerido"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Vehículo" for="idVehiculo" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="idVehiculo" 
+                                         required="true"
+                                         requiredMessage="Vehículo es requerido"
+                                         value="#{operacionKmTacografoController.c_coVehiculo}">
+                                <p:ajax event="blur" update="out3" process="@this,out3" />
+                                <p:keyFilter regEx="/[a-z0-9_]/i"/>
+                            </p:inputText>
+                            <h:outputText id="out3"
+                                          value="#{operacionKmTacografoController.verificacionVeh()}" 
+                                          />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="-" style="visibility: hidden" for="btnFoto" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="idFULOP">
+                            <p:commandButton id="btnFoto" 
+                                             icon="fa fa-file-pdf-o" value="Agregar" 
+                                             process="@this"
+                                             class="OrangeButton cssWhite"
+                                             actionListener="#{operacionKmTacografoController.openDialogFileUpLoad()}">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand action="#{operacionKmTacografoController.update}"
+                             name="rc_update_kmt"
+                             update="@form,
+                             :OperacionKmTacografoListForm:datalist,
+                             :OperacionKmTacografoListForm:upOperKmT" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                onclick="rc_update_kmt();"
+                value="Actualizar" 
+                class="cssWhite"
+                icon="fa fa-check"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

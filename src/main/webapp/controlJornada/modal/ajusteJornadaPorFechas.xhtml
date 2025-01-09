@@ -1,0 +1,256 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="ajuste_jornada_fecha_id"
+              widgetVar="ajuste_jornada_fecha_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Ajuste Jornada por Rango de Fechas" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('ajuste_jornada_fecha_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form_ajuste_jornada_fecha">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="fecha_desde" value="Fecha Desde"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fecha_desde" required="true"
+                                        value="#{controlJornada.fechaDesdeBM}"
+                                        navigator="true"
+                                        locale="es"
+                                        showOn="button"
+                                        pattern="dd/MM/yyyy"
+                                        mask="99/99/9999"
+                                        placeholder="DD/MM/AAAA">
+                                <p:ajax event="dateSelect" process="fecha_desde"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="fecha_hasta" value="Fecha Hasta"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fecha_hasta" required="true"
+                                        value="#{controlJornada.fechaHastaBM}"
+                                        navigator="true"
+                                        showOn="button"
+                                        locale="es"
+                                        pattern="dd/MM/yyyy"
+                                        mask="99/99/9999"
+                                        placeholder="DD/MM/AAAA">
+                                <p:ajax event="dateSelect" process="fecha_desde"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="codigo_operador" value="Empleado"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="codigo_operador" 
+                                             readonly="true"
+                                             value="#{controlJornada.nombreEmpleado}" />
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Listar Empleados"
+                                                     icon="fa fa-list"
+                                                     style="margin: 0px"
+                                                     class="cssWhite"
+                                                     process="@this"
+                                                     update="msgs"
+                                                     actionListener="#{controlJornada.findEmplActivos()}">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                    </div>
+
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="H. Ini Turno 1" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="hora-ini-real"
+                                         mask="99:99:99"
+                                         value="#{controlJornada.prgSerconNew.realTimeOrigin}"
+                                         required="true"
+                                         requiredMessage="Hora Inicial Turno 1 es requerido">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="H. Fin Turno 1" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="hora-fin-real"
+                                         mask="99:99:99"
+                                         value="#{controlJornada.prgSerconNew.realTimeDestiny}"
+                                         required="true"
+                                         requiredMessage="Hora Fin Turno 1 es requerida">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="H. Ini Turno 2" for="id_h_ini_turno2"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="id_h_ini_turno2"
+                                         requiredMessage="Hora Inicial Turno 2 es requerido"
+                                         mask="99:99:99"
+                                         required="true"
+                                         value="#{controlJornada.prgSerconNew.realHiniTurno2}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="H. Fin Turno 2" for="id_h_fin_turno2"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="id_h_fin_turno2"
+                                         requiredMessage="Hora Fin Turno 2 es requerido"
+                                         required="true"
+                                         mask="99:99:99"
+                                         value="#{controlJornada.prgSerconNew.realHfinTurno2}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="H. Ini Turno 3" for="id_h_ini_turno3"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="id_h_ini_turno3"
+                                         requiredMessage="Hora Inicial Turno 3 es requerido"
+                                         mask="99:99:99"
+                                         required="true"
+                                         value="#{controlJornada.prgSerconNew.realHiniTurno3}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="H. Fin Turno 3" for="id_h_fin_turno3"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="id_h_fin_turno3"
+                                         requiredMessage="Hora Fin Turno 3 es requerido"
+                                         mask="99:99:99"
+                                         required="true"
+                                         value="#{controlJornada.prgSerconNew.realHfinTurno3}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Motivo del registro" />
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:selectOneMenu id="motivo" 
+                                             value="#{controlJornada.i_prgSerconMotivo}" 
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             required="true"
+                                             requiredMessage="Motivo es requerido">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}" />
+                                <f:selectItems value="#{controlJornada.prgSerconMotivoList}" 
+                                               var="items"
+                                               itemLabel="#{items.descripcion}"
+                                               itemValue="#{items.idPrgSerconMotivo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1"  style="padding: 0px;">
+                            <p:commandButton title="Actualizar Motivos"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{controlJornada.consultarMotivos()}"
+                                             update="form_ajuste_jornada_fecha:motivo"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="observacion" value="Observación"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="observacion" 
+                                             required="true" 
+                                             maxlength="2000"
+                                             value="#{controlJornada.observacionesBM}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             process="@this,
+                             form_ajuste_jornada_fecha:fecha_hasta,
+                             form_ajuste_jornada_fecha:fecha_desde,
+                             form_ajuste_jornada_fecha:hora-ini-real,
+                             form_ajuste_jornada_fecha:hora-fin-real,
+                             form_ajuste_jornada_fecha:id_h_ini_turno2,
+                             form_ajuste_jornada_fecha:id_h_fin_turno2,
+                             form_ajuste_jornada_fecha:id_h_ini_turno3,
+                             form_ajuste_jornada_fecha:id_h_fin_turno3,
+                             form_ajuste_jornada_fecha:motivo,
+                             form_ajuste_jornada_fecha:observacion"
+                             action="#{controlJornada.guardarAjusteJornadafechas()}"
+                             update="form_ajuste_jornada_fecha,
+                             formcontroljornada:serconlist,
+                             :formcontroljornada:cj-grow,form_ajuste_jornada_fecha:msgs_turno,
+                             msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarajustar" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()">
+                <p:confirm header="Confirmación" 
+                                       message="Está seguro de realizar el ajuste de jornada?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

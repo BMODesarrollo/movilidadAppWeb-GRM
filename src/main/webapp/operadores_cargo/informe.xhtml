@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+            .no{
+                background: red !important;
+            }
+            .si{
+                background: green !important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            OPERADORES EN CARGO
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmInfoControl:dtInterventoria,:msgs" 
+                                            listener="#{operadoresEnCargoBean.cargarDatosReporte()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmInfoControl">
+                <p:dataTable var="informe" value="#{operadoresEnCargoBean.lsInformeOperadores}"
+                             id="dtInterventoria" widgetVar="wlVInterventoria"
+                             emptyMessage="No se han encontrado registros"
+                             rowStyleClass="text-center" rows="30"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             filterDelay="1500"
+                             reflow="true" paginator="true">
+
+                    <f:facet name="header">
+                        <div align="right">
+
+                            <h:outputText value="Fechas: " title="Fechas"
+                                          style="right: 300px"/>&nbsp;&nbsp;
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{operadoresEnCargoBean.fechaInicio}"
+                                        placeholder="Fecha Ini"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        readonlyInput="true"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar fecha de inicio"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="lastDate"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{operadoresEnCargoBean.fechaFin}"
+                                        placeholder="Fecha Fin"
+                                        mindate="#{operadoresEnCargoBean.fechaInicio}"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        readonlyInput="true"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar fecha fin"
+                                        style="right: 300px">
+                            </p:calendar>
+                            <p:spacer width="15"/>
+                            <p:commandButton value="Buscar" icon="fa fa-search"
+                                             update="frmInfoControl:dtInterventoria,msgs"
+                                             class="cssWhite"
+                                             actionListener="#{operadoresEnCargoBean.cargarDatosReporte()}">
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha"
+                              width="250"
+                              >
+                        <h:outputText value="#{informe.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Código_TM" 
+                              filterBy="#{informe.codigo_tm}"
+                              filterMatchMode="contains"
+                              width="150">
+                        <h:outputText value="#{informe.codigo_tm}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre" filterBy="#{informe.nombre_cargo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{informe.nombres}" />
+                    </p:column>
+
+                    <p:column headerText="Apellidos" filterBy="#{informe.apellidos}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{informe.apellidos}" />
+                    </p:column>
+
+                    <p:column headerText="Cargo">
+                        <h:outputText value="#{informe.nombre_cargo}" />
+                    </p:column>
+
+                    <p:column headerText="Tipo Vehículo">
+                        <h:outputText value="#{informe.nombre_tipo_vehiculo}" />
+                    </p:column>
+                    <p:column headerText="Total Viajes">
+                        <h:outputText value="#{informe.total_viajes}" />
+                    </p:column>
+                    <p:column headerText="Km realizados">
+                        <h:outputText value="#{informe.km_realizados}" />
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{operadoresEnCargoBean.lsInformeOperadores.size()} registro(s).
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtInterventoria" 
+                                                postProcessor="#{operadoresEnCargoBean.postProcessXLS}"
+                                                fileName="informe #{now}"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

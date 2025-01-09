@@ -1,0 +1,217 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="nov_novedad_infra_wv" id="nov_novedad_infra_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top"
+              class="mr1024_60 mr500_90"
+              height="auto" closable="false">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Novedad Infraestructura" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('nov_novedad_infra_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="nov_novedad_infra_form">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha_ini" value="Fecha:" />
+
+                        <p:calendar id="fecha_ini" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Fecha es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{gmoNovInfrastructBean.novedadInfrastruc.fechaHoraNov}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipoinfraStruct" value="Tipo de novedad:"/>
+                        <p:selectOneMenu id="SOMNovedadTipoinfraStruct"
+                                         style="width: 99.9999%"
+                                         required="true"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{gmoNovInfrastructBean.i_idNovedadTipoInfraStruct}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{gmoNovInfrastructBean.listNovTipoInfrastruc}"
+                                           var="genTipo" itemLabel="#{genTipo.nombre}"
+                                           itemDescription="#{genTipo.descripcion}"
+                                           itemValue="#{genTipo.idGmoNovedadTipoInfrastruc}" />
+                            <p:ajax listener="#{gmoNovInfrastructBean.prepareTipoDetalles(true)}" update="SOMNovedadTipoDetallesinfraStruct"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipoDetallesinfraStruct" value="Detalle de tipo novedad:"/>
+                        <p:selectOneMenu id="SOMNovedadTipoDetallesinfraStruct"
+                                         style="width: 99.9999%"
+                                         required="true"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{gmoNovInfrastructBean.i_idNovedaTipoDetallesInfraStruct}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{gmoNovInfrastructBean.listNovTipoDetInfrastruc}"
+                                           var="tipoDet" itemLabel="#{tipoDet.nombre}"
+                                           itemDescription="#{tipoDet.descripcion}"
+                                           itemValue="#{tipoDet.idGmoNovedadTipoDetInfrastruc}" />
+                            <p:ajax listener="#{gmoNovInfrastructBean.prepareTipoDetalles(false)}"/>
+
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Agregar archivos novedad (IMÁGEN Ó PDF)">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{gmoNovInfrastructBean.handleFileUpload}"
+                                              id="archivos"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="4000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG|pdf|PDF)$/"
+                                              update="@this"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG,.pdf,.PDF"
+                                              process="@this"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 4mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <br/>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0">
+                            <p:outputLabel value="-" 
+                                           style="visibility: hidden"/>
+                        </div>
+                        <div class="ui-g-8 ui-md-8 ui-lg-8 Padding0">
+                            <p:commandButton value="Abrir mapa" 
+                                             icon="fa fa-map-marker"
+                                             process="@this"
+                                             oncomplete="PF('dlgMap').show();"
+                                             update=":gmapDialog"
+                                             styleClass="cssWhite"/>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0"></div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Latitud" for="@next"/>
+                        </div>
+                        <p:inputText
+                            id="latitud"
+                            readonly="true"
+                            value="#{gmoNovInfrastructBean.novedadInfrastruc.latitud}"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Longitud" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            id="longitud"
+                            readonly="true"
+                            value="#{gmoNovInfrastructBean.novedadInfrastruc.longitud}"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Dirección" for="@next"/>
+                        </div>
+                        <p:inputText
+                            id="direccion"
+                            required="true"
+                            requiredMessage="Debe ingresar una dirección"
+                            value="#{gmoNovInfrastructBean.novedadInfrastruc.direccion}"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <br/>
+                        <p:dataTable id="checkbox_estado_pend_dt" 
+                                     var="item" 
+                                     rows="8"
+                                     rowIndexVar="varr"
+                                     paginatorPosition="bottom"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} Preguntas"
+                                     filterDelay="1000"
+                                     rowsPerPageTemplate="20,30,50,100"
+                                     value="#{gmoNovInfrastructBean.lstRutas}" 
+                                     selection="#{gmoNovInfrastructBean.lstRutasAfectadas}" 
+                                     rowKey="#{item.idPrgRoute}" 
+                                     emptyMessage="No existen registros">
+                            <f:facet name="header">
+                                Seleccionar rutas afectadas.
+                            </f:facet>
+                            <p:column selectionMode="multiple" 
+                                      styleClass="text-center"
+                                      width="2%"/>
+                            <p:column headerText="Nombre" 
+                                      filterMatchMode="contains"
+                                      width="30%"
+                                      filterBy="#{item.name}">
+                                <h:outputText value="#{item.name}" />
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="observacion" value="Observación:" />
+                        <p:inputTextarea id="observacion" 
+                                         value="#{gmoNovInfrastructBean.novedadInfrastruc.observaciones}"
+                                         />
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="descripcion" value="Descripción:" />
+                        <p:inputTextarea id="descripcion" 
+                                         value="#{gmoNovInfrastructBean.novedadInfrastruc.descripcion}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una descripcion"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_save" 
+                             class="cssWhite"
+                             actionListener="#{gmoNovInfrastructBean.guardar()}"  
+                             value="Guardar" 
+                             process="nov_novedad_infra_form"
+                             update="form_novedad_infra:dt_novedad_infra_id,:msgs,messages"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnEditNov" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc_save()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="../modal/MapaDlg.xhtml"/>
+</ui:composition>

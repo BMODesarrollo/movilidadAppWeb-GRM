@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="NotificaListDlg"
+              widgetVar="NotificaListDialog"
+              modal="true" 
+              resizable="false"
+              class="mr1024_50 mr500_90"
+              position="center top"
+              closeOnEscape="true"
+              closable="false"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Proceso a Notificar" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('NotificaListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNotificaList">
+            <p:dataTable id="id_area_noti_dt" var="notif" value="#{notificaListComponentBean.lstNotificacionProcesos}"  
+                         selectionMode="single" 
+                         selection="#{notificaListComponentBean.proceso}"                       
+                         rowIndexVar="nroFila"
+                         widgetVar="wlvIdAreaNotiDt"
+                         rowKey="#{notif.idNotificacionProceso}"
+                         emptyMessage="No existen tipos de novedad registrados"
+                         reflow="true" 
+                         filterDelay="1000"
+                         rows="10" 
+                         paginator="true">
+                <p:ajax event="rowSelect" 
+                        listener="#{notificaListComponentBean.onRowClckSelectNotifica}"
+                        update="msgs"
+                        oncomplete="PF('NotificaListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 5%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código" filterBy="#{notif.codigoProceso}" filterMatchMode="contains"  style="width: 15%">
+                    <h:outputText value="#{notif.codigoProceso}" />
+                </p:column>
+                <p:column headerText="Proceso" filterBy="#{notif.nombreProceso}" filterMatchMode="contains" >
+                    <h:outputText value="#{notif.nombreProceso}" />
+                </p:column>
+                <p:column headerText="Emails" class="cortar">
+                    <h:outputText value="#{notif.emails}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

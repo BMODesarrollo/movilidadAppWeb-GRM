@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel header="Operación CheckList" > 
+            <h:form id="formTablaOpKm" >
+                <p:dataTable id="tblOPkM" var="opKmCL"  editable="true" 
+                             value="#{opKmCLJSFMB.listOpKmCL}" rows="10"
+                             paginator="true"
+                             widgetVar="tblOPkMWV"
+                             filterDelay="1000"
+                             rowIndexVar="nroFila"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="btnAdd"
+                                             value="Nuevo"
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             process="@this"
+                                             action="#{opKmCLJSFMB.openDialog()}">
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="tblOPkM" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Fecha" filterBy="#{opKmCL.fecha}" 
+                              filterMatchMode="startsWith">
+                        <f:facet name="filter">
+
+                            <p:calendar id="searchFR" pattern="MM/dd/yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        placeholder="Seleccione fecha"
+                                        onkeyup="PF('tblOPkMWV').filter()"
+                                        showOn="button"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('tblOPkMWV').filter()" update="tblOPkM"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{opKmCL.fecha}" >
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{opKmCL.idVehiculo.codigo}"
+                              filterMatchMode="contains"
+                              headerText="Vehículo">
+                        <h:outputText value="#{opKmCL.idVehiculo.codigo}"/>
+                    </p:column>
+                    <p:column filterBy="#{opKmCL.kmInicial}"
+                              filterMatchMode="contains"
+                              headerText="KM Inicio">
+                        <h:outputText value="#{opKmCL.kmInicial}"/>
+                    </p:column>
+                    <p:column filterBy="#{opKmCL.kmFinal}"
+                              filterMatchMode="contains"
+                              headerText="KM Fin">
+                        <h:outputText value="#{opKmCL.kmFinal}"/>
+                    </p:column>
+
+                    <p:column headerText="Opciones" style="width:15%; text-align: center" exportable="false" >
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         update="frmOpKm"
+                                         oncomplete="PF('opKmDialog').show();"
+                                         action="#{opKmCLJSFMB.editar(opKmCL)}"
+                                         title="Modificar" 
+                                         disabled="#{opKmCL.estadoReg==1}"/>
+                        <p:commandButton 
+                            icon="fa fa-eye"
+                            class="cssWhite"
+                            update="frmVistaDocumento"
+                            disabled="#{opKmCL.pathChecklist=='/'}"
+                            actionListener="#{opKmCLJSFMB.prepDownloadLocal(opKmCL.pathChecklist)}"
+                            oncomplete="PF('VistaDocumentoDialog').show();">
+                        </p:commandButton>
+                        <p:commandButton title="Descargar Archivo" icon="fa fa-download"
+                                         ajax="false" class="OrangeButton cssWhite"
+                                         disabled="#{opKmCL.pathChecklist=='/'}"
+                                         actionListener="#{opKmCLJSFMB.prepDownloadLocal(opKmCL.pathChecklist)}">
+                            <p:fileDownload value="#{viewDocuJSFMB.download}" />
+                        </p:commandButton>
+
+                    </p:column>
+                    <f:facet name="footer">
+                        <div align="right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="tblOPkM" fileName="operación-checkList #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="tblOPkM" fileName="operación-checkList #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="tblOPkM" fileName="operación-checkList #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/opKmCheckListDialog.xhtml"/>
+        <ui:include src="../empleado/modal/vistaDocumento.xhtml"/>
+    </ui:define>
+
+</ui:composition>
+
+
+

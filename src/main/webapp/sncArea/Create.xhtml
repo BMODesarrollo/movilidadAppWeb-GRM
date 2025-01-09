@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <p:dialog id="SncAreaCreateDlg" widgetVar="SncAreaCreateDialog" 
+              closeOnEscape="true" modal="true" resizable="false" 
+             class="mr1024_40 mr500_90"
+              position="center top"
+              responsive="true"
+              appendTo="@(body)" header="#{bundle.CreateSncAreaTitle}">
+        <c:if test="#{sncAreaController.selected.idSncArea == null }">
+            <f:facet name="header">
+                Nuevo snc área
+            </f:facet>
+        </c:if>
+        <c:if test="#{sncAreaController.selected.idSncArea != null }">
+            <f:facet name="header">
+                Editar snc área: #{sncAreaController.selected.codigo.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <h:form id="SncAreaCreateForm">
+            <div class="ui-fluid" jsf:rendered="#{sncAreaController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="#{bundle.CreateSncAreaLabel_codigo}" for="codigo" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText  
+                                maxlength="6"
+                                id="codigo" 
+                                value="#{sncAreaController.selected.codigo}" 
+                                title="#{bundle.CreateSncAreaTitle_codigo}" 
+                                required="true"
+                                requiredMessage="Debe ingresar el CODIGO"
+                                />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="codigo" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea 
+                                maxlength="150"
+                                counter="count"
+                                counterTemplate="{0} caracteres restantes."
+                                id="descripcion" 
+                                value="#{sncAreaController.selected.descripcion}" 
+                                title="#{bundle.CreateSncAreaTitle_descripcion}" 
+                                required="true"
+                                requiredMessage="Debe ingresar la DESCRIPCION"/>
+                            <p:outputLabel id="count" /> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand 
+                actionListener="#{sncAreaController.create}" 
+                name="rc_snc_area"
+                update="SncAreaCreateForm,:SncAreaListForm:datalist,msgs" />
+            <p:remoteCommand 
+                actionListener="#{sncAreaController.update}" 
+                name="rc_update_snc_area"
+                update=":SncAreaListForm:datalist,msgs" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                onclick="rc_snc_area();" 
+                value="Guardar" 
+                class="cssWhite" 
+                rendered="#{empty sncAreaController.selected.idSncArea}"
+                icon="fa fa-save"/>
+            <p:commandButton 
+                onclick="rc_update_snc_area();" 
+                rendered="#{!empty sncAreaController.selected.idSncArea}"
+                value="Actualizar"
+                class="cssWhite"
+                icon="fa fa-save"/>
+        </f:facet>
+    </p:dialog>
+
+</ui:composition>
+

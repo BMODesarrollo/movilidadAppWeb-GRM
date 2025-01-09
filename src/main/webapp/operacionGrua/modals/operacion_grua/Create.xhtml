@@ -1,0 +1,182 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="mtipo" id="modal" modal="true" 
+              closable="true"
+              closeOnEscape="true"
+              class="mr1024_70 mr500_90"
+              responsive="true"
+              resizable="false" appendTo="@(body)">
+        <c:if test="#{operacionGruaBean.selected == null }">
+            <f:facet name="header">
+                Nueva operación de grúa
+            </f:facet>
+        </c:if>
+        <c:if test="#{operacionGruaBean.selected != null }">
+            <f:facet name="header">
+                Editar operacion grúa: #{operacionGruaBean.selected.placaGrua.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_og();"
+                             value="Guardar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{operacionGruaBean.selected == null }"
+                             >
+            </p:commandButton>
+            <p:commandButton onclick="rc_update_og();" 
+                             value="Actualizar"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             rendered="#{operacionGruaBean.selected != null }"/>
+        </f:facet>
+        <h:form id="frmNuevaOperacionGrua">
+            <p:remoteCommand name="rc_og"
+                             action="#{operacionGruaBean.guardar()}"
+                             update="frmPrincipalOperacionGrua:dtOperacionGruas,pGrid,messages,msgs"
+                             rendered="#{operacionGruaBean.selected == null }"/>
+            <p:remoteCommand name="rc_update_og"
+                             action="#{operacionGruaBean.actualizar()}"
+                             update="frmPrincipalOperacionGrua:dtOperacionGruas,:message,msgs"
+                             rendered="#{operacionGruaBean.selected != null }" />
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+
+            <div class="ui-fluid" jsf:id="pGrid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha" value="Fecha:" />
+                        <p:calendar id="fecha" 
+                                    pattern="yyyy-MM-dd"
+                                    value="#{operacionGruaBean.operacionGrua.fecha}"
+                                    maxdate="today"
+                                    showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Fecha es requerido"
+                                    showTodayButton="true"
+                                    navigator="true"
+                                    >
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="empresa_grua" value="Empresa grúa:" />
+                        <p:inputText id="empresa_grua" value="#{operacionGruaBean.operacionGrua.empresaGrua}"
+                                     required="true" requiredMessage="Debe especificar la empresa"
+                                     maxlength="15"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="placa_grua" value="Placa grúa:" />
+                        <p:inputText id="placa_grua" 
+                                     required="true"
+                                     requiredMessage="Placa grúa es requerido"
+                                     value="#{operacionGruaBean.operacionGrua.placaGrua}"
+                                     maxlength="6"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="cc_operador" value="CC operador grúa:" />
+                        <p:inputText id="cc_operador"
+                                     required="true"
+                                     requiredMessage="Cédula de Ciudadanía es requerido"
+                                     value="#{operacionGruaBean.operacionGrua.ccOperador}"
+                                     maxlength="15"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="operador_grua" value="Operador grúa:" />
+                        <p:inputText id="operador_grua" 
+                                     required="true"
+                                     requiredMessage="Operador grúa es requerido"
+                                     value="#{operacionGruaBean.operacionGrua.operadorGrua}"
+                                     maxlength="60"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="vehiculo" value="Vehículo"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione vehículo"
+                                             id="vehiculo"
+                                             value="#{operacionGruaBean.vehiculo.codigo}"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un vehículo"
+                                             readonly="#{facesContext.renderResponse}"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Seleccione vehículo"
+                                                     icon="fa fa-list"
+                                                     style="margin: 0px"
+                                                     class="cssWhite"
+                                                     update="frmPrincipalListVehiculo"
+                                                     onclick="PF('wVdtVehiculo').getPaginator().setPage(0);"
+                                                     actionListener="#{operacionGruaBean.prepareListVehiculos}"
+                                                     oncomplete="PF('VehiculoListDialog').show()"
+                                                     >
+                                        <p:ajax event="dialogReturn" listener="#{operacionGruaBean.onVehiculoChosen}" process="@this" update="vehiculo"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Patio operación:" for="operacion_patio"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione patio"
+                                             id="operacion_patio"
+                                             value="#{operacionGruaBean.operacionPatios.nombrePatio}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar lista de patios"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     update=":frmOperacionPatioList"
+                                                     onclick="PF('wVdtOperacionPatio').getPaginator().setPage(0);"
+                                                     actionListener="#{operacionGruaBean.prepareListOperacionPatios}"                                     
+                                                     oncomplete="PF('OperacionPatioListDialog').show()"
+                                                     >
+                                        <p:ajax event="dialogReturn" listener="#{operacionGruaBean.onOperacionPatiosChosen}" process="@this" update="operacion_patio"/>
+                                    </p:commandButton>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="-" style="visibility: hidden"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:commandButton title="Cargar foto(s)"
+                                             value="Agregar Fotos"
+                                             icon="fa fa-camera"
+                                             class="cssWhite OrangeButton"
+                                             update="frmAddFiles"
+                                             oncomplete="PF('AddFilesListDialog').show()">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 " jsf:id="pgrid2" >
+                        <p:outputLabel for="observaciones" value="Descripción" />
+                        <p:inputTextarea id="observaciones" 
+                                         value="#{operacionGruaBean.operacionGrua.observaciones}"
+                                         required="true" 
+                                         counter="display" 
+                                         maxlength="150"
+                                         counterTemplate="{0} caracteres restantes." />
+                        <p:outputLabel id="display"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+    <ui:include src="AddFiles.xhtml" />
+    <ui:include src="ListVehiculos.xhtml" />
+    <ui:include src="ListOperacionPatios.xhtml" />
+</ui:composition>

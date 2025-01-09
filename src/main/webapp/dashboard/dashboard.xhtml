@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content" >
+        <p:panel header="Dashboard" > 
+            <h:form id="id_dashboard">
+                <div class="ui-fluid" >
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-4 ui-lg-4"  >
+                            <p:outputLabel for="por_hora" value="Fecha por hora:" />
+                            <p:calendar id="por_hora" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{dashboardJSFMB.fecha1}"
+                                        showOn="button" 
+                                        locale="es"
+                                        showTodayButton="true"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2"  >
+                            <p:outputLabel for="desde" value="Fecha desde:" />
+                            <p:calendar id="desde" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{dashboardJSFMB.desde}"
+                                        showOn="button" 
+                                        locale="es"
+                                        showTodayButton="true"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2"  >
+                            <p:outputLabel for="hasta" value="Fecha hasta:" />
+                            <p:calendar id="hasta" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{dashboardJSFMB.hasta}"
+                                        showOn="button" 
+                                        locale="es"
+                                        showTodayButton="true"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4" ></div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4" >
+                            <p:commandButton id="btn_hora_id" 
+                                             icon="fa fa-check" value="Hora" 
+                                             action="#{dashboardJSFMB.getByhour()}"
+                                             class="cssWhite"
+                                             update="msgs,id_dashboard:id_model_line"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4" >
+                            <p:commandButton id="btn_dia_id" 
+                                             icon="fa fa-check" value="Día" 
+                                             action="#{dashboardJSFMB.getByDay()}"
+                                             class="cssWhite"
+                                             update="msgs,id_dashboard:id_model_line"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4" >
+                            <p:commandButton id="btn_trimestre_id" 
+                                             icon="fa fa-check" value="Último Trimestre" 
+                                             action="#{dashboardJSFMB.getByTastTrimester()}"
+                                             class="cssWhite"
+                                             update="msgs,id_dashboard:id_model_line"/>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" jsf:id="id_model_line">
+                            <p:chart type="line" model="#{dashboardJSFMB.diagramaHora}" 
+                                     responsive="true"
+                                     style="height:600px;width: 100%" widgetVar="chart_hora"
+                                     rendered="#{dashboardJSFMB.flag_hora}"/>
+                            <p:commandButton type="button" icon="fa fa-refresh" 
+                                             rendered="#{dashboardJSFMB.flag_hora}" class="cssWhite" 
+                                             onclick="PF('chart_hora').resetZoom()"/>
+
+                            <p:chart type="line" model="#{dashboardJSFMB.diagramaDia}" 
+                                     responsive="true"
+                                     style="height:600px;width: 100%" widgetVar="chart_dia"
+                                     rendered="#{dashboardJSFMB.flag_dia}"/>
+                            <p:commandButton type="button" icon="fa fa-refresh" 
+                                             rendered="#{dashboardJSFMB.flag_dia}" class="cssWhite" 
+                                             onclick="PF('chart_dia').resetZoom()"/>
+
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" >
+                            <p:barChart model="#{dashboardJSFMB.barModel}"
+                                        style="width: 100%; height: 400px;"/>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+
+
+

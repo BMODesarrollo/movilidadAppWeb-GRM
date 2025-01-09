@@ -1,0 +1,211 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <p:panel header="Reporte Pilona">
+            <h:form id="form_reporte_pilona">
+                <div class="ui-g">
+                    <p:dataTable id="dt_reporte_pilona_id" var="item" 
+                                 scrollable="true"
+                                 styleClass="verticalHeader"
+                                 widgetVar="wlVdt_reporte_pilona_id"
+                                 scrollHeight="600"
+                                 reflow="true"
+                                 rows="10"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,50,100"
+                                 emptyMessage="No existen registros"
+                                 value="#{segReportePilonaJSFMB.list}">
+
+                        <f:facet name="header">
+                            <div align="right" jsf:id="botones">
+                                <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                                <p:calendar id="fecha_desde" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{segReportePilonaJSFMB.desde}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{segReportePilonaJSFMB.consultar()}"
+                                            update="dt_reporte_pilona_id"/>
+                                </p:calendar>
+                                <p:calendar id="fecha_hasta" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{segReportePilonaJSFMB.hasta}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{segReportePilonaJSFMB.consultar()}"
+                                            update="dt_reporte_pilona_id"/>
+                                </p:calendar>
+                                <p:commandButton
+                                    icon="fa fa-plus"
+                                    value="Nuevo"
+                                    actionListener="#{segReportePilonaJSFMB.nuevo()}"
+                                    class="cssWhite"
+                                    update="msgs,form_create_reporte_pilona"/>   
+                            </div>
+                        </f:facet>
+
+                        <p:column width="25" exportable="false">
+                            <p:rowToggler />
+                        </p:column>
+                        <p:column headerText="Fecha" width="15%" styleClass="text-center">
+                            <h:outputText value="#{item.fechaHora}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Pilona"
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.idSegPilona.nombre}" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.idSegPilona.nombre}" />
+                        </p:column>
+                        <p:column headerText="Observación Reporte" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.observación}" />
+                        </p:column>
+                        <p:column headerText="# Novedades" width="10%" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.segReportePilonaNovedadList.size()}" />
+                        </p:column>
+                        <p:column headerText="Recorrido" sortBy="#{item.numRecorrido}" width="10%" styleClass="text-word-wrap">
+                            <h:outputText value="#{item.numRecorrido}" />
+                        </p:column>
+                        <p:column headerText="Creado" width="15%" styleClass="text-center">
+                            <h:outputText value="#{item.creado}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Usuario" width="15%" styleClass="text-word-wrap"
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.username}">
+                            <h:outputText value="#{item.username}" />
+                        </p:column>
+                        <p:rowExpansion>
+                            <p:dataTable id="dt_nov_id" var="nov" 
+                                         scrollable="true"
+                                         widgetVar="dt_nov_wv"
+                                         reflow="true"
+                                         rows="5"
+                                         paginatorPosition="top"
+                                         paginator="true"
+                                         rowsPerPageTemplate="5,10,20"
+                                         emptyMessage="No existen registros"
+                                         value="#{segReportePilonaJSFMB.obtenerNovedades(item)}">
+
+                                <p:column headerText="Fecha" width="12%" styleClass="text-center">
+                                    <h:outputText value="#{nov.novedadInfrastruc.fechaHoraNov}" >
+                                        <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Tipo Novedad" styleClass="text-word-wrap">
+                                    <h:outputText value="#{nov.novedadInfrastruc.novedadTipoInfrastruc.nombre}" />
+                                </p:column>
+                                <p:column headerText="Detalle Tipo Novedad" styleClass="text-word-wrap">
+                                    <h:outputText value="#{nov.novedadInfrastruc.novedadTipoDetallesInfrastruc.nombre}" />
+                                </p:column>
+                                <p:column headerText="Descripción" styleClass="text-word-wrap">
+                                    <h:outputText value="#{nov.novedadInfrastruc.descripcion}" />
+                                </p:column>
+                                <p:column headerText="Acciones" styleClass="text-center"
+                                          width="10%"
+                                          exportable="false">
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:commandButton title="Editar Novedad"
+                                                             icon="fa fa-pencil"
+                                                             class="cssWhite GreenButton"
+                                                             update="nov_edit_dialog_form"  
+                                                             action="#{segReportePilonaJSFMB.editarNovedad()}"
+                                                             oncomplete="PF('nov_edit_reporte_pilona_wv').show()" >
+                                                <f:setPropertyActionListener target="#{segReportePilonaJSFMB.novedad}" value="#{nov.novedadInfrastruc}"/>
+                                            </p:commandButton>
+                                            <p:commandButton title="Ver fotos"
+                                                             icon="fa fa-photo"
+                                                             class="cssWhite OrangeButton"
+                                                             update="galeria_foto_dialog_id"  
+                                                             rendered="#{!empty(nov.novedadInfrastruc.pathFotos) and nov.novedadInfrastruc.pathFotos!='/'}"
+                                                             action="#{segReportePilonaJSFMB.obtenerFotos(3)}"
+                                                             oncomplete="PF('galeria_foto_dialog_wv').show()" >
+                                                <f:setPropertyActionListener target="#{segReportePilonaJSFMB.novedad}" value="#{nov.novedadInfrastruc}"/>
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </p:column>
+                            </p:dataTable>
+                        </p:rowExpansion>
+                        <p:column headerText="Acciones" styleClass="text-center"
+                                  width="10%"
+                                  exportable="false">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                    <p:commandButton title="Editar"
+                                                     icon="fa fa-pencil"
+                                                     class="cssWhite GreenButton"
+                                                     update="form_create_reporte_pilona"  
+                                                     action="#{segReportePilonaJSFMB.editar()}"
+                                                     oncomplete="PF('create_reporte_pilona_wv').show()" >
+                                        <f:setPropertyActionListener target="#{segReportePilonaJSFMB.segReportePilona}" value="#{item}"/>
+                                    </p:commandButton>
+                                    <p:commandButton title="Ver fotos"
+                                                     icon="fa fa-photo"
+                                                     class="cssWhite OrangeButton"
+                                                     update="galeria_foto_dialog_id"  
+                                                     rendered="#{!empty(item.pathFotos) and item.pathFotos!='/'}"
+                                                     action="#{segReportePilonaJSFMB.obtenerFotos(1)}"
+                                                     oncomplete="PF('galeria_foto_dialog_wv').show()" >
+                                        <f:setPropertyActionListener target="#{segReportePilonaJSFMB.segReportePilona}" value="#{item}"/>
+                                    </p:commandButton>
+                                    <p:commandButton title="Ver foto(s) Minuta"
+                                                     icon="fa fa-file-image-o"
+                                                     class="cssWhite PurpleButton"
+                                                     update="galeria_foto_dialog_id"  
+                                                     rendered="#{!empty(item.pathFotoMinuta) and item.pathFotoMinuta!='/'}"
+                                                     action="#{segReportePilonaJSFMB.obtenerFotos(2)}"
+                                                     oncomplete="PF('galeria_foto_dialog_wv').show()" >
+                                        <f:setPropertyActionListener target="#{segReportePilonaJSFMB.segReportePilona}" value="#{item}"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </p:column>
+
+                        <f:facet name="footer">
+                            En total existen #{segReportePilonaJSFMB.list.size()} registros.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="dt_reporte_pilona_id" 
+                                                    fileName="Reporte Pilona"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/createReporte.xhtml"/>
+        <ui:include src="modal/editarNovedad.xhtml"/>
+        <ui:include src="../galeriaFotos.xhtml"/>
+    </ui:define>
+</ui:composition>

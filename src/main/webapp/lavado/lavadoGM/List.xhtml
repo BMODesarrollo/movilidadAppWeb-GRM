@@ -1,0 +1,171 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <div class="EmptyBox5" />
+            <p:panel class="Wid100">
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Gestión Lavado
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <div class="Wid100" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <ui:include src="../../zComponent/selectUnidadFuncional.xhtml" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:panel id="p-costos" 
+                         header="Contador"
+                         toggleable="true"
+                         collapsed="true"
+                         class="Wid100">
+                    <p:outputLabel value=" Lavados: #{lavadoGMJSF.listLavadosRange.size()}" />
+                    <p:outputLabel value=" Vehiculos: #{lavadoGMJSF.vehiculos.size()}" />
+
+                    <p:dataGrid value="#{lavadoGMJSF.vehiculoLavadoStatusList}" var="lavado" columns="15">
+                        <p:panel styleClass="#{lavado.estaLavado ? 'bus-green' : 'bus-red'}">
+                            <p:outputLabel value="#{lavado.codigo}" style="color: #fff" />
+                            <p:outputLabel value=" - #{lavado.lavados}" style="color: #fff" />
+                        </p:panel>
+                    </p:dataGrid>
+                </p:panel>
+
+                <p:dataTable id="servicios" 
+                             value="#{lavadoGMJSF.listLavado}"
+                             widgetVar="datalistWV"
+                             var="item"
+                             filterDelay="1000"
+                             paginator="true"
+                             rowKey="#{rVar + 1}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} records"
+                             emptyMessage="No existen registros">
+
+                    <p:column headerText="#" style="width: 30px" class="TexAlCenter" > 
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="UF" rendered="#{uniFuncSessionBean.filtradoUF}" style="width: 50px" class="TexAlCenter">
+                        <p:outputLabel value="#{item.idGopUnidadFuncional.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Fecha" class="TexAlCenter">
+                        <p:outputLabel value="#{item.fechaHora}">
+                            <f:convertDateTime pattern="MM-dd HH:mm" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Vehículo" filterBy="#{item.idVehiculo.codigo}" filterMatchMode="contains" class="TexAlCenter">
+                        <h:outputText value="#{item.idVehiculo.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Vehículo" filterBy="#{item.idVehiculo.idVehiculoTipo.nombreTipoVehiculo}" filterMatchMode="contains" class="TexAlCenter">
+                        <h:outputText value="#{item.idVehiculo.idVehiculoTipo.nombreTipoVehiculo}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Servicio" filterBy="#{item.idLavadoTipoServicio.nombre}" filterMatchMode="contains" class="TexAlCenter">
+                        <h:outputText value="#{item.idLavadoTipoServicio.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Especial" class="TexAlCenter">
+                        <h:outputText value="#{item.idLavadoTipoServicio.especial == 1 ? 'Sí':'No'}"/>
+                    </p:column>
+                    <p:column headerText="Motivo" filterBy="#{item.idLavadoMotivo.motivo}" filterMatchMode="contains" class="TexAlCenter">
+                        <h:outputText value="#{item.idLavadoMotivo.motivo}"/>
+                    </p:column>
+                    <p:column headerText="Observación" class="TexAlCenter cortar">
+                        <h:outputText value="#{item.obsMotivo}"/>
+                    </p:column>
+                    <p:column headerText="Usuario Creador" class="TexAlCenter">
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column headerText="Acciones" exportable="false">
+                        <p:commandButton id="editButton"   
+                                         title="Editar"
+                                         update="dial-modal" 
+                                         disabled="#{item.fechaCierre != null}"
+                                         icon="fa fa-pencil" 
+                                         actionListener="#{lavadoGMJSF.onLavadoGm(item)}"
+                                         class="cssWhite GreenButton"
+                                         oncomplete="PF('modalDlg').show()">
+                            <p:resetInput target="form-modal"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="header">
+                        <div class="ui-fluid Padding0">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-7 Padding0"></div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-5 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                                        Desde
+                                        <p:calendar id="desde"
+                                                    styleClass="calendarFilter" 
+                                                    value="#{lavadoGMJSF.desde}"
+                                                    placeholder="Desde"
+                                                    title="Desde"
+                                                    navigator="true"
+                                                    showOn="button"
+                                                    pattern="yyyy-MM-dd" 
+                                                    locale="es" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                                        Hasta
+                                        <p:calendar id="hasta"
+                                                    styleClass="calendarFilter" 
+                                                    value="#{lavadoGMJSF.hasta}"
+                                                    placeholder="Hasta"
+                                                    title="Hasta"
+                                                    navigator="true"
+                                                    showOn="button"
+                                                    pattern="yyyy-MM-dd"
+                                                    locale="es" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                                        <h:outputText value="d" style="visibility: hidden" />
+                                        <p:commandButton id="btn-consultar"   
+                                                         value="Buscar" 
+                                                         actionListener="#{lavadoGMJSF.consultarLavados()}" 
+                                                         update="@form,:msgs" 
+                                                         process="desde,hasta,@this"
+                                                         icon="fa fa-search" 
+                                                         class="cssWhite" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                                        <h:outputText value="d" style="visibility: hidden" />
+                                        <p:commandButton id="createButton"   
+                                                         value="Nuevo" 
+                                                         actionListener="#{lavadoGMJSF.nuevoLavado()}" 
+                                                         update="dial-modal" 
+                                                         icon="fa fa-plus" 
+                                                         class="cssWhite"
+                                                         oncomplete="PF('modalDlg').show()">
+                                            <p:resetInput target="form-modal"/>
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target=":form:servicios,:form:costos-servicios" fileName="lavados" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/administracion.xhtml"/>
+    </ui:define>
+</ui:composition>

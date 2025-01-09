@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="mtipo" id="modal" modal="true" closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              resizable="false"
+              position="center top"
+              responsive="true">
+        <c:if test="#{vehiculoComponenteDanoBean.selected == null }">
+            <f:facet name="header">
+                Nuevo componente de daño
+            </f:facet>
+        </c:if>
+        <c:if test="#{vehiculoComponenteDanoBean.selected != null }">
+            <f:facet name="header">
+                Editar componente de daño: #{vehiculoComponenteDanoBean.selected.idVehiculoComponenteGrupo.nombre.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             onclick="rc_save_tca();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoComponenteDanoBean.selected == null }"/>
+            <p:commandButton value="Actualizar" 
+                             onclick="rc_update_tca();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoComponenteDanoBean.selected != null }"/>
+        </f:facet>
+
+        <h:form id="frmNuevoTipo">
+            <p:remoteCommand name="rc_save_tca" action="#{vehiculoComponenteDanoBean.guardar()}"
+                             update=":frmPrincipalVhclComponDano:dtTipo,messages,msgs,frmNuevoTipo"
+                             rendered="#{vehiculoComponenteDanoBean.selected == null }"/>
+            <p:remoteCommand name="rc_update_tca" action="#{vehiculoComponenteDanoBean.actualizar()}"
+                             update=":frmPrincipalVhclComponDano:dtTipo,messages,msgs"
+                             rendered="#{vehiculoComponenteDanoBean.selected != null }"/>
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Componente Grupo:" for="vehiculoComponente"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:selectOneMenu id="vehiculoComponente" value="#{vehiculoComponenteDanoBean.vehiculoComponenteGrupo.idVehiculoComponenteGrupo}"
+                                             filter="true" filterMatchMode="contains"
+                                             style="width: 99.9999%"
+                                             required="true" requiredMessage="Debe seleccionar un componente">
+                                <f:selectItem itemLabel="Seleccione componente" itemValue="" />
+                                <f:selectItems value="#{vehiculoComponenteDanoBean.lstVehiculoComponente}"
+                                               var="vcd" itemLabel="#{vcd.nombre}"  itemValue="#{vcd.idVehiculoComponenteGrupo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Daño:" for="vehiculoDano"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:selectOneMenu id="vehiculoDano" value="#{vehiculoComponenteDanoBean.vehiculoDano.idVehiculoDano}"
+                                             filter="true" filterMatchMode="contains"
+                                             style="width: 99.9999%"
+                                             required="true" requiredMessage="Debe seleccionar el daño">
+                                <f:selectItem itemLabel="Seleccione daño de vehículo" itemValue="" />
+                                <f:selectItems value="#{vehiculoComponenteDanoBean.lstvehiculoDano}"
+                                               var="item" itemLabel="#{item.nombre}"  itemValue="#{item.idVehiculoDano}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>  
+    </p:dialog>  
+</ui:composition>

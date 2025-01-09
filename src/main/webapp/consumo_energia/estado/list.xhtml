@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Estados (CONSUMO ENERGÍA)">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtConsumoEnergiaEstado" var="estado" 
+                             scrollable="true"
+                             widgetVar="wlVdtConsumoEnergiaEstado"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{consumoEnergiaEstadoBean.lstConsumoEnergiaEstados}">
+                    
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{consumoEnergiaEstadoBean.nuevo()}"
+                                oncomplete="PF('wlvConsumoEnergiaEstado').show();"
+                                class="cssWhite"
+                                update="dtConsumoEnergiaEstado,:consumoEnergiaEstado,:frmConsumoEnergiaEstado"
+                                >
+                                <p:resetInput target=":frmConsumoEnergiaEstado:pGridDatos"/>
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+                    
+                    <p:column headerText="Estado" styleClass="text-center">
+                        <h:outputText value="#{estado.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{consumoEnergiaEstadoBean.editar()}"
+                                                 process="@this"
+                                                 update=":consumoEnergiaEstado,:frmConsumoEnergiaEstado"
+                                                 oncomplete="PF('wlvConsumoEnergiaEstado').show();"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{estado}" target="#{consumoEnergiaEstadoBean.selected}"/>
+                                    <p:resetInput target=":frmConsumoEnergiaEstado:pGridDatos"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{consumoEnergiaEstadoBean.lstConsumoEnergiaEstados.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtConsumoEnergiaEstado" 
+                                                fileName="Dias horario"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

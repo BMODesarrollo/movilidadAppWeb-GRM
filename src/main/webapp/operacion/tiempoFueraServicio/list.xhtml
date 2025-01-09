@@ -1,0 +1,69 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="gop_fuera_servicio_form">
+            <p:panel header="Operación Alerta Tiempo Detenido">
+                <p:dataTable id="datalist" 
+                             value="#{gopFueraServicioBean.list}"
+                             var="item"
+                             selectionMode="single" 
+                             selection="#{gopFueraServicioBean.gopAlertaTiempoFueraServicio}"
+                             rowKey="#{item.idGopAlertaTiempoFueraServicio}"
+                             rowIndexVar="rVar"
+                             reflow="true"
+                             emptyMessage="No existen registros">
+                    <p:ajax event="rowSelect" listener="#{gopFueraServicioBean.onRowSelect}" update="editButton" />
+                    <p:ajax event="rowUnselect" listener="#{gopFueraServicioBean.reset()}" update="datalist" />
+
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.dias}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Días"/>
+                        </f:facet>
+                        <h:outputText value="#{item.dias}"/>
+                    </p:column>
+                    <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                        <h:outputText value="#{item.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Usuario" >
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             actionListener="#{gopFueraServicioBean.prepareGuardar()}" 
+                                             update="gop_fuera_servicio_dlg,gop_fuera_servicio_dlg_form" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             disabled="#{not empty gopFueraServicioBean.list}"
+                                             oncomplete="PF('gop_fuera_servicio_dlg_wv').show()"/>
+                            <p:commandButton id="editButton"   
+                                             value="Editar" 
+                                             update="gop_fuera_servicio_dlg,gop_fuera_servicio_dlg_form" 
+                                             icon="fa fa-pencil" 
+                                             disabled="#{empty gopFueraServicioBean.gopAlertaTiempoFueraServicio.idGopAlertaTiempoFueraServicio}"
+                                             class="cssWhite GreenButton"
+                                             oncomplete="PF('gop_fuera_servicio_dlg_wv').show()"/>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="operacion tiempo fuera servicio #{now}" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="create.xhtml"/>
+    </ui:define>
+</ui:composition>

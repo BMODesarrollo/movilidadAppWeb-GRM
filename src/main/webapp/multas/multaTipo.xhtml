@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <p:panel header="Tipos de multa">
+            <h:form id="frmPrincipalMultaTipo">
+                <p:dataTable var="multaTipo" value="#{multaTipoBean.lista}"
+                             id="dtTipo"
+                             rowIndexVar="nroFila"
+                             rows="5"
+                             filterDelay="1000"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                             emptyMessage="No existen tipos de multa registrados">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton action="#{multaTipoBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo tipo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":frmNuevoTipo"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmNuevoTipo" />
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre" filterBy="#{multaTipo.tipo}">
+                        <h:outputText value="#{multaTipo.tipo}" />
+                    </p:column>
+                    <p:column headerText="Acción" width="15%">
+                        <p:commandButton icon="fa fa-pencil"
+                                         title="Editar registro"
+                                         class="GreenButton cssWhite"
+                                         action="#{multaTipoBean.editar()}"
+                                         update=":frmNuevoTipo:modal"
+                                         oncomplete="PF('mtipo').show();"
+                                         >
+                            <f:setPropertyActionListener target="#{multaTipoBean.selected}" value="#{multaTipo}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh"
+                                         title="Cambiar estado"
+                                         action="#{multaTipoBean.cambiarEstado()}"
+                                         update=":frmNuevoTipo:modal,:frmNuevoTipo:messages,dtTipo"
+                                         disabled="true">
+                            <f:setPropertyActionListener target="#{multaTipoBean.selected}" value="#{multaTipo}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{multaTipoBean.lista.size()} tipo(s).
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <h:form id="frmNuevoTipo">
+                <p:dialog widgetVar="mtipo"
+                          id="modal" 
+                          modal="true"
+                          resizable="false"
+                          responsive="true"
+                          class="mr1024_30 mr500_90"
+                          position="center top"
+                          closeOnEscape="true">
+                    <c:if test="#{multaTipoBean.selected == null }">
+                        <f:facet name="header">
+                            Nuevo tipo de multa
+                        </f:facet>
+                    </c:if>
+                    <c:if test="#{multaTipoBean.selected != null }">
+                        <f:facet name="header">
+                            Editar tipo de multa: #{multaTipoBean.selected.tipo.toUpperCase()}
+                        </f:facet>
+                    </c:if>
+                    <p:messages id="messages" showDetail="true" closable="true">
+                    </p:messages>
+                    <p:focus context="frmNuevoTipo"/>
+                    <div class="ui-fluid" >
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:outputLabel value="Nombre:" for="tipo"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:inputText id="tipo" value="#{multaTipoBean.multaTipo.tipo}"
+                                                 required="true" requiredMessage="El tipo de multa es obligatorio"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar"
+                                         class="cssWhite"
+                                         icon="fa fa-save"
+                                         actionListener="#{multaTipoBean.guardar()}"
+                                         update=":frmPrincipalMultaTipo:dtTipo,messages,msgs"
+                                         rendered="#{multaTipoBean.selected == null }">
+                        </p:commandButton>
+                        <p:commandButton value="Actualizar" 
+                                         actionListener="#{multaTipoBean.actualizar()}"
+                                         class="cssWhite"
+                                         icon="fa fa-save"
+                                         update=":frmPrincipalMultaTipo:dtTipo,messages,msgs"
+                                         rendered="#{multaTipoBean.selected != null }"/>
+                    </f:facet>
+                </p:dialog>  
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

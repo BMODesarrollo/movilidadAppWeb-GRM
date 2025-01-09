@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <ui:define name="content" id="contenido">   
+        <p:panel >
+            <f:facet name="header">
+                <div class="ui-fluid" >
+                    <div class="ui-g ">
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Cierre de ausentismos"/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-5 ui-lg-4 Padding0">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <h:form id="uf">
+                                    <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                     filter="true" 
+                                                     rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                     autoWidth="true"
+                                                     filterMatchMode="contains">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                       var="uniFunc" 
+                                                       itemLabel="#{uniFunc.nombre}"
+                                                       itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                        <p:ajax process="@this"
+                                                event="change"
+                                                listener="#{paramTiempoCierreBean.consultar()}"
+                                                update="frmBloquear:mensaje,
+                                                frmBloquear:pnlPrincipal,frmBloquear:dtCierreAusentismo"/>
+                                    </p:selectOneMenu>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmBloquear">
+                <p:messages id="mensaje" showDetail="true" closable="true"/>
+                <div class="ui-fluid" >
+                    <div class="ui-g ">
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                        </div>
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5" jsf:id="pnlPrincipal">
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Fecha Desde: "/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:calendar id="fechaDesde" 
+                                                pattern="yyyy-MM-dd"
+                                                value="#{paramTiempoCierreBean.fechaDesde}"
+                                                showOn="button" 
+                                                disabled="#{not(paramTiempoCierreBean.estaAbierto)}"
+                                                maxdate="today"
+                                                placeholder="Seleccione fecha"
+                                                locale="es"
+                                                readonlyInput="true"
+                                                required="true"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                showTodayButton="true"
+                                                navigator="true">
+                                        <p:ajax event="dateSelect" process="@this"/>
+                                    </p:calendar>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Fecha Hasta: "/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:calendar id="fechaHasta" 
+                                                pattern="yyyy-MM-dd"
+                                                value="#{paramTiempoCierreBean.fechaHasta}"
+                                                showOn="button" 
+                                                maxdate="today"
+                                                placeholder="Seleccione fecha"
+                                                locale="es"
+                                                disabled="#{not(paramTiempoCierreBean.estaAbierto)}"
+                                                readonlyInput="true"
+                                                required="true"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                showTodayButton="true"
+                                                navigator="true">
+                                        <p:ajax update="mensaje,botones" 
+                                                event="dateSelect"/>
+                                    </p:calendar>
+                                </div>
+                            </div>
+
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="-" style="visibility: hidden"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="botones">
+                                    <p:commandButton icon="fa fa-check" 
+                                                     class="GreenButton cssWhite" 
+                                                     value="Desbloquear"
+                                                     id="btnDesbloquear"
+                                                     disabled="#{uniFuncSessionBean.i_unidad_funcional eq null}"
+                                                     rendered="#{not(paramTiempoCierreBean.estaAbierto)}"
+                                                     actionListener="#{paramTiempoCierreBean.desbloquearAusentismos()}"
+                                                     update="frmBloquear:fechaDesde,frmBloquear:fechaHasta,botones,frmBloquear:mensaje,dtCierreAusentismo">
+                                        <p:confirm header="Confirmación" message="Está seguro de desbloquear el rango de fechas?"
+                                                   icon="fa fa-exclamation-triangle"
+                                                   class="cssWhite"/>
+                                    </p:commandButton>
+                                    <p:commandButton icon="fa fa-close" 
+                                                     class="RedButton cssWhite" 
+                                                     disabled="#{uniFuncSessionBean.i_unidad_funcional eq null}"
+                                                     value="Cerrar"
+                                                     id="btnCerrar"
+                                                     actionListener="#{paramTiempoCierreBean.bloquearAusentismos()}"
+                                                     rendered="#{paramTiempoCierreBean.estaAbierto}"
+                                                     update="frmBloquear:fechaDesde,frmBloquear:fechaHasta,botones,frmBloquear:mensaje,dtCierreAusentismo">
+                                        <p:confirm header="Confirmación" message="Está seguro de CERRAR el rango de fechas?"
+                                                   icon="fa fa-exclamation-triangle"
+                                                   class="cssWhite"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LISTADO DE REGISTROS -->
+                <p:dataTable var="item" value="#{paramTiempoCierreBean.cierresAusentismo}"
+                             id="dtCierreAusentismo"
+                             widgetVar="wlvCierreAusentismo"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="10"
+                             tableStyle="table-layout:auto"
+                             filterDelay="1000"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,20"
+                             emptyMessage="No existen tipos de documento registrados">
+                    <f:facet name="header">
+                        <div class="ui-fluid Padding0">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-7 Padding0"></div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-5 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                                        Desde
+                                        <p:calendar id="desde"
+                                                    styleClass="calendarFilter" 
+                                                    value="#{paramTiempoCierreBean.fechaDesdeBusqueda}"
+                                                    placeholder="Desde"
+                                                    title="Desde"
+                                                    required="true"
+                                                    requiredMessage="Debe seleccionar una fecha desde"
+                                                    navigator="true"
+                                                    showOn="button"
+                                                    pattern="yyyy-MM-dd" 
+                                                    locale="es" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                                        Hasta
+                                        <p:calendar id="hasta"
+                                                    styleClass="calendarFilter" 
+                                                    value="#{paramTiempoCierreBean.fechaHastaBusqueda}"
+                                                    placeholder="Hasta"
+                                                    required="true"
+                                                    requiredMessage="Debe seleccionar una fecha hasta"
+                                                    title="Hasta"
+                                                    navigator="true"
+                                                    showOn="button"
+                                                    pattern="yyyy-MM-dd"
+                                                    locale="es" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                                        <h:outputText value="d" style="visibility: hidden" />
+                                        <p:commandButton id="btn-consultar"   
+                                                         value="Buscar" 
+                                                         actionListener="#{paramTiempoCierreBean.consultar()}" 
+                                                         update="dtCierreAusentismo,:msgs" 
+                                                         process="desde,hasta,@this"
+                                                         icon="fa fa-search" 
+                                                         class="cssWhite" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <h:outputText value="d" style="visibility: hidden" />
+                                        </div>
+                                        <p:commandButton id="toggler" type="button" 
+                                                         title="Columnas"
+                                                         style="float: right"
+                                                         icon="fa fa-align-justify" 
+                                                         class="OrangeButton cssWhite"/>
+                                        <p:columnToggler datasource="dtCierreAusentismo" trigger="toggler" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Desde" class="TexAlCenter">
+                        <p:outputLabel value="#{item.desde}">
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Hasta" class="TexAlCenter">
+                        <p:outputLabel value="#{item.hasta}">
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Bloqueado"
+                              filterBy="#{item.bloqueado}"
+                              filterMatchMode="exact"
+                              width="150"
+                              styleClass="#{item.bloqueado gt 0 ? 'cssGreen TexAlCenter': item.bloqueado eq 0 ? 'cssRed TexAlCenter' : 'TexAlCenter'}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu id="s-filter-bloqueado"
+                                             widgetVar="selFilterBloqueadoWV"
+                                             onchange="PF('wlvCierreAusentismo').filter()"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Todos"
+                                              itemValue="#{null}" />
+                                <f:selectItem itemLabel="Sí"
+                                              itemValue="#{1}" />
+                                <f:selectItem itemLabel="No"
+                                              itemValue="#{0}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{item.bloqueado == 1}"
+                                      styleClass="cssWhite"/>
+                        <h:outputText value="No" rendered="#{item.bloqueado == 0}"
+                                      styleClass="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Acción" width="10%" styleClass="TexAlCenter">
+                        <p:commandButton icon="fa fa-check" 
+                                         class="GreenButton cssWhite" 
+                                         title="Desbloquear rango de fechas"
+                                         disabled="#{uniFuncSessionBean.i_unidad_funcional eq null}"
+                                         rendered="#{item.bloqueado eq 1}"
+                                         actionListener="#{paramTiempoCierreBean.desbloquearAusentismo(item)}"
+                                         update="dtCierreAusentismo,frmBloquear:mensaje">
+                            <p:confirm header="Confirmación" message="Está seguro de desbloquear el rango de fechas?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="fa fa-pencil" 
+                                         class="cssWhite" 
+                                         disabled="#{uniFuncSessionBean.i_unidad_funcional eq null}"
+                                         title="Modificar Fechas"
+                                         action="#{paramTiempoCierreBean.prepareModificarRangoFechas()}"
+                                         rendered="#{item.bloqueado eq 0}"
+                                         update="frmBloquear:pnlPrincipal">
+                            <f:setPropertyActionListener value="#{item}"
+                                                         target="#{paramTiempoCierreBean.paramCierreAusentismo}"/>
+                        </p:commandButton>
+
+                        <p:commandButton icon="fa fa-close" 
+                                         class="RedButton cssWhite" 
+                                         disabled="#{uniFuncSessionBean.i_unidad_funcional eq null}"
+                                         title="Cerrar rango de fechas"
+                                         actionListener="#{paramTiempoCierreBean.bloquearAusentismo(item)}"
+                                         rendered="#{item.bloqueado eq 0}"
+                                         update="dtCierreAusentismo,frmBloquear:mensaje">
+                            <p:confirm header="Confirmación" message="Está seguro de CERRAR el rango de fechas?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{paramTiempoCierreBean.cierresAusentismo.size()} tipos.
+                    </f:facet>
+                </p:dataTable>
+
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

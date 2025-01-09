@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <p:panel header="Componentes de daño">
+            <h:form id="frmPrincipalVhclComponDano">
+                <p:dataTable var="vehiculoComponenteDano" value="#{vehiculoComponenteDanoBean.lista}"
+                             id="dtTipo"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             filterDelay="1000"
+                             rows="5"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                             emptyMessage="No existen componentes de daño registrados">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="dtTipo" fileName="Componentes de daño"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton actionListener="#{vehiculoComponenteDanoBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo componente" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update="frmNuevoTipo,modal"
+                                             value="Nuevo">
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Grupo" filterBy="#{vehiculoComponenteDano.idVehiculoComponenteGrupo.nombre}">
+                        <h:outputText value="#{vehiculoComponenteDano.idVehiculoComponenteGrupo.nombre}" />
+                    </p:column>
+                    <p:column headerText="Daño" filterBy="#{vehiculoComponenteDano.idVehiculoDano.nombre}">
+                        <h:outputText value="#{vehiculoComponenteDano.idVehiculoDano.nombre}" />
+                    </p:column>
+                    <p:column headerText="Acción" exportable="false" width="15%">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         title="Editar registro"
+                                         action="#{vehiculoComponenteDanoBean.editar()}"
+                                         update="frmNuevoTipo,modal"
+                                         oncomplete="PF('mtipo').show();"
+                                         >
+                            <f:setPropertyActionListener target="#{vehiculoComponenteDanoBean.selected}" value="#{vehiculoComponenteDano}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh"
+                                         title="Cambiar estado"
+                                         action="#{vehiculoComponenteDanoBean.cambiarEstado()}"
+                                         update="frmNuevoTipo,modal,:frmNuevoTipo:messages,dtTipo"
+                                         rendered="false">
+                            <f:setPropertyActionListener target="#{vehiculoComponenteDanoBean.selected}" value="#{vehiculoComponenteDano}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{vehiculoComponenteDanoBean.lista.size()} tipos.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modals/gestionComponenteDano.xhtml"/>
+    </ui:define>
+</ui:composition>
+

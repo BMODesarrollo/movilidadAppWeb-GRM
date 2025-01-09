@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              closable="false"
+              widgetVar="modalDlg"
+              modal="true"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            #{accAtencionViaJSF.accAtencionVia.idAccAtencionVia != null ? 'EDITAR ACC ATENCION EN VÍA' : 'NUEVA ACC ATENCION EN VÍA'}
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('modalDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="form-modal">
+            <div class="ui-fluid">
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Nombre *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nombre"
+                                         maxlength="45"
+                                         required="true"
+                                         requiredMessage="Nombre es requerido"
+                                         value="#{accAtencionViaJSF.accAtencionVia.nombre}" />
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             maxlength="255"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             value="#{accAtencionViaJSF.accAtencionVia.descripcion}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             rendered="#{empty accAtencionViaJSF.accAtencionVia.idAccAtencionVia}"
+                             actionListener="#{accAtencionViaJSF.guardar()}"
+                             update=":form,@form"
+                             process="@form" />
+            <p:remoteCommand name="editar" 
+                             rendered="#{not empty accAtencionViaJSF.accAtencionVia.idAccAtencionVia}"
+                             actionListener="#{accAtencionViaJSF.actualizar()}"
+                             update=":form"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-guardar"
+                             value="Guardar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{empty accAtencionViaJSF.accAtencionVia.idAccAtencionVia}"
+                             onclick="guardar()"/>
+            <p:commandButton id="btn-editar"
+                             value="Actualizar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             onclick="editar()"
+                             rendered="#{not empty accAtencionViaJSF.accAtencionVia.idAccAtencionVia}" />
+        </f:facet>
+    </p:dialog>
+</ui:composition>

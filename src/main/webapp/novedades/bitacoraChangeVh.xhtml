@@ -1,0 +1,279 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            input.readonly,
+            input.readonly.ui-state-focus {
+                background: none;
+                box-shadow: none;
+                border: none;
+            }
+            .calendarFilter .ui-inputfield
+            {
+                width:90px !important;
+                margin: 0 0.2em !important;
+            }
+            .ui-datatable .ui-datatable-header,.ui-datatable-footer{
+                padding: 0px;
+            }  
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Bitácora de novedades Cambio de vehículos
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":formCambioVehiculo:dtTipo" 
+                                            oncomplete="PF('dtNovedades').getPaginator().setPage(0);"
+                                            listener="#{bitacoraCVhJSFMB.getByDateRange()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="formCambioVehiculo">
+                <p:dataTable var="novedad" value="#{bitacoraCVhJSFMB.listaCambioVehiculos}"
+                             id="dtTipo"
+                             scrollable="true"
+                             scrollHeight="600"
+                             widgetVar="dtNovedades"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1000"
+                             paginator="true"
+                             styleClass="fixed-size"
+                             sortBy="#{novedad.creado}"
+                             sortOrder="descending"
+                             rowKey="#{novedad.idNovedad}"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen novedades registradas">
+                    <p:cache disabled="true"/>
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <h:outputText value="Fechas: " title="Fecha Inicio"
+                                          style="right: 300px"/>&nbsp;&nbsp;
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{bitacoraCVhJSFMB.fechaInicio}"
+                                        placeholder="Fecha Ini"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dtTipo" 
+                                        listener="#{bitacoraCVhJSFMB.getByDateRange()}"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{bitacoraCVhJSFMB.fechaFin}"
+                                        placeholder="Fecha Fin"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dtTipo" 
+                                        listener="#{bitacoraCVhJSFMB.getByDateRange()}"/>
+                            </p:calendar>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#" style="width: 30px" toggleable="false">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="ID"
+                              filterBy="#{novedad.idNovedad}"
+                              filterMatchMode="contains"
+                              style="min-width: 80px">
+                        <h:outputText value="N-#{novedad.idNovedad}" />
+                    </p:column>
+                    <p:column headerText="Fecha"
+                              filterBy="#{novedad.fecha}" 
+                              filterMatchMode="startsWith"
+                              style="width: 7%"
+                              >
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('dtNovedades').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dtNovedades').filter()" update="dtTipo"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{novedad.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo Novedad" filterBy="#{novedad.idNovedadTipo.nombreTipoNovedad}">
+                        <h:outputText value="#{novedad.idNovedadTipo.nombreTipoNovedad}" />
+                    </p:column>
+                    <p:column headerText="Grupo PM" 
+                              filterBy="#{bitacoraCVhJSFMB.master(novedad.idEmpleado)}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('dtNovedades').filter()" 
+                                             styleClass="custom-filter" 
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             style="width: auto" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{bitacoraCVhJSFMB.grupoPM()}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{bitacoraCVhJSFMB.master(novedad.idEmpleado)}" />
+                    </p:column>
+                    <p:column id="detTipoNovedad" filterBy="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+                        <f:facet name="header">
+                            <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novedad.idNovedadDano eq null and novedad.idMulta eq null}" />
+                        <h:outputText value="#{novedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}" rendered="#{novedad.idNovedadDano.idNovedadDano gt 0}"/>
+                        <h:outputText value="#{novedad.idMulta.idMultaTipo.tipo}" rendered="#{novedad.idMulta.idMulta gt 0}"/>
+                    </p:column>
+                    <p:column filterBy="#{novedad.idEmpleado.codigoTm}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Código operador" title="Código del operador"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.idEmpleado.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Operador" filterBy="#{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}" />
+                    </p:column>
+                    <p:column headerText="Vehículo" filterBy="#{novedad.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column headerText="Vehículo OLD" filterBy="#{novedad.oldVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.oldVehiculo.codigo}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Observación" title="Observaciones"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.observaciones}"/>
+                    </p:column>
+                    <p:column id="documento"
+                              styleClass="#{novedad.novedadDocumentosList.size() gt 0 ? 'cssGreen': 'cssRed'}">
+                        <f:facet name="header" >
+                            <h:outputText value="Documento" title="¿Tiene documentos asociados?"/>  
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.novedadDocumentosList.size() gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.novedadDocumentosList.size() eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+
+                    <p:column id="seguimiento"
+                              styleClass="#{novedad.novedadSeguimientoList.size() gt 0 ? 'cssGreen': novedad.novedadSeguimientoList.size() eq 0 ? 'cssRed':' '}">
+                        <f:facet name="header">
+                            <h:outputText value="Seguimiento" title="¿Tiene seguimiento?"/>  
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.novedadSeguimientoList.size() gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.novedadSeguimientoList.size() eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column id="puntosPm">
+                        <f:facet name="header">
+                            <h:outputText value="Puntos PM" title="Puntos programa Máster"/>
+                        </f:facet>
+                        <h:outputText value="#{bitacoraCVhJSFMB.puntoView(novedad)}"  />
+                    </p:column>
+                    <p:column rendered="#{bitacoraCVhJSFMB.b_rol}" headerText="Puntos PM Conciliados">
+                        <h:outputText value="#{novedad.puntosPmConciliados}"  />
+                    </p:column>
+                    <p:column id="procede"
+                              styleClass="#{novedad.procede gt 0 ? 'cssGreen': novedad.procede eq 0 ? 'cssRed' : ''}">
+                        <f:facet name="header">
+                            <h:outputText value="Procede"/>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.procede == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.procede == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column id="liquidada"
+                              styleClass="#{novedad.liquidada gt 0 ? 'cssGreen': novedad.liquidada eq 0 ? 'cssRed' : ''}">
+                        <f:facet name="header">
+                            <h:outputText value="Liquidada" title="¿Novedad liquidada?"/>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.liquidada == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.liquidada == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{novedad.username}"/>
+                    </p:column>
+                    <p:column headerText="Creado">
+                        <h:outputText value="#{novedad.creado}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{bitacoraCVhJSFMB.listaCambioVehiculos.size()} novedad(es) registradas.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtTipo" fileName="bitacora #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="dtTipo" fileName="bitacora #{now}"  />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="dtTipo" fileName="bitacora #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

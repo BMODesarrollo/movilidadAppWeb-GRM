@@ -1,0 +1,160 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="UsersCreateDlg" 
+              widgetVar="UsersCreateDialog" 
+              modal="true" 
+              height="auto"
+              closeOnEscape="true"
+              width="auto"
+              class="mr1024_40 mr500_90"
+              responsive="true"
+              position="center top"
+              closable="false"
+              resizable="false" 
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Crear Usuario" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('UsersCreateDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <p:ajax event="close" listener="#{usersController.reset()}" update=":UsersListForm:datalist"/>
+        <h:form id="UsersCreateForm">
+            <p:messages id="messages" showDetail="true" closable="true"/>
+            <f:passThroughAttribute name="autocomplete" value="off"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Empleado"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText value="#{usersController.empleado.nombres} #{usersController.empleado.apellidos}" 
+                                         readonly="true"/>
+                            <div class="botonFloat">
+                                <p:commandButton id="btn-emp"
+                                                 oncomplete="PF('empleDlg').show();"
+                                                 actionListener="#{usersController.cargarEmpleados()}"
+                                                 update=":form-list-emp"
+                                                 icon="fa fa-list"
+                                                 style="margin: 0px"
+                                                 process="@this"
+                                                 title="Listar empleados"
+                                                 class="cssWhite"
+                                                 >
+                                    <p:resetInput target="UsersCreateForm:container"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div jsf:id="container" jsf:rendered="#{usersController.b_cont}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:inputText id="email" 
+                                         style="color: black;font-weight: 900;"
+                                         required="true"
+                                         readonly="true"
+                                         requiredMessage="Correo es requerido"
+                                         placeholder="Correo Electrónico"
+                                         value="#{usersController.empleado.emailCorporativo}" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                            <p:outputLabel value="Estado:" for="enabled" />
+                            <p:selectOneMenu id="enabled" value="#{usersController.selected.enabled}" 
+                                             required="true"
+                                             requiredMessage="Estado es requerido">
+                                <f:selectItem itemLabel="Seleccione uno .." itemValue="" itemDisabled="true" />
+                                <f:selectItem itemLabel="Activo" itemValue="true" />
+                                <f:selectItem itemLabel="Inactivo" itemValue="false" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="rol" value="Rol del Usuario" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu id="rol"
+                                                 value="#{usersController.rol}"
+                                                 filter="true"
+                                                 filterMatchMode="contains"
+                                                 required="true"
+                                                 requiredMessage="Rol del Usuario es requerido"
+                                                 style="width: 99.9999%">
+                                    <f:selectItem itemLabel="Seleccionar Rol" itemValue="#{null}" />
+                                    <f:selectItems value="#{usersController.itemsRoles}"
+                                                   var="rol" itemLabel="#{rol.nombre}" itemValue="#{rol.nombre}"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:inputText id="username" 
+                                         value="#{usersController.c_username}" 
+                                         required="true"
+                                         placeholder="Nombre de Usuario"
+                                         requiredMessage="Usuario es requerido">
+                                <p:keyFilter regEx="/[A-Za-z0-9]/i" />
+                                <p:ajax event="keyup" update="username" global="false" 
+                                        listener="#{usersController.handleKeyEvent()}"
+                                        process="username" delay="1500"
+                                        />
+                            </p:inputText>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:password id="password" autocomplete="new-password"
+                                        value="#{usersController.selected.password}" 
+                                        required="true"
+                                        placeholder="Contraseña"
+                                        requiredMessage="Contraseña es requerido"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:password id="confirPassword" 
+                                        value="#{usersController.confirContrasena}" 
+                                        required="true"
+                                        placeholder="Confirmar contraseña"
+                                        requiredMessage="Confirmar contraseña es requerido"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                                <p:outputLabel value="Unidad Funcional" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                                <ui:include src="../zComponent/selectUnidadFuncional.xhtml"/>
+                            </div>
+                        </div>
+                    </div>
+                    <p:remoteCommand action="#{usersController.create}" 
+                                     name="rc_u"
+                                     update="UsersListForm:datalist,msgs,@form,uf:uni_func"/>
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_u();"
+                             value="Guardar"
+                             icon="fa fa-save"
+                             class="cssWhite">
+                <p:confirm header="ADVERTENCIA" 
+                           icon="fa fa-exclamation-triangle" escape="false"
+                           message="Verificar los datos. &lt;br/&gt;Una vez confirme el registro no podrá editar los campos!"
+                           class="cssWhite"/>
+            </p:commandButton>
+
+        </f:facet>
+    </p:dialog>
+</ui:composition>

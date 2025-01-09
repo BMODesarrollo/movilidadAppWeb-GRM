@@ -1,0 +1,177 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <ui:define name="head">
+        <style>
+            .ui-chips-token .ui-chips-token-icon {
+                cursor: pointer;
+                margin-top: -9px;
+                position: absolute;
+                right: .2em;
+                top: 50%;
+                background-color: black;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Bitácora Mantenimiento">
+                <p:dataTable id="datalist" 
+                             value="#{novedadMttoDiariaJSF.listNovedadMttoDiaria}"
+                             var="novD"
+                             filterDelay="2000"
+                             paginator="true"
+                             rowKey="#{rwVar + 1}"
+                             rowIndexVar="rwVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             emptyMessage="No existen registros">
+
+                    <f:facet name="header">
+                        <div style="float: right">
+                            <p:commandButton id="toggle" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify"  
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="datalist" trigger="toggle" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px" exportable="false">
+                        <p:outputLabel value="#{rwVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Fecha">
+                        <h:outputText value="#{novD.fechaHora}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Estación o Línea" 
+                              filterBy="#{novD.idEstacion.nombre} #{novD.idCabina.nombre} #{novD.idPilona.nombre}" filterMatchMode="contains">
+                        <h:outputText value="#{novD.idEstacion.nombre}"
+                                      title="#{novD.idEstacion.codigo}" 
+                                      rendered="#{novD.idEstacion != null}"/>
+                        <h:outputText value="#{novD.idCabina.nombre}" 
+                                      title="#{novD.idCabina.codigo}"
+                                      rendered="#{novD.idCabina != null}"/>
+                        <h:outputText value="#{novD.idPilona.nombre}" 
+                                      title="#{novD.idPilona.codigo}"
+                                      rendered="#{novD.idPilona != null}"/>
+                    </p:column>
+                    <p:column headerText="Hora Inicio">
+                        <h:outputText value="#{novD.horaInicio}">
+                            <f:convertDateTime pattern="HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Finalización">
+                        <h:outputText value="#{novD.horaFin}">
+                            <f:convertDateTime pattern="HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo Actividad" 
+                              filterBy="#{novD.idNovedadMttoTipoActividad.nombre}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novD.idNovedadMttoTipoActividad.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Actividad Det" 
+                              filterBy="#{novD.idNovedadMttoTipoActDet.nombre}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novD.idNovedadMttoTipoActDet.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Empleados" class="cortar">
+                        <h:outputText value="#{novD.nombresEmpleados}"/>
+                    </p:column>
+                    <p:column headerText="Descripción" class="cortar">
+                        <h:outputText value="#{novD.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Usuario" visible="false">
+                        <h:outputText value="#{novD.username}"/>
+                    </p:column>
+                    <p:column headerText="Acciones" style="width: 70px;text-align: center" exportable="false">
+                        <p:commandButton id="editButton"   
+                                         update="dial-modal" 
+                                         icon="fa fa-pencil" 
+                                         title="Editar"
+                                         actionListener="#{novedadMttoDiariaJSF.onNovedadMttoDiaria(novD)}"
+                                         class="cssWhite GreenButton"
+                                         oncomplete="PF('modalDlg').show()">
+                            <p:resetInput target="form-modal"/>
+                        </p:commandButton>
+                        <p:commandButton id="viewPhoto"   
+                                         update="galeria_fotos_form,msgs" 
+                                         icon="fa fa-photo" 
+                                         title="Ver fotos"
+                                         actionListener="#{novedadMttoDiariaJSF.obtenerFotos(novD)}"
+                                         class="cssWhite OrangeButton">
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:calendar id="ini" 
+                                        value="#{novedadMttoDiariaJSF.dInicio}" 
+                                        locale="es"
+                                        title="Fecha inicio"
+                                        inputStyle="width: 120px"
+                                        showOn="button"
+                                        pattern="yyyy-MM-dd HH:mm" 
+                                        mask="true" />
+                            <p:calendar id="fin" 
+                                        value="#{novedadMttoDiariaJSF.dFin}" 
+                                        locale="es"
+                                        title="Fecha fin"
+                                        inputStyle="width: 120px"
+                                        showOn="button"
+                                        pattern="yyyy-MM-dd HH:mm" 
+                                        mask="true" />
+                            <p:commandButton id="buscar"   
+                                             value="Buscar" 
+                                             actionListener="#{novedadMttoDiariaJSF.buscar()}" 
+                                             update="datalist,:form:msg" 
+                                             icon="fa fa-search" 
+                                             process="@this,ini,fin"
+                                             class="cssWhite" />
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             actionListener="#{novedadMttoDiariaJSF.prepareGuardar()}" 
+                                             update="dial-modal" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             oncomplete="PF('modalDlg').show()">
+                                <p:resetInput target="form-modal"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="bitacora novedad mtto #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="bitacora novedad mtto #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="bitacora novedad mtto #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/administracion.xhtml"/>
+        <ui:include src="modal/cabina.xhtml"/>
+        <ui:include src="modal/estacion.xhtml"/>
+        <ui:include src="modal/pilona.xhtml"/>
+        <ui:include src="modal/ListaEmpleados.xhtml"/>
+        <ui:include src="../galeriaFotos.xhtml"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{myAppNovedadParamJSF.appNovedadParam.idMyAppNovedadParam != null ? 'EDITAR PARAMETRIZACIÓN NOVEDAD MYAPP' : 'NUEVA PARAMETRIZACIÓN NOVEDAD MYAPP'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid Padding0">
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Código Proceso *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputText id="codigo"
+                                     maxlength="5"
+                                     required="true"
+                                     requiredMessage="Código proceso es requerido"
+                                     value="#{myAppNovedadParamJSF.appNovedadParam.codigoProceso}" />
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Asunto del correo *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputTextarea id="asunto"
+                                         maxlength="255"
+                                         required="true"
+                                         requiredMessage="Asunto es requerido"
+                                         value="#{myAppNovedadParamJSF.appNovedadParam.asunto}"/>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Descripción Proceso *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputTextarea id="descripcion"
+                                         maxlength="255"
+                                         required="true"
+                                         requiredMessage="Descripción proceso es requerido"
+                                         value="#{myAppNovedadParamJSF.appNovedadParam.descripcion}"/>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                        <p:outputLabel for="SOMTipoNovedad"  value="Tipo de Novedad: " />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                        <p:selectOneMenu  id="SOMTipoNovedad" filterMatchMode="contains" filter="true"
+                                          style="width: 99.9999%"
+                                          value="#{myAppNovedadParamJSF.idNovTp}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                            <f:selectItems  value="#{myAppNovedadParamJSF.listNovedadTipo}" 
+                                            var="nov"
+                                            itemValue="#{nov.idNovedadTipo}" 
+                                            itemLabel="#{nov.nombreTipoNovedad}" />
+                            <p:ajax listener="#{myAppNovedadParamJSF.cargarNovedadTipoDetalles()}" 
+                                    global="false"
+                                    process="@this"
+                                    update="SOMTipoNovedadDet"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                        <p:outputLabel for="SOMTipoNovedadDet"  value="Detalle Tipo Novedad: " />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                        <p:selectOneMenu id="SOMTipoNovedadDet"
+                                         filterMatchMode="contains" 
+                                         filter="true" 
+                                         disabled="#{myAppNovedadParamJSF.idNovTp == null}"
+                                         style="width: 99.9999%"
+                                         value="#{myAppNovedadParamJSF.idNovTpDetalles}"
+                                         required="true">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                            <f:selectItems  value="#{myAppNovedadParamJSF.listNovedadTipoDetalles}"
+                                            var="novDet" 
+                                            itemLabel="#{novDet.tituloTipoNovedad}"
+                                            itemValue="#{novDet.idNovedadTipoDetalle}" 
+                                            itemDescription="#{novDet.descripcionTipoNovedad}">
+                            </f:selectItems>
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="@form" 
+                             rendered="#{empty myAppNovedadParamJSF.appNovedadParam.idMyAppNovedadParam}"
+                             update=":form,@form"
+                             actionListener="#{myAppNovedadParamJSF.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             rendered="#{not empty myAppNovedadParamJSF.appNovedadParam.idMyAppNovedadParam}"
+                             process="@form,@this"
+                             update=":form,@form"
+                             actionListener="#{myAppNovedadParamJSF.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" 
+                             icon="fa fa-save"
+                             rendered="#{empty myAppNovedadParamJSF.appNovedadParam.idMyAppNovedadParam}"
+                             class="cssWhite" 
+                             onclick="guardar()"/>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-save"
+                             rendered="#{not empty myAppNovedadParamJSF.appNovedadParam.idMyAppNovedadParam}"
+                             class="cssWhite" 
+                             onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

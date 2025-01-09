@@ -1,0 +1,130 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <div class="ui-fluid">
+            <div class="ui-g">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" >
+                    <p:staticMessage severity="error" 
+                                     summary="ERROR!" 
+                                     detail="No tiene acceso a este modulo"  
+                                     rendered="#{!genCtrlJornadaMB.b_permiso}">
+                        <p:effect type="pulsate" 
+                                  event="load" 
+                                  delay="300" />
+                    </p:staticMessage>
+                </div>
+            </div>
+        </div>
+        <h:form id="formgestionarmarcacion" rendered="#{genCtrlJornadaMB.b_permiso}">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="HISTÓRICO DE Marcaciones">
+
+                <p:dataTable id="novedadeslist" 
+                             value="#{genCtrlJornadaMB.listaNovedadesMarcacionesHistorico}" 
+                             var="item"
+                             rowKey="#{item.idGenericaJornada}"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             tableStyle="table-layout:fixed"
+                             reflow="true"
+                             filterDelay="1000"
+                             rows="25"
+                             selectionMode="single"
+                             widgetVar="dtserconlist"
+                             rowsPerPageTemplate="25,50,100,200,500">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:outputLabel value="Fecha " class="cssWhite Fs20" for="desde"></p:outputLabel>
+                            <p:calendar id="desde"
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{calcularMasivoBean.fechaDesde}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" listener="#{genCtrlJornadaMB.consultarHistorico()}" 
+                                        update="novedadeslist"></p:ajax>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta"
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{calcularMasivoBean.fechaHasta}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" listener="#{genCtrlJornadaMB.consultarHistorico()}" 
+                                        update="novedadeslist"></p:ajax>
+                            </p:calendar>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="novedadeslist" fileName="Novedades Marcaciones"/>
+                        </h:commandLink>
+                    </f:facet>
+
+                    <p:column headerText="Fecha Turno" sortBy="#{item.fecha}">
+                        <h:outputText  value="#{item.fecha}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column filterBy="#{item.idEmpleado.identificacion} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              exportable="false"
+                              headerText="Empleado">
+                        <h:outputText value="#{item.idEmpleado.identificacion}" class="cssBlack"/>
+                        <h:outputText value=" #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"/>
+                    </p:column>
+                    <p:column headerText="Observación">
+                        <h:outputText value="#{item.observaciones}" title="Explicación de la acción tomada en la novedad"/>
+                    </p:column>
+                    <p:column headerText="H. Inicio Programada"  filterBy="#{item.timeOrigin}" filterMatchMode="contains">
+                        <h:outputText value="#{item.timeOrigin}" title="Hora de inicio jornada  programada"/>
+                    </p:column>
+                    <p:column headerText="H. Fin Programada"  filterBy="#{item.timeDestiny}" filterMatchMode="contains">
+                        <h:outputText value="#{item.timeDestiny}" title="Hora de salida jornada programada"/>
+                    </p:column>
+                    <p:column headerText="H. Real Inicio">
+                        <h:outputText value="#{item.realTimeOrigin}" title="Hora real de inicio jornada"/>
+                    </p:column>
+                    <p:column headerText="H. Real Fin">
+                        <h:outputText value="#{item.realTimeDestiny}" title="Hora real de salida jornada"/>
+                    </p:column>
+                    <p:column headerText="Entrada Biometrico">
+                        <h:outputText value="#{item.bioEntrada}" title="Indica la hora en que se registra entrada en el biométrico"/>
+                    </p:column>
+                    <p:column headerText="Salida Biometrico">
+                        <h:outputText value="#{item.bioSalida}" title="Indica la hora en que se registra salida en el biométrico"/>
+                    </p:column>
+                    <p:column headerText="Fecha Gestión">
+                        <h:outputText value="#{item.fechaGestion}" title="Fecha en la que se realiza la gestión de la novedad">
+                            <f:convertDateTime pattern="yyyy-MM-dd hh:mm:ss" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Usuario Gestión">
+                        <h:outputText value="#{item.usernameGestion}" title="Usuario quien realiza la autorización"/>
+                    </p:column>
+                    <p:column headerText="Fecha Autorización">
+                        <h:outputText value="#{item.fechaAuth}" title="Fecha en la que se realiza la gestión de la novedad">
+                            <f:convertDateTime pattern="yyyy-MM-dd hh:mm:ss" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Usuario Autorización">
+                        <h:outputText value="#{item.usernameAuth}" title="Usuario quien realiza la autorización"/>
+                    </p:column>
+                    
+                    <p:column filterBy="#{item.estadoMarcacion  eq '1' ? 'Retardo' : item.estadoMarcacion  eq '2' ? 'Abandono' : item.estadoMarcacion eq '3' ? 'Ausencia' : item.estadoMarcacion eq '4' ? 'Salida Anticipada' : item.estadoMarcacion eq '5' ? 'H.Extra NO Autorizada' : item.estadoMarcacion eq '6' ? 'Normal' : 'NO PROCESS'}" 
+                              filterMatchMode="contains"
+                              exportable="false"
+                              headerText="Novedad">
+                        <h:outputText value="#{item.estadoMarcacion  eq '1' ? 'Retardo' : item.estadoMarcacion  eq '2' ? 'Abandono' : item.estadoMarcacion eq '3' ? 'Ausencia' : item.estadoMarcacion eq '4' ? 'Salida Anticipada' : item.estadoMarcacion eq '5' ? 'H.Extra NO Autorizada' : item.estadoMarcacion eq '6' ? 'Normal' : 'NO PROCESS'}"
+                                      title="Indica el tipo de novedad en la marcación">
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-right{
+                text-align: right;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="frmPlantaObz">
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0">
+                                Planta OBZ
+                            </div>
+                            <div class="ui-g-6 ui-md-6" align="right">
+                                <div class="ui-lg-6 ui-md-6 ui-lg-6 Padding0">
+                                    <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                                    <p:calendar id="fecha_desde" 
+                                                pattern="yyyy/MM/dd"
+                                                value="#{plantaObzBean.desde}"
+                                                locale="es"
+                                                inputStyle="width: 90px"
+                                                maxdate="today"
+                                                navigator="true"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }">
+                                    </p:calendar>
+                                    <p:calendar id="fecha_hasta" 
+                                                pattern="yyyy/MM/dd"
+                                                value="#{plantaObzBean.hasta}"
+                                                locale="es"
+                                                inputStyle="width: 90px"
+                                                maxdate="today"
+                                                navigator="true"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }">
+                                    </p:calendar>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" align="right">
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0">
+                                    <p:selectOneMenu 
+                                        styleClass="custom-filter" 
+                                        filter="true" 
+                                        value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                        rendered="#{uniFuncSessionBean.filtradoUF}"
+                                        filterMatchMode="contains" 
+                                        style="width: 99.999%" title="Seleccione Uno..">
+                                        <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                      itemValue="#{0}"
+                                                      itemDescription="Seleccione Uno.."/>
+                                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                       var="uf" itemLabel="#{uf.nombre}"
+                                                       itemValue="#{uf.idGopUnidadFuncional}"/>
+                                        <p:ajax update="plantaObzList" 
+                                                listener="#{plantaObzBean.consultar()}"
+                                                process="@this"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="ui-lg-3 ui-md-3 ui-lg-3 Padding0">
+                                    <p:commandButton action="#{plantaObzBean.consultar()}" 
+                                                     title="Consultar" 
+                                                     icon="fa fa-plus"
+                                                     class="cssWhite"
+                                                     update="frmPlantaObz"
+                                                     value="Consultar">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:panel>
+                    <p:dataTable id="plantaObzList" value="#{plantaObzBean.lista}" 
+                                 var="item" widgetVar="dtplantaObzList"
+                                 emptyMessage="No hay registros que mostrar!!"
+                                 paginator="true"
+                                 rows="80"
+                                 tableStyle="table-layout:auto"
+                                 filterDelay="1500"
+                                 rowsPerPageTemplate="80,100,200,500"
+                                 >
+
+                        <f:facet name="paginatorTopRight">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="plantaObzList" 
+                                                fileName="Planta OBZ"/>
+                            </h:commandLink>
+                        </f:facet>
+
+                        <p:column headerText="Codigo Empresa" 
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.codigoEmpresa}" />
+                        </p:column>
+
+                        <p:column headerText="Identificación" 
+                                  class="TexAlCenter"
+                                  filterBy="#{item.identificacion}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.identificacion}" />
+                        </p:column>
+
+                        <p:column headerText="Nombres" 
+                                  class="TexAlCenter"
+                                  filterBy="#{item.nombrecompleto}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.nombrecompleto}" />
+                        </p:column>
+
+                        <p:column headerText="Cargo" 
+                                  class="TexAlCenter"
+                                  filterBy="#{item.descripcionaCargo}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.descripcionaCargo}" />
+                        </p:column>
+
+                        <p:column headerText="Fecha Contrato"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.fechaContrato}" />
+                        </p:column>
+
+                        <p:column headerText="Código Transmilenio" 
+                                  filterBy="#{item.codigoTm}"
+                                  filterMatchMode="contains"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.codigoTm}" />
+                        </p:column>
+
+                        <p:column headerText="Accidentes" 
+                                  sortBy="#{item.accidentes}"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.accidentes}" />
+                        </p:column>
+
+                        <p:column headerText="Kilometraje Recorrido"
+                                  sortBy="#{item.kmRecorrido}"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.kmRecorrido}" />
+                        </p:column>
+                        <p:column headerText="Infracciones"
+                                  sortBy="#{item.infracciones}"
+                                  exportable="true"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.infracciones}" />
+                        </p:column>
+                        <p:column headerText="PQR"
+                                  sortBy="#{item.pqr}"
+                                  exportable="true"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.pqr}" />
+                        </p:column>
+                        <p:column headerText="H.Prog"
+                                  sortBy="#{item.pqr}"
+                                  exportable="true"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.horasProgramadas}" />
+                        </p:column>
+                        <p:column headerText="H.Real"
+                                  sortBy="#{item.pqr}"
+                                  exportable="true"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item.horasReales}" />
+                        </p:column>
+                        <p:column style="text-align: center;" width="90"
+                                  styleClass="#{item.capacitacion == 1 ? 'cssGreen texto-blanco' : 
+                                                item.capacitacion == 2 ? 'cssGray texto-blanco' : 
+                                                item.capacitacion == 0 ? 'cssRed texto-blanco' : ''}">
+                            <f:facet name="header">
+                                <h:outputText value="Certificado Capacitación"/>
+                            </f:facet>
+                            <h:outputText value="#{item.capacitacion == 1 ? 'Si' : 
+                                                   item.capacitacion == 2 ? 'No' : 
+                                                   item.capacitacion == 0 ? 'No' : 'Indefinido'}" style="color: white;"/>
+                        </p:column>
+
+                        <p:column headerText="Archivo">
+                            <p:commandButton 
+                                icon="fa fa-eye"
+                                class="cssWhite"
+                                update="frmPlantaObz,:VistaDocumentoDlgObz,:frmVistaDocumentoObz"
+                                actionListener="#{plantaObzBean.documento(item.idEmpleado)}"
+                                oncomplete="PF('VistaDocumentoDialogObz').show();"
+                                rendered="#{item.capacitacion != 2}">
+                            </p:commandButton>
+                        </p:column>
+
+                        <f:facet name="footer">
+                            <div align="center">
+                                En total existen #{plantaObzBean.lista.size()} registro(s)
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/vistaDocumento.xhtml"/>
+    </ui:define>
+
+</ui:composition>

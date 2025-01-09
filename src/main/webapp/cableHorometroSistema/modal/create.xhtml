@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="horometro_sistema_wv" id="horometro_sistema_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top" resizable="false" class="mr1024_60 mr500_90"
+              height="auto" header="Gestión Horometro del Sistema">
+        <h:form id="horometro_sistema_form">
+            <div class="ui-fluid">
+                <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-8 ui-lg-6 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="fecha" value="Fecha:" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" >
+                            <p:calendar id="fecha" 
+                                        pattern="yyyy/MM/dd" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Fecha es requerido"
+                                        title="año/mes/día"
+                                        showOn="button"
+                                        mask="true"
+                                        value="#{horometroSistemaSFMB.horometro.fecha}"  >
+                                <p:ajax event="dateSelect" listener="#{horometroSistemaSFMB.cargarDataByFecha()}" update="horometro_sistema_form,msgs,messages" process="@this"/>
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" >
+                            <p:commandButton id="btn_cargar_id" icon="fa fa-refresh" value="Recargar Datos" 
+                                             update="horometro_sistema_form,msgs,messages"
+                                             class="cssWhite"
+                                             action="#{horometroSistemaSFMB.cargarData()}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" >
+                        <p:outputLabel value="Hr. Inicial ación" />
+                        <p:inputMask id="hora_ini_operacionid"
+                                     mask="99:99:99"
+                                     value="#{horometroSistemaSFMB.horometro.horaIniOperacion}"
+                                     required="true"
+                                     readonly="true"
+                                     requiredMessage="Hr. Inicial Operació es requerido">
+                            <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                        </p:inputMask>
+                    </div>
+                    <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" >
+                        <p:outputLabel value="Hr. Final Operación" />
+                        <p:inputMask id="hora_fin_operacion_id"
+                                     mask="99:99:99"
+                                     readonly="true"
+                                     value="#{horometroSistemaSFMB.horometro.horaFinOperacion}"
+                                     required="true"
+                                     requiredMessage="Hr. Final Operació es requerido">
+                            <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                        </p:inputMask>
+                    </div>
+                    <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" >
+                        <p:outputLabel for="@next" value="Horometro Inicial"/>
+                        <p:inputNumber 
+                            required="true"                            
+                            readonly="true"
+                            maxValue="9999999.99"
+                            requiredMessage="Debe ingresar Horometro Inicial"
+                            value="#{horometroSistemaSFMB.horometro.horometroInicial}"/>
+                    </div>
+                    <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" >
+                        <p:outputLabel for="@next" value="Horometro Final"/>
+                        <p:inputNumber 
+                            required="true"
+                            readonly="true"
+                            maxValue="9999999.99"
+                            requiredMessage="Debe ingresar Horometro Final"
+                            value="#{horometroSistemaSFMB.horometro.horometroFinal}"/>
+                    </div>
+                    <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" >
+                        <p:outputLabel for="@next" value="Hrs. Operación Com."/>
+                        <p:inputNumber 
+                            required="true"
+                            readonly="true"
+                            maxValue="24.00"
+                            decimalPlaces="2"
+                            requiredMessage="Debe ingresar Temp. Reductor Panel"
+                            value="#{horometroSistemaSFMB.horometro.horasOperacionComercial}"/>
+                    </div>
+                    <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" >
+                        <p:outputLabel for="@next" value="Hrs. del Sistema"/>
+                        <p:inputNumber 
+                            required="true"                            readonly="true"
+                            maxValue="24.00"
+                            decimalPlaces="2"
+                            requiredMessage="Debe ingresar Horas del Sistema"
+                            value="#{horometroSistemaSFMB.horometro.horasSistema}"/>
+                    </div>
+                    <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" >
+                        <p:outputLabel for="@next" value="Horas Cabinas"/>
+                        <p:inputNumber 
+                            required="true"
+                            readonly="true"
+                            maxValue="24.00"
+                            decimalPlaces="2"
+                            requiredMessage="Debe ingresar Horas Cabinas"
+                            value="#{horometroSistemaSFMB.horometro.horasCabinas}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_create" 
+                             class="cssWhite"
+                             actionListener="#{horometroSistemaSFMB.guardar()}"  
+                             process="horometro_sistema_form"
+                             update="msgs,form_horometro:dt_horometro_id"  >
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn_save_aseo_bano" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc_create()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

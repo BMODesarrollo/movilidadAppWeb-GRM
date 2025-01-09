@@ -1,0 +1,84 @@
+<ui:composition template="../template/template-content.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="form">
+            <div class="max">
+                <p:growl id="msg" showDetail="true" showSummary="true" life="6000" />
+                <p:panel id="pnl" header="Buscar Servicios por Cédula">
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:outputLabel value="Cédula" class="cssBlack" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:inputText id="identificacion"
+                                         value="#{prgTcServbusBuscarJSF.identificacion}"
+                                         required="true"
+                                         requiredMessage="Cédula es requerida"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:commandButton id="btn-buscar"
+                                             value="Buscar"
+                                             icon="fa fa-search"
+                                             actionListener="#{prgTcServbusBuscarJSF.buscar()}"
+                                             class="cssWhite"
+                                             process="@form"
+                                             update="@form" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <p:dataTable id="tblPrgTc" 
+                                         var="prgtc" 
+                                         widgetVar="tblPrgTcWV"
+                                         style="border: none;padding: 0"
+                                         rowIndexVar="nroFila"
+                                         rowKey="#{nroFila + 1}"
+                                         value="#{prgTcServbusBuscarJSF.listPrgTc}">
+                                <p:column class="#{prgTcServbusBuscarJSF.alarStyleClass(prgtc)} "  headerText="Servicios">
+
+                                    <ui:fragment rendered="#{prgTcServbusBuscarJSF.enEjecucion(prgtc)}" >
+                                        <script type="text/javascript">$(function () {
+                                                document.getElementById('#{prgtc.idPrgTc}').scrollIntoView({
+                                                    behavior: 'smooth',
+                                                    block: 'center',
+                                                    inline: 'center'
+                                                });
+                                            });</script>
+                                    </ui:fragment>
+                                    <span class="ui-fluid">
+                                        <span class="ui-g Padding0">
+                                            <span class="ui-g-5 ui-md-12 ui-lg-3" style="padding: 0px;" id="#{prgtc.idPrgTc}">
+                                                <span class="Fs20  #{prgtc.idVehiculo.idVehiculoTipo.idVehiculoTipo==1 ? 'redCar fa fa-bus': prgtc.idVehiculo.idVehiculoTipo.idVehiculoTipo==2 ?  'yellowCar fa fa-bus' : 'white fa fa-bus'}" ></span>
+                                                <span class="Fs18">#{prgtc.idVehiculo.codigo}</span>
+                                            </span>
+
+                                            <span class="ui-g-5 ui-md-12 ui-lg-3 Padding3">
+                                                <span class="Fs16">#{prgtc.timeOrigin}<br/><span class="Fs15">#{prgtc.timeDestiny}</span></span>
+                                            </span>
+                                           
+                                            <span class="ui-g-2 ui-md-12 ui-lg-2 Padding3">
+                                                <span class="Fs14" style="font-weight: bold;">#{prgtc.idTaskType.tarea}<br/><span class="Fs12">#{prgtc.tabla}</span></span>
+                                            </span>
+
+                                            <span class="ui-g-12 ui-md-12 ui-lg-3 Padding3">
+                                                <span class="Fs14">#{prgtc.fromStop.name}<br/><span class="Fs12">#{prgtc.toStop.name}</span></span>
+                                            </span>
+
+                                        </span>
+                                    </span>
+                                </p:column>
+                                <f:facet name="footer">
+                                    #{prgTcServbusBuscarJSF.listPrgTc.size()} servicios consultados.
+                                </f:facet>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </p:panel>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="ACCIDENTE CHECKLIST">
+            <h:form id="frmCheckList">
+                <p:dataTable id="dtCheckLists" 
+                             var="checklist" 
+                             reflow="true"
+                             paginator="true"
+                             rows="20"
+                             selectionMode="single" 
+                             selection="#{accChecklistBean.selected}" 
+                             rowKey="#{checklist.idAccChecklist}"
+                             filterDelay="1700"
+                             emptyMessage="No se encontraron registros!!"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             widgetVar="dtCheckList"
+                             value="#{accChecklistBean.lstAccChecklists}">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton oncomplete="PF('checklistDlg').show()"
+                                             action="#{accChecklistBean.nuevo()}"
+                                             update=":checklist,:frmCheckListAdd,dtCheckLists"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmCheckListAdd:pGridDatos"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Tipo Evento" styleClass="text-center"
+                              filterBy="#{checklist.idNovedadTipoDetalle.tituloTipoNovedad}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{checklist.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                    </p:column>
+
+                    <p:column headerText="Tipo Documento" styleClass="text-center">
+                        <h:outputText value="#{checklist.idAccTipoDocumento.tipoDocs}" />
+                    </p:column>
+
+                    <p:column headerText="Requerido"
+                              styleClass="#{checklist.requerido eq 1 ? 'cssGreen text-center': checklist.requerido eq 2 ? 'cssRed text-center' : 'text-center'}">
+                        <h:outputText value="SI" rendered="#{checklist.requerido eq 1}" styleClass="cssWhite"/>
+                        <h:outputText value="NO" rendered="#{checklist.requerido eq 2}" styleClass="cssWhite"/>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{accChecklistBean.lstAccChecklists.size()} registro(s).
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="./../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtCheckLists" fileName="LISTADO"
+                                                />
+                            </h:commandLink>
+                            <h:commandLink rendered="false">
+                                <img src="./../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 34px;height: 34px"/>
+                                <p:dataExporter type="pdf" target="dtCheckLists" fileName="LISTADO"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+                <p:contextMenu for="dtCheckLists">
+                    <p:menuitem value="Editar" action="#{accChecklistBean.editar()}" 
+                                update=":checklistEdit,:frmCheckListEdit" icon="fa fa-pencil">
+                        <p:resetInput target=":frmCheckListEdit:pGridDatos"/>
+                    </p:menuitem>
+                </p:contextMenu>
+            </h:form>
+        </p:panel>
+        <ui:include src="child/create.xhtml"/>
+        <ui:include src="child/edit.xhtml"/>
+    </ui:define>
+
+</ui:composition>

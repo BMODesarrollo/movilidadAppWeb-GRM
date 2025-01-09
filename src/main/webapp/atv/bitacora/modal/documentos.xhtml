@@ -1,0 +1,139 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="idModalDoc" 
+              closeOnEscape="true" 
+              widgetVar="docModal"
+              modal="true"
+              header="Documentos"
+              resizable="false" 
+              class="mr1024_40 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-doc">
+            <div class="ui-fluid Padding0">
+                <div class="ui-g Padding5" jsf:rendered="#{atvNovedadJSF.atvNovDoc != null}" jsf:id="formulario-documento">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:fieldset toggleable="true" legend="Documento">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{atvNovedadJSF.handleFileUpload}"
+                                              id="foto"
+                                              style="width: 99.9999%"
+                                              mode="advanced"
+                                              multiple="false"
+                                              sizeLimit="20000000"
+                                              update=":msgs"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 20mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Número documento" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nro-doc"
+                                         value="#{atvNovedadJSF.atvNovDoc.nroDocumento}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="descripcion"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             maxlength="65000"
+                                             value="#{atvNovedadJSF.atvNovDoc.descripcion}"/>
+                        </div>
+                    </div>
+                    <div class="EmptyBox5" />
+                    <div>
+                        <p:commandButton id="btn-guar-doc"
+                                         value="Guardar" 
+                                         icon="fa fa-save"
+                                         class="cssWhite" 
+                                         process="formulario-documento,@this" 
+                                         update="@form,:msgs"
+                                         actionListener="#{atvNovedadJSF.guardarDocumentoAtv()}"/>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <p:dataTable id="documentos-tabla"
+                                 value="#{atvNovedadJSF.consultarAtvNovedadDocumentos()}"
+                                 var="doc"
+                                 rowIndexVar="rowIndex"
+                                 rowKey="#{doc.idAtvNovedadDocumento}"
+                                 rows="5"
+                                 rowStyleClass="text-center"
+                                 rowsPerPageTemplate="5,10,20"
+                                 emptyMessage="No existen registros"
+                                 paginator="true"
+                                 reflow="true">
+                        <f:facet name="paginatorTopRight">
+                            <p:commandButton id="btn-new-doc"   
+                                             value="Nuevo" 
+                                             actionListener="#{atvNovedadJSF.prepareGuardarNovDoc()}" 
+                                             update=":msgs,@form"
+                                             process="@this"
+                                             icon="fa fa-plus" 
+                                             class="cssWhite" />
+                        </f:facet>
+                        <p:column headerText="#" style="width: 40px;">
+                            <h:outputText value="#{rowIndex + 1}" />
+                        </p:column>
+                        <p:column headerText="Creado">
+                            <h:outputText value="#{doc.creado}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Novedad">
+                            <h:outputText value="#{doc.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}" title="#{item.descripcion}" />
+                        </p:column>
+                        <p:column headerText="Número">
+                            <h:outputText value="#{doc.nroDocumento}" />
+                        </p:column>
+                        <p:column headerText="Descripción" class="cortar">
+                            <h:outputText value="#{doc.descripcion}" />
+                        </p:column>
+                        <p:column headerText="Acciones" exportable="false">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-6" style="text-align: center">
+                                    <p:commandButton id="file-master-test" 
+                                                     ajax="false"
+                                                     title="Ver documento"
+                                                     disabled="#{empty doc.pathDocumento}"
+                                                     icon="fa fa-external-link" 
+                                                     onclick="target = '_blank'"
+                                                     class="OrangeButton cssWhite">
+                                        <p:fileDownload value="#{atvNovedadJSF.prepDownloadLocal(doc.pathDocumento)}" 
+                                                        contentDisposition="inline"/>
+                                    </p:commandButton>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-6" style="text-align: center">
+                                    <p:commandButton id="descargar-doc"
+                                                     ajax="false"
+                                                     title="Descargar documento"
+                                                     disabled="#{empty doc.pathDocumento}"
+                                                     icon="fa fa-arrow-circle-o-down"
+                                                     class="OrangeButton cssWhite">
+                                        <p:fileDownload value="#{atvNovedadJSF.prepDownloadLocal(doc.pathDocumento)}" />
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

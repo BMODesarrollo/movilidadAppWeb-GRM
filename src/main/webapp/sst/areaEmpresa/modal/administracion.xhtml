@@ -1,0 +1,96 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              resizable="false" 
+              closable="false"
+              class="mr1024_40 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{sstAreaEmpresaJSF.sstAreaEmpresa.idSstAreaEmpresa == null}">
+                                <p:outputLabel value="NUEVA PARAMETRIZACIÓN SST ÁREA" class="cssWhite"/>
+                            </c:if>
+                            <c:if test="#{sstAreaEmpresaJSF.sstAreaEmpresa.idSstAreaEmpresa != null}">
+                                <p:outputLabel value="EDITAR PARAMETRIZACIÓN SST ÁREA" class="cssWhite"/>
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('modalDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="form-modal">
+            <div class="ui-fluid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Área *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="area"
+                                         maxlength="45"
+                                         required="true"
+                                         requiredMessage="Área es requerido"
+                                         value="#{sstAreaEmpresaJSF.sstAreaEmpresa.area}" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             maxlength="255"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             value="#{sstAreaEmpresaJSF.sstAreaEmpresa.descripcion}"/>
+                        </div>
+                    </div>
+                </div>
+                <p:remoteCommand id="btn-guardar"
+                                 name="rc_ae"
+                                 rendered="#{empty sstAreaEmpresaJSF.sstAreaEmpresa.idSstAreaEmpresa}"
+                                 action="#{sstAreaEmpresaJSF.guardar()}"
+                                 update=":form,@form,msgs"
+                                 process="@form" />
+                <p:remoteCommand id="btn-editar"
+                                 name="rc_update_ae"
+                                 rendered="#{not empty sstAreaEmpresaJSF.sstAreaEmpresa.idSstAreaEmpresa}"
+                                 action="#{sstAreaEmpresaJSF.actualizar()}"
+                                 update=":form,msgs"/>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_ae();"
+                             rendered="#{empty sstAreaEmpresaJSF.sstAreaEmpresa.idSstAreaEmpresa}"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             value="Guardar"/>
+            <p:commandButton onclick="rc_update_ae();"
+                             icon="fa fa-save"
+                             rendered="#{not empty sstAreaEmpresaJSF.sstAreaEmpresa.idSstAreaEmpresa}"
+                             class="cssWhite"
+                             value="Actualizar"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

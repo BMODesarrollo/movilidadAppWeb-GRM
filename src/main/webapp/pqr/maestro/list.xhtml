@@ -1,0 +1,461 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form_novedad_infra">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <div class="EmptyBox5" />
+            <p:panel class="Wid100">
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Maestro PQR
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <div class="Wid100" >
+                                    <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                     filter="true" 
+                                                     rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains">
+                                        <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                       var="uniFunc" 
+                                                       itemLabel="#{uniFunc.nombre}"
+                                                       itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                        <p:ajax update="dt_pqr" 
+                                                listener="#{maestroPqrBean.consultar()}"
+                                                process="@this"/>
+                                    </p:selectOneMenu>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+
+                <div class="ui-g">
+                    <p:dataTable id="dt_pqr" var="item" 
+                                 scrollable="true"
+                                 widgetVar="wlVdt_pqr"
+                                 scrollHeight="600"
+                                 reflow="true"
+                                 rowKey="#{item.idPqrMaestro}"
+                                 selection="#{maestroPqrBean.pqrMaestro}" 
+                                 selectionMode="single"
+                                 rows="10"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,50,100"
+                                 emptyMessage="No existen registros"
+                                 value="#{maestroPqrBean.list}">
+
+                        <f:facet name="header">
+                            <div align="right" jsf:id="botones">
+                                <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                                <p:calendar id="fecha_desde" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{maestroPqrBean.desde}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{maestroPqrBean.consultar()}"
+                                            update="dt_pqr"/>
+                                </p:calendar>
+                                <p:calendar id="fecha_hasta" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{maestroPqrBean.hasta}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{maestroPqrBean.consultar()}"
+                                            update="dt_pqr"/>
+                                </p:calendar>
+                                <p:commandButton
+                                    icon="fa fa-plus"
+                                    value="Nuevo"
+                                    actionListener="#{maestroPqrBean.nuevo()}"
+                                    class="cssWhite"
+                                    update="msgs,pqr_form"/>   
+                                <p:commandButton id="toggle" type="button" 
+                                                 title="Columnas" style="float:right" 
+                                                 icon="fa fa-align-justify"  
+                                                 class="OrangeButton cssWhite"/>
+                                <p:columnToggler datasource="dt_pqr" trigger="toggle" />
+                            </div>
+                        </f:facet>
+
+                        <p:column style="width:25px" exportable="false">
+                            <p:rowToggler />
+                        </p:column>
+
+                        <p:rowExpansion>
+                            <p:panelGrid columns="2" styleClass="expansion-grid" columnClasses="col1,col2">
+                                <p:column headerText="Petición" styleClass="text-word-wrap">
+                                    <h:outputText value="&lt;strong&gt;Petición:&lt;/strong&gt; #{item.reporte}" escape="false" />
+                                </p:column>
+                                <p:column headerText="Análisis" styleClass="text-word-wrap">
+                                    <h:outputText value="&lt;strong&gt;Análisis:&lt;/strong&gt; #{item.analisis}" escape="false" />
+                                </p:column>
+                                <p:column headerText="Observación" styleClass="text-word-wrap">
+                                    <h:outputText value="&lt;strong&gt;Observación:&lt;/strong&gt; #{item.obsCierre}" escape="false" />
+                                </p:column>
+                            </p:panelGrid>
+
+                            <p:panelGrid columns="2" styleClass="expansion-grid" columnClasses="col1,col2">
+                                <p:column headerText="Causas:" styleClass="text-word-wrap">
+                                    <h:outputText value="&lt;strong&gt;Causas:&lt;/strong&gt;" escape="false" />
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Causa 1:&lt;/strong&gt; #{item.c1}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Causa 2:&lt;/strong&gt; #{item.c2}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Causa 3:&lt;/strong&gt; #{item.c3}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Causa 4:&lt;/strong&gt; #{item.c4}" escape="false" />
+                                </p:column>
+                                <p:column headerText="Acciones: " styleClass="text-word-wrap">
+                                    <h:outputText value="&lt;strong&gt;Acciones:&lt;/strong&gt;" escape="false" />
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Acción 1:&lt;/strong&gt; #{item.aa1}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Responsable:&lt;/strong&gt; #{item.ar1}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="#{item.af1}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                    </h:outputText>
+
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Acción 2:&lt;/strong&gt; #{item.aa2}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Responsable:&lt;/strong&gt; #{item.ar2}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="#{item.af2}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                    </h:outputText>
+
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Acción 3:&lt;/strong&gt; #{item.aa3}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Responsable:&lt;/strong&gt; #{item.ar3}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="#{item.af3}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                    </h:outputText>
+
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Acción 4:&lt;/strong&gt; #{item.aa4}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="&lt;strong&gt;Responsable:&lt;/strong&gt; #{item.ar4}" escape="false" />
+                                    <br/>
+                                    <h:outputText value="#{item.af4}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                    </h:outputText>
+                                    <br/>
+
+                                </p:column>
+                            </p:panelGrid>
+                        </p:rowExpansion>
+
+                        <p:column headerText="Fecha R"  >
+                            <h:outputText value="#{item.fecha_radicado}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha E"  >
+                            <h:outputText value="#{item.fecha_evento}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha Est" visible="false">
+                            <h:outputText value="#{item.fecha_estimada1}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Días Restantes" visible="#{maestroPqrBean.validUser()}" exportable="#{maestroPqrBean.validUser()}">
+                            <h:outputText value="#{maestroPqrBean.calcularDiferenciaDias(item.fecha_estimada1)}" />
+                        </p:column>
+
+                        <p:column headerText="Tipo" 
+                                  filterBy="#{item.idPqrTipo.nombre}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.idPqrTipo.nombre}" />
+                        </p:column>
+                        <p:column headerText="Radicado" 
+                                  filterBy="#{item.radicado}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.radicado}" />
+                        </p:column>
+                        <p:column headerText="Clasificación" 
+                                  filterBy="#{item.idPqrTipo.idPqrClasificacion.nombre}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.idPqrTipo.idPqrClasificacion.nombre}" 
+                                          title="#{item.idPqrTipo.idPqrClasificacion.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Responsable" 
+                                  filterBy="#{item.idPqrTipo.idPqrResponsable.responsable}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.idPqrTipo.idPqrResponsable.responsable}" 
+                                          title="#{item.idPqrTipo.idPqrResponsable.responsable}"/>
+                        </p:column>
+                        <p:column headerText="Fecha limite Respuesta" styleClass="text-center">
+                            <h:outputText value="#{item.fecha_estimada2}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                            </h:outputText>
+
+                        </p:column>
+
+                        <p:column filterBy="#{item.estado}" 
+                                  styleClass="text-center"
+                                  exportable="false"
+                                  headerText="Estado"
+                                  filterMatchMode="exact">
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('wlVdt_pqr').filter()" 
+                                                 styleClass="custom-filter" style="width: 99.9999%">
+                                    <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemValue="#{1}" itemLabel="Abierta"/>
+                                    <f:selectItem itemValue="#{2}" itemLabel="Cerrada"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.estado==1 ? 'ABIERTA': 'CERRADA'}" />
+                        </p:column>
+
+                        <p:column headerText="Documentos" 
+                                  styleClass="text-center">
+                            <h:outputText value="#{empty(item.pqrMaestroDocumentosList)? 'NO':item.pqrMaestroDocumentosList eq null ? 'NO':'SI'}" />
+                        </p:column>
+
+                        <p:column headerText="Rp Cédula" 
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.rpCedula}">
+                            <h:outputText value="#{item.rpCedula}" />
+                        </p:column>
+                        <p:column headerText="Rp Nombre" 
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.rpNombre}">
+                            <h:outputText value="#{item.rpNombre}" />
+                        </p:column>
+                        <p:column headerText="Rp Dirección" >
+                            <h:outputText value="#{item.rpDireccion}" />
+                        </p:column>
+                        <p:column headerText="Rp Teléfono" >
+                            <h:outputText value="#{item.rpTelefono}" 
+                                          title="#{item.rpTelefono}"/>
+                        </p:column>
+                        <p:column headerText="Rp Email" styleClass="cortar">
+                            <h:outputText value="#{item.rpEmail}" />
+                        </p:column>
+                        <p:column headerText="Usuario Cierre" 
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.usrCierre}">
+                            <h:outputText value="#{item.usrCierre}" />
+                        </p:column>
+                        <p:column headerText="Registrada por" 
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.registradaPor}">
+                            <h:outputText value="#{item.registradaPor}" />
+                        </p:column>
+                        <p:column headerText="Creado" >
+                            <h:outputText value="#{item.creado}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Observación" visible="false">
+                            <h:outputText value="#{item.obsCierre}" />
+                        </p:column>
+
+                        <p:column headerText="Petición" visible="false">
+                            <h:outputText value="#{item.reporte}" />
+                        </p:column>
+
+                        <p:column headerText="Análisis" visible="false">
+                            <h:outputText value="#{item.analisis}" />
+                        </p:column>
+
+                        <p:column headerText="Caso 1" visible="false">
+                            <h:outputText value="#{item.c1}" />
+                        </p:column>
+
+                        <p:column headerText="Caso 2" visible="false">
+                            <h:outputText value="#{item.c2}" />
+                        </p:column>
+
+                        <p:column headerText="Caso 3" visible="false">
+                            <h:outputText value="#{item.c3}" />
+                        </p:column>
+
+                        <p:column headerText="Caso 4" visible="false">
+                            <h:outputText value="#{item.c4}" />
+                        </p:column>
+
+                        <p:column headerText="Accion 1" visible="false">
+                            <h:outputText value="#{item.aa1}" />
+                        </p:column>
+
+                        <p:column headerText="Accion 1 Fecha" visible="false">
+                            <h:outputText value="#{item.af1}" />
+                        </p:column>
+
+                        <p:column headerText="Accion 1 Responsable" visible="false">
+                            <h:outputText value="#{item.ar1}" />
+                        </p:column>
+
+
+                        <p:column headerText="Accion 2" visible="false">
+                            <h:outputText value="#{item.aa2}" />
+                        </p:column>
+
+                        <p:column headerText="Accion 2 Fecha" visible="false">
+                            <h:outputText value="#{item.af2}" />
+                        </p:column>
+
+                        <p:column headerText="Accion 2 Responsable" visible="false">
+                            <h:outputText value="#{item.ar2}" />
+                        </p:column>
+
+
+                        <p:column headerText="Accion 3" visible="false">
+                            <h:outputText value="#{item.aa3}" />
+                        </p:column>
+
+                        <p:column headerText="Accion 3 Fecha" visible="false">
+                            <h:outputText value="#{item.af3}" />
+                        </p:column>
+
+                        <p:column headerText="Accion 3 Responsable" visible="false">
+                            <h:outputText value="#{item.ar3}" />
+                        </p:column>
+
+
+                        <p:column headerText="Accion 4" visible="false">
+                            <h:outputText value="#{item.aa4}" />
+                        </p:column>
+
+                        <p:column headerText="Accion 4 Fecha" visible="false">
+                            <h:outputText value="#{item.af4}" />
+                        </p:column>
+
+                        <p:column headerText="Accion 4 Responsable" visible="false">
+                            <h:outputText value="#{item.ar4}" />
+                        </p:column>
+
+                        <p:column headerText="Vehículo" visible="false">
+                            <h:outputText value="#{item.idVehiculo.codigo}" />
+                        </p:column>
+
+                        <p:column headerText="Ruta" visible="false">
+                            <h:outputText value="#{item.idPrgRoute.name}" />
+                        </p:column>
+
+                        <p:column headerText="F. Horaria" visible="false">
+                            <h:outputText value="#{item.idPqrFranjaHoraria.nombre}" />
+                        </p:column>
+
+                        <p:column headerText="Paradero" visible="false">
+                            <h:outputText value="#{item.paradero}" />
+                        </p:column>
+                        <p:column headerText="Empleado Codigo" visible="false">
+                            <h:outputText value="#{item.idEmpleado.codigoTm}" />
+                        </p:column>
+                        <p:column headerText="Empleado" visible="false">
+                            <h:outputText value="#{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}" />
+                        </p:column>
+                        <p:column headerText="Historico"  exportable="false" visible="false">
+                            <p:commandButton value="Generar" 
+                                             actionListener="#{maestroPqrBean.generateExcel(item)}" 
+                                             icon="fa fa-folder" 
+                                             style="background-color: purple;color: white" 
+                                             class="cssMenuItem" 
+                                             ajax="false">
+                                <p:fileDownload value="#{maestroPqrBean.file}" />
+                            </p:commandButton>
+                        </p:column>
+                        <f:facet name="footer">
+                            En total existen #{maestroPqrBean.list.size()} registros.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="dt_pqr" 
+                                                    fileName="Listado PQRS"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                    <p:contextMenu for="dt_pqr">
+                        <p:menuitem value="Abir PQR" action="#{maestroPqrBean.changeEstatus(1)}" 
+                                    style="background-color: blue;color: white" 
+                                    class="cssMenuItem" update="msgs,dt_pqr,pqr_form"  />
+                        <p:menuitem value="Editar" 
+                                    icon="fa fa-pencil" 
+                                    class="cssMenuItem"
+                                    style="background-color: green;color: white"
+                                    update="pqr_form,msgs"      
+                                    action="#{maestroPqrBean.editar()}"/>
+                        <p:menuitem value="Insumo de PQR" 
+                                    icon="fa fa-folder-o" 
+                                    action="#{maestroPqrBean.onCerrar()}"  
+                                    style="background-color: grey;color: white" 
+                                    class="cssMenuItem" 
+                                    update="msgs,cierre_form" />
+                        <p:menuitem value="Ver documentos" 
+                                    icon="fa fa-book" 
+                                    class="cssMenuItem"
+                                    style="background-color: steelblue;color: white"
+                                    update=":frmNovedadDocumentosList,:msgs"  
+                                    action="#{pqrMaestroDocBean.prepararModulo()}"/>               
+                        <p:menuitem value="Cerrar PQR" 
+                                    action="#{maestroPqrBean.changeEstatus(2)}" 
+                                    icon="fa fa-folder" 
+                                    style="background-color: red;color: white" 
+                                    class="cssMenuItem" update="msgs,cierre_form,pqr_form,dt_pqr" />
+                    </p:contextMenu>
+                </div>
+
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/create.xhtml"/>
+        <ui:include src="modal/cierre.xhtml"/>
+        <ui:include src="modal/documentos/ListaNovedadDocumentos.xhtml"/>
+    </ui:define>
+</ui:composition>

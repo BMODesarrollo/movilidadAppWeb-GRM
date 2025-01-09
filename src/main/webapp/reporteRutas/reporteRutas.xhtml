@@ -1,0 +1,110 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form id="formRutasEjec">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Rutas Ejecutadas">
+                <p:dataTable id="rutasListId" 
+                             value="#{rutasEjecuJSFMB.prglist}" 
+                             var="item"
+                             rowIndexVar="index"
+                             filteredValue="#{rutasEjecuJSFMB.prglistFiltre}"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             scrollHeight="600"
+                             filterDelay="1000"
+                             rowKey="#{item.idPrgTc}"
+                             rows="20"
+                             widgetVar="dtrutasList"
+                             rowsPerPageTemplate="20,100,200,500">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="rutasListId" 
+                                            preProcessor="#{rutasEjecuJSFMB.totalEliminadosCount()}"
+                                            fileName="Rutas Ejecutadas #{rutasEjecuJSFMB.fecha(1)} a #{rutasEjecuJSFMB.fecha(2)}"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:outputLabel value="Fechas: " class="cssWhite Fs20" for="desde"></p:outputLabel>
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        locale="es"
+                                        value="#{rutasEjecuJSFMB.fechaDesde}"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" process="desde"></p:ajax>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{rutasEjecuJSFMB.fechaHasta}"
+                                        locale="es"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" process="hasta"></p:ajax>
+                            </p:calendar>
+                            <p:commandButton 
+                                value="Buscar"
+                                class="cssWhite"
+                                icon="fa fa-search"
+                                process="hasta,desde,formRutasEjec"
+                                actionListener="#{rutasEjecuJSFMB.consultar()}"
+                                update="formRutasEjec:rutasListId,msgs">
+                            </p:commandButton>
+
+                        </div>
+                    </f:facet>
+                    <p:column filterBy="#{item.fecha}"
+                              headerText="Fecha">
+                        <h:outputText value="#{item.fecha}">
+                            <f:convertDateTime type="date" pattern="yyyy/MM/dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains"
+                              headerText="Vehículo">
+                        <h:outputText value="#{item.idVehiculo.codigo}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.timeOrigin}"
+                              filterMatchMode="contains"
+                              headerText="Hora Inicio">
+                        <h:outputText value="#{item.timeOrigin}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.timeDestiny}"
+                              filterMatchMode="contains"
+                              headerText="Hora Fin">
+                        <h:outputText value="#{item.timeDestiny}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.fromStop.name}"
+                              filterMatchMode="contains"
+                              headerText="Punto Inicio">
+                        <h:outputText value="#{item.fromStop.name}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.toStop.name}"
+                              filterMatchMode="contains"
+                              headerText="Punto Fin">
+                        <h:outputText value="#{item.toStop.name}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idRuta.name}"
+                              filterMatchMode="contains"
+                              headerText="Ruta">
+                        <h:outputText value="#{item.idRuta.name}"/>
+                    </p:column>
+                    <p:column headerText="Eliminado" width="10%"
+                              styleClass="#{item.estadoOperacion eq 5 or item.estadoOperacion eq 99 or item.estadoOperacion eq 8 ? 'cssRed' : 'cssGreen'}">
+                        <h:outputText class="cssWhite" value="#{item.estadoOperacion eq 5 or item.estadoOperacion eq 99 or item.estadoOperacion eq 8 ? 'Si':'No'}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Total Eliminados" >
+                        <h:outputText value="#{rutasEjecuJSFMB.totalEliminados}" rendered="#{index==0}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,132 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="solicitud"
+              widgetVar="solicitudDlg" 
+              modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              fitViewport="true"
+              class="mr1024_60 mr500_90"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+        <f:facet name="header">
+            NUEVA SOLICITUD
+        </f:facet>
+        <h:form id="frmSolicitud">
+            <div class="ui-fluid">
+                <p:messages id="message" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Codigo Operador" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="cod_operador_sol"
+                                         value="#{prgSolicitudesMasterBean.cod_operador}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar código de operador"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-search"
+                                                 action="#{prgSolicitudesMasterBean.buscarEmpleado()}"
+                                                 style="margin: 0px"
+                                                 update="empSolicitante,:msgs,message,:frmSelect"
+                                                 styleClass="cssWhite"
+                                                 process="cod_operador_sol,@this"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre Operador" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="empSolicitante">
+                            <p:inputText value="N/A" 
+                                         readonly="true"
+                                         rendered="#{prgSolicitudesMasterBean.empSolicitante eq null}"
+                                         styleClass="cssBlack texto-mayuscula"/>
+
+                            <p:inputText rendered="#{prgSolicitudesMasterBean.empSolicitante != null}"
+                                         readonly="true"
+                                         value="#{prgSolicitudesMasterBean.empSolicitante.nombres} #{prgSolicitudesMasterBean.empSolicitante.apellidos}" 
+                                         styleClass="cssBlack texto-mayuscula"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha solicitud" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                value="#{prgSolicitudesMasterBean.prgSolicitud.fechaSolicitud}"
+                                readonly="true"
+                                styleClass="cssBlack">
+                                <f:convertDateTime type="date" pattern="YYYY-MMMM-dd"/>
+                            </p:inputText>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Motivo" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="motivo" 
+                                             value="#{prgSolicitudesMasterBean.i_idSolicitudMotivo}"
+                                             required="true"
+                                             style="width: 99.9999%"
+                                             requiredMessage="Debe seleccionar un motivo">
+                                <f:selectItem itemLabel="Seleccione motivo" itemValue="#{null}" />
+                                <f:selectItems 
+                                    value="#{prgSolicitudesMasterBean.lstSolicitudMotivos}" 
+                                    var="item" itemLabel="#{item.motivo}" 
+                                    itemValue="#{item.idPrgSolicitudMotivo}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo solicitud" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="tipo_solicitud" 
+                                             value="#{prgSolicitudesMasterBean.tipo_solicitud}" 
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un tipo de solicitud">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItem itemLabel="Permiso" itemValue="permiso" />
+                                <f:selectItem itemLabel="Cambio" itemValue="cambio" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea autoResize="false"
+                                             value="#{prgSolicitudesMasterBean.prgSolicitud.motivo}"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"
+                                             rows="5"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="sig" 
+                             update="@form,:msgs,:modal,:frmRegistroSolicitudes:panelSolicitudes"
+                             action="#{prgSolicitudesMasterBean.mostrarTipoSolicitud()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Siguiente" onclick="sig()" 
+                             icon="fa fa-arrow-right"
+                             class="cssWhite"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

@@ -1,0 +1,68 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="PrgCompaniaListForm">
+            <p:panel  header="Prg Compañía">
+                <p:dataTable  id="datalist"
+                              value="#{prgCompaniaController.items}"
+                              var="item"
+                              selectionMode="single" 
+                              selection="#{prgCompaniaController.selected}"
+                              paginator="true"
+                              rowKey="#{item.idPrgCompania}"
+                              rows="20"
+                              rowsPerPageTemplate="20,50,100"
+                              filterDelay="1000"
+                              emptyMessage="No existen registros">
+
+                    <p:ajax event="rowSelect"   update="createButton,editButton,deleteButton"/>
+                    <p:ajax event="rowUnselect" update="createButton,editButton,deleteButton" listener="#{prgCompaniaController.reset()}" />
+
+                    <p:column filterBy="#{item.nombreCompania}"
+                              headerText="Nombre de la Compañía">
+                        <h:outputText value="#{item.nombreCompania}"/>
+                    </p:column>
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton class="cssWhite" 
+                                             id="createButton" 
+                                             icon="fa fa-plus"   
+                                             value="#{bundle.Create}" 
+                                             actionListener="#{prgCompaniaController.prepareCreate}" 
+                                             update=":PrgCompaniaCreateForm,PrgCompaniaCreateDlg" 
+                                             oncomplete="PF('PrgCompaniaCreateDialog').show()">
+                                <p:resetInput target="PrgCompaniaCreateDlg"></p:resetInput>
+                            </p:commandButton>
+                            <p:commandButton id="editButton" 
+                                             class="cssWhite GreenButton"  
+                                             icon="fa fa-pencil" 
+                                             value="#{bundle.Edit}" 
+                                             update=":PrgCompaniaCreateForm,PrgCompaniaCreateDlg" 
+                                             oncomplete="PF('PrgCompaniaCreateDialog').show()" 
+                                             disabled="#{empty prgCompaniaController.selected.idPrgCompania}">
+                                <p:resetInput target="PrgCompaniaCreateForm"></p:resetInput>
+                            </p:commandButton>
+                            <p:commandButton id="deleteButton" 
+                                             class="cssWhite RedButton" 
+                                             icon="fa fa-trash"  
+                                             rendered="false"
+                                             value="#{bundle.Delete}" 
+                                             actionListener="#{prgCompaniaController.destroy}" 
+                                             update="datalist" 
+                                             disabled="#{empty prgCompaniaController.selected.idPrgCompania}">
+                                <p:confirm header="Confirmación" message="Estas seguro?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="Create.xhtml"/>
+    </ui:define>
+</ui:composition>

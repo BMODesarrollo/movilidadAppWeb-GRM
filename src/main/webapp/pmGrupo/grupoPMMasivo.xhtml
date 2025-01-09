@@ -1,0 +1,239 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <!--update="datalist,:DlgCsvDg" -->
+    <ui:define name="content">
+        <h:form id="formAsig">
+            <p:growl id="upAsig" showDetail="true" showSummary="true" life="6000"/>
+            <p:tabView id="tab">
+                <p:tab title="PreCarga">
+                    <f:facet name="actions">
+                        <p:commandButton 
+                            icon="fa fa-arrow-circle-o-up"
+                            class="cssWhite GreenButton"
+                            process="@this"
+                            actionListener="#{pmGrupJSFMB.reset()}"
+                            value="Cargar Archivo"
+                            oncomplete="PF('upCsv').show()" 
+                            />
+                    </f:facet>
+                    <p:dataTable id="datalistPreC" 
+                                 value="#{pmGrupJSFMB.listCargar}" 
+                                 paginator="true"
+                                 rows="50"
+                                 var="preCarga"
+                                 rowsPerPageTemplate="50,100,150"
+                                 emptyMessage="No se ha iniciado el proceso"
+                                 reflow="true"
+                                 >
+                        <p:column headerText="Fecha ingreso">
+                            <h:outputText value="#{preCarga.empleado.fechaIngreso}">
+                                <f:convertDateTime  parent="yyyy-MM-dd"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Operador">
+                            <h:outputText value="#{preCarga.operador}"/>
+                        </p:column>
+                        <p:column headerText="Grupo">
+                            <h:outputText value="#{preCarga.grupo.nombreGrupo}"/>
+                        </p:column>
+                        <f:facet name="paginatorTopRight">
+                            <p:commandButton 
+                                icon="fa fa-arrow-circle-o-up"
+                                class="cssWhite OrangeButton"
+                                process="@this"
+                                actionListener="#{pmGrupJSFMB.programar()}"
+                                value="Realizar asignación" >
+                                <p:confirm header="Realizar asignación" message="¿Está seguro de asignar la programación?" 
+                                           icon="fa fa-exclamation-triangle" class="cssWhite" />
+                            </p:commandButton>
+                        </f:facet>
+                        <f:facet name="paginatorTopLeft">
+                            <p:commandButton id="btn-info"
+                                             icon="fa fa-info-circle"
+                                             type="button"
+                                             onclick="PF('infoDlg').show();"
+                                             class="cssWhite OrangeButton"
+                                             title="Antes de realizar la asignación, click aquí" >
+                            </p:commandButton>
+                        </f:facet>
+                        <f:facet name="footer">
+                            En total existen #{pmGrupJSFMB.listCargar.size()} registros correctos de #{pmGrupJSFMB.sumRow} en el archivo.
+                        </f:facet>
+                    </p:dataTable>
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes cssWhite" icon="fa fa-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no cssWhite" icon="fa fa-times" />
+                    </p:confirmDialog>   
+                </p:tab>
+                <p:tab title="PreCarga Errores">
+                    <f:facet name="actions">
+                        <p:commandButton 
+                            icon="fa fa-arrow-circle-o-up"
+                            class="cssWhite GreenButton"
+                            process="@this"
+                            actionListener="#{pmGrupJSFMB.reset}"
+                            value="Cargar Archivo"
+                            oncomplete="PF('upCsv').show()" 
+                            />
+                    </f:facet>
+                    <p:dataTable id="datalistErrs" 
+                                 value="#{pmGrupJSFMB.listPreCargaError}" 
+                                 paginator="true"
+                                 rows="50"
+                                 filterDelay="1500"
+                                 var="errores"
+                                 rowsPerPageTemplate="50,100,150"
+                                 emptyMessage="No existen Errores"
+                                 reflow="true" >
+                        <p:column headerText="Operador" 
+                                  filterBy="#{errores.operador}" 
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{errores.operador}" />
+                        </p:column>
+                        <p:column headerText="Grupo"
+                                  filterBy="#{errores.grupo}" 
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{errores.grupo}" />
+                        </p:column>
+                        <p:column headerText="Errores">
+                            <h:outputText value="#{errores.motivo}" />
+                        </p:column>
+                        <f:facet name="paginatorTopLeft">
+                            <p:commandButton id="btn-info"
+                                             icon="fa fa-info-circle"
+                                             type="button"
+                                             onclick="PF('infoDlg').show();"
+                                             class="cssWhite OrangeButton"
+                                             title="Antes de realizar la asignación, click aquí" >
+                            </p:commandButton>
+                        </f:facet>
+                        <f:facet name="footer">
+                            En total existen #{pmGrupJSFMB.listPreCargaError.size()} Error(es) encontrados de #{pmGrupJSFMB.sumRow} en el archivo.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="datalistErrs" fileName="Errores-Programacion #{now}" />
+                                </h:commandLink>
+                                <h:commandLink>
+                                    <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                         alt="pdf" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="pdf" target="datalistErrs" fileName="Errores-Programacion #{now}"  />
+                                </h:commandLink>
+                                <h:commandLink>
+                                    <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                         alt="csv" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="csv" target="datalistErrs" fileName="Errores-Programacion #{now}"  />
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Aplicada">
+                    <p:dataTable id="datalist" 
+                                 value="#{pmGrupJSFMB.listCargadoCorrecto}" 
+                                 var="item"
+                                 paginator="true"
+                                 rows="50"
+                                 rowsPerPageTemplate="50,100,150"
+                                 emptyMessage="No se han realizado asignación para el día de hoy"
+                                 reflow="true"
+                                 >
+                        <p:column headerText="Fecha ingreso">
+                            <h:outputText value="#{item.empleado.fechaIngreso}">
+                                <f:convertDateTime  parent="yyyy-MM-dd"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Operador">
+                            <h:outputText value="#{item.operador}"/>
+                        </p:column>
+                        <p:column headerText="Grupo">
+                            <h:outputText value="#{item.grupo.nombreGrupo}"/>
+                        </p:column>
+                        <f:facet name="footer">
+                            En total existen #{pmGrupJSFMB.listCargadoCorrecto.size()} registros cargados correctamente en la base de datos.
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Error al subir">
+                    <p:dataTable id="datalisterrorcarga" 
+                                 value="#{pmGrupJSFMB.listCargarError}" 
+                                 var="itemError"
+                                 paginator="true"
+                                 rows="50"
+                                 rowsPerPageTemplate="50,100,150"
+                                 emptyMessage="No se han realizado asignación para el día de hoy"
+                                 reflow="true"
+                                 >
+                        <p:column headerText="Fecha ingreso">
+                            <h:outputText value="#{itemError.empleado.fechaIngreso}">
+                                <f:convertDateTime  parent="yyyy-MM-dd"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Operador">
+                            <h:outputText value="#{itemError.operador}"/>
+                        </p:column>
+                        <p:column headerText="Grupo">
+                            <h:outputText value="#{itemError.grupo.nombreGrupo}"/>
+                        </p:column>
+                        <f:facet name="footer">
+                            En total existen #{pmGrupJSFMB.listCargarError.size()} registros que fallaron en la carga a la base de datos.
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+        <ui:include src="../pmGrupo/modal/modalUpFile.xhtml"/>
+        <ui:include src="modal/confirmacion.xhtml" />
+        <p:dialog header="INFORMACIÓN" 
+                  widgetVar="infoDlg" 
+                  resizable="false" 
+                  draggable="false" 
+                  responsive="true" 
+                  modal="true" 
+                  closable="true"
+                  focus="btn-cerrar" >
+            <h:outputText value="La asignación se debe realizar por 
+                          el usuario permitido, y con un conocimiento 
+                          previo de como se realiza este proceso " /><br/>
+            <h:outputText value="Tenga en cuenta: "/> <br/>
+            <h:outputText value="La aplicación recibe un archivo csv 
+                          (.csv) el cual debe estar con el formato 
+                          separado por coma (,) y las fechas deben 
+                          estar con el formato (año-mes-día)." />  
+            <div class="cssBlack">
+                Nota: si el documento no viene con los formatos permitidos (los mensionados anteriormente) 
+                no realizará la asignación de los vehículos a los servicios.
+            </div>
+            <p:separator />
+            <div class="cssBlack">
+                Siga estos pasos para solucionar el problema del cambio de (;) a (,):<br/><br/>
+                1. Haga clic con el botón derecho en el archivo y abrirlo con el Bloc de notas.<br/>
+                2. Haga clic en el menú Edición y seleccione Reemplazar.<br/>
+                3. En el cuadro Buscar escriba un símbolo de punto y coma (;).<br/>
+                4. En el cuadro Reemplazar con tipo en una coma (,).<br/>
+                5. Haga clic en el botón Reemplazar.<br/>
+                6. Cierre la ventana Reemplazar.<br/>
+                7. Guarde el archivo.
+            </div>
+            <f:facet name="footer">
+                <p:commandButton id="btn-cerrar"
+                                 value="Cerrar"
+                                 icon="fa fa-times"
+                                 class="cssWhite"
+                                 onclick="PF('infoDlg').hide();" />
+
+            </f:facet>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+
+

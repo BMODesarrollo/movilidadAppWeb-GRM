@@ -1,0 +1,40 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="NotificaListDlg" widgetVar="NotificaListDialog" modal="true" 
+              resizable="false" responsive="true"
+              position="center top" class="mr1024_40 mr500_90"
+              appendTo="@(body)" header="Proceso a Notificar" >
+        <h:form id="frmNotificaList">
+            <p:dataTable var="notif" value="#{cableEventoTipoDetBean.lstNotificacionProcesos}"  
+                         selectionMode="single"
+                         id="dtNotificacionProcesos"
+                         widgetVar="wlvdtNotificacionProcesos"
+                         selection="#{cableEventoTipoDetBean.notificacionProceso}"                       
+                         rowIndexVar="nroFila"
+                         rowKey="#{notif.idNotificacionProceso}"
+                         emptyMessage="No existen listas de distribución registradas"
+                         reflow="true" 
+                         filterDelay="1000"
+                         rows="5" 
+                         paginator="true">
+                <p:ajax event="rowSelect" 
+                        listener="#{cableEventoTipoDetBean.onRowNotificacionProcesoClckSelect}"
+                        update=":frmCableEventoTipoDet:notifProceso"
+                        oncomplete="PF('NotificaListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 5%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Código" filterBy="#{notif.codigoProceso}" filterMatchMode="contains"  style="width: 15%">
+                    <h:outputText value="#{notif.codigoProceso}" />
+                </p:column>
+                <p:column headerText="Proceso" filterBy="#{notif.nombreProceso}" filterMatchMode="contains" >
+                    <h:outputText value="#{notif.nombreProceso}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

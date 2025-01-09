@@ -1,0 +1,2374 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .eliminados{
+                background: red !important;
+            }
+            .eliminados:hover{
+                background: #34e49a !important;
+            }
+            .eliminadosEdit{
+                background: #fd872f !important;
+            }
+            .adicionales{
+                background: green !important;
+            }
+            .adicionales:hover{
+                background: #34e49a !important;
+            }
+            .adicionalesEdit{
+                background: #fd872f !important;
+            }
+            .fuente{
+                font-size: 18px;
+            }
+            .blueColor{
+                background: blue !important;
+            }
+            .alinearDerecha{
+                text-align: right;
+            }
+            .grayColor{
+                background-color:#3b3131 !important;
+            }
+            .ui-datatable .ui-datatable-tablewrapper table tbody .ui-state-highlight > td, 
+            .ui-datatable-scrollable table tbody .ui-state-highlight > td {
+                background-color: #fd872f;
+            }
+            .ui-button-text-only .ui-button-text {
+                padding: 5px 5px 5px 5px !important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content" id="contenido">   
+        <p:growl id="messages" showDetail="true" life="8000"/>
+        <p:layout id="layoutPrg" style="min-width:98%;min-height:100%;">
+            <p:layoutUnit id="layoutTotalKm" position="north" size="320"  header="Total KM (Metros)"
+                          resizable="true" collapsible="true" collapsed="true">
+                <h:form id="frmConciliacion">
+                    <div align="center">
+                        <h:panelGrid columns="2" id="pGridResumen" 
+                                     class="ui-noborder">
+                            <p:panelGrid class="ui-noborder" id="pGridData">  
+                                <f:facet name="header">  
+                                    <p:row>  
+                                        <p:column></p:column>  
+                                        <p:column style="font-weight: bold;">ART</p:column>  
+                                        <p:column style="font-weight: bold;">BI</p:column>  
+                                        <p:column style="font-weight: bold;">TOTAL</p:column>  
+                                    </p:row>  
+                                </f:facet>
+                                <p:row>  
+                                    <p:column style="font-weight: bold;">  
+                                        Comerciales programados
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha"
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.mcomArtPrg != null ? prgTcResumenBean.prgTcResumen.mcomArtPrg :0}"/>   
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha" 
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.mcomBiPrg != null ? prgTcResumenBean.prgTcResumen.mcomBiPrg :0}"/>  
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha" 
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.mcomPrg!= null ? prgTcResumenBean.prgTcResumen.mcomPrg :0}"/>  
+                                    </p:column>
+                                </p:row>
+                                <p:row>  
+                                    <p:column style="font-weight: bold;">  
+                                        Vacios programados
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha"
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.mhlpArtPrg!= null ? prgTcResumenBean.prgTcResumen.mhlpArtPrg :0}"/> 
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha" 
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.mhlpBiPrg!= null ? prgTcResumenBean.prgTcResumen.mhlpBiPrg :0}"/>  
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha"
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.mhlpProg!= null ? prgTcResumenBean.prgTcResumen.mhlpProg :0}"/>  
+                                    </p:column>
+                                </p:row>
+                                <p:row>  
+                                    <p:column style="font-weight: bold;">  
+                                        Adicionales
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha" 
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.madicArt!= null ? prgTcResumenBean.prgTcResumen.madicArt :0}"/>   
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha" 
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.madicBi!= null ? prgTcResumenBean.prgTcResumen.madicBi :0}"/>  
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha"
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.b_Adicionales!= null ? prgTcResumenBean.b_Adicionales :0}"/>  
+                                    </p:column>
+                                </p:row>
+                                <p:row>  
+                                    <p:column style="font-weight: bold;">  
+                                        Eliminados
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha" 
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.melimArt!= null ? prgTcResumenBean.prgTcResumen.melimArt :0}"/>   
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha" 
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.prgTcResumen.melimBi!= null ? prgTcResumenBean.prgTcResumen.melimBi :0}"/>  
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha"
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.b_Eliminados!= null ? prgTcResumenBean.b_Eliminados :0}"/>  
+                                    </p:column>
+                                </p:row>
+                                <p:separator />
+                                <p:row>  
+                                    <p:column style="font-weight: bold;">  
+                                        Conciliado
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       inputStyleClass="alinearDerecha" 
+                                                       padControl="false"
+                                                       value="#{prgTcResumenBean.b_Total_Art}"/>   
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber 
+                                            readonly="true" 
+                                            padControl="false"
+                                            inputStyleClass="alinearDerecha" 
+                                            value="#{prgTcResumenBean.b_Total_Bi}"/>  
+                                    </p:column>  
+                                    <p:column>  
+                                        <p:inputNumber readonly="true" 
+                                                       padControl="false"
+                                                       inputStyleClass="alinearDerecha" 
+                                                       value="#{prgTcResumenBean.b_Total}"/>  
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>
+                            <h:panelGrid columns="1" 
+                                         class="ui-noborder"
+                                         style="margin: 10px">
+                                <p:commandButton id="btnGetResumenKm"
+                                                 title="Traer consolidado" 
+                                                 icon="fa fa-sign-in"
+                                                 actionListener="#{prgTcResumenBean.getResumenKm()}"
+                                                 style="color: white;right: 5px ;margin-top: 10px;width: 150px"
+                                                 process="@this"
+                                                 value="Traer datos"
+                                                 update="frmConciliacion:pGridResumen,@this,messages,
+                                                 frmConciliacion:pGridEstado,btnGuardarConciliacionKm,btnDeshacerConciliacionKm,
+                                                 :tabResumen"/>
+                                <h:panelGrid class="ui-noborder" columns="1" id="pGridEstado">
+                                    <p:outputLabel value="Estado: " 
+                                                   rendered="#{prgTcResumenBean.prgTcResumen.conciliado == 0 or prgTcResumenBean.prgTcResumen.conciliado == 1 or prgTcResumenBean.prgTcResumen.conciliado eq 2}"/>
+                                    <h:outputText value="Conciliado" 
+                                                  style="color: green;font-weight: bold"
+                                                  rendered="#{prgTcResumenBean.prgTcResumen.conciliado == 1}"/>
+                                    <h:outputText value="Sin conciliar" 
+                                                  style="color: red;font-weight: bold"
+                                                  rendered="#{(prgTcResumenBean.prgTcResumen.conciliado == 0 or prgTcResumenBean.prgTcResumen.conciliado eq 2 ) and prgTcResumenBean.flagConciliacion}"/>
+                                </h:panelGrid>
+
+                                <p:commandButton id="btnGuardarConciliacionKm"
+                                                 title="Guardar conciliación" 
+                                                 icon="fa fa-sign-out"
+                                                 actionListener="#{prgTcResumenBean.guardarConciliacion()}"
+                                                 style="color: white;right: 5px ;margin-top: 10px;width: 150px"
+                                                 process="@this"
+                                                 rendered="#{(prgTcResumenBean.prgTcResumen.conciliado eq 0 or prgTcResumenBean.prgTcResumen.conciliado eq 2) and prgTcResumenBean.flagConciliacion}"
+                                                 value="Guardar conciliación"
+                                                 update="frmConciliacion:pGridResumen,
+                                                 frmConciliacion:pGridData,@this,
+                                                 messages,frmConciliacion:pGridEstado,
+                                                 :tabResumen">
+                                    <p:confirm header="Confirmación"
+                                               message="Ésta seguro de guardar los datos de la conciliación?" 
+                                               icon="fa fa-exclamation-triangle"/>
+                                </p:commandButton>
+
+                                <p:commandButton id="btnDeshacerConciliacionKm"
+                                                 title="Deshacer conciliación" 
+                                                 icon="fa fa-sign-out"
+                                                 actionListener="#{prgTcResumenBean.deshacerConciliacion()}"
+                                                 style="color: white;right: 5px ;margin-top: 10px;width: 150px"
+                                                 process="@this"
+                                                 rendered="#{prgTcResumenBean.prgTcResumen.conciliado eq 1 and !prgTcResumenBean.flagConciliacion}"
+                                                 value="Deshacer conciliación"
+                                                 oncomplete="#{prgTcResumenBean.getResumenKm()}"
+                                                 update="frmConciliacion:pGridResumen,
+                                                 frmConciliacion:pGridData,@this,
+                                                 messages,frmConciliacion:pGridEstado,
+                                                 :tabResumen">
+                                    <p:confirm header="Confirmación"
+                                               message="Ésta seguro de deshacer la conciliación?" 
+                                               icon="fa fa-exclamation-triangle"/>
+                                </p:commandButton>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </div>
+                </h:form>
+            </p:layoutUnit>
+
+            <p:layoutUnit position="center" collapsed="false"
+                          style="min-width:98%;min-height:90%;">
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Resúmen de Km (Metros)
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <h:form id="frmSelect">
+                                    <p:selectOneMenu 
+                                        styleClass="custom-filter" 
+                                        filter="true" 
+                                        value="#{prgTcResumenBean.idGopUnidadFuncional}"
+                                        rendered="#{prgTcResumenBean.flagListaUF}"
+                                        filterMatchMode="contains" 
+                                        style="width: 99.999%" title="Seleccione Uno..">
+                                        <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                      itemValue="#{0}"
+                                                      itemDescription="Seleccione Uno.."/>
+                                        <f:selectItems value="#{prgTcResumenBean.lstUnidadesFuncionales}"
+                                                       var="uf" itemLabel="#{uf.nombre}"
+                                                       itemValue="#{uf.idGopUnidadFuncional}"/>
+                                        <p:ajax process="@this" listener="#{prgTcResumenBean.selectDateIzquierda()}"
+                                                update="tabResumen:tabResumenFechas
+                                                tabResumen:frmIzquierda,
+                                                tabResumen:frmDerecha,
+                                                :frmConciliacion:pGridEstado,
+                                                messages"/>
+                                    </p:selectOneMenu>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:panel style="min-width:98%;min-height:90%;">
+                    <p:tabView id="tabResumen" dynamic="true" cache="true" 
+                               activeIndex="#{prgControlTableMB.activeIndex}">
+
+                        <p:ajax event="tabChange" 
+                                listener="#{prgTcResumenBean.onChange}"/>
+
+                        <p:tab title="Liquidación Diaria" id="liqDiaria">
+                            <div class="ui-fluid" >
+                                <div class="ui-g" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0"  jsf:id="tabResumenFechas">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3 " jsf:id="pGridFechas">
+                                            <div class="ui-g-12 ui-md-1 ui-lg-1 Padding3" >
+                                            </div>
+                                            <div class="ui-g-12 ui-md-1 ui-lg-1 Padding3" align="right">
+
+                                                <p:commandButton 
+                                                    icon="fa fa-angle-double-left"
+                                                    style="font-size: 20px"
+                                                    actionListener="#{prgTcResumenBean.llenarFechasAnterior()}"
+                                                    update="pGridFechas"
+                                                    class="cssWhite"/>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-2 ui-lg-1 Padding3 " >
+
+                                                <p:commandButton
+                                                    value="LUNES &#10;#{prgTcResumenBean.b1}"
+                                                    actionListener="#{prgTcResumenBean.onClickBtn(prgTcResumenBean.b1)}"
+                                                    update="tabResumenFechas,
+                                                    tabResumen:frmIzquierda,
+                                                    tabResumen:frmDerecha,
+                                                    messages"
+                                                    style="white-space: pre;"
+                                                    class="cssWhite #{prgTcResumenBean.asignarColor(prgTcResumenBean.b1)}">
+                                                </p:commandButton>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-2 ui-lg-1 Padding3">
+
+                                                <p:commandButton value="MARTES &#10;#{prgTcResumenBean.b2}"
+                                                                 actionListener="#{prgTcResumenBean.onClickBtn(prgTcResumenBean.b2)}"
+                                                                 update="tabResumenFechas,
+                                                                 tabResumen:frmIzquierda,
+                                                                 tabResumen:frmDerecha,
+                                                                 messages"
+                                                                 style="white-space: pre;"
+                                                                 class="cssWhite #{prgTcResumenBean.asignarColor(prgTcResumenBean.b2)}">
+                                                </p:commandButton>
+                                            </div>
+
+                                            <div class="ui-g-6 ui-md-3 ui-lg-2 Padding3">
+
+                                                <p:commandButton value="MIERCOLES &#10;#{prgTcResumenBean.b3}"
+                                                                 actionListener="#{prgTcResumenBean.onClickBtn(prgTcResumenBean.b3)}"
+                                                                 update="tabResumenFechas,
+                                                                 tabResumen:frmIzquierda,
+                                                                 tabResumen:frmDerecha,
+                                                                 messages"
+                                                                 style="white-space: pre;"
+                                                                 class="cssWhite #{prgTcResumenBean.asignarColor(prgTcResumenBean.b3)}"
+                                                                 >
+                                                </p:commandButton>
+                                            </div>
+
+                                            <div class="ui-g-6 ui-md-2 ui-lg-1 Padding3">
+
+                                                <p:commandButton value="JUEVES &#10;#{prgTcResumenBean.b4}"
+                                                                 actionListener="#{prgTcResumenBean.onClickBtn(prgTcResumenBean.b4)}"
+                                                                 update="tabResumenFechas,
+                                                                 tabResumen:frmIzquierda,
+                                                                 tabResumen:frmDerecha,
+                                                                 messages"
+                                                                 style="white-space: pre;"
+                                                                 class="cssWhite #{prgTcResumenBean.asignarColor(prgTcResumenBean.b4)}"
+                                                                 >
+                                                </p:commandButton>
+                                            </div>
+
+                                            <div class="ui-g-6 ui-md-2 ui-lg-1 Padding3">
+
+                                                <p:commandButton value="VIERNES &#10;#{prgTcResumenBean.b5}"
+                                                                 actionListener="#{prgTcResumenBean.onClickBtn(prgTcResumenBean.b5)}"
+                                                                 update="tabResumenFechas,
+                                                                 tabResumen:frmIzquierda,
+                                                                 tabResumen:frmDerecha,
+                                                                 messages"
+                                                                 style="white-space: pre;"
+                                                                 class="cssWhite #{prgTcResumenBean.asignarColor(prgTcResumenBean.b5)}"
+                                                                 >
+                                                </p:commandButton>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-2 ui-lg-1 Padding3">
+
+                                                <p:commandButton value="SÁBADO &#10;#{prgTcResumenBean.b6}"
+                                                                 actionListener="#{prgTcResumenBean.onClickBtn(prgTcResumenBean.b6)}"
+                                                                 update="tabResumenFechas,
+                                                                 tabResumen:frmIzquierda,
+                                                                 tabResumen:frmDerecha,
+                                                                 messages"
+                                                                 style="white-space: pre;"
+                                                                 class="cssWhite #{prgTcResumenBean.asignarColor(prgTcResumenBean.b6)}">
+                                                </p:commandButton>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-2 ui-lg-1 Padding3">
+
+                                                <p:commandButton value="DOMINGO &#10;#{prgTcResumenBean.b7}"
+                                                                 actionListener="#{prgTcResumenBean.onClickBtn(prgTcResumenBean.b7)}"
+                                                                 update="tabResumenFechas,
+                                                                 tabResumen:frmIzquierda,
+                                                                 tabResumen:frmDerecha,
+                                                                 messages"
+                                                                 style="white-space: pre;"
+                                                                 class="cssWhite #{prgTcResumenBean.asignarColor(prgTcResumenBean.b7)} TexAlCenter"
+                                                                 >
+                                                </p:commandButton>
+                                            </div>
+
+                                            <div class="ui-g-12 ui-md-1 ui-lg-1 Padding3" align="left">
+
+                                                <p:commandButton 
+                                                    icon="fa fa-angle-double-right"
+                                                    style="font-size: 20px"
+                                                    actionListener="#{prgTcResumenBean.llenarFechasSiguiente()}"
+                                                    update="pGridFechas,:messages"
+                                                    disabled="#{prgTcResumenBean.validarFechaSiguiente()}"
+                                                    class="cssWhite">
+                                                </p:commandButton>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-1 ui-lg-1 Padding3" >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p:separator/>
+                            <div class="ui-fluid" >
+                                <div class="ui-g" >
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                        <h:form id="frmIzquierda">
+                                            <p:remoteCommand name="asignarDistancia" 
+                                                             action="#{prgTcResumenBean.asignarDistanciaIzquierda}"
+                                                             update="dtPrgtcIzquierda,paramIzquierda,:messages,:frmConciliacion"/>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="paramIzquierda">
+                                                <div class="ui-g-12 ui-md-5 ui-lg-3 Padding3" >
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Fecha a conciliar: "/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:calendar id="fechaIzquierda" 
+                                                                    pattern="dd-MM-yyyy"
+                                                                    value="#{prgTcResumenBean.fechaIzquierda}"
+                                                                    showOn="button" 
+                                                                    maxdate="today"
+                                                                    placeholder="Seleccione fecha"
+                                                                    locale="es"
+                                                                    readonlyInput="true"
+                                                                    required="true"
+                                                                    requiredMessage="Debe seleccionar una fecha"
+                                                                    showTodayButton="true"
+                                                                    navigator="true"
+                                                                    >
+                                                            <p:ajax event="dateSelect" listener="#{prgTcResumenBean.selectDateIzquierda()}"
+                                                                    update="tabResumen:tabResumenFechas
+                                                                    tabResumen:frmIzquierda,
+                                                                    tabResumen:frmDerecha,
+                                                                    :frmConciliacion:pGridEstado,
+                                                                    paramIzquierda,
+                                                                    messages"
+                                                                    />
+                                                        </p:calendar>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3" >
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Tipo vehículo: " for="console"/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:selectOneMenu id="console"
+                                                                         value="#{prgTcResumenBean.tipoVehiculoIzq}">
+                                                            <f:selectItem itemLabel="Todos" itemValue="0" />
+                                                            <f:selectItem itemLabel="Art" itemValue="1" />
+                                                            <f:selectItem itemLabel="Bi" itemValue="2" />
+
+                                                            <p:ajax event="change"
+                                                                    listener="#{prgTcResumenBean.obtenerTvIzquierda}"
+                                                                    update="@form"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-4 ui-lg-3 Padding3" >
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Tipo servicio: " for="tipo_servicio_izquierda"/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:selectOneMenu id="tipo_servicio_izquierda"
+                                                                         value="#{prgTcResumenBean.tipoServicioIzq}">
+                                                            <f:selectItem itemLabel="Todos" itemValue="0" />
+                                                            <f:selectItem itemLabel="Adicionales" itemValue="3" />
+                                                            <f:selectItem itemLabel="Eliminados" itemValue="5" />
+                                                            <p:ajax event="change"
+                                                                    listener="#{prgTcResumenBean.obtenerTsIzquierda}" 
+                                                                    update="pGridBotones
+                                                                    paramIzquierda"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3" jsf:id="pGridDistancia">
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Distancia: "/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:inputNumber id="distance"
+                                                                       value="#{prgTcResumenBean.b_Distancia}"
+                                                                       minValue="0"
+                                                                       required="true"
+                                                                       requiredMessage="Debe ingresar una distancia"
+                                                                       readonly="#{not(prgTcResumenBean.lstDistance.size() gt 0) }"
+                                                                       onkeypress="if (event.keyCode === 13) {
+                                                                                   asignarDistancia();
+                                                                                   return false;
+
+                                                                               }"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Seleccionados: "/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" align="center">
+                                                        <p:outputLabel value="#{prgTcResumenBean.lstDistance.size()}"
+                                                                       styleClass="cssBlack Fs20"/>
+                                                    </div>
+                                                </div>
+                                                <div class="EmptyBox10"/>
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="pGridBotones">
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding3" >
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                            &nbsp;
+                                                        </div>
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                            <p:commandButton icon="fa fa-plus" class="cssWhite" 
+                                                                             value="Adicionar servicio"
+                                                                             action="#{prgTcResumenBean.nuevo()}"
+                                                                             update=":frmAddServicio,:modalAddServicio"
+                                                                             rendered="#{(prgTcResumenBean.lstPrgTcIzquierda.size() gt 0 and prgTcResumenBean.lstPrgTcDerecha.size() gt 0) and prgTcResumenBean.tipoServicioIzq == 3 or prgTcResumenBean.tipoServicioDer == 3 or prgTcResumenBean.tipoServicioIzq == 0 or prgTcResumenBean.flagConciliacion}"
+                                                                             oncomplete="PF('addServicio').show();"
+                                                                             title="Adicionar servicio"
+                                                                             >
+                                                                <p:resetInput target=":frmAddServicio:pGrid,:frmAddServicio:pGrid2"/>
+                                                            </p:commandButton>
+                                                        </div>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding3" >
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                            &nbsp;
+                                                        </div>
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                            <p:commandButton icon="fa fa-plus" class="cssWhite" 
+                                                                             value="Reasignar tarea"
+                                                                             id="btnReasignar"
+                                                                             action="#{prgTcResumenBean.setCodVehiculo('')}"
+                                                                             update=":frmReasignarTarea,:modalReasignarTarea"
+                                                                             rendered="#{prgTcResumenBean.lstDistance.size() gt 0}"
+                                                                             oncomplete="PF('ReasignarTarea').show();"
+                                                                             title="Reasignar tarea"
+                                                                             >
+                                                                <p:resetInput target=":frmReasignarTarea:pGrid"/>
+                                                            </p:commandButton>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="ui-g-12 ui-md-8 ui-lg-5 Padding3" jsf:id="pGridDistanciaTM">
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                                <p:outputLabel value="TM: "/>
+                                                            </div>
+                                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                                <p:inputNumber value="#{prgTcResumenBean.b_DistanciaTm}"
+                                                                               onkeypress="if (event.keyCode === 13) {
+                                                                                           return false;
+
+                                                                                       }">
+                                                                    <p:ajax listener="#{prgTcResumenBean.b_Distancia.subtract(prgTcResumenBean.b_DistanciaTm)}"
+                                                                            update="diferencia"/>
+                                                                </p:inputNumber>
+                                                            </div>
+                                                        </div>
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+
+                                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.lstDistance.size() gt 0}">
+                                                                <p:outputLabel value="Diferencia: "/>
+                                                            </div>
+                                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.lstDistance.size() gt 0}">
+
+                                                                <p:inputNumber value="#{prgTcResumenBean.b_Distancia.subtract(prgTcResumenBean.b_DistanciaTm)}"
+                                                                               readonly="true"
+                                                                               id="diferencia"
+                                                                               onkeypress="if (event.keyCode === 13) {
+                                                                                           return false;
+
+                                                                                       }"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p:dataTable var="prgtc" value="#{prgTcResumenBean.lstPrgTcIzquierda}"
+                                                         id="dtPrgtcIzquierda"
+                                                         rowIndexVar="nroFila"
+                                                         reflow="true"
+                                                         selection="#{prgTcResumenBean.lstDistance}"
+                                                         rowSelectMode="new"
+                                                         filterDelay="1700"
+                                                         rows="500"
+                                                         editable="true" 
+                                                         scrollable="true" scrollHeight="600"
+                                                         editMode="cell" 
+                                                         widgetVar="cellIzq"
+                                                         paginator="true"
+                                                         rowStyleClass="#{prgtc == prgTcResumenBean.selected ? 'adicionalesEdit' : prgTcResumenBean.colores(prgtc)}"
+                                                         rowKey="#{prgtc.idPrgTc}"
+                                                         rowsPerPageTemplate="1000,3000,10000"
+                                                         emptyMessage="No existe Tabla Control para la fecha indicada">
+                                                <f:facet name="header">
+                                                    <div align="right" >
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="xlsx" 
+                                                                            target="dtPrgtcIzquierda" 
+                                                                            fileName="servicios #{now}"
+                                                                            postProcessor="#{prgTcResumenBean.postProcessXLS}"/>
+                                                        </h:commandLink>
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                                                 alt="pdf" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="pdf" target="dtPrgtcIzquierda" fileName="servicios #{now}" />
+                                                        </h:commandLink>
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                                                 alt="csv" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="csv" target="dtPrgtcIzquierda" fileName="servicios #{now}"/>
+                                                        </h:commandLink>
+                                                    </div>
+                                                </f:facet>
+                                                <p:ajax event="filter" listener="#{prgTcResumenBean.filterListenerIzq}"/>
+                                                <p:column headerText="Bus" 
+                                                          filterBy="#{prgtc.idVehiculo.codigo}"
+                                                          filterMatchMode="contains" width="50">
+                                                    <h:outputText value="#{prgtc.idVehiculo.codigo}" 
+                                                                  style="font-size: 12px; text-align: center"
+                                                                  class="cssWhite"
+                                                                  id="vehiculo"/>
+                                                    <p:tooltip id="toolTipFade" for="vehiculo" style="width: 30vh">
+                                                        <h:outputText value="Responsable: #{prgtc.idPrgTcResponsable.responsable}" style="font-size: 13px"/>
+                                                        <br/>
+                                                        <h:outputText value="Observación: #{prgtc.observaciones}" style="font-size: 13px"/>
+                                                        <br/>
+                                                        <h:outputText value="Control: #{prgtc.control}" style="font-size: 13px"/>
+                                                    </p:tooltip>
+                                                </p:column>
+                                                <p:column headerText="H.ini" width="50">
+                                                    <h:outputText value="#{prgtc.timeOrigin}"
+                                                                  class="cssWhite"
+                                                                  style="font-size: 12px;"/>
+                                                </p:column>
+                                                <p:column headerText="H.fin" width="50">
+                                                    <h:outputText value="#{prgtc.timeDestiny}" 
+                                                                  class="cssWhite"
+                                                                  style="font-size: 12px;"/>
+                                                </p:column>
+                                                <p:column headerText="Servicio" 
+                                                          filterBy="#{prgtc.idRuta.name}"
+                                                          filterMatchMode="contains"
+                                                          width="90">
+                                                    <h:outputText value="#{prgtc.idRuta.name}" 
+                                                                  rendered="#{prgtc.idRuta != null}"
+                                                                  class="cssWhite"
+                                                                  style="font-size: 12px;"
+                                                                  />
+                                                    <h:outputText value="No tiene" 
+                                                                  rendered="#{prgtc.idRuta == null}" 
+                                                                  class="cssWhite"
+                                                                  style="font-size: 12px;"
+                                                                  />
+                                                </p:column>
+                                                <p:column headerText="Tarea">
+                                                    <h:outputText value="#{prgtc.idTaskType.tarea}"
+                                                                  class="cssWhite"
+                                                                  style="font-size: 12px;"
+                                                                  title="#{prgtc.idTaskType.tarea}"/>
+                                                </p:column>
+                                                <p:column headerText="Punto Ini"
+                                                          width="90">
+                                                    <h:outputText value="#{prgtc.fromStop.name}"
+                                                                  class="cssWhite"
+                                                                  style="font-size: 12px;"/>
+                                                </p:column>
+                                                <p:column headerText="Punto Fin"
+                                                          width="90">
+                                                    <h:outputText value="#{prgtc.toStop.name}"
+                                                                  class="cssWhite"
+                                                                  style="font-size: 12px;"/>
+                                                </p:column>
+                                                <p:column headerText="Tabla" width="30"
+                                                          filterBy="#{prgtc.tabla}"
+                                                          filterMatchMode="exact"
+                                                          style="text-align: center">
+                                                    <h:outputText value="#{prgtc.tabla}" 
+                                                                  class="cssWhite"
+                                                                  style="font-size: 12px;"/>
+                                                </p:column>
+                                                <p:column headerText="Distancia"
+                                                          style="text-align: center"
+                                                          selectRow="false"
+                                                          width="60">
+                                                    <p:cellEditor id="modelInput" disabled="#{prgtc.estadoOperacion eq 0 or prgtc.estadoOperacion eq 1 or prgtc.estadoOperacion eq 2 or prgtc.estadoOperacion eq 99}">
+                                                        <f:facet name="output">
+                                                            <h:outputText value="#{prgtc.distance}" 
+                                                                          class="cssWhite"
+                                                                          style="font-size: 12px;">
+                                                                <f:converter converterId="javax.faces.Long"/>
+                                                            </h:outputText>
+                                                        </f:facet>
+                                                        <f:facet name="input">
+                                                            <p:inputText  maxlength="8"
+                                                                          rendered="#{not(prgtc.estadoOperacion eq 0 or prgtc.estadoOperacion eq 1 or prgtc.estadoOperacion eq 2 or prgtc.estadoOperacion eq 99) }"
+                                                                          value="#{prgTcResumenBean.c_operacionDistancia}" 
+                                                                          style="width:96%">
+                                                                <p:keyFilter regEx="/[+-=1234567890]/i"/> 
+                                                            </p:inputText>
+                                                        </f:facet>
+                                                    </p:cellEditor>
+                                                </p:column>
+                                                <p:column headerText="Responsable" 
+                                                          style="text-align: center">
+                                                    <h:outputText value="#{prgtc.idPrgTcResponsable.responsable}" 
+                                                                  class="cssWhite"
+                                                                  title="#{prgtc.idPrgTcResponsable.responsable}"
+                                                                  style="font-size: 12px;"/>
+                                                </p:column>
+                                                <p:column headerText="Tipo" exportable="true" rendered="true">
+                                                    <h:outputText value="Adicional" 
+                                                                  title="Adicional"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtc.estadoOperacion eq 3 or prgtc.estadoOperacion eq 4 or prgtc.estadoOperacion eq 6}"/>
+                                                    <h:outputText value="Prog"
+                                                                  title="Programado"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtc.estadoOperacion eq 0 }"/>
+                                                    <h:outputText value="Adic_Elim"
+                                                                  title="Adicional Eliminado"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtc.estadoOperacion eq 99 }"/>
+                                                    <h:outputText value="Eliminado"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtc.estadoOperacion eq 5 or prgtc.estadoOperacion eq 8 }"/>
+                                                    <h:outputText value="Ejecutado"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtc.estadoOperacion eq 1 or prgtc.estadoOperacion eq 2 }"/>
+                                                </p:column>
+
+                                                <p:column selectionMode="multiple" selectRow="true" style="width: 20px;text-align:center " 
+                                                          exportable="false">
+                                                </p:column>
+
+                                                <p:ajax event="rowSelect" 
+                                                        listener="#{prgTcResumenBean.calcularDistancia()}" 
+                                                        update="tabResumen:frmIzquierda:paramIzquierda,
+                                                        ,tabResumen:frmIzquierda:btnReasignar,
+                                                        tabResumen:frmIzquierda:context_menu_izq,
+                                                        tabResumen:frmIzquierda:pGridDistanciaTM"/>
+                                                <p:ajax event="rowUnselect" 
+                                                        listener="#{prgTcResumenBean.calcularDistancia()}"
+                                                        update="tabResumen:frmIzquierda:paramIzquierda,
+                                                        tabResumen:frmIzquierda:btnReasignar,
+                                                        tabResumen:frmIzquierda:context_menu_izq,
+                                                        tabResumen:frmIzquierda:pGridDistanciaTM"/>
+                                                <p:ajax event="rowSelectCheckbox" 
+                                                        listener="#{prgTcResumenBean.calcularDistancia()}" 
+                                                        update="tabResumen:frmIzquierda:paramIzquierda,
+                                                        ,tabResumen:frmIzquierda:btnReasignar,
+                                                        tabResumen:frmIzquierda:context_menu_izq,
+                                                        tabResumen:frmIzquierda:pGridDistanciaTM"/>
+                                                <p:ajax event="rowUnselectCheckbox" 
+                                                        listener="#{prgTcResumenBean.calcularDistancia()}"
+                                                        update="tabResumen:frmIzquierda:paramIzquierda,
+                                                        tabResumen:frmIzquierda:btnReasignar,
+                                                        tabResumen:frmIzquierda:context_menu_izq,
+                                                        tabResumen:frmIzquierda:pGridDistanciaTM"/>
+                                                <p:ajax event="toggleSelect" update="tabResumen:frmIzquierda:paramIzquierda
+                                                        ,tabResumen:frmIzquierda:btnReasignar,
+                                                        tabResumen:frmIzquierda:pGridDistanciaTM"
+                                                        listener="#{prgTcResumenBean.calcularDistancia()}"/>
+                                                <p:ajax event="cellEdit" listener="#{prgTcResumenBean.onCellEdit}" 
+                                                        update="tabResumen:frmIzquierda:dtPrgtcIzquierda,
+                                                        :messages,modelInput,
+                                                        :frmConciliacion:pGridResumen,
+                                                        tabResumen:frmIzquierda:paramIzquierda,
+                                                        tabResumen:frmIzquierda:pGridDistancia,
+                                                        :frmConciliacion:pGridData,
+                                                        :frmConciliacion:pGridEstado" />
+
+                                                <f:facet name="footer">
+                                                    En total existen #{prgTcResumenBean.lstPrgTcIzquierda.size()} registros.
+                                                    <div align="right">
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="xlsx" target="dtPrgtcIzquierda" fileName="servicios #{now}"
+                                                                            postProcessor="#{prgTcResumenBean.postProcessXLS}"/>
+                                                        </h:commandLink>
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                                                 alt="pdf" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="pdf" target="dtPrgtcIzquierda" fileName="servicios #{now}" />
+                                                        </h:commandLink>
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                                                 alt="csv" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="csv" target="dtPrgtcIzquierda" fileName="servicios #{now}"/>
+                                                        </h:commandLink>
+                                                    </div>
+                                                </f:facet>
+                                            </p:dataTable>
+                                            <p:contextMenu for="dtPrgtcIzquierda" id="context_menu_izq" rendered="true">
+                                                <p:menuitem value="Debe seleccionar un servicio" disabled="true"
+                                                            rendered="#{prgTcResumenBean.selected == null}"
+                                                            icon="fa fa-warn" styleClass="eliminados cssWhite">
+                                                </p:menuitem>
+                                                <p:menuitem value="Editar"
+                                                            action="#{prgTcResumenBean.editar()}"
+                                                            update=":frmAddServicio,:modalAddServicio" 
+                                                            icon="fa fa-pencil" 
+                                                            rendered="#{prgTcResumenBean.selected != null and not(prgTcResumenBean.selected.estadoOperacion eq 0 or prgTcResumenBean.selected.estadoOperacion eq 1 or prgTcResumenBean.selected.estadoOperacion eq 2 or prgTcResumenBean.selected.estadoOperacion eq 99)}"
+                                                            oncomplete="PF('addServicio').show();">
+                                                    <p:resetInput target=":frmAddServicio:pGrid,:frmAddServicio:pGrid2"/>
+                                                </p:menuitem>
+                                                <p:menuitem value="Cambiar responsable" 
+                                                            update=":frmCambiarResponsable" 
+                                                            icon="fa fa-hand-rock-o" 
+                                                            action="#{prgTcResumenBean.setI_codResponsable(0)}"
+                                                            rendered="#{prgTcResumenBean.selected.estadoOperacion eq 5 and prgTcResumenBean.tipoServicioIzq eq 5}"
+                                                            oncomplete="PF('cambiarResponsable').show()">
+                                                    <p:resetInput target=":frmCambiarResponsable"/>
+                                                </p:menuitem>
+                                                <p:menuitem value="Eliminar adicional" 
+                                                            update=":frmEliminarAdicional" 
+                                                            icon="fa fa-ban"
+                                                            action="#{prgTcResumenBean.setI_codResponsable(0)}"
+                                                            rendered="#{prgTcResumenBean.selected.estadoOperacion == 3 or prgTcResumenBean.selected.estadoOperacion == 4 or prgTcResumenBean.selected.estadoOperacion == 6}"
+                                                            oncomplete="PF('eliminarAdicional').show()">
+                                                    <p:resetInput target=":frmEliminarAdicional"/>
+                                                </p:menuitem>
+                                                <p:menuitem value="Eliminar programado" 
+                                                            update=":frmEliminarProgramado" 
+                                                            icon="fa fa-trash" 
+                                                            action="#{prgTcResumenBean.setI_codResponsable(0)}"
+                                                            rendered="#{prgTcResumenBean.selected.estadoOperacion == 0}"
+                                                            oncomplete="PF('eliminarProgramado').show()">
+                                                    <p:resetInput target=":frmEliminarAdicional"/>
+                                                </p:menuitem>
+                                                <p:menuitem value="Deshacer eliminado" 
+                                                            update=":frmDeshacerEliminado"
+                                                            icon="fa fa-retweet"
+                                                            rendered="#{prgTcResumenBean.selected.estadoOperacion == 5}"
+                                                            oncomplete="PF('deshacerEliminado').show()">
+                                                    <p:resetInput target=":frmDeshacerEliminado"/>
+                                                </p:menuitem>
+                                            </p:contextMenu>
+                                        </h:form>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                        <h:form id="frmDerecha">
+                                            <p:remoteCommand name="asignarDistanciaDerecha" 
+                                                             action="#{prgTcResumenBean.asignarDistanciaDerecha}"
+                                                             update="dtPrgtcDerecha,paramDerecha,:messages,:frmConciliacion"/>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="paramDerecha">
+                                                <div class="ui-g-12 ui-md-5 ui-lg-3 Padding3">
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Fecha a conciliar: "/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:calendar id="fechaDerecha" 
+                                                                    pattern="dd-MM-yyyy"
+                                                                    value="#{prgTcResumenBean.fechaIzquierda}"
+                                                                    showOn="button" 
+                                                                    maxdate="today"
+                                                                    disabled="true"
+                                                                    placeholder="Seleccione fecha"
+                                                                    locale="es"
+                                                                    readonlyInput="true"
+                                                                    required="true"
+                                                                    requiredMessage="Debe seleccionar una fecha"
+                                                                    showTodayButton="true"
+                                                                    navigator="true"
+                                                                    >
+                                                        </p:calendar>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Tipo vehículo: " for="tipo_vehiculo_derecha"/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:selectOneMenu id="tipo_vehiculo_derecha" 
+                                                                         value="#{prgTcResumenBean.tipoVehiculoDer}">
+                                                            <f:selectItem itemLabel="Todos" itemValue="0" />
+                                                            <f:selectItem itemLabel="Art" itemValue="1" />
+                                                            <f:selectItem itemLabel="Bi" itemValue="2" />
+
+                                                            <p:ajax event="change"
+                                                                    listener="#{prgTcResumenBean.obtenerTvDerecha}"
+                                                                    update="paramDerecha"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-4 ui-lg-3 Padding3">
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Tipo servicio: " for="tipo_servicio_derecha"/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:selectOneMenu id="tipo_servicio_derecha" 
+                                                                         value="#{prgTcResumenBean.tipoServicioDer}">
+                                                            <f:selectItem itemLabel="Todos" itemValue="0" />
+                                                            <f:selectItem itemLabel="Adicionales" itemValue="3" />
+                                                            <f:selectItem itemLabel="Eliminados" itemValue="5" />
+                                                            <p:ajax event="change"
+                                                                    listener="#{prgTcResumenBean.obtenerTsDerecha}" 
+                                                                    update="paramDerecha,tabResumen:frmIzquierda:pGridBotones"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Distancia: "/>   
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:inputNumber value="#{prgTcResumenBean.b_DistanciaDerecha}"
+                                                                       minValue="0"
+                                                                       required="true"
+                                                                       requiredMessage="Debe ingresar una distancia"
+                                                                       readonly="#{not(prgTcResumenBean.lstDistanceDerecha.size() gt 0) }"
+                                                                       onkeypress="if (event.keyCode === 13) {
+                                                                                   asignarDistanciaDerecha();
+                                                                                   return false;
+
+                                                                               }"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:outputLabel value="Seleccionados: "/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" align="center">
+                                                        <p:outputLabel value="#{prgTcResumenBean.lstDistanceDerecha.size()}"
+                                                                       styleClass="cssBlack Fs20"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="EmptyBox10"/>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="pGridBotonesDer">
+                                                <div class="ui-g-12 ui-md-6 ui-lg-4 Padding3" >
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        &nbsp;
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                        <p:commandButton icon="fa fa-plus" class="cssWhite" 
+                                                                         value="Reasignar tarea"
+                                                                         id="btnReasignarDer"
+                                                                         action="#{prgTcResumenBean.setCodVehiculo('')}"
+                                                                         update=":frmReasignarTareaDer,:modalReasignarTareaDer"
+                                                                         rendered="#{prgTcResumenBean.lstDistanceDerecha.size() gt 0}"
+                                                                         oncomplete="PF('ReasignarTareaDer').show();"
+                                                                         title="Reasignar tarea"
+                                                                         >
+                                                            <p:resetInput target=":frmReasignarTareaDer:pGrid"/>
+                                                        </p:commandButton>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-3 Padding3" >
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.lstPreconcialiado.size() gt 0 }">
+                                                        <p:outputLabel value="PC: "/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.lstPreconcialiado.size() gt 0 }">
+                                                        <p:inputNumber value="#{prgTcResumenBean.b_Preconcialiado}"
+                                                                       minValue="0"
+                                                                       readonly="true"
+                                                                       onkeypress="if (event.keyCode === 13) {
+                                                                                   return false;
+
+                                                                               }"/>
+                                                    </div>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-8 ui-lg-5 Padding3" jsf:id="pGridDistanciaTM">
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                            <p:outputLabel value="TM: "/>
+                                                        </div>
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                            <p:inputNumber value="#{prgTcResumenBean.b_DistanciaTmDer}"
+                                                                           onkeypress="if (event.keyCode === 13) {
+                                                                                       return false;
+                                                                                   }">
+                                                                <p:ajax listener="#{prgTcResumenBean.b_DistanciaDerecha.subtract(prgTcResumenBean.b_DistanciaTmDer)}"
+                                                                        update="diferencia"/>
+                                                            </p:inputNumber>
+                                                        </div>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.lstDistanceDerecha.size() gt 0}">
+                                                            <p:outputLabel value="Diferencia: " />
+                                                        </div>
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{prgTcResumenBean.lstDistanceDerecha.size() gt 0}">
+                                                            <p:inputNumber value="#{prgTcResumenBean.b_DistanciaDerecha.subtract(prgTcResumenBean.b_DistanciaTmDer)}"
+                                                                           readonly="true"
+                                                                           id="diferencia"
+                                                                           onkeypress="if (event.keyCode === 13) {
+                                                                                       return false;
+                                                                                   }" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p:dataTable var="prgtcDer" value="#{prgTcResumenBean.lstPrgTcDerecha}"
+                                                         id="dtPrgtcDerecha"
+                                                         rowIndexVar="nroFilaD"
+                                                         reflow="true"
+                                                         editable="true" 
+                                                         editMode="cell"
+                                                         widgetVar="cellDer"
+                                                         selection="#{prgTcResumenBean.lstDistanceDerecha}"
+                                                         rowSelectMode="new"
+                                                         filterDelay="1700"
+                                                         rows="500"
+                                                         paginator="true"
+                                                         scrollable="true" scrollHeight="600"
+                                                         rowKey="#{prgtcDer.idPrgTc}"
+                                                         rowStyleClass="#{prgtcDer == prgTcResumenBean.selected ? 'eliminadosEdit' : prgTcResumenBean.coloresDerecha(prgtcDer)}"
+                                                         rowsPerPageTemplate="1000,3000,10000"
+                                                         emptyMessage="No existe Tabla Control para la fecha indicada">
+                                                <f:facet name="header">
+                                                    <div align="right">
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="xlsx" 
+                                                                            target="dtPrgtcDerecha" 
+                                                                            fileName="servicios #{now}"
+                                                                            postProcessor="#{prgTcResumenBean.postProcessXLS}"/>
+                                                        </h:commandLink>
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                                                 alt="pdf" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="pdf" target="dtPrgtcDerecha" fileName="servicios #{now}" />
+                                                        </h:commandLink>
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                                                 alt="csv" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="csv" target="dtPrgtcDerecha" fileName="servicios #{now}"/>
+                                                        </h:commandLink>
+                                                    </div>
+                                                </f:facet>
+                                                <p:ajax event="filter" listener="#{prgTcResumenBean.filterListenerDer}"/>
+                                                <p:column headerText="Bus" 
+                                                          filterBy="#{prgtcDer.idVehiculo.codigo}"
+                                                          filterMatchMode="contains"
+                                                          width="40">
+                                                    <h:outputText value="#{prgtcDer.idVehiculo.codigo}" 
+                                                                  style="font-size: 12px; text-align: center" 
+                                                                  id="vehiculoDer"
+                                                                  class="cssWhite"/>
+                                                    <p:tooltip id="toolTipFade" for="vehiculoDer" style="width: 30vh">
+                                                        <h:outputText value="Responsable: #{prgtcDer.idPrgTcResponsable.responsable}" style="font-size: 13px"/>
+                                                        <br/>
+                                                        <h:outputText value="Observación: #{prgtcDer.observaciones}" style="font-size: 13px"/>
+                                                        <br/>
+                                                        <h:outputText value="Control: #{prgtcDer.control}" style="font-size: 13px"/>
+                                                    </p:tooltip>
+                                                </p:column>
+                                                <p:column headerText="H.ini"
+                                                          width="50">
+                                                    <h:outputText value="#{prgtcDer.timeOrigin}" 
+                                                                  style="font-size: 12px;"
+                                                                  class="cssWhite"/>
+                                                </p:column>
+                                                <p:column headerText="H.fin"
+                                                          width="50">
+                                                    <h:outputText value="#{prgtcDer.timeDestiny}" 
+                                                                  style="font-size: 12px;"
+                                                                  class="cssWhite"/>
+                                                </p:column>
+                                                <p:column headerText="Servicio" 
+                                                          filterBy="#{prgtcDer.idRuta.name}"
+                                                          filterMatchMode="contains"
+                                                          >
+                                                    <h:outputText value="#{prgtcDer.idRuta.name}" 
+                                                                  rendered="#{prgtcDer.idRuta != null}" 
+                                                                  style="font-size: 12px;"
+                                                                  class="cssWhite"
+                                                                  />
+                                                    <h:outputText value="No tiene" 
+                                                                  rendered="#{prgtcDer.idRuta == null}" 
+                                                                  style="font-size: 12px;"
+                                                                  class="cssWhite"
+                                                                  />
+                                                </p:column>
+                                                <p:column headerText="Tarea">
+                                                    <h:outputText value="#{prgtcDer.idTaskType.tarea}" 
+                                                                  style="font-size: 12px;"
+                                                                  class="cssWhite"
+                                                                  title="#{prgtcDer.idTaskType.tarea}"/>
+                                                </p:column>
+                                                <p:column headerText="Punto Ini"
+                                                          width="100" style="text-align: center">
+                                                    <h:outputText value="#{prgtcDer.fromStop.name}" 
+                                                                  style="font-size: 12px;"
+                                                                  class="cssWhite"/>
+                                                </p:column>
+                                                <p:column headerText="Punto Fin"
+                                                          width="100" style="text-align: center">
+                                                    <h:outputText value="#{prgtcDer.toStop.name}"
+                                                                  style="font-size: 12px;"
+                                                                  class="cssWhite"/>
+                                                </p:column>
+                                                <p:column headerText="Tabla" width="30"
+                                                          style="text-align: center"
+                                                          filterBy="#{prgtcDer.tabla}"
+                                                          filterMatchMode="exact">
+                                                    <h:outputText value="#{prgtcDer.tabla}" 
+                                                                  style="font-size: 12px;"
+                                                                  class="cssWhite"/>
+                                                </p:column>
+                                                <p:column headerText="Distancia"
+                                                          style="text-align: center"
+                                                          selectRow="false"
+                                                          width="60">
+                                                    <p:cellEditor id="modelInput" disabled="#{prgtcDer.estadoOperacion eq 0 or prgtcDer.estadoOperacion eq 1 or prgtcDer.estadoOperacion eq 2 or prgtcDer.estadoOperacion eq 99 }">
+                                                        <f:facet name="output">
+                                                            <h:outputText value="#{prgtcDer.distance}" 
+                                                                          id="modelOutPut"
+                                                                          style="font-size: 12px;"
+                                                                          class="cssWhite">
+                                                                <f:converter converterId="javax.faces.Long"/>
+                                                            </h:outputText>
+                                                        </f:facet>
+                                                        <f:facet name="input">
+                                                            <p:inputText rendered="#{not(prgtcDer.estadoOperacion eq 0 or prgtcDer.estadoOperacion eq 1 or prgtcDer.estadoOperacion eq 2 or prgtcDer.estadoOperacion eq 99) }"  
+                                                                         value="#{prgTcResumenBean.c_operacionDistancia}" 
+                                                                         style="width:96%">
+                                                                <p:keyFilter regEx="/[+-=1234567890]/i"/> 
+                                                            </p:inputText>
+                                                        </f:facet>
+                                                    </p:cellEditor>
+                                                </p:column>
+                                                <p:column headerText="Responsable" 
+                                                          style="text-align: center">
+                                                    <h:outputText value="#{prgtcDer.idPrgTcResponsable.responsable}" 
+                                                                  title="#{prgtcDer.idPrgTcResponsable.responsable}"
+                                                                  style="font-size: 12px;"
+                                                                  class="cssWhite"/>
+                                                </p:column>
+                                                <p:column headerText="Tipo" exportable="true" rendered="true">
+                                                    <h:outputText value="Adicional" 
+                                                                  title="Adicional"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtcDer.estadoOperacion eq 3 or prgtcDer.estadoOperacion eq 4 or prgtcDer.estadoOperacion eq 6}"/>
+                                                    <h:outputText value="Prog"
+                                                                  title="Programado"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtcDer.estadoOperacion eq 0 }"/>
+                                                    <h:outputText value="Adic_Elim"
+                                                                  title="Adicional Eliminado"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtcDer.estadoOperacion eq 99 }"/>
+                                                    <h:outputText value="Eliminado"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtcDer.estadoOperacion eq 5 or prgtc.estadoOperacion eq 8 }"/>
+                                                    <h:outputText value="Ejecutado"
+                                                                  class="cssWhite"
+                                                                  rendered="#{prgtcDer.estadoOperacion eq 1 or prgtc.estadoOperacion eq 2 }"/>
+                                                </p:column>
+                                                <p:column selectionMode="multiple" style="width:20px;text-align:center " 
+                                                          exportable="false">
+                                                </p:column>
+                                                <p:ajax event="rowSelect" 
+                                                        listener="#{prgTcResumenBean.calcularDistanciaDerecha()}" 
+                                                        update=":tabResumen:frmDerecha:paramDerecha,
+                                                        tabResumen:frmDerecha:context_menu_der,
+                                                        tabResumen:frmDerecha:pGridBotonesDer"/>
+                                                <p:ajax event="rowUnselect" 
+                                                        listener="#{prgTcResumenBean.calcularDistanciaDerecha()}"
+                                                        update=":tabResumen:frmDerecha:paramDerecha,
+                                                        tabResumen:frmDerecha:context_menu_der,
+                                                        tabResumen:frmDerecha:pGridBotonesDer"/>
+                                                <p:ajax event="rowSelectCheckbox" 
+                                                        listener="#{prgTcResumenBean.calcularDistanciaDerecha()}" 
+                                                        update=":tabResumen:frmDerecha:paramDerecha,
+                                                        tabResumen:frmDerecha:context_menu_der,
+                                                        tabResumen:frmDerecha:pGridBotonesDer"/>
+                                                <p:ajax event="rowUnselectCheckbox" 
+                                                        listener="#{prgTcResumenBean.calcularDistanciaDerecha()}"
+                                                        update=":tabResumen:frmDerecha:paramDerecha,
+                                                        tabResumen:frmDerecha:context_menu_der,
+                                                        tabResumen:frmDerecha:pGridBotonesDer"/>
+                                                <p:ajax event="toggleSelect" 
+                                                        update="tabResumen:frmDerecha:paramDerecha,
+                                                        tabResumen:frmDerecha:pGridBotonesDer,
+                                                        tabResumen:frmDerecha:pGridBotonesDer" 
+                                                        listener="#{prgTcResumenBean.calcularDistanciaDerecha()}"/>
+                                                <p:ajax event="cellEdit" listener="#{prgTcResumenBean.onCellEditDerecha}" 
+                                                        process="modelInput"
+                                                        update=":tabResumen:frmDerecha:paramDerecha,tabResumen:frmDerecha:dtPrgtcDerecha,:messages,
+                                                        modelInput,
+                                                        :frmConciliacion:pGridResumen,
+                                                        :frmConciliacion:pGridData,
+                                                        :frmConciliacion:pGridEstado" />
+
+                                                <f:facet name="footer">
+                                                    En total existen #{prgTcResumenBean.lstPrgTcDerecha.size()} registros.
+                                                    <div align="right">
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="xlsx" target="dtPrgtcDerecha" fileName="servicios eliminados #{now}"/>
+                                                        </h:commandLink>
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                                                 alt="pdf" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="pdf" target="dtPrgtcDerecha" fileName="servicios eliminados #{now}" />
+                                                        </h:commandLink>
+                                                        <h:commandLink>
+                                                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                                                 alt="csv" style="width: 24px;height: 24px"/>
+                                                            <p:dataExporter type="csv" target="dtPrgtcDerecha" fileName="servicios eliminados #{now}"/>
+                                                        </h:commandLink>
+                                                    </div>
+                                                </f:facet>
+                                            </p:dataTable>
+                                            <p:contextMenu for="dtPrgtcDerecha" id="context_menu_der" rendered="true">
+                                                <p:menuitem value="Debe seleccionar un servicio" disabled="true"
+                                                            rendered="#{prgTcResumenBean.selected == null}"
+                                                            styleClass="eliminados cssWhite"
+                                                            icon="fa fa-warn">
+                                                </p:menuitem>
+                                                <p:menuitem value="Editar"
+                                                            action="#{prgTcResumenBean.editar()}"
+                                                            update=":frmAddServicio,:modalAddServicio"
+                                                            oncomplete="PF('addServicio').show();"
+                                                            rendered="#{prgTcResumenBean.selected != null and not(prgTcResumenBean.selected.estadoOperacion eq 0 or prgTcResumenBean.selected.estadoOperacion eq 1 or prgTcResumenBean.selected.estadoOperacion eq 2 or prgTcResumenBean.selected.estadoOperacion eq 99)}"
+                                                            icon="fa fa-pencil">
+                                                    <p:resetInput target=":frmAddServicio:pGrid,:frmAddServicio:pGrid2"/>
+                                                </p:menuitem>
+                                                <p:menuitem value="Cambiar responsable" 
+                                                            update=":frmCambiarResponsable" 
+                                                            icon="fa fa-hand-rock-o" 
+                                                            action="#{prgTcResumenBean.setI_codResponsable(0)}"
+                                                            rendered="#{prgTcResumenBean.selected.estadoOperacion == 5 }"
+                                                            oncomplete="PF('cambiarResponsable').show()">
+                                                    <p:resetInput target=":frmCambiarResponsable"/>
+                                                </p:menuitem>
+                                                <p:menuitem value="Eliminar adicional" 
+                                                            update=":frmEliminarAdicional" 
+                                                            icon="fa fa-ban" 
+                                                            action="#{prgTcResumenBean.setI_codResponsable(0)}"
+                                                            rendered="#{prgTcResumenBean.selected.estadoOperacion == 3 or prgTcResumenBean.selected.estadoOperacion == 4 or prgTcResumenBean.selected.estadoOperacion == 6}"
+                                                            oncomplete="PF('eliminarAdicional').show()">
+                                                    <p:resetInput target=":frmEliminarAdicional"/>
+                                                </p:menuitem>
+                                                <p:menuitem value="Eliminar programado" 
+                                                            update=":frmEliminarProgramado" 
+                                                            icon="fa fa-trash" 
+                                                            action="#{prgTcResumenBean.setI_codResponsable(0)}"
+                                                            rendered="#{prgTcResumenBean.selected.estadoOperacion == 0}"
+                                                            oncomplete="PF('eliminarProgramado').show()">
+                                                    <p:resetInput target=":frmEliminarAdicional"/>
+                                                </p:menuitem>
+                                                <p:menuitem value="Deshacer eliminado" 
+                                                            update=":frmDeshacerEliminado"
+                                                            icon="fa fa-retweet"
+                                                            rendered="#{prgTcResumenBean.selected.estadoOperacion == 5}"
+                                                            oncomplete="PF('deshacerEliminado').show()">
+                                                    <p:resetInput target=":frmDeshacerEliminado"/>
+                                                </p:menuitem>
+                                            </p:contextMenu>
+                                        </h:form>
+                                    </div>
+                                </div>
+                            </div>
+                        </p:tab>
+                        <p:tab title="Resumen semanal (Metros)" id="tbResumenS"
+                               rendered="#{prgTcResumenBean.prgTcResumen != null}">
+                            <div align="center">
+                                <h:panelGrid columns="2" id="pGridResumenS" 
+                                             class="ui-noborder">
+                                    <p:dataTable var="res"
+                                                 reflow="true"
+                                                 value="#{prgTcResumenBean.lstResumenSem}"
+                                                 emptyMessage="No se han cargado los servicios">
+                                        <f:facet name="header">
+                                            Resúmen Semanal
+                                        </f:facet>
+                                        <p:columnGroup type="header">
+                                            <p:row>
+                                                <p:column rowspan="3" headerText="Día" />
+                                                <p:column colspan="16" headerText="Resúmen" />
+                                            </p:row>
+                                            <p:row>
+                                                <p:column colspan="2" headerText="Programados" />
+                                                <p:column colspan="2" headerText="Adicionales" />
+                                                <p:column colspan="2" headerText="Eliminados" />
+                                                <p:column colspan="2" headerText="Conciliado" />
+                                                <p:column colspan="2" headerText="Vacio Pago" />
+                                                <p:column colspan="2" headerText="Factor" width="30"/>
+                                                <p:column colspan="2" headerText="CONC+VAC PAGO" />
+                                                <p:column headerText="Total" />
+                                                <p:column width="4" headerText="Conciliado" />
+                                            </p:row>
+                                            <p:row>
+                                                <p:column headerText="ART" />
+                                                <p:column headerText="BI" />
+                                                <p:column headerText="ART" />
+                                                <p:column headerText="BI" />
+                                                <p:column headerText="ART" />
+                                                <p:column headerText="BI" />
+                                                <p:column headerText="ART" />
+                                                <p:column headerText="BI" />
+                                                <p:column headerText="ART" />
+                                                <p:column headerText="BI" />
+                                                <p:column headerText="ART" />
+                                                <p:column headerText="BI" />
+                                                <p:column headerText="ART" />
+                                                <p:column headerText="BI" />
+                                            </p:row>
+                                        </p:columnGroup>
+
+                                        <p:column>
+                                            <h:outputText value="#{res.fecha}" >
+                                                <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.mcomArtPrg)}" />
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.mcomBiPrg)}" />
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.madicArt)}" />
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.madicBi)}" />
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.melimArt)}">
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.melimBi)}">
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.mcomArtCon)}">
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.mcomBiCon)}">
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.hlpNoptArt)}"
+                                                          rendered="#{res.hlpNoptArt gt 0}">
+                                            </h:outputText>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.hlpOptArt)}"
+                                                          rendered="#{res.hlpOptArt gt 0}">
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.hlpNoptBi)}"
+                                                          rendered="#{res.hlpNoptBi gt 0}">
+                                            </h:outputText>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(res.hlpOptBi)}"
+                                                          rendered="#{res.hlpOptBi gt 0}">
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{res.factorArt}">
+                                                <f:convertNumber minFractionDigits="3" maxFractionDigits="5"/>
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{res.factorBi}">
+                                                <f:convertNumber minFractionDigits="3" maxFractionDigits="5"/>
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal((res.mcomArtPrg.add(res.madicArt).subtract(res.melimArt)).add(res.hlpNoptArt.multiply(res.factorArt)))}"
+                                                          rendered="#{res.hlpNoptArt gt 0 }">
+                                            </h:outputText>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal((res.mcomArtPrg.add(res.madicArt).subtract(res.melimArt)).add(res.hlpOptArt.multiply(res.factorArt)))}"
+                                                          rendered="#{res.hlpOptArt gt 0 }">
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal((res.mcomBiPrg.add(res.madicBi).subtract(res.melimBi)).add(res.hlpNoptBi.multiply(res.factorBi)))}"
+                                                          rendered="#{res.hlpNoptBi gt 0 }">
+                                            </h:outputText>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal((res.mcomBiPrg.add(res.madicBi).subtract(res.melimBi)).add(res.hlpOptBi.multiply(res.factorBi)))}"
+                                                          rendered="#{res.hlpOptBi gt 0 }"/>
+                                        </p:column>
+                                        <p:column>
+                                            <h:outputText value="#{prgTcResumenBean.formatearDecimal(prgTcResumenBean.obtenerTotal(res))}">
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Conciliado"
+                                                  width="4"
+                                                  styleClass="#{res.conciliado eq 1 ? 'adicionales': (res.conciliado eq 0 or res.conciliado eq 2 ) ? 'eliminados' : ''}">
+                                            <div align="center">
+                                                <h:outputText value="Si" rendered="#{res.conciliado == 1}"
+                                                              class="cssWhite"
+                                                              style="text-transform: uppercase"/>
+                                                <h:outputText value="No" rendered="#{res.conciliado != 1}"
+                                                              class="cssWhite"
+                                                              style="text-transform: uppercase"/>
+                                            </div>
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            <div align="right" jsf:id="totalSemana">
+                                                <b>Total semana: </b> #{prgTcResumenBean.formatearDecimal(prgTcResumenBean.b_TotalResSemana)}
+                                            </div>
+                                        </f:facet>
+                                    </p:dataTable>
+                                </h:panelGrid>
+                            </div>
+                        </p:tab>
+                        <p:tab title="Liquidación HLP" id="tbLiqHLP"
+                               rendered="#{prgTcResumenBean.prgTcResumen.conciliado eq 1}">
+                            <div align="center">
+                                <h:form id="frmtbLiqHLP">
+                                    <h:panelGrid id="pGridLiqHLP" 
+                                                 class="ui-noborder">
+                                        <p:panelGrid class="ui-noborder" id="pGridData">  
+                                            <f:facet name="header"> 
+                                                <p:columnGroup type="header">
+                                                    <p:row style="text-align: center">
+                                                        <p:column colspan="7" style="font-weight: bold">Liquidación</p:column>
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column rowspan="2"/>
+                                                        <p:column colspan="2" style="font-weight: bold;">Comerciales</p:column>  
+                                                        <p:column colspan="2" style="font-weight: bold;">HLP</p:column>  
+                                                        <p:column colspan="2" style="font-weight: bold;">Totales</p:column>  
+                                                    </p:row>
+                                                    <p:row>
+                                                        <p:column>ART</p:column>
+                                                        <p:column>BI</p:column>
+                                                        <p:column>ART</p:column>
+                                                        <p:column>BI</p:column>
+                                                        <p:column>Comerciales</p:column>
+                                                        <p:column>HLP</p:column>
+                                                    </p:row>
+                                                </p:columnGroup>
+                                            </f:facet>
+                                            <p:row>  
+                                                <p:column style="font-weight: bold;">  
+                                                    Km IPH
+                                                </p:column>  
+                                                <p:column>  
+                                                    <p:inputNumber  inputStyleClass="alinearDerecha" 
+                                                                    value="#{prgTcResumenBean.b_IPH_ComercialArt}"
+                                                                    thousandSeparator="."
+                                                                    decimalSeparator=","
+                                                                    decimalPlaces="3"
+                                                                    padControl="true"
+                                                                    required="true" requiredMessage="Ingrese valor"
+                                                                    onkeypress="if (event.keyCode === 13) {
+                                                                                return false;
+
+                                                                            }">
+                                                        <p:ajax listener="#{prgTcResumenBean.b_IPH_ComercialArt.add(prgTcResumenBean.b_IPH_ComercialBi)}" 
+                                                                update="totalComercialIPH,pGridData"/>
+                                                    </p:inputNumber>
+                                                </p:column>  
+                                                <p:column>  
+                                                    <p:inputNumber  inputStyleClass="alinearDerecha" 
+                                                                    padControl="true"
+                                                                    value="#{prgTcResumenBean.b_IPH_ComercialBi}"
+                                                                    thousandSeparator="."
+                                                                    decimalSeparator=","
+                                                                    decimalPlaces="3"
+                                                                    required="true" requiredMessage="Ingrese valor"
+                                                                    onkeypress="if (event.keyCode === 13) {
+                                                                                return false;
+
+                                                                            }">
+                                                        <p:ajax listener="#{prgTcResumenBean.b_IPH_ComercialArt.add(prgTcResumenBean.b_IPH_ComercialBi)}" 
+                                                                update="totalComercialIPH,pGridData"/>
+                                                    </p:inputNumber>
+                                                </p:column>  
+                                                <p:column>  
+                                                    <p:inputNumber  inputStyleClass="alinearDerecha" value="#{prgTcResumenBean.b_IPH_HlpArt}"
+                                                                    thousandSeparator="."
+                                                                    decimalSeparator=","
+                                                                    decimalPlaces="3"
+                                                                    padControl="true"
+                                                                    required="true" requiredMessage="Ingrese valor"
+                                                                    onkeypress="if (event.keyCode === 13) {
+                                                                                return false;
+
+                                                                            }">
+                                                        <p:ajax listener="#{prgTcResumenBean.b_IPH_HlpArt.add(prgTcResumenBean.b_IPH_HlpBi)}" 
+                                                                update="totalHlpIPH"/>
+                                                        <p:ajax listener="#{prgTcResumenBean.operar(prgTcResumenBean.b_IPH_ComercialArt, prgTcResumenBean.b_IPH_HlpArt)}" 
+                                                                update="opDistArt,pGridData"/>
+                                                    </p:inputNumber>
+                                                </p:column>
+                                                <p:column>  
+                                                    <p:inputNumber  inputStyleClass="alinearDerecha" value="#{prgTcResumenBean.b_IPH_HlpBi}"
+                                                                    thousandSeparator="."
+                                                                    decimalSeparator=","
+                                                                    decimalPlaces="3"
+                                                                    padControl="true"
+                                                                    required="true" requiredMessage="Ingrese valor"
+                                                                    onkeypress="if (event.keyCode === 13) {
+                                                                                return false;
+
+                                                                            }">
+                                                        <p:ajax listener="#{prgTcResumenBean.b_IPH_HlpArt.add(prgTcResumenBean.b_IPH_HlpBi)}" 
+                                                                update="totalHlpIPH"/>
+                                                        <p:ajax listener="#{prgTcResumenBean.operar(prgTcResumenBean.b_IPH_ComercialBi, prgTcResumenBean.b_IPH_HlpBi)}" 
+                                                                update="opDistBi,pGridData"/>
+                                                    </p:inputNumber>
+                                                </p:column>  
+                                                <p:column>  
+                                                    <h:outputText id="totalComercialIPH" styleClass="alinearDerecha" value="#{prgTcResumenBean.b_IPH_ComercialArt.add(prgTcResumenBean.b_IPH_ComercialBi)}"/>  
+                                                </p:column>
+                                                <p:column>  
+                                                    <h:outputText id="totalHlpIPH" styleClass="alinearDerecha" value="#{prgTcResumenBean.b_IPH_HlpArt.add(prgTcResumenBean.b_IPH_HlpBi)}"/>  
+                                                </p:column>
+                                            </p:row>
+                                            <p:row>  
+                                                <p:column style="font-weight: bold;">  
+                                                    Km Distribución
+                                                </p:column>  
+                                                <p:column>  
+                                                    <p:inputNumber  inputStyleClass="alinearDerecha" value="#{prgTcResumenBean.b_PRG_ComercialArt}"
+                                                                    thousandSeparator="."
+                                                                    decimalSeparator=","
+                                                                    decimalPlaces="3"
+                                                                    padControl="true"
+                                                                    required="true" requiredMessage="Ingrese valor"
+                                                                    onkeypress="if (event.keyCode === 13) {
+                                                                                return false;
+
+                                                                            }">
+                                                        <p:ajax listener="#{prgTcResumenBean.b_PRG_ComercialArt.add(prgTcResumenBean.b_PRG_ComercialBi)}" 
+                                                                update="totalComercialPRG,pGridData"/>
+                                                    </p:inputNumber>
+                                                </p:column>  
+                                                <p:column>  
+                                                    <p:inputNumber  inputStyleClass="alinearDerecha" value="#{prgTcResumenBean.b_PRG_ComercialBi}"
+                                                                    thousandSeparator="."
+                                                                    decimalSeparator=","
+                                                                    decimalPlaces="3"
+                                                                    padControl="true"
+                                                                    required="true" requiredMessage="Ingrese valor"
+                                                                    onkeypress="if (event.keyCode === 13) {
+                                                                                return false;
+
+                                                                            }"
+                                                                    >
+                                                        <p:ajax listener="#{prgTcResumenBean.b_PRG_ComercialArt.add(prgTcResumenBean.b_PRG_ComercialBi)}" 
+                                                                update="totalComercialPRG,pGridData"/>
+                                                    </p:inputNumber>
+                                                </p:column>  
+                                                <p:column>  
+                                                    <p:inputNumber  inputStyleClass="alinearDerecha" value="#{prgTcResumenBean.b_PRG_HlpArt}"
+                                                                    thousandSeparator="."
+                                                                    decimalSeparator=","
+                                                                    decimalPlaces="3"
+                                                                    padControl="true"
+                                                                    required="true" requiredMessage="Ingrese valor"
+                                                                    onkeypress="if (event.keyCode === 13) {
+                                                                                return false;
+
+                                                                            }"
+                                                                    >
+                                                        <p:ajax listener="#{prgTcResumenBean.b_PRG_HlpArt.add(prgTcResumenBean.b_PRG_HlpBi)}" 
+                                                                update="totalHlpPRG"/>
+                                                        <p:ajax listener="#{prgTcResumenBean.operar(prgTcResumenBean.b_PRG_ComercialArt, prgTcResumenBean.b_PRG_HlpArt)}" 
+                                                                update="opPrgArt,pGridOptimizacion,pGridResFac,pGridData"/>
+                                                        <p:ajax listener="#{prgTcResumenBean.calcularVacArt()}" update="pGridOptimizacion"/>
+                                                    </p:inputNumber>
+                                                </p:column>
+                                                <p:column>  
+                                                    <p:inputNumber  inputStyleClass="alinearDerecha" value="#{prgTcResumenBean.b_PRG_HlpBi}"
+                                                                    thousandSeparator="."
+                                                                    decimalSeparator=","
+                                                                    decimalPlaces="3"
+                                                                    padControl="true"
+                                                                    required="true" requiredMessage="Ingrese valor"
+                                                                    onkeypress="if (event.keyCode === 13) {
+                                                                                return false;
+
+                                                                            }"
+                                                                    >
+                                                        <p:ajax listener="#{prgTcResumenBean.b_PRG_HlpArt.add(prgTcResumenBean.b_PRG_HlpBi)}" 
+                                                                update="totalHlpPRG"/>
+                                                        <p:ajax listener="#{prgTcResumenBean.calcularVacBi()}" update="pGridOptimizacion"/>
+                                                        <p:ajax listener="#{prgTcResumenBean.calcularFacArt()}" update="pGridOptimizacion" />
+                                                        <p:ajax listener="#{prgTcResumenBean.calcularFacBi()}" update="pGridOptimizacion" />
+                                                        <p:ajax listener="#{prgTcResumenBean.operar(prgTcResumenBean.b_IPH_ComercialBi, prgTcResumenBean.b_PRG_HlpBi)}" 
+                                                                update="opPrgBi,pGridOptimizacion,pGridResFac,pGridGuardarLiq,pGridData"/>
+                                                    </p:inputNumber>
+                                                </p:column>  
+                                                <p:column>  
+                                                    <p:outputLabel id="totalComercialPRG" styleClass="alinearDerecha" value="#{prgTcResumenBean.b_PRG_ComercialArt.add(prgTcResumenBean.b_PRG_ComercialBi)}"/>  
+                                                </p:column>
+                                                <p:column>  
+                                                    <p:outputLabel id="totalHlpPRG" styleClass="alinearDerecha" value="#{prgTcResumenBean.b_PRG_HlpArt.add(prgTcResumenBean.b_PRG_HlpBi)}"/>  
+                                                </p:column>  
+                                            </p:row>
+                                            <p:row>
+                                                <p:column colspan="7">
+                                                    <p:spacer height="20"/>
+                                                </p:column>
+                                            </p:row>
+                                            <p:row style="text-align: center">
+                                                <p:column colspan="3" style="font-weight: bold; text-align: center">% IPH</p:column>
+                                                <td jsf:id="opDistArt" style="font-weight: bold">
+                                                    <p:panelGrid columns="2" layout="grid" style="background-color: green">
+                                                        <p:outputLabel value="ART: " class="cssWhite"/>
+                                                        <p:outputLabel value="#{prgTcResumenBean.calcularOpDist(prgTcResumenBean.b_IPH_ComercialArt, prgTcResumenBean.b_IPH_HlpArt,false)}"
+                                                                       class="cssWhite">
+                                                            <f:convertNumber type="number" minFractionDigits="2" />
+                                                        </p:outputLabel>
+                                                    </p:panelGrid>
+                                                </td>
+                                                <td jsf:id="opDistBi" style="font-weight: bold">
+                                                    <p:panelGrid columns="2" layout="grid" style="background-color: red">
+                                                        <p:outputLabel value="BI: " class="cssWhite"/>
+                                                        <p:outputLabel value="#{prgTcResumenBean.calcularOpDist(prgTcResumenBean.b_IPH_ComercialBi, prgTcResumenBean.b_IPH_HlpBi,false)}"
+                                                                       class="cssWhite">
+                                                            <f:convertNumber type="number" minFractionDigits="2"/>
+                                                        </p:outputLabel>
+                                                    </p:panelGrid>
+                                                </td>
+                                                <p:column colspan="2"/>
+                                            </p:row>
+                                            <p:row style="text-align: center">
+                                                <p:column colspan="3" style="font-weight: bold; text-align: center">% Distribución</p:column>
+                                                <td jsf:id="opPrgArt" style="font-weight: bold">
+                                                    <p:panelGrid columns="2" layout="grid" style="background-color: green">
+                                                        <p:outputLabel value="ART: " class="cssWhite"/>
+                                                        <p:outputLabel value="#{prgTcResumenBean.calcularOpPrg(prgTcResumenBean.b_PRG_ComercialArt, prgTcResumenBean.b_PRG_HlpArt)}"
+                                                                       class="cssWhite">
+                                                            <f:convertNumber type="number"/>
+                                                        </p:outputLabel>
+                                                    </p:panelGrid>
+                                                </td>
+                                                <td jsf:id="opPrgBi" style="font-weight: bold">
+                                                    <p:panelGrid columns="2" layout="grid" style="background-color: red">
+                                                        <p:outputLabel value="BI: " class="cssWhite"/>
+                                                        <p:outputLabel value="#{prgTcResumenBean.calcularOpPrg(prgTcResumenBean.b_PRG_ComercialBi, prgTcResumenBean.b_PRG_HlpBi)}"
+                                                                       class="cssWhite">
+                                                            <f:convertNumber type="number"/>
+                                                        </p:outputLabel>
+                                                    </p:panelGrid>
+                                                </td>
+                                                <p:column colspan="2"/>
+                                            </p:row>
+                                        </p:panelGrid>
+                                    </h:panelGrid>
+                                    <p:separator/>
+                                    <h:panelGrid columns="2" cellspacing="10" id="pGridOptimizacion">
+                                        <h:panelGrid id="pGridNoOpt" columns="1">
+                                            <h3 align="center" jsf:rendered="#{(prgTcResumenBean.b_PRG_HlpArt gt prgTcResumenBean.b_IPH_HlpArt) || (prgTcResumenBean.b_PRG_HlpBi gt prgTcResumenBean.b_IPH_HlpBi) }" >ESCENARIO 1 (VACIO NO OPTIMIZADO)</h3>
+                                            <h:panelGrid columns="2"
+                                                         cellspacing="10"
+                                                         class="ui-noborder">
+                                                <p:panelGrid class="ui-noborder" rendered="#{prgTcResumenBean.b_PRG_HlpArt gt prgTcResumenBean.b_IPH_HlpArt}">  
+                                                    <f:facet name="header"> 
+                                                        <p:columnGroup type="header">
+                                                            <p:row style="text-align: center">
+                                                                <p:column colspan="2" style="font-weight: bold">#{bundle.tipo_vehiculo_i}</p:column>
+                                                            </p:row>
+                                                        </p:columnGroup>
+                                                    </f:facet>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            EJECUTADO
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                value="#{prgTcResumenBean.b_Total_Art}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"
+                                                                >
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM PROG
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                value="#{prgTcResumenBean.prgTcResumen.mcomArtPrg}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"
+                                                                >
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM ADC
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                value="#{prgTcResumenBean.prgTcResumen.madicArt}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"
+                                                                >
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM ELIMINADO
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                value="#{prgTcResumenBean.prgTcResumen.melimArt}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"
+                                                                >
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            % CUMPLIMIENTO
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber 
+                                                                inputStyleClass="alinearDerecha"
+                                                                value="#{prgTcResumenBean.calcularCumplimientoArt()}"
+                                                                readonly="true"
+                                                                decimalPlaces="2"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"/>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;background-color: green;color: white">  
+                                                            VAC
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber 
+                                                                inputStyleClass="alinearDerecha"
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                value="#{prgTcResumenBean.prgTcResumen.hlpNoptArt}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"/>
+                                                        </p:column>  
+                                                    </p:row>
+                                                </p:panelGrid>
+                                                <p:panelGrid class="ui-noborder" rendered="#{prgTcResumenBean.b_PRG_HlpBi gt prgTcResumenBean.b_IPH_HlpBi}">  
+                                                    <f:facet name="header"> 
+                                                        <p:columnGroup type="header">
+                                                            <p:row style="text-align: center">
+                                                                <p:column colspan="2" style="font-weight: bold">#{bundle.tipo_vehiculo_ii}</p:column>
+                                                            </p:row>
+                                                        </p:columnGroup>
+                                                    </f:facet>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            EJECUTADO
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.b_Total_Bi}"
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"
+                                                                >
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM PROG
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha"
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                value="#{prgTcResumenBean.prgTcResumen.mcomBiPrg}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"
+                                                                >
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM ADC
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha"
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                value="#{prgTcResumenBean.prgTcResumen.madicBi}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"
+                                                                >
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM ELIMINADO
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                value="#{prgTcResumenBean.prgTcResumen.melimBi}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"
+                                                                >
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            % CUMPLIMIENTO
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber 
+                                                                inputStyleClass="alinearDerecha"
+                                                                value="#{prgTcResumenBean.calcularCumplimientoBi()}"
+                                                                readonly="true"
+                                                                decimalPlaces="2"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"/>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;background-color: red;color: white">  
+                                                            VAC
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber 
+                                                                inputStyleClass="alinearDerecha"
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                padControl="true"
+                                                                value="#{prgTcResumenBean.prgTcResumen.hlpNoptBi}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                </p:panelGrid>
+                                            </h:panelGrid>
+                                        </h:panelGrid>
+                                        <h:panelGrid id="pGridOpt" columns="1" style="margin-bottom: 35px">
+                                            <h3 align="center" jsf:rendered="#{(prgTcResumenBean.b_PRG_HlpArt lt prgTcResumenBean.b_IPH_HlpArt) || (prgTcResumenBean.b_PRG_HlpBi lt prgTcResumenBean.b_IPH_HlpBi) }">ESCENARIO 2 (VACIO OPTIMIZADO)</h3>
+                                            <h:panelGrid columns="2"
+                                                         cellspacing="5"
+                                                         class="ui-noborder">
+                                                <p:panelGrid class="ui-noborder" rendered="#{prgTcResumenBean.b_PRG_HlpArt lt prgTcResumenBean.b_IPH_HlpArt}">  
+                                                    <f:facet name="header"> 
+                                                        <p:columnGroup type="header">
+                                                            <p:row class="cssWhite" style="text-align: center;background-color: green">
+                                                                <p:column colspan="2" style="font-weight: bold">#{bundle.tipo_vehiculo_i}</p:column>
+                                                            </p:row>
+                                                        </p:columnGroup>
+                                                    </f:facet>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM VACIO IPH
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.b_IPH_HlpArt}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM VACIO DISTRIBUCION
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.b_PRG_HlpArt}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            FACTOR
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.b_Fac_Art}"
+                                                                required="true"
+                                                                readonly="true"
+                                                                requiredMessage="Debe ingresar factor de Art"
+                                                                decimalPlaces="3"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }"
+                                                                >
+                                                                <p:ajax update="pGridResFac"/>
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row rendered="false">  
+                                                        <p:column style="font-weight: bold;">  
+                                                            % CUMPLIMIENTO
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.calcularCumplimientoArt()}"
+                                                                readonly="true"
+                                                                decimalPlaces="3"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;background-color: green;color: white">  
+                                                            VACIO IPH
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber 
+                                                                inputStyleClass="alinearDerecha"
+                                                                value="#{prgTcResumenBean.b_Vacio_IPH_Art}"
+                                                                required="true" requiredMessage="Ingrese vacío IPH #{bundle.tipo_vehiculo_i}"
+                                                                decimalPlaces="3"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                                <p:ajax listener="#{prgTcResumenBean.calcularResArt()}" 
+                                                                        update="pGridResFac,vacArtOpt"/>
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row rendered="false">  
+                                                        <p:column style="font-weight: bold;">  
+                                                            VAC
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                id="vacArtOpt"
+                                                                decimalSeparator=","
+                                                                padControl="true"
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.b_Res_Art}"
+                                                                readonly="true"
+                                                                decimalPlaces="3"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                </p:panelGrid>
+                                                <p:panelGrid class="ui-noborder" rendered="#{prgTcResumenBean.b_PRG_HlpBi lt prgTcResumenBean.b_IPH_HlpBi}">  
+                                                    <f:facet name="header"> 
+                                                        <p:columnGroup type="header">
+                                                            <p:row style="text-align: center">
+                                                                <p:column colspan="2" style="font-weight: bold">#{bundle.tipo_vehiculo_ii}</p:column>
+                                                            </p:row>
+                                                        </p:columnGroup>
+                                                    </f:facet>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM VACIO IPH
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.b_IPH_HlpBi}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            KM VACIO DISTRIBUCION
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                decimalPlaces="3"
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.b_PRG_HlpBi}"
+                                                                readonly="true"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;">  
+                                                            FACTOR
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.b_Fac_Bi}"
+                                                                readonly="true"
+                                                                required="true"
+                                                                requiredMessage="Debe ingresar factor de BiArt"
+                                                                decimalPlaces="3"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                                <p:ajax update="pGridResFac"/>
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row rendered="false">  
+                                                        <p:column style="font-weight: bold;">  
+                                                            % CUMPLIMIENTO
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber  
+                                                                inputStyleClass="alinearDerecha" 
+                                                                value="#{prgTcResumenBean.calcularCumplimientoBi()}"
+                                                                readonly="true"
+                                                                decimalPlaces="3"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row>  
+                                                        <p:column style="font-weight: bold;background-color: red;color: white">  
+                                                            VACIO IPH
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber 
+                                                                inputStyleClass="alinearDerecha"
+                                                                required="true" requiredMessage="Ingrese vacío IPH #{bundle.tipo_vehiculo_ii}"
+                                                                value="#{prgTcResumenBean.b_Vacio_IPH_Bi}"
+                                                                decimalPlaces="3"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                                <p:ajax listener="#{prgTcResumenBean.calcularResBi()}" 
+                                                                        update="pGridResFac,vacBiOpt"/>
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                    <p:row rendered="false">  
+                                                        <p:column style="font-weight: bold;">  
+                                                            VAC
+                                                        </p:column>  
+                                                        <p:column>  
+                                                            <p:inputNumber 
+                                                                id="vacBiOpt"
+                                                                inputStyleClass="alinearDerecha" 
+                                                                thousandSeparator="."
+                                                                decimalSeparator=","
+                                                                value="#{prgTcResumenBean.b_Res_Bi}"
+                                                                readonly="true"
+                                                                decimalPlaces="3"
+                                                                onkeypress="if (event.keyCode === 13) {
+                                                                            return false;
+
+                                                                        }">
+                                                            </p:inputNumber>
+                                                        </p:column>  
+                                                    </p:row>
+                                                </p:panelGrid>
+                                                <h:panelGrid columns="1">
+                                                </h:panelGrid>
+                                            </h:panelGrid>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="2" id="pGridResFac">
+                                        <h:panelGrid columns="1">
+                                        </h:panelGrid>    
+                                        <div align="center" jsf:rendered="#{prgTcResumenBean.b_PRG_HlpBi gt 0}">
+                                            <p:panelGrid class="ui-noborder">  
+                                                <f:facet name="header"> 
+                                                    <p:columnGroup type="header">
+                                                        <p:row style="text-align: center">
+                                                            <p:column/>
+                                                            <p:column style="font-weight: bold">VACIO</p:column>
+                                                            <p:column style="font-weight: bold">FACTOR</p:column>
+                                                            <p:column style="font-weight: bold">EDICIÓN</p:column>
+                                                        </p:row>
+                                                    </p:columnGroup>
+                                                </f:facet>
+                                                <p:row>  
+                                                    <p:column style="font-weight: bold;background-color: green;color: white">  
+                                                        ART
+                                                    </p:column>
+                                                    <p:column>
+                                                        <p:inputNumber  
+                                                            inputStyleClass="alinearDerecha" 
+                                                            value="#{prgTcResumenBean.b_Res_Art}"
+                                                            thousandSeparator="."
+                                                            decimalPlaces="3"
+                                                            decimalSeparator=","
+                                                            readonly="true"
+                                                            rendered="#{prgTcResumenBean.b_PRG_HlpArt lt prgTcResumenBean.b_IPH_HlpArt}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                        <p:inputNumber  
+                                                            inputStyleClass="alinearDerecha"
+                                                            thousandSeparator="."
+                                                            decimalPlaces="3"
+                                                            decimalSeparator=","
+                                                            value="#{prgTcResumenBean.prgTcResumen.hlpNoptArt}"
+                                                            readonly="true"
+                                                            rendered="#{!(prgTcResumenBean.b_PRG_HlpArt lt prgTcResumenBean.b_IPH_HlpArt)}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <p:inputNumber  
+                                                            inputStyleClass="alinearDerecha"
+                                                            thousandSeparator="."
+                                                            decimalSeparator=","
+                                                            decimalPlaces="3"
+                                                            required="true"
+                                                            requiredMessage="Debe ingresar factor #{bundle.tipo_vehiculo_i}"
+                                                            value="#{prgTcResumenBean.b_Fac_Art}"
+                                                            rendered="#{prgTcResumenBean.b_PRG_HlpArt lt prgTcResumenBean.b_IPH_HlpArt}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                        <p:inputNumber  
+                                                            inputStyleClass="alinearDerecha" 
+                                                            thousandSeparator="."
+                                                            decimalSeparator=","
+                                                            decimalPlaces="3"
+                                                            value="1"
+                                                            readonly="true"
+                                                            rendered="#{!(prgTcResumenBean.b_PRG_HlpArt lt prgTcResumenBean.b_IPH_HlpArt)}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <p:inputNumber  
+                                                            thousandSeparator="."
+                                                            decimalSeparator=","
+                                                            decimalPlaces="3"
+                                                            inputStyleClass="alinearDerecha" 
+                                                            value="#{prgTcResumenBean.b_Res_Art_NoOpt}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                    </p:column>
+                                                </p:row>
+                                                <p:row>
+                                                    <p:column style="font-weight: bold;background-color: red;color: white">  
+                                                        BI
+                                                    </p:column>
+                                                    <p:column>
+                                                        <p:inputNumber  
+                                                            inputStyleClass="alinearDerecha" 
+                                                            thousandSeparator="."
+                                                            decimalPlaces="3"
+                                                            decimalSeparator=","
+                                                            value="#{prgTcResumenBean.b_Res_Bi}"
+                                                            readonly="true"
+                                                            rendered="#{prgTcResumenBean.b_PRG_HlpBi lt prgTcResumenBean.b_IPH_HlpBi}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                        <p:inputNumber  
+                                                            inputStyleClass="alinearDerecha" 
+                                                            thousandSeparator="."
+                                                            decimalPlaces="3"
+                                                            decimalSeparator=","
+                                                            value="#{prgTcResumenBean.prgTcResumen.hlpNoptBi}"
+                                                            readonly="true"
+                                                            rendered="#{!(prgTcResumenBean.b_PRG_HlpBi lt prgTcResumenBean.b_IPH_HlpBi)}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <p:inputNumber  
+                                                            inputStyleClass="alinearDerecha" 
+                                                            decimalSeparator=","
+                                                            thousandSeparator="."
+                                                            decimalPlaces="3"
+                                                            required="true"
+                                                            requiredMessage="Debe ingresar factor #{bundle.tipo_vehiculo_i}"
+                                                            value="#{prgTcResumenBean.b_Fac_Bi}"
+                                                            rendered="#{prgTcResumenBean.b_PRG_HlpBi lt prgTcResumenBean.b_IPH_HlpBi}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                        <p:inputNumber  
+                                                            inputStyleClass="alinearDerecha" 
+                                                            thousandSeparator="."
+                                                            decimalSeparator=","
+                                                            decimalPlaces="3"
+                                                            value="1"
+                                                            readonly="true"
+                                                            rendered="#{!(prgTcResumenBean.b_PRG_HlpBi lt prgTcResumenBean.b_IPH_HlpBi)}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        asignarDistancia();
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <p:inputNumber  
+                                                            inputStyleClass="alinearDerecha" 
+                                                            thousandSeparator="."
+                                                            decimalSeparator=","
+                                                            decimalPlaces="3"
+                                                            value="#{prgTcResumenBean.b_Res_Bi_NoOpt}"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+
+                                                                    }">
+                                                        </p:inputNumber>
+                                                    </p:column>
+                                                </p:row>
+                                            </p:panelGrid>
+                                        </div>
+                                    </h:panelGrid>
+                                    <p:spacer height="15"/> 
+                                    <h:panelGrid columns="2" id="pGridGuardarLiq">
+                                        <div align="right" jsf:rendered="#{prgTcResumenBean.b_PRG_HlpBi gt 0}" style="margin-top: 10px">
+                                            <h2>Fecha: <b style="color: red;text-decoration: underline;text-emphasis-color: #97E8A9;">#{prgTcResumenBean.formatearFechaActual()}</b></h2> &nbsp;&nbsp;
+                                            <p:commandButton value="GUARDAR LIQUIDACIÓN "
+                                                             actionListener="#{prgTcResumenBean.guardarLiquidacionHlp()}"
+                                                             update=":msgs,:tabResumen:pGridResumenS"
+                                                             style="font-weight: bold;font-size: 30px">
+                                                <p:confirm header="Confirmación"
+                                                           message="Ésta seguro de guardar los datos de la liquidación?" 
+                                                           icon="fa fa-exclamation-triangle"/>
+                                            </p:commandButton>
+                                        </div>
+                                    </h:panelGrid>    
+                                </h:form>
+                            </div>
+                        </p:tab>
+                    </p:tabView>
+                </p:panel>
+                <ui:include src="formularios/addServicioArt.xhtml"/>
+                <ui:include src="formularios/eliminarAdicional.xhtml"/>
+                <ui:include src="formularios/cambiarResponsable.xhtml"/>
+                <ui:include src="formularios/eliminarProgramado.xhtml"/>
+                <ui:include src="formularios/deshacerEliminado.xhtml"/>
+                <ui:include src="formularios/reasignarTarea.xhtml"/>
+                <ui:include src="formularios/reasignarTareaDerecha.xhtml"/>
+            </p:layoutUnit>
+        </p:layout>
+    </ui:define>
+</ui:composition>

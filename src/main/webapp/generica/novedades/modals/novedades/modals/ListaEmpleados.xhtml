@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmEmpleadosListDlg" widgetVar="PmEmpleadosListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de empleados"
+              class="mr1024_70 mr500_90" closeOnEscape="true" responsive="true" position="center top">
+        <h:form id="frmPmEmpleadoList">
+            <p:dataTable var="vht" value="#{genericaBean.lstEmpleados}" 
+                         id="dtEmpleados"
+                         widgetVar="wVPmEmpleadosListDialog"
+                         selectionMode="single" selection="#{genericaBean.empleado}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         rowIndexVar="nroFila"
+                         rowKey="#{vht.idEmpleado}"
+                         emptyMessage="NO existen empleados registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{genericaBean.onRowEmpleadoClckSelect}"
+                        update=":frmNovedadesPm:operador,btnGuardarNovedadPM"
+                        oncomplete="PF('PmEmpleadosListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Identificación" filterBy="#{vht.identificacion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.identificacion}" />
+                </p:column>
+                <p:column headerText="Nombre completo" filterBy="#{vht.nombres} #{vht.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.nombres} #{vht.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

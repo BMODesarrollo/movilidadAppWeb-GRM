@@ -1,0 +1,134 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmVrbonoTipovehiCreateDlg" 
+              widgetVar="PmVrbonoTipovehiCreateDialog" 
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              class="mr1024_30 mr500_90"
+              position="center top"
+              appendTo="@(body)"
+              closable="false">
+        <p:ajax event="close" listener="#{pmVrbonoTipovehiController.reset()}" update=":PmVrbonoTipovehiListForm:datalist"/>
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Crear Nuevo Pm Valor Bono Tipo Vehículo" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('PmVrbonoTipovehiCreateDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="PmVrbonoTipovehiCreateForm">
+            <div class="ui-fluid" jsf:rendered="#{pmVrbonoTipovehiController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desde:" for="desde" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="desde" 
+                                        pattern="yyyy-MM-dd" 
+                                        value="#{pmVrbonoTipovehiController.selected.desde}"
+                                        required="true" 
+                                        requiredMessage="Fecha Desde es requerido"
+                                        readonly="#{facesContext.renderResponse}"
+                                        showOn="button"
+                                        locale="es"
+                                        mindate="today"
+                                        >
+                                <p:ajax event="dateSelect" update="hasta"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Hasta:" for="hasta" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hasta" 
+                                        pattern="yyyy-MM-dd"
+                                        value="#{pmVrbonoTipovehiController.selected.hasta}" 
+                                        required="true"
+                                        locale="es"
+                                        requiredMessage="Fecha Hasta es requerido"
+                                        readonly="#{facesContext.renderResponse}"
+                                        showOn="button"
+                                        mindate="#{pmVrbonoTipovehiController.selected.desde}"
+                                        >
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Valor Bono:" for="vrBono" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="vrBono" 
+                                           value="#{pmVrbonoTipovehiController.selected.vrBono}"
+                                           required="true"
+                                           requiredMessage="Valor Bono es requerido"
+                                           maxValue="9999999"
+                                           minValue="0"
+                                           symbol="$"
+                                           decimalPlaces="0">
+                            </p:inputNumber>                      
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo de Vehículo:" for="idVehiculoTipo" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="idVehiculoTipo" 
+                                             value="#{pmVrbonoTipovehiController.i_idVehiculoTipo}" 
+                                             required="true" 
+                                             requiredMessage="Tipo de Vehículo es requerido"
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains"
+                                             >
+                                <f:selectItem itemLabel="Seleccionar uno" itemValue=""/>
+                                <f:selectItems value="#{pmVrbonoTipovehiController.listVehiculoTipo}"
+                                               var="Item"
+                                               itemLabel="#{Item.nombreTipoVehiculo}"
+                                               itemValue="#{Item.idVehiculoTipo}"/>
+                                <p:ajax process="@this" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand actionListener="#{pmVrbonoTipovehiController.create}"
+                             name="rc_tv"
+                             update="@form,
+                             PmVrbonoTipovehiListForm:datalist,
+                             :PmVrbonoTipovehiListForm:upPmVbVeh" />
+            <p:staticMessage severity="warn" 
+                             summary="Tenga en cuenta"
+                             detail="Fecha Desde no debe ser mayor a Fecha Hasta" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_tv();"
+                             value="Guardar"
+                             class="cssWhite"
+                             icon="fa fa-save"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

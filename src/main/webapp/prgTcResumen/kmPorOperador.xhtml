@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <h:form id="frmPrincipal">
+            <p:hotkey bind="ctrl+shift+q" 
+                      update="frmPrincipal:kmByOperadorlist,
+                      frmPrincipal:fechaIni,frmPrincipal:fechaFin" 
+                      action="#{kilometroBean.clearFiltersOperador()}"/>
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Kilómetros por operador
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="kmByOperadorlist" 
+                                            listener="#{kilometroBean.obtenerKmByOperador()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:panel>
+                    <f:facet name="header">
+                        <div style="float:right">
+                            <p:outputLabel value="Seleccione rango de fechas: " for="fechaIni" class="cssWhite"/>
+                            <p:spacer width="2"/>
+                            <p:calendar id="fechaIni" label="Fecha de Consulta" 
+                                        value="#{kilometroBean.fecha}"
+                                        locale="es"
+                                        inputStyle="width: 18%;"
+                                        maxdate="today"
+                                        title="Fecha Inicio"
+                                        navigator="true">
+                            </p:calendar>
+                            -
+                            <p:calendar id="fechaFin" label="Fecha de Consulta" 
+                                        value="#{kilometroBean.fechaFin}"
+                                        locale="es"
+                                        inputStyle="width: 18%;"
+                                        maxdate="today"
+                                        title="Fecha Fin"
+                                        navigator="true">
+                            </p:calendar>
+                            <p:spacer width="10"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                actionListener="#{kilometroBean.obtenerKmByOperador()}"
+                                class="cssWhite"
+                                update="kmByOperadorlist"
+                                >
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:dataTable id="kmByOperadorlist" value="#{kilometroBean.lstKmsOperadores}" 
+                                 var="item" widgetVar="dtkmByOperadorlist"
+                                 emptyMessage="No hay registros que mostrar!!"
+                                 paginator="true" filterDelay="1700"
+                                 rows="100"
+                                 rowsPerPageTemplate="100,200,500" >
+
+                        <f:facet name="paginatorTopRight">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="kmByOperadorlist" 
+                                                fileName="Kilómetros por operador #{now}"
+                                                postProcessor="#{kilometroBean.postProcessXLSOp}"/>
+                            </h:commandLink>
+                        </f:facet>
+
+                        <p:column filterBy="#{item.codigo_tm}"
+                                  filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Código TM"/>
+                            </f:facet>
+                            <h:outputText value="#{item.codigo_tm}"/>
+                        </p:column>
+
+                        <p:column filterBy="#{item.nombres.concat(' ').concat(item.apellidos)}"
+                                  filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Operador"/>
+                            </f:facet>
+                            <h:outputText value="#{item.nombres.concat(' ').concat(item.apellidos)}"/>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Comercial"/>
+                            </f:facet>
+                            <h:outputText value="#{item.comercial}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Hlp_Prg"/>
+                            </f:facet>
+                            <h:outputText value="#{item.hlp_prg}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Adicionales"/>
+                            </f:facet>
+                            <h:outputText value="#{item.adicionales}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Vac. Comerciales"/>
+                            </f:facet>
+                            <h:outputText value="#{item.vaccom}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Comercial_Eliminados"/>
+                            </f:facet>
+                            <h:outputText value="#{item.comercial_Eliminados}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Hlp_Eliminados"/>
+                            </f:facet>
+                            <h:outputText value="#{item.hlp_Eliminados}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Vacíos"/>
+                            </f:facet>
+                            <h:outputText value="#{item.vac}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="id_create_dlg" 
+              class="modalResponsivoGS"
+              closeOnEscape="true" 
+              widgetVar="wv_create_dlg" modal="true" 
+              closable="false"
+              position="center top" >
+        
+         <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="PM Novedad Tipo Detalle Incluir" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wv_create_dlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="form_create_dlg">
+            <p:messages showDetail="true" id="msgs_create_dlg">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-g">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" >
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                        <p:outputLabel for="SOMTipoNovedad"  value="Tipo de Novedad: " />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                        <p:selectOneMenu style="width: 95%"  id="SOMTipoNovedad" filterMatchMode="contains" filter="true"
+                                         value="#{pmTipoDetIncluirJSFMB.i_tipo}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                            <f:selectItems  value="#{pmTipoDetIncluirJSFMB.listT}" var="nov" 
+                                            itemValue="#{nov.idNovedadTipo}" itemLabel="#{nov.nombreTipoNovedad}" />
+                            <p:ajax listener="#{pmTipoDetIncluirJSFMB.findById}"  update="SOMTipoNovedadDet"/>
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" >
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                        <p:outputLabel for="SOMTipoNovedadDet"  value="Detalle Tipo Novedad " />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                        <p:selectOneMenu style="width: 95%" id="SOMTipoNovedadDet" filterMatchMode="contains" filter="true" 
+                                         value="#{pmTipoDetIncluirJSFMB.i_tipoDet}"
+                                         required="true">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                            <f:selectItems  value="#{pmTipoDetIncluirJSFMB.listTDet}"
+                                            var="novDet" itemLabel="#{novDet.tituloTipoNovedad}"
+                                            itemValue="#{novDet.idNovedadTipoDetalle}" 
+                                            itemDescription="#{novDet.descripcionTipoNovedad}">
+                            </f:selectItems>
+                            <p:ajax listener="#{pmTipoDetIncluirJSFMB.setTipoNovedadDet()}" process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                    <h:outputLabel for="SBBEstado"  value="Estado:" />
+                    <p:selectBooleanButton id="SBBEstado" 
+                                           offIcon="fa fa-close" 
+                                           onIcon="fa fa-check" 
+                                           onLabel="Sí" 
+                                           class="cssWhite"
+                                           offLabel="No" value="#{pmTipoDetIncluirJSFMB.activo}"/>
+                </div>
+            </div>
+            <p:remoteCommand name="rc"
+                             process="@this,form_create_dlg,"
+                             rendered="#{pmTipoDetIncluirJSFMB.genPmNovedadIncluir.idPmNovedadIncluir==null}"
+                             update="msgs,
+                             msgs_create_dlg,
+                             frm_principal:dt_pm_nov_tipo_det_encluir_id,
+                             form_create_dlg" 
+                             action="#{pmTipoDetIncluirJSFMB.guardar()}" />
+            <p:remoteCommand name="rc"
+                             process="@this,form_create_dlg,"
+                             rendered="#{pmTipoDetIncluirJSFMB.genPmNovedadIncluir.idPmNovedadIncluir!=null}"
+                             update="msgs,
+                             msgs_create_dlg,
+                             frm_principal:dt_pm_nov_tipo_det_encluir_id" 
+                             action="#{pmTipoDetIncluirJSFMB.editar()}" />
+
+        </h:form>
+        <f:facet name="footer">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-3 ui-lg-3" style="padding: 0px">
+                        <p:commandButton id="btnGuardarPrgTc" 
+                                         icon="fa fa-save" value="Guardar" 
+                                         class="cssWhite" onclick="rc()">
+                        </p:commandButton>
+                    </div>
+                </div>
+            </div>
+
+
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+
+
+

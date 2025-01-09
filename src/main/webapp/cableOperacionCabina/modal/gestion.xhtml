@@ -1,0 +1,120 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="gestion_dialog"
+              widgetVar="gestion_dialog_wv" 
+              modal="true" 
+              class="mr1024_50 mr500_90"
+              closeOnEscape="true"
+              resizable="false" 
+              header="Gestión Cabina Operación: #{cabinaOperacionJSFMB.operacionCabina.idCableCabina.nombre}"
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <h:form id="gestion_dialog_form">
+            <div class="ui-fluid ui-g" >
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="pinza_d" value="Pinza Inicial"/>         
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputText 
+                            id="pinza_d"
+                            readonly="true"
+                            value="#{cabinaOperacionJSFMB.operacionCabina.idCablePinza.nombre}"/>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="pinza_hoy" value="Pinza para hoy" />
+                    </div>
+                    <p:selectOneMenu id="pinza_hoy" 
+                                     value="#{cabinaOperacionJSFMB.i_idCablePinza}" 
+                                     filter="true"
+                                     style="width: 99.9999%"
+                                     filterMatchMode="contains">
+                        <p:ajax global="false" process="@this"/>
+                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" noSelectionOption="true"/>
+                        <f:selectItems value="#{cabinaOperacionJSFMB.listCablePinza}" 
+                                       var="item"
+                                       itemDescription="#{item.descripcion}"
+                                       itemLabel="#{item.nombre}"
+                                       itemValue="#{item.idCablePinza}"/>
+                    </p:selectOneMenu>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="bateria_am_id" value="Batería AM"/>         
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputNumber 
+                            id="bateria_am_id"
+                            decimalPlaces="0"
+                            maxValue="100"
+                            value="#{cabinaOperacionJSFMB.operacionCabina.bateriaAm}"/>
+                        <div class="botonFloat">
+                            <p:commandButton icon="fa fa-google" 
+                                             update="bateria_am_id"
+                                             class="cssWhite"
+                                             style="margin: 0px"
+                                             action="#{cabinaOperacionJSFMB.metodoG(1)}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel for="bateria_pm_id" value="Batería PM"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputNumber 
+                            id="bateria_pm_id"
+                            maxValue="100"
+                            decimalPlaces="0"
+                            value="#{cabinaOperacionJSFMB.operacionCabina.bateriaPm}"/>
+                        <div class="botonFloat">
+                            <p:commandButton icon="fa fa-google" 
+                                             update="bateria_pm_id"
+                                             class="cssWhite"
+                                             style="margin: 0px"
+                                             action="#{cabinaOperacionJSFMB.metodoG(2)}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5" 
+                     onclick="rc_si()"
+                     align="center" 
+                     style="background-color: green;
+                     color: white;
+                     border-radius: 3px;
+                     font-weight: bold;cursor: pointer">
+                    <i class="fa fa-check Fs100"/>
+                    <br/>
+                    En Operación
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5" 
+                     onclick="rc_no()"
+                     align="center" 
+                     style="background-color: red;
+                     color: white;
+                     border-radius: 3px;
+                     font-weight: bold;cursor: pointer">
+                    <i class="fa fa-close Fs100" />
+                    <br/>
+                    No Operando
+                </div>
+            </div>
+            <p:remoteCommand name="rc_si" 
+                             actionListener="#{cabinaOperacionJSFMB.save(1)}"  
+                             update="msgs,form_cabina_operacion:dg_cabina_id"  >
+            </p:remoteCommand>
+            <p:remoteCommand name="rc_no" 
+                             actionListener="#{cabinaOperacionJSFMB.save(0)}"  
+                             update="msgs,form_cabina_operacion:dg_cabina_id"  >
+            </p:remoteCommand>
+        </h:form>
+    </p:dialog>
+</ui:composition>     

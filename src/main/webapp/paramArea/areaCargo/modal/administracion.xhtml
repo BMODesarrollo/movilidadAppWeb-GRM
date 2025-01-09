@@ -1,0 +1,94 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-cargo"
+              closeOnEscape="true"
+              widgetVar="cargoDlg"
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closable="false"
+              resizable="false" 
+              appendTo="@(body)" position="center top" responsive="true">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{paramAreaCargoJSF.paramAreaCargo.idParamAreaCargo != null 
+                                                    ? 'EDITAR PARAMETRIZACIÓN DE ÁREA - CARGO' 
+                                                    : 'NUEVA PARAMETRIZACIÓN DE ÁREA - CARGO'}"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('cargoDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-cargo">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Área *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="t-area"
+                                         value="#{paramAreaCargoJSF.paramAreaCargo.idParamArea.area}"
+                                         readonly="true" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Cargo *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="t-cargo" 
+                                             value="#{paramAreaCargoJSF.i_idEmpleadoCargo}" 
+                                             style="width: 99.9999%" 
+                                             filter="true" 
+                                             filterMatchMode="contains" >
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{paramAreaCargoJSF.listEmpleadoCargo}" 
+                                               var="listcargo" 
+                                               itemLabel="#{listcargo.nombreCargo}" 
+                                               itemDescription="#{listcargo.nombreCargo}"
+                                               itemValue="#{listcargo.idEmpleadoTipoCargo}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand id="btn-guardar"
+                             name="rc_ac"
+                             rendered="#{empty paramAreaCargoJSF.paramAreaCargo.idParamAreaCargo}"
+                             action="#{paramAreaCargoJSF.guardar()}"
+                             update=":AreaCargoListForm,@form,msgs"
+                             process="@form" />
+            <p:remoteCommand id="btn-editar"
+                             name="rc_update_ac"
+                             rendered="#{not empty paramAreaCargoJSF.paramAreaCargo.idParamAreaCargo}"
+                             action="#{paramAreaCargoJSF.editar()}"
+                             update=":AreaCargoListForm,msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_ac();"
+                             rendered="#{empty paramAreaCargoJSF.paramAreaCargo.idParamAreaCargo}"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar"/>
+            <p:commandButton onclick="rc_update_ac();"
+                             class="cssWhite"
+                             rendered="#{not empty paramAreaCargoJSF.paramAreaCargo.idParamAreaCargo}"
+                             icon="fa fa-save"
+                             value="Actualizar"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

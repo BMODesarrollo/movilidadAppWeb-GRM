@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../template/template-content.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <ui:define name="content">
+        <p:panel header="REGISTRO DE ENTRADA Y SALIDA" 
+                 styleClass="panelEntradaSalida">
+            <h:form>
+                <div class="ui-g" align="center">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        Fecha
+                    </div>  
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <p:calendar showOn="button" 
+                                    id="fecha"
+                                    locale="es"
+                                    value="#{sstEntradaSalidaBean.fecha}"
+                                    required="true"
+                                    readonlyInput="true"
+                                    requiredMessage="Debe seleccionar Fecha y hora llegada"
+                                    timeInput="true"
+                                    mask="true"
+                                    pattern="yyyy-MM-dd">
+                        </p:calendar>
+                    </div>
+                    <div class="EmptyBox10"></div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        Cédula
+                    </div>  
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <p:inputText
+                            value="#{sstEntradaSalidaBean.cedula}"
+                            id="cedula"
+                            required="true"
+                            requiredMessage="Debe ingresar una cédula"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" align="center">
+                        <p:commandButton value="Buscar"
+                                         actionListener="#{sstEntradaSalidaBean.consultarAutorizacion()}"
+                                         update="pnlDatos,:msgs"
+                                         process="@this,fecha,cedula"
+                                         styleClass="cssWhite"/>
+                    </div>
+                </div>
+                <div class="EmptyBox20"></div>
+                <div class="ui-g" jsf:id="pnlDatos">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" jsf:rendered="#{sstEntradaSalidaBean.autorizacion != null}">
+                        <p:fieldset legend="Datos Autorización" 
+                                    class="align-center Wid80">
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <h3>NOMBRE AUTORIZADO</h3>
+                            </div>  
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{sstEntradaSalidaBean.autorizacion.idSstEmpresaVisitante.nombre} #{sstEntradaSalidaBean.autorizacion.idSstEmpresaVisitante.apellidos}" styleClass="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <h3>TIPO LABOR</h3>
+                            </div>  
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{sstEntradaSalidaBean.autorizacion.idSstTipoLabor.tipoLabor}" styleClass="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <h3>ÁREA</h3>
+                            </div>  
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <h:outputText value="#{sstEntradaSalidaBean.autorizacion.idSstAreaEmpresa.area}" styleClass="cssBlack"/>
+                            </div>
+                            <div class="EmptyBox20"></div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <p:commandButton 
+                                    action="#{sstEntradaSalidaBean.autorizarEntrada()}"
+                                    disabled="#{sstEntradaSalidaBean.autorizacion.idSstEsMatEqui.estado eq 0}"
+                                    value="Aprobar Ingreso"
+                                    styleClass="cssWhite GreenButton">
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la entrada?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>  
+                            <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                <p:commandButton 
+                                    action="#{sstEntradaSalidaBean.autorizarSalida()}"
+                                    disabled="#{sstEntradaSalidaBean.autorizacion.idSstEsMatEqui.estado eq 1}"
+                                    value="Rechazar Ingreso"
+                                    styleClass="cssWhite RedButton">
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la salida?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+        <div class="EmptyBox10"></div>
+    </ui:define>
+
+</ui:composition>

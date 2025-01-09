@@ -1,0 +1,494 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgEmpleadoID" 
+              closeOnEscape="true"
+              widgetVar="dlgEmpelado" 
+              class="mr1024_80 mr500_90"
+              responsive="true" 
+              appendTo="@(body)" 
+              position="top" 
+              closable="false"
+              modal="true" resizable="false" focus="formEmpleado:txtNombres">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Empleado"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('dlgEmpelado').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="formEmpleado">
+            <p:messages id="messages" showDetail="true" closable="true" />
+            <div class="ui-fluid">
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                        <p:fieldset toggleable="true"  legend="Foto">
+                            <h:panelGrid id="idPanelGrid" columns="4" cellpadding="5">
+                                <p:graphicImage cache="false"
+                                                style="border:1px solid #106ebc; border-radius: 5px;"
+                                                id="GIImagen"
+                                                value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                rendered="#{emplJSFMdB.empl.idEmpleado!=null}" 
+                                                width="170">
+                                    <f:param name="path_foto" value="#{emplJSFMdB.empl.pathFoto}" />
+                                </p:graphicImage>
+                                <p:commandButton id="btnFoto" 
+                                                 icon="fa fa-file-photo-o" value="Agregar" 
+                                                 process="@this"
+                                                 update="formFoto"
+                                                 class="OrangeButton cssWhite"
+                                                 actionListener="#{emplJSFMdB.openDialogFoto()}">
+                                </p:commandButton>
+                                <p:staticMessage severity="info"
+                                                 id="msgs_info"
+                                                 summary="Exito!" 
+                                                 rendered="#{uploadFotoJSFManagedBean.flag}" 
+                                                 detail="Foto cargada" />
+
+                            </h:panelGrid>
+                        </p:fieldset>
+                    </div>
+                    <div class="EmptyBox5" />
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                        <p:fieldset toggleable="true" legend="Datos Personales">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtNombres" value="Nombres"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtNombres" value="#{emplJSFMdB.empl.nombres}" maxlength="50"  required="true"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtApellidos" value="Apellidos"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtApellidos" value="#{emplJSFMdB.empl.apellidos}" maxlength="50"  required="true"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="SOMTipoDocumento"  value="Tipo Identificación" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="SOMTipoDocumento"
+                                                     filterMatchMode="contains" filter="true" style="width: 99.999%"
+                                                     value="#{emplJSFMdB.i_idTipoIdentificacion}"
+                                                     required="true">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                        <f:selectItems value="#{emplJSFMdB.listEmplTipoIdents}"
+                                                       var="tpId" itemLabel="#{tpId.nombre}"
+                                                       itemValue="#{tpId.idEmpleadoTipoIdentificacion}" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="NUMIdentificacion" value="Identificación"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="NUMIdentificacion" value="#{emplJSFMdB.empl.identificacion}" maxlength="15"  
+                                                 required="true"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="CFechaNct" value="Fecha Nacimiento"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:calendar id="CFechaNct" required="true"
+                                                value="#{emplJSFMdB.empl.fechaNcto}"
+                                                navigator="true"
+                                                locale="es"
+                                                pattern="dd/MM/yyyy"
+                                                mask="99/99/9999"
+                                                placeholder="DD/MM/AAAA"
+                                                showOtherMonths="true" showOn="button" />
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="SOMGenero"  value="Género" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="SOMGenero" 
+                                                     filterMatchMode="contains" 
+                                                     filter="true" 
+                                                     value="#{emplJSFMdB.empl.genero}" 
+                                                     style="width: 99.999%"
+                                                     required="true">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                        <f:selectItem itemLabel="Masculino" itemValue="M" />
+                                        <f:selectItem itemLabel="Femenino" itemValue="F" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="SOMTipoSangre"  value="Tipo de Sangre" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="SOMTipoSangre" 
+                                                     filterMatchMode="contains"
+                                                     filter="true"
+                                                     value="#{emplJSFMdB.empl.rh}"
+                                                     style="width: 99.999%"
+                                                     required="true">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                        <f:selectItem itemLabel="A+" itemValue="A+" />
+                                        <f:selectItem itemLabel="A-" itemValue="A-" />
+                                        <f:selectItem itemLabel="B+" itemValue="B+" />
+                                        <f:selectItem itemLabel="B-" itemValue="B-" />
+                                        <f:selectItem itemLabel="O+" itemValue="O+" />
+                                        <f:selectItem itemLabel="O-" itemValue="O-" />
+                                        <f:selectItem itemLabel="AB+" itemValue="AB+" />
+                                        <f:selectItem itemLabel="AB-" itemValue="AB-" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="SOMDepartamento"  value="Departamento" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu  id="SOMDepartamento" 
+                                                      filterMatchMode="contains" 
+                                                      filter="true"
+                                                      style="width: 99.999%"
+                                                      value="#{emplJSFMdB.i_idDepartamento}">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                        <f:selectItems  value="#{emplJSFMdB.listEmplDeprtS}" var="d" 
+                                                        itemValue="#{d.idEmpleadoDepartamento}" itemLabel="#{d.nombre}" />
+                                        <p:ajax listener="#{emplJSFMdB.findByIdNew}"  update="SOMMunicipio"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="SOMMunicipio"  value="Municipio" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="SOMMunicipio" 
+                                                     filterMatchMode="contains" 
+                                                     filter="true" 
+                                                     style="width: 99.999%"
+                                                     value="#{emplJSFMdB.i_idMunicipio}"
+                                                     required="true">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" noSelectionOption="true" />
+                                        <f:selectItems  value="#{emplJSFMdB.listEmplMunicipios}"
+                                                        var="muni" itemLabel="#{muni.nombre}"
+                                                        itemValue="#{muni.idEmpleadoCiudad}" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="ITxtDireccion"  value="Dirección"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="ITxtDireccion" value="#{emplJSFMdB.empl.direccion}" maxlength="150"  
+                                                 required="true"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="NUMTelefonoF" value="Tel fijo"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="NUMTelefonoF" value="#{emplJSFMdB.empl.telefonoFijo}" 
+                                                 maxlength="45"  />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="NUMTelefonoM" value="Tel Móvil"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputMask id="NUMTelefonoM" value="#{emplJSFMdB.empl.telefonoMovil}" required="true" mask="(999) 999-9999"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-3 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtEmailP" value="Email Personal" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtEmailP" value="#{emplJSFMdB.empl.emailPersonal}" maxlength="75"
+                                                 validatorMessage="Formato de correo inválido" >
+                                        <p:keyFilter regEx="/[a-z0-9_\.\-@]/i"/>  
+                                    </p:inputText>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-3 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtEmailE" value="Email Empresarial" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtEmailE"  value="#{emplJSFMdB.empl.emailCorporativo}" maxlength="75" 
+                                                 required="true">
+                                        <p:keyFilter regEx="/[a-z0-9_\.\-@]/i"/>  
+                                    </p:inputText>
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="EmptyBox5" />
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                        <p:fieldset toggleable="true" legend="Datos para la Empresa">
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtCodigoI" value="Código"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtCodigoI" value="#{emplJSFMdB.empl.codigoInterno}"
+                                                 maxlength="6">
+                                        <p:keyFilter regEx="/[0-9]/i"/>
+                                    </p:inputText>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtCodigoT" value="Código TransMilenio"/>   
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtCodigoT" value="#{emplJSFMdB.empl.codigoTm}" 
+                                                 >
+                                        <p:keyFilter regEx="/[0-9]/i"/>
+                                    </p:inputText>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="SOMPatio"  value="Patio" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="SOMPatio" 
+                                                     filterMatchMode="contains" filter="true" style="width: 99.999%"
+                                                     value="#{emplJSFMdB.i_idPatio}" required="true" >
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                        <f:selectItems value="#{emplJSFMdB.listPatios}" var="patio"
+                                                       itemLabel="#{patio.nombrePatio}" 
+                                                       itemValue="#{patio.idOperacionPatios}" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="SOMCargo"  value="Cargo" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="SOMCargo" filterMatchMode="contains" filter="true" style="width: 99.999%"
+                                                     value="#{emplJSFMdB.i_idCargo}" required="true"   >
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                        <f:selectItems value="#{emplJSFMdB.listEmplTipoCargo}" 
+                                                       var="tipCarg"
+                                                       itemLabel="#{tipCarg.nombreCargo}"
+                                                       itemValue="#{tipCarg.idEmpleadoTipoCargo}" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="SOMEstado"  value="Estado" />
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="SOMEstado"
+                                                     filterMatchMode="contains" filter="true" style="width: 99.999%"
+                                                     value="#{emplJSFMdB.i_idEsdado}"
+                                                     required="true">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                        <f:selectItems value="#{emplJSFMdB.listEmplEstados}"
+                                                       var="std" itemLabel="#{std.nombre}"
+                                                       itemValue="#{std.idEmpleadoEstado}" />
+
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="CFechaIngr" value="Fecha Ingreso"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:calendar id="CFechaIngr"
+                                                required="true"
+                                                locale="es"
+                                                pattern="dd/MM/yyyy"
+                                                mask="99/99/9999"
+                                                placeholder="DD/MM/AAAA"
+                                                value="#{emplJSFMdB.empl.fechaIngreso}"
+                                                navigator="true"
+                                                showOtherMonths="true" showOn="button"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="CFechaSalida" value="Fecha retiro"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:calendar id="CFechaSalida"
+                                                locale="es"
+                                                pattern="dd/MM/yyyy"
+                                                mask="99/99/9999"
+                                                placeholder="DD/MM/AAAA"
+                                                value="#{emplJSFMdB.empl.fechaRetiro}"
+                                                navigator="true"
+                                                showOtherMonths="true" showOn="button"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-ml-6 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="SEmpleador" value="Empleador"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="SEmpleador"
+                                                     filterMatchMode="contains" filter="true" style="width: 99.999%"
+                                                     value="#{emplJSFMdB.i_idEmpleador}" >
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{empleadoEmpleadorJSF.listEmpleadoEmpleador}"
+                                                       var="empr" itemLabel="#{empr.nombre}"
+                                                       itemDescription="#{empr.descripcion}"
+                                                       itemValue="#{empr.idEmpleadoEmpleador}" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-4  Padding5" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                                    <p:outputLabel value="Unidad Funcional" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                                    <ui:include src="../../zComponent/selectUnidadFuncional.xhtml"/>
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="EmptyBox5" />
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                        <p:fieldset toggleable="true"  legend="Contacto en Caso de Emergencia">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtCEmerg" value="Nombre"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtCEmerg" value="#{emplJSFMdB.empl.nombreContactoEmergencia}"
+                                                 maxlength="150"  required="true"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtTEmrg" value="Tel Fijo"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputText id="txtTEmrg" required="true" value="#{emplJSFMdB.empl.telefonoContactoEmergencia}"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-2 Padding3">
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="txtTEmrgM" value="Tel Móvil"/>
+                                </div>
+                                <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                    <p:inputMask id="txtTEmrgM" value="#{emplJSFMdB.empl.movilContactoEmergencia}" required="true" mask="(999) 999-9999"/>
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="EmptyBox5" />
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0" jsf:id="mapa">
+                        <p:fieldset id="gamp-f"
+                                    toggleable="true"
+                                    collapsed="true"
+                                    legend="Georeferencia">
+                            <div jsf:id="fielDiv" class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <div jsf:id="direc" class="ui-g-12 ui-ml-12 ui-lg-12 Padding3">
+                                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="direcMap" value="Dirección"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText placeholder="Av NQS #52-38, Bogotá, Cundinamarca"
+                                                     title="Ingrese código de vehículo"
+                                                     id="direcMap"
+                                                     value="#{emplJSFMdB.empl.direccion}"/>
+                                        <div class="botonFloat" >
+                                            <p:commandButton title="Buscar"
+                                                             icon="fa fa-search"
+                                                             class="cssWhite"
+                                                             style="margin: 0px"
+                                                             update="fielDiv,:msgs"
+                                                             process="direcMap,@this"
+                                                             actionListener="#{emplJSFMdB.localizacionEmpleado()}">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div jsf:id="lat" class="ui-g-12 ui-ml-12 ui-lg-4 Padding3">
+                                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="longitud" value="Longitud"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                        <p:inputText id="longitud" 
+                                                     readonly="true"
+                                                     value="#{emplJSFMdB.empl.longitud}"/>
+                                    </div>
+                                </div>
+                                <div jsf:id="lon" class="ui-g-12 ui-ml-12 ui-lg-4 Padding3">
+                                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="latitud" value="Latitud"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                        <p:inputText id="latitud" 
+                                                     readonly="true"
+                                                     value="#{emplJSFMdB.empl.latitud}"/>
+                                    </div>
+                                </div>
+                                <div jsf:id="localid" class="ui-g-12 ui-ml-12 ui-lg-4 Padding3">
+                                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="localidad" value="Localidad"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                        <p:inputText id="localidad" 
+                                                     value="#{emplJSFMdB.empl.localidad}"/>
+                                    </div>
+                                </div>
+                                <p:gmap id="gmap" center="#{emplJSFMdB.s_lat}, #{emplJSFMdB.s_lng}" 
+                                        zoom="18" 
+                                        type="HYBRID" 
+                                        style="height: 500px"
+                                        styleClass="mapClass"
+                                        model="#{emplJSFMdB.simpleModel}" >
+                                    <p:ajax event="pointSelect" 
+                                            listener="#{emplJSFMdB.onPointSelect}"
+                                            update="messages,gmap,lat,lon"/>
+                                </p:gmap>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                </div>
+                <p:remoteCommand name="rc" 
+                                 class="cssWhite"
+                                 actionListener="#{emplJSFMdB.guardar()}"
+                                 update="formEmpleado,msgs,formTablaEmpl,messages"/>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarAdd" 
+                             icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="uploadArchivo.xhtml"/>
+</ui:composition>
+

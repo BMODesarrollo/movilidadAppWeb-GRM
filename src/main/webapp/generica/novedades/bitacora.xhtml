@@ -1,0 +1,356 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            input.readonly,
+            input.readonly.ui-state-focus {
+                background: none;
+                box-shadow: none;
+                border: none;
+            }
+            .calendarFilter .ui-inputfield
+            {
+                width:90px !important;
+                margin: 0 0.2em !important;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .oneLine {
+                display: inline-block;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Bitácora de novedades genéricas">
+            <p:hotkey bind="ctrl+esc" 
+                      handler="PF('dtNovedades').clearFilters()"
+                      update="frmPrincipal:dtTipo"/>
+            <h:form id="frmPrincipal">
+                <p:dataTable var="novedad" value="#{genericaBean.lista}"
+                             id="dtTipo"
+                             scrollable="true"
+                             scrollHeight="600"
+                             widgetVar="dtNovedades"
+                             disabledTextSelection="false"
+                             filteredValue="#{genericaBean.listaFilter}"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1700"
+                             paginator="true"
+                             styleClass="fixed-size"
+                             sortBy="#{novedad.fecha}"
+                             sortOrder="descending"
+                             selection="#{genericaBean.selected}"
+                             rowKey="#{novedad.idGenerica}"
+                             selectionMode="single"
+                             style="table-layout: fixed;"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen novedades registradas">
+                    <p:cache disabled="true"/>
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <h:outputText value="Fechas: " title="Fecha Inicio"
+                                          style="right: 300px"/>&nbsp;&nbsp;
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{genericaBean.fechaInicio}"
+                                        placeholder="Fecha Ini"
+                                        readonlyInput="true"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{genericaBean.fechaFin}"
+                                        readonlyInput="true"
+                                        placeholder="Fecha Fin"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                            </p:calendar>
+                            <p:spacer width="10"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                actionListener="#{genericaBean.getByDateRange()}"
+                                class="cssWhite"
+                                update="dtTipo"
+                                >
+                            </p:commandButton>    
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Cambiar Puntos"
+                                             id="cambio-puntos"
+                                             update="formaplPM"
+                                             class="GreenButton cssWhite"
+                                             disabled="#{empty genericaBean.selected.idGenerica}"
+                                             rendered="#{genericaBean.b_rol}"
+                                             oncomplete="PF('apli-pm').show();"
+                                             />
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Ver más"
+                                             id="ver-mas"
+                                             update=":frmverMas"
+                                             icon="fa fa-info"
+                                             class="OrangeButton cssWhite"
+                                             rendered="false"
+                                             oncomplete="PF('verMasWv').show();"
+                                             />
+                            <p:commandButton id="btnSeguimiento"
+                                             icon="fa fa-book" style="color: white"
+                                             value="Seguimiento de novedad"
+                                             class="GreenButton cssWhite"
+                                             rendered="#{not(genericaBean.selected == null)}"
+                                             update="dtTipo,:frmNovedadSeguimientoList:dtNovedadSeguimiento"
+                                             oncomplete="PF('NovedadSeguimientoListDialog').show();"
+                                             >
+                            </p:commandButton>
+                            <p:spacer width="10"/>
+                            <p:commandButton id="btnDocumentos"
+                                             icon="fa fa-file-text-o" style="color: white"
+                                             value="Documentos de novedad"
+                                             class="OrangeButton cssWhite"
+                                             rendered="#{not(genericaBean.selected == null)}"
+                                             update="dtTipo,:frmNovedadDocumentosList"
+                                             oncomplete="PF('NovedadDocumentosListDialog').show();"
+                                             />
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Nueva novedad" 
+                                             id="btnNuevaNovedadPM"
+                                             title="Nueva novedad programa máster"
+                                             class="cssWhite"
+                                             icon="fa fa-sticky-note"
+                                             action="#{genericaBean.nuevo()}"
+                                             disabled="#{genericaBean.b_BtNuevo}"
+                                             update=":frmNovedadesPm,:modalnovedadesPM,modalnovedadesPM,
+                                             :frmNovedadesPm:pgrid2"
+                                             oncomplete="PF('novedadesPM').show();">
+                                <p:resetInput target=":frmNovedadesPm:pGrid"/>
+                                <p:resetInput target=":frmNovedadesPm:pgrid2"/>
+                                <p:resetInput target=":frmNovedadesPm:pgrid3"/>
+                                <p:ajax event="click" listener="#{genericaBean.resetSelected()}"
+                                        update="dtTipo"/>
+                            </p:commandButton>
+                            <p:commandButton value="Editar novedad" 
+                                             id="btnEditNovedadPM"
+                                             title="Editar novedad programa máster"
+                                             class="cssWhite"
+                                             icon="fa fa-pencil"
+                                             rendered="#{(genericaBean.selected.username == genericaBean.user.username or genericaBean.b_rol or genericaBean.validarRolSeg()) and genericaBean.selected != null}"
+                                             action="#{genericaBean.editar()}"
+                                             update=":frmNovedadesPm,:modalnovedadesPM"
+                                             oncomplete="PF('novedadesPM').show();">
+                                <p:resetInput target=":frmNovedadesPm:pGrid"/>
+                                <p:resetInput target=":frmNovedadesPm:pgrid2"/>
+                                <p:resetInput target=":frmNovedadesPm:pgrid3"/>
+                            </p:commandButton>
+                            <p:spacer width="10"/>
+
+                            <p:commandButton value="Generar reporte" icon="fa fa-download"
+                                             rendered="#{genericaBean.lista.size() gt 0}" 
+                                             class="GreenButton cssWhite"
+                                             update=":msgs"
+                                             ajax="false"
+                                             actionListener="#{genericaBean.generarReporte()}">
+                                <p:fileDownload value="#{genericaBean.fileReporte}" />
+                            </p:commandButton>
+
+                            <p:spacer width="10"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:ajax event="rowSelect" listener="#{genericaBean.onRowSelect}" update="botones" />
+                    <p:ajax event="rowUnselect" update="botones"/>
+
+                    <p:column headerText="#" style="width: 30px" toggleable="false"
+                              exportable="false">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Fecha"
+                              filterBy="#{novedad.fecha}" 
+                              filterMatchMode="startsWith"
+                              width="240">
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        showOn="button"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('dtNovedades').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dtNovedades').filter()" update="dtTipo"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{novedad.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Hora" title="Hora"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.hora}" rendered="#{novedad.hora != null}">
+                            <f:convertDateTime type="date" pattern="HH:mm" />
+                        </h:outputText>
+                        <h:outputText value="N/A" rendered="#{novedad.hora == null}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Novedad" filterBy="#{novedad.idGenericaTipo.nombreTipoNovedad}">
+                        <h:outputText value="#{novedad.idGenericaTipo.nombreTipoNovedad}" />
+                    </p:column>
+                    <p:column id="detTipoNovedad" filterBy="#{novedad.idGenericaTipoDetalle.tituloTipoGenerica}">
+                        <f:facet name="header">
+                            <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.idGenericaTipoDetalle.tituloTipoGenerica}" 
+                                      title="#{novedad.idGenericaTipoDetalle.tituloTipoGenerica}" />
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{novedad.idEmpleado.identificacion} #{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Empleado">
+                        <h:outputText value="#{novedad.idEmpleado.identificacion}" class="cssBlack"/>
+                        <h:outputText value=" #{novedad.idEmpleado.nombres.concat(' ').concat(novedad.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Identificación">
+                        <h:outputText value="#{novedad.idEmpleado.identificacion}" rendered="#{novedad.idEmpleado != null}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.idEmpleado eq null}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Nombre Empleado" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}" rendered="#{novedad.idEmpleado != null}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.idEmpleado eq null}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Observación" title="Observaciones"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.observaciones}"/>
+                    </p:column>
+                    <p:column id="documento"
+                              styleClass="#{novedad.genericaDocumentosList.size() gt 0 ? 'cssGreen': 'cssRed'}">
+                        <f:facet name="header" >
+                            <h:outputText value="Documento" title="¿Tiene documentos asociados?"/>  
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.genericaDocumentosList.size() gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.genericaDocumentosList.size() eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+
+                    <p:column id="seguimiento"
+                              styleClass="#{novedad.genericaSeguimientoList.size() gt 0 ? 'cssGreen': 'cssRed'}">
+                        <f:facet name="header">
+                            <h:outputText value="Seguimiento" title="¿Tiene seguimiento?"/>  
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.genericaSeguimientoList.size() gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.genericaSeguimientoList.size() eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column id="puntosPm" styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Puntos CP" title="Puntos compensación"/>
+                        </f:facet>
+                        <h:outputText value="#{genericaBean.puntoView(novedad)}"  />
+                    </p:column>
+                    <p:column rendered="#{genericaBean.b_rol}" 
+                              styleClass="text-center"
+                              headerText="Puntos CP Conciliados">
+                        <h:outputText value="#{novedad.puntosPmConciliados}"  />
+                    </p:column>
+                    <p:column id="procede"
+                              styleClass="#{novedad.procede gt 0 ? 'cssGreen': novedad.procede eq 0 ? 'cssRed' : ''}">
+                        <f:facet name="header">
+                            <h:outputText value="Procede"/>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.procede == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.procede == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column id="liquidada"
+                              styleClass="#{novedad.liquidada gt 0 ? 'cssGreen': novedad.liquidada eq 0 ? 'cssRed' : ''}">
+                        <f:facet name="header">
+                            <h:outputText value="Liquidada" title="¿Novedad liquidada?"/>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.liquidada == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.liquidada == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{novedad.username}"/>
+                    </p:column>
+                    <p:column headerText="Creado">
+                        <h:outputText value="#{novedad.creado}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="width: 40px" headerText="Acción" exportable="false" rendered="#{genericaBean.b_rol}">
+                        <p:commandButton actionListener="#{genericaBean.procedeCociliacion(novedad)}"
+                                         icon="fa fa-thumbs-up"
+                                         class="cssWhite GreenButton"
+                                         title="Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea aplicar los puntos?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                        <p:spacer width="3"/>
+                        <p:commandButton actionListener="#{genericaBean.noProcedeConciliacion(novedad)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite"
+                                         title="No Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea NO proceder con la conciliación?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{genericaBean.lista.size()} novedad(es) registradas.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtTipo" fileName="bitacora #{now}" 
+                                                postProcessor="#{genericaBean.postProcessXLS}"/>
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="dtTipo" fileName="bitacora #{now}"  />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="dtTipo" fileName="bitacora #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modals/novedades/modals/Create.xhtml"/>
+        <ui:include src="modals/seguimiento/ListaNovedadSeguimiento.xhtml"/>
+        <ui:include src="modals/documentos/ListaNovedadDocumentos.xhtml"/>
+        <ui:include src="modals/aplica.xhtml"/>
+        <ui:include src="modals/novedades/modals/verMasModal.xhtml"/>
+    </ui:define>
+</ui:composition>

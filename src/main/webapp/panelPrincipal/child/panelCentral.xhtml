@@ -1,0 +1,506 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <style>
+        .ui-panel {
+            border: 0px solid #C8D9E2;
+            padding: 0px !important;
+        }
+    </style>
+    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="btns_panel_central">
+            <div class="ui-g-6 ui-md-6 ui-lg-3 Padding2"
+                 jsf:rendered="#{prgTcJSFMB.flagRol and novedadDanoBean.viewCreateDAnoPP}">
+                <p:commandButton action="#{novedadDanoBean.nuevo(false,prgTcJSFMB.fechaConsulta)}" 
+                                 title="Agregar nueva novedad de daño" 
+                                 icon="fa fa-plus"
+                                 class="cssWhite"
+                                 disabled="#{prgTcJSFMB.flagConciliado or prgTcJSFMB.flagTurnoCerrado}"
+                                 update="frmDano,modalDano"
+                                 value="Daño">
+                    <p:resetInput target="frmDano,modalDano" />
+                </p:commandButton>
+            </div>
+            <div class="ui-g-6 ui-md-6 ui-lg-3 Padding2" 
+                 jsf:rendered="#{prgTcJSFMB.flagRol and multaController.viewCreateMultaPP}">
+                <p:commandButton id="createButton"
+                                 icon="fa fa-plus"  
+                                 title="Agregar nueva multa"
+                                 class="cssWhite OrangeButton"
+                                 value="Multa" 
+                                 disabled="#{prgTcJSFMB.flagConciliado or prgTcJSFMB.flagTurnoCerrado}"
+                                 action="#{multaController.prepareCreate(false,prgTcJSFMB.fechaConsulta)}"
+                                 update=":MultaCreateForm">
+                    <p:resetInput target="MultaCreateForm:display"/>
+                </p:commandButton>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding2" 
+                 jsf:rendered="#{prgTcJSFMB.flagRol and novedadBean.viewCreateNovedadPP}">
+                <p:commandButton value="Programa. Máster" 
+                                 id="btnNuevaNovedadPMPP"
+                                 title="Nueva novedad Programa Máster"
+                                 class="cssWhite RedButton"
+                                 icon="fa fa-plus"
+                                 disabled="#{prgTcJSFMB.flagConciliado or prgTcJSFMB.flagTurnoCerrado}" 
+                                 action="#{novedadBean.nuevo(prgTcJSFMB.fechaConsulta)}"
+                                 update="frmNovedadesPm,modalnovedadesPM"/>
+
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+        <p:tabView scrollable="true" id="tab_pp" dynamic="true" cache="true" > 
+            <p:ajax event="tabChange" process="@this"
+                    listener="#{tabViewPPBean.tabChange}" 
+                    update="msgs"/>
+            <p:tab title="Servicios" titletip="Servicios sin vehículo y operador" >
+                <p:panel id="headSinOp" header="Sin Operador ( #{prgTcJSFMB.listaSinOperador.size()} )" class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                    <h:form id="frmSinOpe" >
+                        <p:poll interval="60" 
+                                global="false"
+                                update="tab_pp:frmSinOpe:tbsinoper,tab_pp:frmSinBus:tblssb"
+                                listener="#{prgTcJSFMB.cargar()}"></p:poll>
+                        <p:poll interval="60" 
+                                global="false"
+                                listener="#{tabViewPPBean.cargarDataFromPoll()}"/>
+                        <p:poll interval="600" 
+                                update="noti_id"
+                                global="false"
+                                listener="#{alertaAsistenciaBean.alertaSinPresentacion()}"/>
+                        <p:remoteCommand name="remoteD"
+                                         process="@this"
+                                         global="false"
+                                         update="msgs"
+                                         actionListener="#{alertaAsistenciaBean.onSetVisto()}"/>
+                        <p:dataTable var="sso"
+                                     value="#{prgTcJSFMB.listaSinOperador}"
+                                     rows="15"
+                                     selection="#{prgTcJSFMB.prgTcSinOperador}"
+                                     selectionMode="single"
+                                     style="padding: 0px"
+                                     rowIndexVar="nroFila"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     id="tbsinoper"
+                                     scrollHeight="600"
+                                     scrollable="true"
+                                     widgetVar="tbsinoperWV"
+                                     filterDelay="1000"
+                                     emptyMessage="No hay servicios sin operador"
+                                     rowKey="#{sso.idPrgTc}"
+                                     paginatorPosition="top"
+                                     paginator="true">
+                            <p:ajax event="rowSelect" update="prgtcForm:tablaPrtTc,
+                                    prgtcForm:servicioPrtTc,
+                                    prgtcForm:servBusPrtTc,
+                                    prgtcForm:vehiculoPrtTc,
+                                    prgtcForm:operadorPrtTc,
+                                    prgtcForm:serconPrtTc,
+                                    prgtcForm:tblPrgTc"
+                                    listener="#{prgTcJSFMB.servicioSinOperador}"/>
+                            <p:column headerText="Sercon - H Ini - punto Ini - servbus"
+                                      class="#{prgTcJSFMB.alertSinOp(sso)}"
+                                      filterBy="#{sso.sercon}#{sso.timeOrigin}#{sso.fromStop.name}Tabla:#{sso.tabla}#{sso.servbus}"
+                                      filterMatchMode="contains" >
+                                <p:inputText value="#{sso.fecha}" 
+                                             id="fecha_id" 
+                                             style="display: none">
+                                    <f:convertDateTime 
+                                        type="date"
+                                        pattern="yyyy-MM-dd"/>
+                                </p:inputText>
+                                <ui:fragment>
+                                    <script type="text/javascript">$(function () {
+                                            var fechaHoraActual, fechaHoraServicio;
+                                            //Fecha hora del servicio
+                                            fechaHoraServicio = Date.parse(document.getElementById('tab_pp:frmSinOpe:tbsinoper:0:fecha_id').value + ' ' + '#{sso.timeOrigin}');
+                                            // Fecha hora en el momento
+                                            fechaHoraActual = Date.parse(new Date());
+                                            //Verificar si la hora actual es mayor a la hora del servicio para determinar si esta vencido.
+                                            if (fechaHoraActual > fechaHoraServicio) {
+                                                //                                                                console.log('rowRedStyle');
+                                            }
+                                        });</script>
+                                </ui:fragment>
+                                <span class="ui-fluid">
+                                    <span class="ui-g">
+                                        <span class="ui-g-12 ui-md-12 ui-lg-12 Fs14 Padding2" 
+                                              style="font-weight: bold;" >
+                                            #{sso.servbus}&nbsp;#{sso.idRuta.name}&nbsp;Tabla:&nbsp;#{sso.tabla}
+                                        </span>
+                                        <span class="ui-g-12 ui-md-12 ui-lg-12 Fs12 Padding2" 
+                                              style="font-weight: bold;" >
+                                            #{sso.timeOrigin}&nbsp; #{sso.fromStop.name}&nbsp;
+                                        </span>
+                                    </span>
+                                </span>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+                <p:panel id="headSinBus" header="Sin Vehículo ( #{prgTcJSFMB.listaSinBus.size()} )" class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                    <h:form id="frmSinBus" >
+                        <p:dataTable var="ssb"
+                                     id="tblssb"
+                                     value="#{prgTcJSFMB.listaSinBus}"
+                                     rows="15"
+                                     scrollHeight="600"
+                                     selectionMode="single"
+                                     scrollable="true"
+                                     filterDelay="1000"
+                                     style="padding: 0px"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     widgetVar="varssb"
+                                     emptyMessage="No hay servicios sin vehículos"
+                                     rowKey="#{ssb.idPrgTc}"
+                                     paginatorPosition="top"
+                                     paginator="true">
+                            <p:ajax event="rowSelect" update="prgtcForm:tablaPrtTc,
+                                    prgtcForm:servicioPrtTc,
+                                    prgtcForm:servBusPrtTc,
+                                    prgtcForm:vehiculoPrtTc,
+                                    prgtcForm:operadorPrtTc,
+                                    prgtcForm:serconPrtTc,
+                                    prgtcForm:tblPrgTc"
+                                    listener="#{prgTcJSFMB.servicioSinVehiculo}"/>
+                            <p:column headerText="Servbus - H Ini - punto Ini"
+                                      class="#{prgTcJSFMB.alertSinBus(ssb)}"
+                                      filterBy="#{ssb.servbus}#{ssb.timeOrigin}Tabla:#{ssb.fromStop.name}"
+                                      filterMatchMode="contains" >
+                                <div class="ui-fluid">
+                                    <div class="ui-g">
+                                        <span class="ui-g-12 ui-md-12 ui-lg-12 Fs14 Padding2" 
+                                              style="font-weight: bold;" >
+                                            #{ssb.servbus}&nbsp;#{ssb.idRuta.name}&nbsp;Tabla:&nbsp;#{ssb.tabla}
+                                        </span>
+                                        <span class="ui-g-5 ui-md-12 ui-lg-12 Fs12 Padding2" 
+                                              style="font-weight: bold;" >
+                                            #{ssb.timeOrigin}&nbsp;#{ssb.fromStop.name}
+                                        </span>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+            </p:tab>
+            <p:tab title="Documentos" id="docs_tab" titletip="Documentos vencidos para operador y vehículo">
+                <p:panel header="Operador" class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                    <h:form id="tbldoc_venc_ope_form">
+                        <p:dataTable var="vope"
+                                     id="tbldoc_venc_ope"
+                                     value="#{validarDocumentacionBean.listAllDocVencidosEmpleado}"
+                                     rows="10"
+                                     scrollHeight="600"
+                                     scrollable="true"
+                                     filterDelay="1000"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     widgetVar="tbldoc_venc_ope_wv"
+                                     emptyMessage="No hay operadores con documentos vencidos"
+                                     rowKey="#{vope.idEmpleadoDocumento}"
+                                     paginatorPosition="top"
+                                     paginator="true">
+                            <p:column headerText="Cod TM"
+                                      filterBy="#{vope.idEmpleado.codigoTm}"
+                                      filterMatchMode="contains" >
+                                <div class="ui-fluid">
+                                    <div class="ui-g">
+                                        <div class="ui-g-3 ui-md-4 ui-lg-3" 
+                                             style="padding: 1px;font-weight: bold; " >
+                                            <span class="Fs12  ">#{vope.idEmpleado.codigoTm}</span>
+                                        </div>
+                                        <div class="ui-g-5 ui-md-4 ui-lg-5" 
+                                             style="padding: 1px;font-weight: bold;" >
+                                            <span class="Fs12  ">#{vope.idEmpleadoTipoDocumento.nombreTipoDocumento}<br/>
+                                            </span>
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4" 
+                                             style="padding: 1px;font-weight: bold;" >
+                                            <span class="Fs12 ">  
+                                                <h:outputText value="#{vope.vigenteDesde}" >
+                                                    <f:convertDateTime type="date" pattern="yyyy/MM/dd" />
+                                                </h:outputText>
+                                                <br/>
+                                                <span class="Fs12 ">
+                                                    <h:outputText value="#{vope.vigenteHasta}" >
+                                                        <f:convertDateTime type="date" pattern="yyyy/MM/dd" />
+                                                    </h:outputText>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+                <p:panel header="Vehículo" class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                    <h:form id="tbldoc_venc_veh_form">
+                        <p:dataTable var="vvhc"
+                                     id="tbldoc_venc_veh"
+                                     value="#{validarDocumentacionBean.listAllDocVencidosVehiculo}"
+                                     rows="10"
+                                     scrollHeight="600"
+                                     scrollable="true"
+                                     filterDelay="1000"
+                                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                     widgetVar="tbldoc_venc_veh_wv"
+                                     emptyMessage="No hay vehiculos con documentos vencidos"
+                                     rowKey="#{vvhc.idVehiculoDocumento}"
+                                     paginatorPosition="top"
+                                     paginator="true">
+                            <p:column headerText="Cod Vehículo"
+                                      filterBy="#{vvhc.idVehiculo.codigo}"
+                                      filterMatchMode="contains" >
+                                <div class="ui-fluid">
+                                    <div class="ui-g">
+                                        <div class="ui-g-3 ui-md-4 ui-lg-3" 
+                                             style="padding: 1px;font-weight: bold; " >
+                                            <span class="Fs12  ">#{vvhc.idVehiculo.codigo}</span>
+                                        </div>
+                                        <div class="ui-g-5 ui-md-4 ui-lg-5" 
+                                             style="padding: 1px;font-weight: bold;" >
+                                            <span class="Fs12  ">#{vvhc.idVehiculoTipoDocumento.nombreTipoDocumento}<br/>
+                                            </span>
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4" 
+                                             style="padding: 1px;font-weight: bold;" >
+                                            <span class="Fs12 ">  
+                                                <h:outputText value="#{vvhc.vigenteDesde}" >
+                                                    <f:convertDateTime type="date" pattern="yyyy/MM/dd" />
+                                                </h:outputText>
+                                                <br/>
+                                                <span class="Fs12 ">
+                                                    <h:outputText value="#{vvhc.vigenteHasta}" >
+                                                        <f:convertDateTime type="date" pattern="yyyy/MM/dd" />
+                                                    </h:outputText>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+            </p:tab>
+
+            <p:tab title="Asistencia" id="asistencia_tab" 
+                   titletip="Operadores sin presentación registrada">
+                <h:form id="serconPresent_form">
+                    <p:dataTable var="serconPresent"
+                                 id="tblsercon_present"
+                                 value="#{alertaAsistenciaBean.prgSerconSonConfirmacion}"
+                                 rows="10"
+                                 selectionMode="single"
+                                 filterDelay="1000"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                 widgetVar="tblsercon_present_wv"
+                                 emptyMessage="No hay operadores sin presentación"
+                                 rowKey="#{serconPresent.idPrgSercon}"
+                                 paginatorPosition="top"
+                                 paginator="true">
+                        <p:ajax event="rowSelect" update="prgtcForm:tablaPrtTc,
+                                prgtcForm:servicioPrtTc,
+                                prgtcForm:servBusPrtTc,
+                                prgtcForm:vehiculoPrtTc,
+                                prgtcForm:operadorPrtTc,
+                                prgtcForm:serconPrtTc,
+                                prgtcForm:tblPrgTc,
+                                :formConsultaEmpl"
+                                listener="#{prgTcJSFMB.findByCodigoOperadorPP}"/>
+                        <p:column headerText="Cod TM"
+                                  filterBy="#{serconPresent.idEmpleado.codigoTm}"
+                                  filterMatchMode="contains" >
+                            <span class="ui-fluid">
+                                <span class="ui-g">
+                                    <span class="ui-g-5 ui-md-5 ui-lg-5 Padding2" 
+                                          style="font-weight: bold; " >
+                                        <span class="Fs12  " style="color: black">#{serconPresent.idEmpleado.codigoTm}-</span>
+                                        <span class="Fs12  ">#{serconPresent.idEmpleado.nombres} #{serconPresent.idEmpleado.apellidos}
+                                        </span>
+                                    </span>
+                                    <span class="ui-g-3 ui-md-4 ui-lg-3 Padding2" 
+                                          style="font-weight: bold;" >
+                                        <span class="Fs12 " >#{serconPresent.idFromStop.name}</span><br/>
+                                    </span>
+                                    <span class="ui-g-2 ui-md-2 ui-lg-2 Padding2" 
+                                          style="font-weight: bold;" >
+                                        <span class="Fs12 ">  
+                                            <span class="ui-g-12 ui-md-12 ui-lg-12 Padding0" style="color: red">
+                                                <h:outputText value="#{serconPresent.realTimeOrigin != null? ((serconPresent.autorizado==null || serconPresent.autorizado==0) ? serconPresent.timeOrigin:  serconPresent.realTimeOrigin) : serconPresent.timeOrigin}"/> 
+                                            </span>
+                                            <span class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                <h:outputText value="#{serconPresent.realTimeDestiny != null? ((serconPresent.autorizado==null || serconPresent.autorizado==0) ? serconPresent.timeDestiny :  serconPresent.realTimeDestiny) : serconPresent.timeDestiny}" />
+                                            </span>
+                                        </span>
+                                    </span>
+                                    <div class="ui-g-2 ui-md-1 ui-lg-2 Padding2">
+                                        <p:commandButton rendered="#{prgTcJSFMB.flagRol}"
+                                                         title="Confirmar presentación, #{serconPresent.idEmpleado.codigoTm} #{serconPresent.idEmpleado.nombres} #{serconPresent.idEmpleado.apellidos}"
+                                                         action="#{alertaAsistenciaBean.registrarInicioJornada(serconPresent)}"
+                                                         process="@this" 
+                                                         update="msgs,tab_pp:serconPresent_form:tblsercon_present" 
+                                                         class="cssWhite OrangeButton" 
+                                                         icon="fa fa-clock-o">
+                                            <p:confirm header="Confirmación"
+                                                       message="Ésta seguro que desea registar el inicio de jornada(#{serconPresent.timeOrigin}) para el operador #{serconPresent.idEmpleado.codigoTm} #{serconPresent.idEmpleado.nombres} #{serconPresent.idEmpleado.apellidos}"
+                                                       icon="fa fa-exclamation-triangle"/>
+                                        </p:commandButton>
+
+                                    </div>
+                                </span>
+                            </span>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+            <p:tab title="Asistencia Vehículo" id="asistencia_veh_tab"
+                   titletip="Veh">
+                <h:form id="asistencia_veh_form">
+                    <p:dataTable var="asiv"
+                                 id="tblveh_present"
+                                 value="#{alertaEntradaVehBean.list}"
+                                 rows="10"
+                                 filterDelay="1000"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                 widgetVar="tblveh_present_wv"
+                                 emptyMessage="No hay vehículos sin presentación"
+                                 rowKey="#{asiv.idPrgTc}"
+                                 paginatorPosition="top"
+                                 paginator="true">
+                        <p:column headerText="Vehículo"
+                                  filterBy="#{asiv.idVehiculo.codigo}"
+                                  filterMatchMode="contains" >
+                            <div class="ui-fluid">
+                                <div class="ui-g">
+                                    <div class="ui-g-3 ui-md-4 ui-lg-3 Padding2" 
+                                         style="font-weight: bold; " >
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <span class="Fs12  ">#{asiv.idVehiculo.codigo}</span>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <span class="Fs12  ">#{asiv.servbus}</span>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-5 ui-md-4 ui-lg-6 Padding2" 
+                                         style="font-weight: bold;" >
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <span class="Fs12  ">#{asiv.idEmpleado.codigoTm}</span>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <span class="Fs12  ">#{asiv.idEmpleado.nombres} #{asiv.idEmpleado.apellidos}</span>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-4 ui-md-4 ui-lg-3 Padding2" 
+                                         style="font-weight: bold;" >
+                                        <span class="Fs12 ">  
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                <h:outputText value="#{asiv.timeOrigin}"/> 
+                                            </div>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                                <h:outputText value="#{asiv.timeDestiny }" />
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+
+            <p:tab title="Detenidos" id="vehiculos_detenidos_tab"
+                   titleStyleClass="#{alertaEntradaVehBean.lstVehiculosDetenidos.size() ge 0? 'animacion':''}">
+                <h:form id="vehiculos_detenidos_form">
+                    <p:dataTable id="dtVehiculosDetenidos" var="item" 
+                                 scrollable="true"
+                                 widgetVar="wlVdtVehiculosDetenidos"
+                                 scrollHeight="600"
+                                 disabledTextSelection="false"
+                                 reflow="true"
+                                 selectionMode="single"
+                                 rowKey="#{item.get_Vehicle()}"
+                                 rows="10"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,50,100"
+                                 paginatorPosition="top"
+                                 emptyMessage="No existen registros"
+                                 value="#{alertaEntradaVehBean.lstVehiculosDetenidos}">
+                        <p:ajax event="rowSelect" update="prgtcForm:tablaPrtTc,
+                                prgtcForm:servicioPrtTc,
+                                prgtcForm:servBusPrtTc,
+                                prgtcForm:vehiculoPrtTc,
+                                prgtcForm:operadorPrtTc,
+                                prgtcForm:serconPrtTc,
+                                prgtcForm:tblPrgTc"
+                                listener="#{prgTcJSFMB.findServVehiculoDetenido}"/>
+                        <p:column headerText="Código vehículo" 
+                                  filterBy="#{item._Vehicle}"
+                                  filterMatchMode="contains"
+                                  class="TexAlCenter">
+                            <h:outputText value="#{item._Vehicle}" />
+                        </p:column>
+
+                        <p:column headerText="Estado" 
+                                  filterBy="#{item._Status}"
+                                  filterMatchMode="exact"
+                                  class="TexAlCenter">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('wlVdtVehiculosDetenidos').filter()" 
+                                                 styleClass="custom-filter" 
+                                                 filter="true" 
+                                                 filterMatchMode="contains" 
+                                                 style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Todos" 
+                                                  itemDescription="Seleccione Uno.." 
+                                                  itemValue="#{null}"/>
+                                    <f:selectItem itemLabel="Apagado"  itemValue="Apagado"/>
+                                    <f:selectItem itemLabel="Detenido" itemValue="Detenido"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item._Status}" />
+                        </p:column>
+                        <p:column headerText="Fecha Registro" class="TexAlCenter">
+                            <h:outputText value="#{item._VehicleTimestamp}" />
+                        </p:column>
+
+                        <p:column headerText="Acciones"
+                                  width="10%"
+                                  class="TexAlCenter">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                    <p:commandButton styleClass="cssWhite OrangeButton"
+                                                     title="Mostrar ubicación vehículo"
+                                                     action="#{alertaEntradaVehBean.mostrarUbicacionVehiculo(item._Vehicle)}"
+                                                     process="@this"
+                                                     update="msgs,map_geo"
+                                                     icon="fa fa-map-marker">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </p:column>
+                        <f:facet name="footer">
+                            En total existen #{alertaEntradaVehBean.lstVehiculosDetenidos.size()} registro(s).
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="dtVehiculosDetenidos" 
+                                                    fileName="Listado vehículos detenidos"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+        </p:tabView>
+    </div>
+
+</ui:composition>

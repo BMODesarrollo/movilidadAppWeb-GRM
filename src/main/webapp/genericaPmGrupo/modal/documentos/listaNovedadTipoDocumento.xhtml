@@ -1,0 +1,47 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="NovedadTipoDocumentosListDlg" widgetVar="NovedadTipoDocumentosListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Tipos de documento"
+              class="mr1024_40 mr500_90" closeOnEscape="true" responsive="true" position="center top" >
+        <h:form id="frmNovedadTipoDocumentosList">
+            <p:cache disabled="true"/>
+            <p:dataTable var="novedadTipoDocumento" value="#{genGruposNovMB.lstNovedadTipoDocumentos}"
+                         id="dtNovedadDocumentos" widgetVar="dtNovedadDocumento"
+                         selectionMode="single"                       
+                         rowIndexVar="nroFila"
+                         reflow="true"
+                         filterDelay="1000"
+                         paginator="true"
+                         rows="8"
+                         rowKey="#{novedadTipoDocumento.idGenericaTipoDocumento}"
+                         emptyMessage="No existen tipos de cocumentos registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{genGruposNovMB.onRowDblClckSelect}"
+                        update=":frmNuevoDocumento:tipo_documento"
+                        oncomplete="PF('NovedadTipoDocumentosListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Fecha" filterBy="#{novedadTipoDocumento.nombreTipoDocumento}" 
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipoDocumento.nombreTipoDocumento}" />
+                </p:column>
+                <p:column headerText="Descripción" filterBy="#{novedadTipoDocumento.descripcionTipoDocumento}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipoDocumento.descripcionTipoDocumento}" />
+                </p:column>
+                <p:column headerText="Obligatorio"
+                          styleClass="#{novedadTipoDocumento.obligatorio gt 0 ? 'cssGreen': novedadTipoDocumento.obligatorio eq 0 ? 'cssRed' : ''}">
+                    <h:outputText value="Sí" rendered="#{novedadTipoDocumento.obligatorio == 1}"
+                                  style=" color: white;"/>
+                    <h:outputText value="No" rendered="#{novedadTipoDocumento.obligatorio == 0}"
+                                  style=" color: white;"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

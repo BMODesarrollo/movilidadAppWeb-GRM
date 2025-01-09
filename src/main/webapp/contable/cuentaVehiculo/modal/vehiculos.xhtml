@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal-veh" 
+              closeOnEscape="true" 
+              widgetVar="vehDlg"
+              modal="true"
+              header="VEHÍCULOS"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)" 
+              fitViewport="true"
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal-veh">
+            <div class="ui-fluid">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:dataTable id="tblveh" 
+                                 var="veh"  
+                                 value="#{contableCtaVehiculoJSF.listVehiculo}" 
+                                 rows="15"
+                                 filterDelay="1500"
+                                 reflow="true"
+                                 widgetVar="dtVehiculo"
+                                 emptyMessage="No se hallaron Vehículos!"
+                                 rowIndexVar="rVar"
+                                 paginator="true"
+                                 rowsPerPageTemplate="15,50,100,500">
+
+                        <p:column headerText="#" style="width: 8%">
+                            <p:outputLabel value="#{rVar+1}" />
+                        </p:column>
+                        <p:column headerText="Placa"
+                                  filterBy="#{veh.placa}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{veh.placa}" />
+                        </p:column>
+                        <p:column filterBy="#{veh.codigo}"
+                                  filterMatchMode="contains"
+                                  headerText="Código">
+                            <h:outputText value="#{veh.codigo}"/>
+                        </p:column>
+                        <p:column headerText="Acciones" style="width: 70px" exportable="false">
+                            <p:commandButton id="seleVehButton"   
+                                             update="form-modal:vehiculo" 
+                                             icon="fa fa-check"
+                                             title="Seleccionar"
+                                             process="@this"
+                                             actionListener="#{contableCtaVehiculoJSF.onVehiculo(veh)}"
+                                             class="cssWhite GreenButton" />
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

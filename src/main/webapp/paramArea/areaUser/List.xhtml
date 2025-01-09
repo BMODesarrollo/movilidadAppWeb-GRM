@@ -1,0 +1,92 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form id="AreaUsuarioListForm">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Parametrización Área Usuario">
+                <p:dataTable id="datalist" 
+                             value="#{paramAreaUserJSF.listParamAreaUsr}"
+                             var="item"
+                             paginator="true"
+                             rowKey="#{rVar + 1}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             filterDelay="2000"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             emptyMessage="No existen registros"
+                             scrollable="true"
+                             scrollHeight="1000"
+                             >
+
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Área" filterBy="#{item.idParamArea.area}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idParamArea.area}"/>
+                    </p:column>
+                    <p:column headerText="Descripción" filterBy="#{item.idParamArea.descripcion}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idParamArea.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Nombres" filterBy="#{item.idParamUsr.nombres}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idParamUsr.nombres}"/>
+                    </p:column>
+                    <p:column headerText="Teléfono">
+                        <h:outputText value="#{item.idParamUsr.idEmpleado != null ? item.idParamUsr.idEmpleado.telefonoMovil : 'NA'}"/>
+                    </p:column>
+                    <p:column headerText="Usuario" filterBy="#{item.idParamUsr.username}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idParamUsr.username}"/>
+                    </p:column>
+                    <p:column headerText="Creado Por" >
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column headerText="Acciones" style="width: 70px" exportable="false">
+                        <p:commandButton id="editButton"   
+                                         update=":form-usu,dial-usu" 
+                                         icon="fa fa-pencil" 
+                                         actionListener="#{paramAreaUserJSF.onSelectEdit(item)}"
+                                         class="cssWhite GreenButton"
+                                         oncomplete="PF('usuDlg').show()">
+                            <p:resetInput target="form-usu"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             actionListener="#{paramAreaUserJSF.prepareGuardar()}" 
+                                             update=":form-usu,dial-usu" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             oncomplete="PF('usuDlg').show()">
+                                <p:resetInput target="form-usu"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="parametros area usuario #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/administracion.xhtml"/>
+    </ui:define>
+</ui:composition>

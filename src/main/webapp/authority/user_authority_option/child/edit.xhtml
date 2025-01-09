@@ -1,0 +1,86 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="checklistEdit"
+              widgetVar="checklistEditDlg" 
+              modal="true" 
+              width="50%"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+        <f:facet name="header">
+            EDITAR REGISTRO
+        </f:facet>
+        <h:form id="frmCheckListEdit">
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div align="center">
+                <h:panelGrid columns="2" id="pGridDatos" styleClass="ui-fluid">
+                    <h:panelGrid columns="1">
+                        <p:outputLabel for="@next" value="Authority: "/>
+                        <h:panelGrid columns="2">
+                            <p:inputText id="tipo_evento" 
+                                         required="true"
+                                         readonly="true"
+                                         placeholder="Seleccione autoridad"
+                                         requiredMessage="Debe seleccionar un authority"
+                                         value="#{userAuthorityOptBean.userAuthority.authority}">
+                            </p:inputText>
+                            <p:commandButton title="Cargar listado"
+                                             id="novedad_tipo_detalleBtn"
+                                             icon="fa fa-search"
+                                             process="@this"
+                                             class="cssWhite"
+                                             update=":frmPmNovedadTipoDetalleListEdit"
+                                             onclick="PF('dtNovedadTipoDetalleEdit').getPaginator().setPage(0);"
+                                             action="#{userAuthorityOptBean.prepareListUserAuthority()}"
+                                             oncomplete="PF('PmNovedadTipoDetalleListDialogEdit').show()">
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1">
+                        <p:outputLabel value="Opción: "/>
+                        <h:panelGrid columns="2">
+                            <p:inputText id="tipo_documento" 
+                                         required="true"
+                                         readonly="true"
+                                         placeholder="Seleccione opción"
+                                         requiredMessage="Debe seleccionar una opción"
+                                         style="width: 300px"
+                                         value="#{userAuthorityOptBean.opcion.nameop}">
+                            </p:inputText>
+                            <p:commandButton title="Cargar listado de opciones"
+                                             id="tipo_Docs_Btn"
+                                             icon="fa fa-search"
+                                             process="@this"
+                                             styleClass="cssWhite"
+                                             update=":frmAccTipoDocsListEdit"
+                                             onclick="PF('dtAccTipoDocEdit').getPaginator().setPage(0);"
+                                             action="#{userAuthorityOptBean.prepareListOpcion()}"
+                                             oncomplete="PF('AccTipoDocsListDialogEdit').show()">
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </div>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmCheckList:dtCheckLists"
+                             action="#{userAuthorityOptBean.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{userAuthorityOptBean.selected != null}"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListPmNovedadTipoDetalles_Edit.xhtml" />
+    <ui:include src="ListAccTipoDocs_Edit.xhtml" />
+</ui:composition>     

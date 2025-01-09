@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:composition>
+        <p:dialog id="GenericaJornadaParamCreateDlg" 
+                  closeOnEscape="true" widgetVar="GenericaJornadaParamCreateDialog" 
+                  class="mr1024_50 mr500_90" modal="true" resizable="false" appendTo="@(body)" 
+                  responsive="true" position="center top">
+            <c:if test="#{genericaJornadaParamBean.selected == null }">
+                <f:facet name="header">
+                    Nuevo registro
+                </f:facet>
+            </c:if>
+            <c:if test="#{genericaJornadaParamBean.selected != null }">
+                <f:facet name="header">
+                    Editar Registro
+                </f:facet>
+            </c:if>
+            <h:form id="GenericaJornadaParamCreateForm">
+
+                <p:growl id="msgs" showDetail="true" escape="false"/>
+                <p:growl id="messages" showDetail="true" />  
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                            <p:outputLabel value="Área:" for="@next"/>
+                            <p:selectOneMenu id="t-area"
+                                             required="true" 
+                                             requiredMessage="Debe seleccionar un área"
+                                             value="#{genericaJornadaParamBean.i_idArea}" 
+                                             filter="true" 
+                                             filterMatchMode="contains" >
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{genericaJornadaParamBean.listParamArea}" 
+                                               var="listarea" 
+                                               itemLabel="#{listarea.area}" 
+                                               itemDescription="#{listarea.descripcion}"
+                                               itemValue="#{listarea.idParamArea}" />
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Cambio Jornada" for="@next"/>
+                            <p:selectBooleanButton id="i_cambio_jornada" 
+                                                   value="#{genericaJornadaParamBean.b_cambio_jornada}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   styleClass="cssWhite">
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Autorizar Extensión Jornada" for="@next"/>
+                            <p:selectBooleanButton id="i_autorizar_extension_jornada" 
+                                                   value="#{genericaJornadaParamBean.b_autorizar_extension_jornada}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times" 
+                                                   styleClass="cssWhite">
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Aprobar Extras Feriadas" for="@next"/>
+                            <p:selectBooleanButton id="i_aprobar_extras_feriadas" 
+                                                   value="#{genericaJornadaParamBean.b_aprobar_extras_feriadas}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times" 
+                                                   styleClass="cssWhite">
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Requerir Orden de Trabajo" for="@next"/>
+                            <p:selectBooleanButton id="i_requerir_orden_trabajo" 
+                                                   value="#{genericaJornadaParamBean.b_requerir_orden_trabajo}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   styleClass="cssWhite">
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Validar Descanso Dominical" for="@next"/>
+                            <p:selectBooleanButton id="i_validar_descanso_dominical" 
+                                                   value="#{genericaJornadaParamBean.b_validar_descanso_dominical}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   styleClass="cssWhite"
+                                                   offIcon="fa fa-times" >
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Notifica" for="@next"/>
+                            <p:selectBooleanButton id="i_notifica" 
+                                                   value="#{genericaJornadaParamBean.b_notifica}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   styleClass="cssWhite"
+                                                   offIcon="fa fa-times" >
+                                <p:ajax update="pGridEmails" listener="#{genericaJornadaParamBean.cargarEmails()}" />
+                            </p:selectBooleanButton>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 " jsf:id="pGridEmails">
+                            <p:outputLabel value="Emails" rendered="#{genericaJornadaParamBean.b_notifica}"/>
+
+                            <div class="EmptyBox5"></div>
+                            <p:staticMessage severity="warn" 
+                                             rendered="#{genericaJornadaParamBean.b_notifica}"
+                                             summary="AVISO!" 
+                                             detail="Los correos electrónicos deben ir separados por cómas (,)" />
+                            <div class="EmptyBox5"></div>
+
+                            <p:inputTextarea id="emails"
+                                             value="#{genericaJornadaParamBean.genericaJornadaParam.emails}" 
+                                             rendered="#{genericaJornadaParamBean.b_notifica}"
+                                             rows="5" maxlength="255" 
+                                             required="true"
+                                             requiredMessage="Debe ingresar al menos un email"
+                                             autoResize="false" placeholder="Ingrese los correos separados por comas (,)" /> 
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Control horas extras" for="@next"/>
+                            <p:selectBooleanButton id="i_control_horas_extras" 
+                                                   value="#{genericaJornadaParamBean.b_control_horas_extras}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times" 
+                                                   styleClass="cssWhite">
+                                <p:ajax update="hExtrasS,hExtrasM" />
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Nro Dias Descanso dominical:" for="@next"/>
+                            <p:inputText id="descansoDominical"
+                                         maxlength="2"
+                                         value="#{genericaJornadaParamBean.genericaJornadaParam.nroDiasDescansoDominical}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar los dias de descanso dominical">
+                                <p:keyFilter regEx="/[\d]/"/>
+                            </p:inputText>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Horas Extras Semanales:" for="@next"/>
+                            <p:inputText id="hExtrasS" 
+                                         maxlength="2"
+                                         value="#{genericaJornadaParamBean.genericaJornadaParam.horasExtrasSemanales}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar las horas extras semanales"
+                                         disabled="#{not(genericaJornadaParamBean.b_control_horas_extras)}">
+                                <p:keyFilter regEx="/[\d]/"/>
+                            </p:inputText>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                            <p:outputLabel value="Horas Extras Mensuales:" for="@next"/>
+                            <p:inputText id="hExtrasM" 
+                                         maxlength="2"
+                                         value="#{genericaJornadaParamBean.genericaJornadaParam.horasExtrasMensuales}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar las horas extras mensuales"
+                                         disabled="#{not(genericaJornadaParamBean.b_control_horas_extras)}">
+                                <p:keyFilter regEx="/[\d]/"/>
+                            </p:inputText>
+                        </div>
+                    </div>
+                </div>
+                <p:remoteCommand name="rc" 
+                                 class="cssWhite"
+                                 actionListener="#{genericaJornadaParamBean.guardar()}"  
+                                 value="Guardar" 
+                                 update="@form,:GenericaJornadaParamListForm:datalist,messages,msgs"/>
+            </h:form>
+            <f:facet name="footer">
+                <p:commandButton id="btnGuardarAdd" 
+                                 icon="fa fa-save" value="Guardar" 
+                                 class="cssWhite" onclick="rc()"/>
+            </f:facet>
+        </p:dialog>
+    </ui:composition>
+</html>

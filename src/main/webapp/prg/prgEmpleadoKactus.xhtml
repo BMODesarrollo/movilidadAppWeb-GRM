@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <p:panel header="Carga de Empleados desde Kactus">
+            <h:form id="frmPrgEmployee">
+                <p:messages id="messages" showDetail="true" closable="true"  />  
+                <div align="right">
+                    <h:panelGrid id="panelGrd" columns="4">
+                        <p:commandButton title="Consumir Empleados" 
+                                         icon="fa fa-plus"
+                                         class="cssWhite"
+                                         rendered="#{!prgEmpKactusGMJSF.flag}"
+                                         actionListener="#{prgEmpKactusGMJSF.consumeEmployeeKactus()}" 
+                                         value="Consumir Empleados"
+                                         update ="panelGrd,tabEmployee:dtEmployee,frmPrgEmployee:messages">
+                        </p:commandButton>
+                        <p:commandButton title="Actualizar Empleados" 
+                                         icon="fa fa-plus"
+                                         class="cssWhite GreenButton"
+                                         rendered="#{!prgEmpKactusGMJSF.flag}"
+                                         actionListener="#{prgEmpKactusGMJSF.actualizarEmpleados()}" 
+                                         value="Actualizar Empleados"
+                                         update="frmPrgEmployee">
+                        </p:commandButton>
+                        <p:commandButton title="Actualizar Coordenadas Todos Empleados" 
+                                         icon="fa fa-check"
+                                         class="cssWhite GreenButton"
+                                         actionListener="#{prgEmpKactusGMJSF.actualizarEmpleados()}" 
+                                         value="Actualizar Coordenadas">
+                        </p:commandButton>
+                        <p:commandButton title="Actualizar Cargos" 
+                                         icon="fa fa-plus"
+                                         class="cssWhite OrangeButton"
+                                         rendered="#{!prgEmpKactusGMJSF.flag}"
+                                         actionListener="#{prgEmpKactusGMJSF.actualizarCargos()}" 
+                                         value="Actualizar Cargos"
+                                         update="frmPrgEmployee">
+                        </p:commandButton>
+                        <p:commandButton title="Aplicar Cambios" 
+                                         id="aplicar"
+                                         class="cssWhite GreenButton"
+                                         icon="fa fa-plus"
+                                         actionListener="#{prgEmpKactusGMJSF.apply()}" 
+                                         rendered="#{prgEmpKactusGMJSF.flag}"
+                                         value="Aplicar Cambios"
+                                         update ="frmPrgEmployee">
+                        </p:commandButton>
+                    </h:panelGrid>
+                </div>
+
+                <p:tabView id="tabEmployee" dynamic="true" cache="true" effect="fold">
+
+                    <p:tab title="Nuevos Empleados">
+                        <div aling="rigth">
+                            <p:commandButton id="toggler2" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtEmployee" trigger="toggler2" />
+                        </div>
+                        <p:dataTable var="emp" value="#{prgEmpKactusGMJSF.lstEmpleado}"
+                                     id="dtEmployee"
+                                     rowIndexVar="nroFila"
+                                     reflow="true"
+                                     rows="50"
+                                     filterDelay="1000"
+                                     paginator="true"
+                                     currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="50,100,150"
+                                     emptyMessage="No existen nuevos empados">
+                            <p:column headerText="#" style="width: 30px">
+                                <h:outputText value="#{nroFila+1}" />
+                            </p:column>
+                            <p:column headerText="Identificación"
+                                      filterBy="#{emp.identificacion}"
+                                      filterMatchMode="contains">
+                                <h:outputText value="#{emp.identificacion}" />
+                            </p:column>
+                            <p:column headerText="Código TM"
+                                      filterBy="#{emp.codigoTm}"
+                                      filterMatchMode="contains">
+                                <h:outputText value="#{emp.codigoTm}" />
+                            </p:column>
+
+                            <p:column filterBy="#{emp.nombres}"
+                                      filterMatchMode="contains"
+                                      headerText="Nombres">
+                                <h:outputText value="#{emp.nombres}"/>
+                            </p:column>
+                            <p:column filterBy="#{emp.apellidos}"
+                                      filterMatchMode="contains"
+                                      headerText="Apellidos">
+                                <h:outputText value="#{emp.apellidos}"/>
+                            </p:column>
+                            <p:column filterBy="#{emp.telefonoMovil}"
+                                      filterMatchMode="contains"
+                                      headerText="Teléfono">
+                                <h:outputText value="#{emp.telefonoMovil}"/>
+                            </p:column>
+                            <p:column filterBy="#{emp.idEmpleadoCargo.nombreCargo}"
+                                      filterMatchMode="contains"
+                                      headerText="Cargo">
+                                <h:outputText value="#{emp.idEmpleadoCargo.nombreCargo}"/>
+                            </p:column>
+                            <p:column 
+                                headerText="Fecha Ingreso">
+                                <h:outputText value="#{emp.fechaIngreso}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+
+                                </h:outputText>
+                            </p:column>
+                            <p:column filterBy="#{emp.emailCorporativo}"
+                                      filterMatchMode="contains"
+                                      headerText="Email">
+                                <h:outputText value="#{emp.emailCorporativo}"/>
+                            </p:column>
+
+                            <f:facet name="footer">
+                                En total existen #{prgEmpKactusGMJSF.lstEmpleado.size()} nuevos empleados.
+                                <div align="right">
+                                    <h:commandLink>
+                                        <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="dtEmployee" fileName="Empleados #{now}" />
+                                    </h:commandLink>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:tab>
+
+                </p:tabView>
+
+
+            </h:form>
+
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

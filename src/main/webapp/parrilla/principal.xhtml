@@ -1,0 +1,320 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core" >
+
+    <ui:define name="head">
+        <style type="text/css">
+            .display-none{
+                display: none;
+            }
+            .redColoredPanel .ui-panel-titlebar {
+                background: #c91515;
+            }
+            .blueColoredPanel .ui-panel-titlebar{
+                background: #023f71;
+            }
+            .flex-horas{
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 0px 40px 0px 15px;
+                align-items: center;
+            }
+            .ui-button .ui-button-text {
+                display: block;
+                line-height: normal;
+                height: 80%;
+            }
+        </style>
+        <script type="text/javascript">
+            function maximizar(op) {
+                const div_entrada = document.querySelector('.progE');
+                const div_salida = document.querySelector('.progS');
+                const div_parrila = document.querySelector('.parrilla');
+                switch (op) {
+                    case 'pa':
+                        div_entrada.classList.toggle('display-none');
+                        div_salida.classList.toggle('display-none');
+                        break;
+                    case 'ps':
+                        div_entrada.classList.toggle('display-none');
+                        div_parrila.classList.toggle('display-none');
+                        break;
+                    case 'pe':
+                        div_parrila.classList.toggle('display-none');
+                        div_salida.classList.toggle('display-none');
+                        break;
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:poll interval="300" 
+                    listener="#{parillaPrincipalJSF.consultarEntradasSalidas()}"
+                    update="tb-salidas,tb-entradas" 
+                    global="false" />
+            <div class="flex-horas" jsf:id="horas">
+                <span class="cssBlack">#{parillaPrincipalJSF.starTime()}</span>
+                <span style="flex-direction: row">
+                    <table>
+                        <th>
+                            <span class="cssBlack MarRight10">#{parillaPrincipalJSF.endTime()}</span>
+                        </th>
+                        <th jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                            <ui:include src="../zComponent/selectUnidadFuncional.xhtml"/>
+                        </th>
+                    </table>
+                </span>
+            </div>
+            <div class="flex-grid">
+                <div class="col progS">
+                    <p:panel header="Salidas Programadas">
+                        <p:dataTable id="tb-salidas" 
+                                     widgetVar="wv-tb-salidas"
+                                     value="#{parillaPrincipalJSF.listSalida}" 
+                                     var="item"
+                                     rowIndexVar="idxSal"
+                                     emptyMessage="Sin registros"
+                                     paginator="true"
+                                     filterDelay="2000"
+                                     rowKey="#{item.idPrgTc}"
+                                     rows="10"
+                                     reflow="true"
+                                     rowsPerPageTemplate="10,20,100,500">
+                            <f:facet name="paginatorTopRight">
+                                <p:commandButton title="Recargar salidas de patio" 
+                                                 icon="fa fa-rotate-left"
+                                                 class="cssWhite"
+                                                 action="#{parillaPrincipalJSF.consultarSalidas()}" 
+                                                 process="@this"
+                                                 update="tb-salidas"/>
+                            </f:facet>
+                            <p:column filterBy="#{item.timeOrigin} #{item.toStop.name} #{item.fromStop.name} #{item.servbus}#{item.idEmpleado.codigoTm} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos} #{item.idVehiculo.codigo}"
+                                      filterStyle = "display: none; visibilidad: hidden;">
+                                <f:facet name="header">
+                                    <p:inputText id="globalFilterS" 
+                                                 onkeyup="PF('wv-tb-salidas').filter()" 
+                                                 style="width: 95%"
+                                                 placeholder="Buscar"/>
+                                </f:facet>
+                                <div class="ui-fluid">
+                                    <div class="ui-g">
+                                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                                            <span class="Fs12 cssBlack">Salida</span>
+                                            <br/>
+                                            <span class="Fs12">#{item.timeOrigin}</span>
+                                        </span>
+                                        <span class="ui-g-12 ui-md-12 ui-lg-4 Padding5 TexAlCenter" >
+                                            <span class="Fs12 cssBlack" >#{item.toStop.name}</span>
+                                            <br/>
+                                            a
+                                            <br/>
+                                            <span class="Fs12 cssBlack">#{item.fromStop.name}</span>
+                                        </span>
+                                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                                            <span class="Fs12 cssBlack">Servbus</span>
+                                            <br/>
+                                            <span class="Fs12">#{item.servbus}</span>
+                                        </span>
+                                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                                            <span class="Fs12 cssBlack" jsf:id="emp">
+                                                Operador
+                                            </span>
+                                            <p:tooltip id="tooltip"
+                                                       value="#{item.idEmpleado.getNombresApellidos()}"
+                                                       position="top"
+                                                       for=":form:tb-salidas:#{idxSal}:emp" />
+                                            <br/>
+                                            <span class="Fs12">#{item.idEmpleado.codigoTm}</span>
+                                        </span>
+                                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter" >
+                                            <span class="Fs12 cssBlack">Vehículo</span>
+                                            <br/>
+                                            <span class="Fs12">#{item.idVehiculo.codigo}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                        <f:facet name="actions">
+                            <i class="fa fa-window-maximize cssWhite"
+                               style="cursor: pointer"
+                               onclick="maximizar('ps')" />
+                        </f:facet>
+                    </p:panel>
+                </div>
+                <div class="col progE">
+                    <p:panel header="Entradas Programadas" styleClass="blueColoredPanel">
+                        <p:dataTable id="tb-entradas" 
+                                     widgetVar="wv-tb-entradas"
+                                     value="#{parillaPrincipalJSF.listEntrada}" 
+                                     rowIndexVar="idxEnt"
+                                     var="item"
+                                     emptyMessage="Sin registros"
+                                     paginator="true"
+                                     filterDelay="2000"
+                                     rowKey="#{item.idPrgTc}"
+                                     rows="10"
+                                     reflow="true"
+                                     rowsPerPageTemplate="10,20,100,500">
+
+                            <f:facet name="paginatorTopRight">
+                                <p:commandButton title="Recargar entradas a patio" 
+                                                 icon="fa fa-rotate-left"
+                                                 class="cssWhite"
+                                                 action="#{parillaPrincipalJSF.consultarEntradas()}" 
+                                                 process="@this"
+                                                 update="tb-entradas"/>
+                            </f:facet>
+
+                            <p:column filterBy="#{item.timeDestiny} #{item.toStop.name} #{item.fromStop.name} #{item.servbus}#{item.idEmpleado.codigoTm} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos} #{item.idVehiculo.codigo}"
+                                      filterStyle = "display: none; visibilidad: hidden;">
+                                <f:facet name="header">
+                                    <p:inputText id="globalFilterE" 
+                                                 onkeyup="PF('wv-tb-entradas').filter()" 
+                                                 style="width: 95%"
+                                                 placeholder="Buscar"/>
+                                </f:facet>
+                                <div class="ui-fluid" id="#{item.idPrgTc}">
+                                    <div class="ui-g">
+                                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                                            <span class="Fs12 cssBlack">Entrada</span>
+                                            <br/>
+                                            <span class="Fs12">#{item.timeDestiny}</span>
+                                        </span>
+                                        <span class="ui-g-12 ui-md-12 ui-lg-4 Padding5 TexAlCenter" >
+                                            <span class="Fs12 cssBlack" >#{item.toStop.name}</span>
+                                            <br/>
+                                            desde
+                                            <br/>
+                                            <span class="Fs12 cssBlack">#{item.fromStop.name}</span>
+                                        </span>
+                                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                                            <span class="Fs12 cssBlack">Servbus</span>
+                                            <br/>
+                                            <span class="Fs12">#{item.servbus}</span>
+                                        </span>
+                                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter">
+                                            <span class="Fs12 cssBlack" jsf:id="emp">
+                                                Operador
+                                            </span>
+                                            <p:tooltip id="tooltip"
+                                                       value="#{item.idEmpleado.getNombresApellidos()}"
+                                                       position="top"
+                                                       for=":form:tb-entradas:#{idxEnt}:emp" />
+                                            <br/>
+                                            <span class="Fs12">#{item.idEmpleado.codigoTm}</span>
+                                        </span>
+                                        <span class="ui-g-12 ui-md-12 ui-lg-2 Padding5 TexAlCenter" >
+                                            <span class="Fs12 cssBlack">Vehículo</span>
+                                            <br/>
+                                            <span class="Fs12">#{item.idVehiculo.codigo}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                        <f:facet name="actions">
+                            <i class="fa fa-window-maximize cssWhite"
+                               style="cursor: pointer"
+                               onclick="maximizar('pe')" />
+                        </f:facet>
+                    </p:panel>
+                </div>
+                <div class="col parrilla">
+                    <p:panel header="Parrilla" styleClass="redColoredPanel">
+                        <div class="flex-grid">
+                            <span class="col">
+                                <p:commandButton value="Novedad Mtto" 
+                                                 id="btnNuevaNovedadMtto"
+                                                 class="cssWhite Wid100"
+                                                 icon="fa fa-plus"
+                                                 action="#{clasificNovBean.nuevaNovMtto()}"
+                                                 actionListener="#{novTipoAndDetBean.prepareModulo()}"
+                                                 process="@this"
+                                                 update="nov_mtto_form,nov_mtto_dlg"
+                                                 oncomplete="PF('nov_mtto_wv').show();"/>
+                            </span>
+                            <span class="col">
+                                <p:commandButton value="Cambio de vehículo" 
+                                                 id="btnCambioVeh"
+                                                 class="cssWhite Wid100"
+                                                 actionListener="#{cambioVehiculoJSF.nuevoCambioVehiculo()}" 
+                                                 icon="fa fa-plus"
+                                                 process="@this"
+                                                 update="id-serv-veh-dlg"
+                                                 oncomplete="PF('serv-veh-wv').show();"/>
+                            </span>
+                            <span class="col">
+                                <p:commandButton value="Entradas a patio" 
+                                                 icon="fa fa-rotate-left"
+                                                 actionListener="#{entradaPatioVehiculoJSF.reset()}" 
+                                                 class="cssWhite Wid100"
+                                                 process="@this"
+                                                 update="id-entrada-patio"
+                                                 oncomplete="PF('entrada-patio-wv').show();"/>
+                            </span>
+                            <span class="col">
+                                <p:commandButton value="Entrada a patio no programada" 
+                                                 id="btnEntradaNoProgramada"
+                                                 class="cssWhite Wid100"
+                                                 icon="fa fa-plus"
+                                                 action="#{entradaPatioVehiculoJSF.entradaNoProgramada()}"
+                                                 actionListener="#{novTipoAndDetBean.prepareModulo()}"
+                                                 process="@this"
+                                                 update="nov_mtto_form,nov_mtto_dlg,msgs"/>
+                            </span>
+                            <span class="col">
+                                <p:commandButton value="Salida de patio" 
+                                                 icon="fa fa-rotate-left"
+                                                 actionListener="#{salidaPatioVehiculoJSF.reset()}" 
+                                                 class="cssWhite Wid100"
+                                                 process="@this"
+                                                 update="id-salida-patio"
+                                                 oncomplete="PF('salida-patio-wv').show();"/>
+                            </span>
+                            <span class="col">
+                                <p:commandButton value="Consultar tarea del operador" 
+                                                 icon="fa fa-rotate-left"
+                                                 actionListener="#{empleadoTareaJSF.reset()}" 
+                                                 class="cssWhite Wid100"
+                                                 process="@this"
+                                                 update="id-tarea-empleado"
+                                                 oncomplete="PF('tarea-empleado-wv').show();"/>
+                            </span>
+                            <span class="col">
+                                <p:commandButton value="Consultar tareas del operador" 
+                                                 icon="fa fa-rotate-left"
+                                                 actionListener="#{empleadoTareaJSF.reset()}" 
+                                                 class="cssWhite Wid100"
+                                                 process="@this"
+                                                 update="servicios-empleado"
+                                                 oncomplete="PF('servicios-empleado-wv').show();"/>
+                            </span>
+                        </div>
+                        <f:facet name="actions">
+                            <i class="fa fa-window-maximize cssWhite"
+                               style="cursor: pointer"
+                               onclick="maximizar('pa')" />
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </div>
+        </h:form>
+        <h:form id="form_clasific_nov">
+            <h:inputHidden id="dt_clasific_nov" />
+        </h:form>
+        <ui:include src="/mtto/clasificNovMtto/modal/createNovMtto.xhtml"/>
+        <ui:include src="/parrilla/prgTc/list.xhtml"/>
+        <ui:include src="/parrilla/entrada/list.xhtml"/>
+        <ui:include src="/parrilla/salida/list.xhtml"/>
+        <ui:include src="/parrilla/tareaEmpleado/tarea.xhtml"/>
+        <ui:include src="/parrilla/tareaEmpleado/tareas.xhtml"/>
+    </ui:define>
+</ui:composition>

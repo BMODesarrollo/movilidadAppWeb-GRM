@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Tipos de daño
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmPrincipalVhclDano:dtTipo" 
+                                            oncomplete="PF('wlvDtTipo').getPaginator().setPage(0);"
+                                            listener="#{vehiculoDanoBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipalVhclDano">
+                <p:dataTable var="vehiculoDano" value="#{vehiculoDanoBean.lista}"
+                             id="dtTipo"
+                             widgetVar="wlvDtTipo"
+                             filterDelay="1000"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="5"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                             emptyMessage="No existen tipos de daño registrados">
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton action="#{vehiculoDanoBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo grupo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":frmNuevoTipo"
+                                             value="Nuevo">
+                                <p:resetInput target="frmNuevoTipo" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre" filterBy="#{vehiculoDano.nombre}">
+                        <h:outputText value="#{vehiculoDano.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{vehiculoDano.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="Taxonomía">
+                        <h:outputText value="#{vehiculoDano.taxonomiaMxm}" />
+                    </p:column>
+                    <p:column headerText="Acción" style="width: 10%">
+                        <p:commandButton icon="fa fa-pencil"
+                                         title="Editar registro"
+                                         class="GreenButton cssWhite"
+                                         action="#{vehiculoDanoBean.editar()}"
+                                         update=":frmNuevoTipo:modal"
+                                         oncomplete="PF('mtipo').show();"
+                                         >
+                            <f:setPropertyActionListener target="#{vehiculoDanoBean.selected}" value="#{vehiculoDano}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh"
+                                         title="Cambiar estado"
+                                         action="#{vehiculoDanoBean.cambiarEstado()}"
+                                         update=":frmNuevoTipo:modal,:frmNuevoTipo:messages,dtTipo"
+                                         disabled="true">
+                            <f:setPropertyActionListener target="#{vehiculoDanoBean.selected}" value="#{vehiculoDano}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{vehiculoDanoBean.lista.size()} tipos.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <h:form id="frmNuevoTipo">
+                <p:dialog widgetVar="mtipo" id="modal" modal="true" closeOnEscape="true"
+                          class="mr1024_30 mr500_90"
+                          position="center top" 
+                          resizable="false"
+                          responsive="true">
+                    <c:if test="#{vehiculoDanoBean.selected == null }">
+                        <f:facet name="header">
+                            Nuevo tipo de daño
+                        </f:facet>
+                    </c:if>
+                    <c:if test="#{vehiculoDanoBean.selected != null }">
+                        <f:facet name="header">
+                            Editar tipo de daño: #{vehiculoDanoBean.selected.nombre.toUpperCase()}
+                        </f:facet>
+                    </c:if>
+                    <p:messages id="messages" showDetail="true" closable="true">
+                    </p:messages>
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar"
+                                         class="cssWhite"
+                                         oncomplete="PF('wlvDtTipo').getPaginator().setPage(0);"
+                                         icon="fa fa-check"
+                                         action="#{vehiculoDanoBean.guardar()}"
+                                         update=":frmPrincipalVhclDano:dtTipo,pGrid,messages,msgs"
+                                         rendered="#{vehiculoDanoBean.selected == null }"
+                                         >
+                        </p:commandButton>
+                        <p:commandButton value="Actualizar" 
+                                         class="cssWhite"
+                                         oncomplete="PF('wlvDtTipo').getPaginator().setPage(0);"
+                                         icon="fa fa-check"
+                                         action="#{vehiculoDanoBean.actualizar()}"
+                                         update=":frmPrincipalVhclDano:dtTipo,messages,msgs"
+                                         rendered="#{vehiculoDanoBean.selected != null }"
+                                         />
+                    </f:facet>
+                    <div class="ui-fluid" jsf:id="pGrid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                                    <p:outputLabel value="Nombre:" for="nombre"/>
+                                </div>
+                                <p:inputText id="nombre" value="#{vehiculoDanoBean.vehiculoDano.nombre}"
+                                             required="true" requiredMessage="Debe ingresar un nombre"/>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                                    <p:outputLabel value="Descripción:" for="descripcion"/>
+                                </div>
+                                <p:inputText id="descripcion" value="#{vehiculoDanoBean.vehiculoDano.descripcion}"
+                                             required="true" requiredMessage="Debe ingresar una descripción"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                                    <p:outputLabel value="Taxonomía MxM:" for="taxonomia"/>
+                                </div>
+                                <p:inputText id="taxonomia" value="#{vehiculoDanoBean.vehiculoDano.taxonomiaMxm}"
+                                             required="true" requiredMessage="Debe ingresar una taxonomía"/>         
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5"
+                                 jsf:rendered="#{vehiculoDanoBean.flagListaUF}">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                                    <p:outputLabel value="Unidad Funcional:" for="uf"/>
+                                </div>
+                                <p:selectOneMenu 
+                                    id="uf"
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{vehiculoDanoBean.idGopUnidadFuncional}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="-" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{vehiculoDanoBean.lstUnidadesFuncionales}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                </p:selectOneMenu>      
+                            </div>
+                        </div>
+                    </div>
+                </p:dialog>  
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

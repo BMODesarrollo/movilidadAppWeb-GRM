@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="componenteFalla" id="modalComponenteFalla" modal="true" closeOnEscape="true"
+              responsive="true"
+              class="mr1024_30 mr500_90"
+              resizable="false" appendTo="@(body)" position="center top">
+        <c:if test="#{mttoComponenteFallaBean.selected == null }">
+            <f:facet name="header">
+                Nuevo falla de componente
+            </f:facet>
+        </c:if>
+        <c:if test="#{mttoComponenteFallaBean.selected != null }">
+            <f:facet name="header">
+                Editar falla de componente
+            </f:facet>
+        </c:if>
+        <h:form id="frmIncapacidad">
+            <p:focus context="falla"/>
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid" >
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Falla: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText value="#{mttoComponenteFallaBean.mttoComponenteFalla.falla}"
+                                         id="falla"
+                                         required="true"
+                                         requiredMessage="Debe ingresar un estado"
+                                         />
+
+                        </div>
+                    </div>
+
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Componente: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="componente"
+                                             value="#{mttoComponenteFallaBean.i_idComponente}" 
+                                             style="width: 99.9999%"
+                                             required="true" 
+                                             requiredMessage="Debe seleccionar componente">
+                                <f:selectItem itemLabel="Seleccione opción" itemValue="" />
+                                <f:selectItems value="#{mttoComponenteFallaBean.lstMttoComponentes}" 
+                                               var="componente" itemLabel="#{componente.nombre}"
+                                               itemDescription="#{componente.descripcion}"
+                                               itemValue="#{componente.idMttoComponente}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Criticidad: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="criticidad" 
+                                             value="#{mttoComponenteFallaBean.i_idCriticidad}"
+                                             style="width: 99.9999%"
+                                             required="true" requiredMessage="Debe seleccionar criticidad">
+                                <f:selectItem itemLabel="Seleccione opción" itemValue="" />
+                                <f:selectItems value="#{mttoComponenteFallaBean.lstMttoCriticidads}" 
+                                               var="criticidad" itemLabel="#{criticidad.criticidad}"
+                                               itemDescription="#{criticidad.descripcion}"
+                                               itemValue="#{criticidad.idMttoCriticidad}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Descripción: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea value="#{mttoComponenteFallaBean.mttoComponenteFalla.descripcion}"
+                                             id="descripcion"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"
+                                             />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_comp_falla"
+                             action="#{mttoComponenteFallaBean.guardar()}"
+                             update=":frmComponenteFalla:dtComponenteFalla,@form,messages"
+                             rendered="#{mttoComponenteFallaBean.selected == null }"/>
+            <p:remoteCommand name="rc_update_comp_falla" 
+                             action="#{mttoComponenteFallaBean.actualizar()}"
+                             update=":frmComponenteFalla:dtComponenteFalla,msgs"
+                             rendered="#{mttoComponenteFallaBean.selected != null }"
+                             />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_comp_falla();"
+                rendered="#{mttoComponenteFallaBean.selected == null }"
+                class="cssWhite"
+                value="Guardar"/>
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_update_comp_falla();"
+                rendered="#{mttoComponenteFallaBean.selected != null }"
+                class="cssWhite"
+                value="Actualizar"/>
+        </f:facet> 
+    </p:dialog> 
+</ui:composition>

@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="NovedadTipoDocumentosListDlg"
+              widgetVar="NovedadTipoDocumentosListDialog" 
+              modal="true" 
+              closable="false"
+              resizable="false" appendTo="@(body)" 
+              class="mr1024_40 mr500_90" closeOnEscape="true" responsive="true" position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Tipos de documento" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('NovedadTipoDocumentosListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNovedadTipoDocumentosList">
+            <p:cache disabled="true"/>
+            <p:dataTable var="novedadTipoDocumento" value="#{novedadBean.lstNovedadTipoDocumentos}"
+                         id="dtNovedadDocumentos" widgetVar="dtNovedadDocumento"
+                         selectionMode="single" selection="#{novedadBean.novedadTipoDocumentos}"                       
+                         rowIndexVar="nroFila"
+                         reflow="true"
+                         filterDelay="1000"
+                         paginator="true"
+                         rows="8"
+                         rowKey="#{novedadTipoDocumento.idNovedadTipoDocumento}"
+                         emptyMessage="No existen tipos de cocumentos registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{novedadBean.onRowTipoDocumentoClckSelect}"
+                        update=":frmNuevoDocumento:tipo_documento"
+                        oncomplete="PF('NovedadTipoDocumentosListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Nombre" filterBy="#{novedadTipoDocumento.nombreTipoDocumento}" 
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipoDocumento.nombreTipoDocumento}" />
+                </p:column>
+                <p:column headerText="Descripción" filterBy="#{novedadTipoDocumento.descripcionTipoDocumento}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipoDocumento.descripcionTipoDocumento}" />
+                </p:column>
+                <p:column headerText="Obligatorio"
+                          styleClass="#{novedadTipoDocumento.obligatorio gt 0 ? 'cssGreen': novedadTipoDocumento.obligatorio eq 0 ? 'cssRed' : ''}">
+                    <h:outputText value="Sí" rendered="#{novedadTipoDocumento.obligatorio == 1}"
+                                  style=" color: white;"/>
+                    <h:outputText value="No" rendered="#{novedadTipoDocumento.obligatorio == 0}"
+                                  style=" color: white;"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

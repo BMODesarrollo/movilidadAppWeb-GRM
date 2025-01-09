@@ -1,0 +1,167 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="id_dialog_vehiculo_atencion"
+              widgetVar="wv_vehiculo_atencion" 
+              modal="true" 
+              class="mr1024_30 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{atvVehiculoAtencionBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO 
+            </f:facet>
+        </c:if>
+        <c:if test="#{atvVehiculoAtencionBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="form_vehiculo_atencion">
+            <div class="ui-fluid">
+                <p:messages id="messages" showDetail="true" closable="true"/>
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Placa"/>
+                        </div>
+                        <p:inputText id="quienSeNotifico" required="true" maxlength="6"
+                                     value="#{atvVehiculoAtencionBean.placa}">
+                        </p:inputText>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Teléfono"/>
+                        </div>
+                        <p:inputText id="telefono" required="true" maxlength="30"
+                                     value="#{atvVehiculoAtencionBean.telefono}">
+                        </p:inputText>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Contraseña"/>
+                        </div>
+                        <p:password id="pwd1"
+                                    value="#{atvVehiculoAtencionBean.contrasena}"
+                                    autocomplete="false"
+                                    match="pwd2" />
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                            <p:outputLabel for="@next" value="Repetir Contraseña"/>
+                        </div>
+                        <p:password id="pwd2"
+                                    autocomplete="false"
+                                    value="#{atvVehiculoAtencionBean.contrasena}"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Prestador" for="@next" />
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:selectOneMenu id="prestador" 
+                                             value="#{atvVehiculoAtencionBean.idAtvPrestador}" 
+                                             filter="true"
+                                             required="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{atvVehiculoAtencionBean.lstPrestadores}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}"
+                                               itemValue="#{item.idAtvPrestador}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0">
+                            <p:commandButton title="Cargar Prestadores"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{atvVehiculoAtencionBean.cargarPrestadores(true)}"
+                                             update="prestador"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Atención" for="@next" />
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:selectOneMenu id="tipoAtencion" 
+                                             value="#{atvVehiculoAtencionBean.idAtvTipoAtencion}" 
+                                             filter="true"
+                                             required="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{atvVehiculoAtencionBean.lstTiposAtencion}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}"
+                                               itemValue="#{item.idAtvTipoAtencion}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-1 ui-lg-1 Padding0">
+                            <p:commandButton title="Cargar Tipos de Atención"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{atvVehiculoAtencionBean.cargarPrestadores(true)}"
+                                             update="tipoAtencion"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Activo" for="@next"/>
+                        </div>
+                        <p:selectBooleanButton offLabel="No" 
+                                               onLabel="Si"
+                                               class="cssWhite"
+                                               onIcon="fa fa-check"
+                                               offIcon="fa fa-close"
+                                               value="#{atvVehiculoAtencionBean.activo}">
+                            <p:ajax process="@this" global="false"/>
+                        </p:selectBooleanButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         required="true"
+                                         value="#{atvVehiculoAtencionBean.descripcion}"
+                                         maxlength="150"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="form_vehiculo_atencion,@this"
+                             update="messages,msgs,form_vehiculo_atencion_list:id_dt_vehiculo_atencion,
+                             form_vehiculo_atencion" 
+                             action="#{atvVehiculoAtencionBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="form_vehiculo_atencion,@this"
+                             update="messages,msgs,form_vehiculo_atencion_list:id_dt_vehiculo_atencion"
+                             action="#{atvVehiculoAtencionBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-save"
+                             rendered="#{atvVehiculoAtencionBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-save"
+                             rendered="#{atvVehiculoAtencionBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

@@ -1,0 +1,91 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <h:form id="formMotivoG">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Generica Motivos">
+                <p:dataTable id="datalist" 
+                             value="#{genericaMotivoJSF.listGenericaMotivo}" 
+                             var="item"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             reflow="true"
+                             scrollHeight="600"
+                             rowIndexVar="index"
+                             filterDelay="1000"
+                             rowKey="#{index + 1}"
+                             rows="20"
+                             widgetVar="datalistWV"
+                             rowsPerPageTemplate="20,50,100,200">
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="nuevo"   
+                                             value="Nuevo" 
+                                             actionListener="#{genericaMotivoJSF.prepareGuardar()}" 
+                                             update=":form-motivo,dlg-motivo" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             oncomplete="PF('motivoWV').show()">
+                                <p:resetInput target=":form-motivo"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText  value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Motivo" filterBy="#{item.motivo}" filterMatchMode="contains" style="width: 200px">
+                        <h:outputText  value="#{item.motivo}" />
+                    </p:column>
+                    <p:column headerText="Descripción">
+                        <h:outputText  value="#{item.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Usuario" filterBy="#{item.username}" filterMatchMode="contains" style="width: 200px">
+                        <h:outputText  value="#{item.username}" />
+                    </p:column>
+                    <p:column headerText="Acciones" style="width: 100px;text-align: center" exportable="false">
+                        <div class="ui-g-12 ui-md-12 Padding3">
+                            <p:commandButton id="editar"
+                                             icon="fa fa-pencil"
+                                             class="cssWhite GreenButton"
+                                             title="Editar"
+                                             process="@this"
+                                             update="@form,:form-motivo,dlg-motivo"
+                                             actionListener="#{genericaMotivoJSF.onGenericaMotivoSelect(item)}"
+                                             oncomplete="PF('motivoWV').show()">
+                                <p:resetInput target=":form-motivo" />
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+                    <f:facet name="footer">
+                        #{genericaMotivoJSF.listGenericaMotivo.size()} Motivo(s)<br/>
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="Generica Motivos #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="Generica Motivos #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="Generica Motivos #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/administrar.xhtml" />
+    </ui:define>
+</ui:composition>

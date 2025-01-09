@@ -1,0 +1,1785 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style type="text/css">
+            @media (max-width: 640px) {
+                .ui-fileupload-files td{
+                    display: inline-block;
+                }
+
+                .ui-fileupload-buttonbar .ui-button{
+                    padding: 19px 30px 19px 30px !important
+                }
+
+                .ui-fileupload-buttonbar .ui-button .ui-button-text {
+                    display: none;
+                }
+
+                .ui-fileupload-buttonbar .ui-button .ui-icon{
+                    margin-left: 15px !important;
+                }
+            }
+            ::placeholder { 
+                color: #000000;
+                opacity: 0.6;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-fluid">
+            <h:form id="form-info-msg">
+                <p:growl id="msg" showDetail="true" showSummary="true" life="10000" /> 
+            </h:form>
+            <ui:include src="accidentes.xhtml" />
+            <h:form id="form-info-master">
+                <div class="ui-g-12 ui-md-12 ui-lg-12">
+                    <p:panel header="EDITAR INFORME MÁSTER" rendered="#{not empty accInformeMasterEditarJSF.accInformeMaster.idAccidente}">
+                        <div style="float: right">
+                            <p:commandButton id="finalizar"
+                                             value="Volver al inicio"
+                                             class="cssWhite RedButton"
+                                             icon="fa fa-check"
+                                             type="button"
+                                             onclick="location.reload()" />
+                        </div>
+                        <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+                        <p:accordionPanel id="acc-panel" style="margin-top:40px">
+                            <p:tab title="1. INFORME GENERAL">
+                                <div jsf:id="tab1">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="lugar"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.lugar}"
+                                                         placeholder="LUGAR"
+                                                         required="true"
+                                                         requiredMessage="Lugar es requerido - Ventana #1"
+                                                         maxlength="255"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                            <p:inputText id="fecha"
+                                                         placeholder="FECHA DEL INFORME"
+                                                         readonly="true"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.fechaInforme}">
+                                                <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                            </p:inputText>
+                                        </div>
+                                        <div class="ui-g-10 ui-md-6 ui-lg-6">
+                                            <p:inputText id="estacion-cerca"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.idPrgStoppoint.name}"
+                                                         readonly="true"
+                                                         placeholder="ESTACIÓN CERCA"/>
+                                        </div>
+                                        <div class="ui-g-2 ui-md-2 ui-lg-2">
+                                            <p:commandButton id="btn-estacion"
+                                                             icon="fa fa-search"
+                                                             onclick="PF('dlgStopPoint').show()"
+                                                             class="cssWhite OrangeButton"
+                                                             type="button" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-4 ui-lg-3">
+                                            <p:inputText id="fecha-evento"
+                                                         placeholder="FECHA DEL EVENTO"
+                                                         readonly="true"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.idAccidente.fechaAcc}">
+                                                <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                            </p:inputText>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-3 ui-lg-3">
+                                            <p:inputMask id="hora-evento"
+                                                         mask="99:99"
+                                                         required="true"
+                                                         requiredMessage="Hora del Evento es requerido - Ventana #1"
+                                                         placeholder="HORA DEL EVENTO"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.horaEvento}"/>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-2 ui-lg-3">
+                                            <p:inputMask id="reaccion"
+                                                         mask="99:99"
+                                                         required="true"
+                                                         requiredMessage="Tiempo de Reacción es requerido - Ventana #1"
+                                                         placeholder="TIEMPO DE REACCIÓN (hora:minutos)"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.tiempoReaccion}"/>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-3 ui-lg-3">
+                                            <p:inputMask id="hora-fin-evento"
+                                                         mask="99:99"
+                                                         required="true"
+                                                         requiredMessage="Hora fin Evento es requerido - Ventana #1"
+                                                         placeholder="HORA FIN DEL EVENTO"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.horaFinEvento}"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-5 ui-md-4 ui-lg-4">
+                                            <h:outputText value="TIPO DE EVENTO: " class="cssBlack"/>
+                                        </div>
+                                        <div class="ui-g-7 ui-md-6 ui-lg-4">
+                                            <h:outputText value="#{accInformeMasterEditarJSF.accInformeMaster.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad} " class="Fs21" style="color: red;font-weight: bold"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-4">
+                                            <p:commandButton id="btn-tab1"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-victima,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.actualizar()}"
+                                                             process="tab1,@this"
+                                                             class="GreenButton cssWhite" />
+                                            <p:spacer width="2"/>
+                                            <p:commandButton id="btn-tb1"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="tab1"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="tab1" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:tab>
+                            <p:tab title="2. VEHÍCULOS Y CONDUCTORES INVOLUCRADOS">
+                                <div jsf:id="panel-veh">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <h:outputText value="VEHÍCULO:" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-8">
+                                            <p:inputText id="codigo"
+                                                         value="#{accInformeMasterEditarJSF.c_codVehiculo}"
+                                                         maxlength="10"
+                                                         placeholder="CÓDIGO" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-4">
+                                            <p:commandButton id="btn-veh"
+                                                             icon="fa fa-search"
+                                                             class="OrangeButton cssWhite"
+                                                             update="placa,color,modelo,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.buscarVehiculo()}"
+                                                             process="form-info-master:acc-panel:codigo,@this"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="placa"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.placa}"
+                                                         maxlength="45"
+                                                         placeholder="PLACA" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="color"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.color}"
+                                                         maxlength="45"
+                                                         placeholder="COLOR" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="modelo"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.modelo}"
+                                                         maxlength="45"
+                                                         placeholder="MODELO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-6">
+                                            <h:outputText value="INMOVILIZADO:" class="cssBlack" />
+                                            <p:selectOneRadio id="inmovilizado" value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.inmovilizado}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-5 ui-md-5 ui-lg-4">
+                                            <p:inputText id="cod-hipotesis"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.codigoHipotesis}"
+                                                         maxlength="45"
+                                                         placeholder="COD. HIPOTESIS" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputTextarea id="hipotesis"
+                                                             value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.hipotesis}"
+                                                             maxlength="65000"
+                                                             rows="7"
+                                                             placeholder="HIPOTESIS" />
+                                        </div>
+                                    </div>
+                                    <p:separator/>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <h:outputText value="CONDUCTOR:" class="cssBlack" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputNumber id="codigo-tm"
+                                                           value="#{accInformeMasterEditarJSF.i_codTm}"
+                                                           maxValue="999999999"
+                                                           placeholder="CÓDIGO TM" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:commandButton id="btn-ope"
+                                                             icon="fa fa-search"
+                                                             class="OrangeButton cssWhite"
+                                                             update="nombre-ope,identificacion-ope,telefono-ope,sexo-ope,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.buscarOperador()}"
+                                                             process="form-info-master:acc-panel:codigo-tm,@this"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="nombre-ope"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.nombres}"
+                                                         maxlength="45"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRES" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputNumber id="identificacion-ope"
+                                                           value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.identificacion}"
+                                                           maxValue="99999999999999"
+                                                           placeholder="Nro IDENTIFICACIÓN" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputText id="telefono-ope"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.telefono}"
+                                                         maxlength="45"
+                                                         placeholder="TELÉFONO" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <h:outputText value="SEXO:" class="cssBlack" />
+                                            <p:selectOneRadio id="sexo-ope" value="#{accInformeMasterEditarJSF.accInformeMasterVehCond.sexo}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="MASCULINO" itemValue="M" />
+                                                <f:selectItem itemLabel="FEMENINO" itemValue="F" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-2">
+                                            <p:commandButton id="guardar-cond-ope"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-veh,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarVehCond()}"
+                                                             process="form-info-master:acc-panel:panel-veh,@this"
+                                                             class="cssWhite GreenButton"/>
+                                            <p:spacer width="5" />
+                                            <p:commandButton id="calcel-cond-ope"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="form-info-master:acc-panel:panel-veh"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="form-info-master:acc-panel:panel-veh" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-involucrados"
+                                                 var="itemInvo" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterVehCond}" 
+                                                 rows="3"
+                                                 rowKey="#{rowIdx + 1}"
+                                                 rowIndexVar="rowIdx"
+                                                 paginator="true"
+                                                 reflow="true" 
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            VEHÍCULOS Y CONDUCTORES REGISTRADOS
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdx + 1}" />
+                                        </p:column>
+                                        <p:column headerText="VEH. CÓDIGO">
+                                            <h:outputText value="#{ not empty itemInvo.codigo ? itemInvo.codigo : 'NO APLICA'}" />
+                                        </p:column>
+                                        <p:column headerText="PLACA">
+                                            <h:outputText value="#{itemInvo.placa}" />
+                                        </p:column>
+                                        <p:column headerText="INMOVILIZADO">
+                                            <h:outputText value="#{itemInvo.inmovilizado == 1 ? 'SÍ' : 'NO'}" />
+                                        </p:column>
+                                        <p:column headerText="OPE. CÓDIGO">
+                                            <h:outputText value="#{ not empty itemInvo.codigoTm ? itemInvo.codigoTm : 'NO APLICA'}" />
+                                        </p:column>
+                                        <p:column headerText="NOMBRES">
+                                            <h:outputText value="#{itemInvo.nombres}" />
+                                        </p:column>
+                                        <p:column headerText="IDENTIFICACIÓN">
+                                            <h:outputText value="#{itemInvo.identificacion}" />
+                                        </p:column>
+                                        <p:column headerText="TELÉFONOS">
+                                            <h:outputText value="#{itemInvo.telefono}" />
+                                        </p:column>
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-veh"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventVehiculoConductor(itemInvo)}"
+                                                             update="form-info-master:acc-panel:panel-veh"
+                                                             process="@this" />
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterVehCond.size()} VEHÍCULOS Y CONDUCTORES AGREGADOS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="3. VÍCTIMAS">
+                                <div jsf:id="panel-victima">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12">
+                                            <p:inputText id="vic-nombres" 
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVic.nombres}" 
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRE"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-4 ui-lg-4">
+                                            <p:outputLabel value="DOCUMENTO" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-3 ui-lg-4">
+                                            <p:selectOneMenu id="sel-doc-vic"
+                                                             value="#{accInformeMasterEditarJSF.i_tpVictimaIdentificacion}" 
+                                                             filter="true" filterMatchMode="contains">
+                                                <f:selectItem itemValue="" itemLabel="Seleccione Uno"/>
+                                                <f:selectItems value="#{accInformeOperadorJSF.listEmpleadoTipoIdentificaicion}" 
+                                                               var="tpdocu" itemLabel="#{tpdocu.nombre}" 
+                                                               itemValue="#{tpdocu.idEmpleadoTipoIdentificacion}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-5 ui-lg-4">
+                                            <p:inputNumber id="vic-num-doc" 
+                                                           value="#{accInformeMasterEditarJSF.accInformeMasterVic.nroDoc}" 
+                                                           maxValue="99999999999999"
+                                                           placeholder="NÚMERO DE DOCUMENTO"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-4 ui-lg-4">
+                                            <p:outputLabel value="FECHA DE NACIMIENTO:" class="cssBlack"/>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-3 ui-lg-4">
+                                            <p:calendar id="vic-fecha-nac"
+                                                        value="#{accInformeMasterEditarJSF.accInformeMasterVic.fechaNac}"
+                                                        navigator="true"
+                                                        locale="es"
+                                                        showOn="button"
+                                                        maxdate="today"
+                                                        mask="true"
+                                                        pattern="yyyy-MM-dd" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-5 ui-lg-4">
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-4">
+                                            <p:inputText id="vic-dir" 
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVic.direccion}" 
+                                                         maxlength="60"
+                                                         placeholder="DIRECCIÓN DOMICILIO"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                            <p:inputText id="vic-ciudad" 
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVic.ciudad}" 
+                                                         maxlength="45"
+                                                         placeholder="CIUDAD"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                            <p:inputNumber id="vic-telefono" 
+                                                           value="#{accInformeMasterEditarJSF.accInformeMasterVic.telefono}" 
+                                                           maxValue="99999999999999"
+                                                           placeholder="TELÉFONO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-3">
+                                            <div class="ui-g-1">
+                                                <p:outputLabel value="CINTURON" class="cssBlack" />
+                                            </div>
+                                            <p:selectOneRadio id="vic-cinturon" value="#{accInformeMasterEditarJSF.accInformeMasterVic.cinturon}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-3">
+                                            <div class="ui-g-1">
+                                                <p:outputLabel value="CASCO" class="cssBlack" />
+                                            </div>
+                                            <p:selectOneRadio id="vic-casco" value="#{accInformeMasterEditarJSF.accInformeMasterVic.casco}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="vic-hospital" 
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVic.sitioAtencion}" 
+                                                         maxlength="45"
+                                                         placeholder="HOSPITAL, CLINICA O SITIO DE ATENCIÓN" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 cssBlack">CONDICIÓN</div>
+                                    <p:selectOneRadio id="vic-condicion" 
+                                                      value="#{accInformeMasterEditarJSF.idTipoVictima}"
+                                                      layout="responsive" 
+                                                      columns="1">
+                                        <f:selectItems 
+                                            value="#{accTipoVictimaJSF.listAccTipoVictima}" 
+                                            var="tpVictim"
+                                            itemLabel="#{tpVictim.tipo}" 
+                                            itemDescription="#{tpVictim.descripcion}"
+                                            itemValue="#{tpVictim.idAccTipoVictima}"/>
+                                        <p:ajax global="false"/>
+                                    </p:selectOneRadio>
+                                    <div class="ui-g-12 cssBlack">SEXO</div>
+                                    <p:selectOneRadio id="vic-sexo" value="#{accInformeMasterEditarJSF.accInformeMasterVic.sexo}" layout="responsive" columns="1">
+                                        <f:selectItem itemLabel="MASCULINO" itemValue="M" />
+                                        <f:selectItem itemLabel="FEMENINO" itemValue="F" />
+                                    </p:selectOneRadio>
+                                    <div class="ui-g-12 cssBlack">GRAVEDAD</div>
+                                    <p:selectOneRadio id="vic-gravedad" value="#{accInformeMasterEditarJSF.accInformeMasterVic.condicion}" layout="responsive" columns="1">
+                                        <f:selectItem itemLabel="HERIDO" itemValue="1" />
+                                        <f:selectItem itemLabel="MUERTO" itemValue="0" />
+                                        <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                    </p:selectOneRadio>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputText id="vic-eps"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterVic.eps}"
+                                                         maxlength="45"
+                                                         placeholder="EPS" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-gl-12">
+                                            <p:inputTextarea id="vic-diagnostico"
+                                                             value="#{accInformeMasterEditarJSF.accInformeMasterVic.diagnostico}"
+                                                             rows="5"
+                                                             maxlength="65000"
+                                                             placeholder="Diagnóstico" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-4">
+                                            <p:commandButton id="btn-guardar-vic"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-victima,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarVictima()}"
+                                                             process="form-info-master:acc-panel:panel-victima,@this"
+                                                             class="GreenButton cssWhite" />
+                                            <p:spacer width="2"/>
+                                            <p:commandButton id="btn-cancelar-vic"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="form-info-master:acc-panel:panel-victima"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="form-info-master:acc-panel:panel-victima" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-victima"
+                                                 var="victima" 
+                                                 rowIndexVar="victimaIdx"
+                                                 paginator="true"
+                                                 rows="3"
+                                                 rowKey="#{victimaIdx + 1}"
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterVic}" 
+                                                 reflow="true" 
+                                                 style="margin-top:10px">
+                                        <f:facet name="header">
+                                            VÍCTIMAS: PASAJEROS Y PEATONES
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{victimaIdx + 1}"/>
+                                        </p:column>
+                                        <p:column headerText="Nombres">
+                                            <h:outputText value="#{victima.nombres}"/>
+                                        </p:column>
+                                        <p:column headerText="Identidicación">
+                                            <h:outputText value="#{victima.nroDoc}"/>
+                                        </p:column>
+                                        <p:column headerText="Teléfono">
+                                            <h:outputText value="#{victima.telefono}"/>
+                                        </p:column>
+                                        <p:column headerText="DIAGNÓSTICO">
+                                            <h:outputText value="#{victima.diagnostico}" />
+                                        </p:column>
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-vic"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventVictima(victima)}"
+                                                             update="form-info-master:acc-panel:panel-victima"
+                                                             process="@this" />
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterVic.size()} VÍCTIMAS AGREGADAS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="3.1 LESIONADOS" rendered="false">
+                                <div jsf:id="panel-les">
+                                    <div class="ui-g">
+                                        <div class="ui-g-8 ui-md-8 ui-lg-8">
+                                            <p:inputText id="nombre-lesionados"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.nombres}"
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRES" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputNumber id="edad-lesio"
+                                                           value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.edad}"
+                                                           maxValue="999"
+                                                           placeholder="EDAD" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputNumber id="identificacion"
+                                                           placeholder="IDENTIFICACIÓN"
+                                                           maxValue="999999999999999999999999999"
+                                                           value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.identificacion}" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputText id="eps"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.eps}"
+                                                         maxlength="45"
+                                                         placeholder="EPS" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                            <p:inputText id="direccion"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.direccion}"
+                                                         maxlength="60"
+                                                         placeholder="DIRECCIÓN" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                            <p:inputText id="barrio"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.barrio}"
+                                                         maxlength="45"
+                                                         placeholder="BARRIO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputNumber id="fijo"
+                                                           placeholder="TEL. FIJO"
+                                                           maxValue="99999999999999"
+                                                           value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.telefono}" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputNumber id="celular"
+                                                           placeholder="CELULAR"
+                                                           maxValue="99999999999999"
+                                                           value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.celular}" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12">
+                                            <p:inputText id="clinica"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.clinicaTraslado}"
+                                                         maxlength="45"
+                                                         placeholder="CLINICA DE TRASLADO" />
+                                        </div>
+                                        <div class="ui-g-12">
+                                            <p:inputTextarea id="diagnostico"
+                                                             value="#{accInformeMasterEditarJSF.accInformeMasterLesionado.diagnostigo}"
+                                                             rows="5"
+                                                             maxlength="65000"
+                                                             placeholder="DIAGNÓSTICO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6">
+                                            <p:commandButton id="guardar-lesionado"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-les,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarLesionado()}"
+                                                             process="form-info-master:acc-panel:panel-les,@this"
+                                                             class="cssWhite GreenButton"/>
+                                            <p:spacer width="5" />
+                                            <p:commandButton id="calcel-lesionado"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="form-info-master:acc-panel:panel-les"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="form-info-master:acc-panel:panel-les" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-lesionados"
+                                                 var="itemLes" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterLesionado}" 
+                                                 rowKey="#{rowIdxLes + 1}"
+                                                 reflow="true" 
+                                                 rowIndexVar="rowIdxLes"
+                                                 rows="2"
+                                                 paginator="true"
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            LESIONADOS
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdxLes + 1}" />
+                                        </p:column>
+                                        <p:column headerText="NOMBRES">
+                                            <h:outputText value="#{itemLes.nombres}" />
+                                        </p:column>
+                                        <p:column headerText="IDENTIFICACIÓN">
+                                            <h:outputText value="#{itemLes.identificacion}" />
+                                        </p:column>
+                                        <p:column headerText="TELÉFONOS">
+                                            <h:outputText value="Fijo: #{itemLes.telefono} - Celular: #{itemLes.celular}" />
+                                        </p:column>
+                                        <p:column headerText="DIAGNÓSTICO">
+                                            <h:outputText value="#{itemLes.diagnostigo}" />
+                                        </p:column>
+                                        <p:column headerText="CLINICA TRASLADO">
+                                            <h:outputText value="#{itemLes.clinicaTraslado}" />
+                                        </p:column>
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-les"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventLesionado(itemLes)}"
+                                                             update="form-info-master:acc-panel:panel-les"
+                                                             process="@this" />
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterLesionado.size()} LESIONADOS AGREGADOS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="4. POLICÍAS Y AGENTES DE TRÁNSITO">
+                                <div jsf:id="panel-pol">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="nombres-agentes"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAgentes.nombres}"
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRES" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="agente-chaleco"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAgentes.chaleco}"
+                                                         maxlength="45"
+                                                         placeholder="Num. CHALECO" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="agente-placa"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAgentes.placaChaleco}"
+                                                         maxlength="45"
+                                                         placeholder="PLACA AGENTE" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="agente-identificacion"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAgentes.identificacion}"
+                                                         maxlength="45"
+                                                         placeholder="IDENTIFICACIÓN" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="agente-unidad"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAgentes.unidadMovil}"
+                                                         maxlength="45"
+                                                         placeholder="UNIDAD MÓVIL" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="agente-placa-um"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAgentes.placaUnidadMovil}"
+                                                         maxlength="15"
+                                                         placeholder="PLACA U.M" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="agente-numero"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAgentes.numeroUnidadMovil}"
+                                                         maxlength="15"
+                                                         placeholder="NÚMERO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6">
+                                            <p:commandButton id="guardar-agente"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-pol,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarAgentes()}"
+                                                             process="form-info-master:acc-panel:panel-pol,@this"
+                                                             class="cssWhite GreenButton"/>
+                                            <p:spacer width="5" />
+                                            <p:commandButton id="calcel-agente"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="form-info-master:acc-panel:panel-pol"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="form-info-master:acc-panel:panel-pol" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-agente"
+                                                 var="itemAge" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterAgentes}"
+                                                 rowKey="#{rowIdxA + 1}"
+                                                 reflow="true" 
+                                                 rows="3"
+                                                 rowIndexVar="rowIdxA"
+                                                 paginator="true"
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            POLICÍAS Y AGENTES DE TRÁNSITO
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdxA + 1}"/>
+                                        </p:column>
+                                        <p:column headerText="Nombres">
+                                            <h:outputText value="#{itemAge.nombres}" />
+                                        </p:column>
+                                        <p:column headerText="Identificación">
+                                            <h:outputText value="#{itemAge.identificacion}" />
+                                        </p:column>
+                                        <p:column headerText="Placa Agente">
+                                            <h:outputText value="#{itemAge.placaChaleco}" />
+                                        </p:column>
+                                        <p:column headerText="# de Chaleco">
+                                            <h:outputText value="#{itemAge.chaleco}" />
+                                        </p:column>
+                                        <p:column headerText="Unidad Movil">
+                                            <h:outputText value="#{itemAge.unidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Placa U.M">
+                                            <h:outputText value="#{itemAge.placaUnidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Número">
+                                            <h:outputText value="#{itemAge.numeroUnidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-agen"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventAgentes(itemAge)}"
+                                                             update="form-info-master:acc-panel:panel-pol"
+                                                             process="@this" />
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterAgentes.size()} POLICÍAS Y AGENTES DE TRÁNSITO AGREGADOS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="5. MÉDICOS Y/O PARAMÉDICOS">
+                                <div jsf:id="panel-med">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-8">
+                                            <p:inputText id="nombres-medicos"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterMedicos.nombres}"
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRES" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-4">
+                                            <p:inputText id="medicos-identificacion"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterMedicos.identificacion}"
+                                                         maxlength="45"
+                                                         placeholder="IDENTIFICACIÓN" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="medicos-ambulancia"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterMedicos.nroAmbulancia}"
+                                                         maxlength="15"
+                                                         placeholder="Num. AMBULANCIA" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="medicos-placa"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterMedicos.placaAmbulancia}"
+                                                         maxlength="15"
+                                                         placeholder="PLACA Amb." />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="medicos-numero"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterMedicos.numeroAmbulancia}"
+                                                         maxlength="15"
+                                                         placeholder="NÚMERO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6">
+                                            <p:commandButton id="guardar-medicos"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-med,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarMedico()}"
+                                                             process="form-info-master:acc-panel:panel-med,@this"
+                                                             class="cssWhite GreenButton"/>
+                                            <p:spacer width="5" />
+                                            <p:commandButton id="calcel-medicos"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="form-info-master:acc-panel:panel-med"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="form-info-master:acc-panel:panel-med" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-medicos"
+                                                 var="itemMed" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterMedicos}"
+                                                 rowKey="#{rowIdxM + 1}"
+                                                 rows="3"
+                                                 paginator="true"
+                                                 rowIndexVar="rowIdxM"
+                                                 reflow="true" 
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            MÉDICOS Y/O PARAMÉDICOS
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdxM + 1}"/>
+                                        </p:column>
+                                        <p:column headerText="Nombres">
+                                            <h:outputText value="#{itemMed.nombres}" />
+                                        </p:column>
+                                        <p:column headerText="Identificación">
+                                            <h:outputText value="#{itemMed.identificacion}" />
+                                        </p:column>
+                                        <p:column headerText="# de Ambulancia">
+                                            <h:outputText value="#{itemMed.nroAmbulancia}" />
+                                        </p:column>
+                                        <p:column headerText="Placa Ambulancia">
+                                            <h:outputText value="#{itemMed.placaAmbulancia}" />
+                                        </p:column>
+                                        <p:column headerText="Número">
+                                            <h:outputText value="#{itemMed.numeroAmbulancia}" />
+                                        </p:column>
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-med"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventMedicos(itemMed)}"
+                                                             update="form-info-master:acc-panel:panel-med"
+                                                             process="@this" />
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterMedicos.size()} MÉDICOS Y/O PARAMÉDICOS AGREGADOS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab id="tabSix" title="6. BOMBEROS">
+                                <div jsf:id="panel-bom" >
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-8">
+                                            <p:inputText id="nombres-bomberos"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterBomberos.nombres}"
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRES" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-4">
+                                            <p:inputText id="bomberos-identificacion"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterBomberos.identificacion}"
+                                                         maxlength="45"
+                                                         placeholder="IDENTIFICACIÓN" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="bomberos-unidad"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterBomberos.unidadMovil}"
+                                                         maxlength="45"
+                                                         placeholder="UNIDAD MÓVIL" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="bomberos-placa"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterBomberos.placaUnidadMovil}"
+                                                         maxlength="15"
+                                                         placeholder="PLACA U.M" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="bomberos-numero"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterBomberos.numeroUnidadMovil}"
+                                                         maxlength="15"
+                                                         placeholder="NÚMERO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6">
+                                            <p:commandButton id="guardar-bomberos"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-bom,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarBomberos()}"
+                                                             process="form-info-master:acc-panel:panel-bom,@this"
+                                                             class="cssWhite GreenButton"/>
+                                            <p:spacer width="5" />
+                                            <p:commandButton id="calcel-bomberos"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="form-info-master:acc-panel:panel-bom"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="form-info-master:acc-panel:panel-bom" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-bomberos"
+                                                 var="itemBom" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterBomberos}" 
+                                                 rowKey="#{rowIdxB + 1}"
+                                                 rows="3"
+                                                 paginator="true"
+                                                 rowIndexVar="rowIdxB"
+                                                 reflow="true" 
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            BOMBEROS
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdxB + 1}"/>
+                                        </p:column>
+                                        <p:column headerText="Nombres">
+                                            <h:outputText value="#{itemBom.nombres}" />
+                                        </p:column>
+                                        <p:column headerText="Identificación">
+                                            <h:outputText value="#{itemBom.identificacion}" />
+                                        </p:column>
+                                        <p:column headerText="Unidad Movil">
+                                            <h:outputText value="#{itemBom.unidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Placa U.M">
+                                            <h:outputText value="#{itemBom.placaUnidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Número U.M">
+                                            <h:outputText value="#{itemBom.numeroUnidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-bom"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventBomberos(itemBom)}"
+                                                             update="form-info-master:acc-panel:panel-bom"
+                                                             process="@this" />
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterBomberos.size()} BOMBEROS AGREGADOS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="7. INSPECTORES">
+                                <div jsf:id="panel-ins">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-8">
+                                            <p:inputText id="nombres-inspectores"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterInspectores.nombres}"
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRES" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="inspectores-chaleco"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterInspectores.chaleco}"
+                                                         maxlength="45"
+                                                         placeholder="CHALECO" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="inspectores-placa"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterInspectores.placaChaleco}"
+                                                         maxlength="45"
+                                                         placeholder="PLACA Chal." />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="inspectores-cedula"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterInspectores.identificacion}"
+                                                         maxlength="45"
+                                                         placeholder="IDENTIFICACIÓN" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="inspectores-unidad"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterInspectores.unidadMovil}"
+                                                         maxlength="45"
+                                                         placeholder="UNIDAD MÓVIL" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="inspectores-placa-unidad"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterInspectores.placaUnidadMovil}"
+                                                         maxlength="15"
+                                                         placeholder="PLACA U.M" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="inspectores-numero"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterInspectores.numeroUnidadMovil}"
+                                                         maxlength="15"
+                                                         placeholder="NÚMERO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6">
+                                            <p:commandButton id="guardar-inspectores"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-ins,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarInspectores()}"
+                                                             process="form-info-master:acc-panel:panel-ins,@this"
+                                                             class="cssWhite GreenButton"/>
+                                            <p:spacer width="5" />
+                                            <p:commandButton id="calcel-inspectores"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="form-info-master:acc-panel:panel-ins"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="form-info-master:acc-panel:panel-ins" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-inspectores"
+                                                 var="itemIns" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterInspectores}" 
+                                                 rowKey="#{rowIdxI + 1}"
+                                                 reflow="true" 
+                                                 rows="3"
+                                                 rowIndexVar="rowIdxI"
+                                                 paginator="true"
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            INSPECTORES
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdxI + 1}"/>
+                                        </p:column>
+                                        <p:column headerText="Nombres">
+                                            <h:outputText value="#{itemIns.nombres}" />
+                                        </p:column>
+                                        <p:column headerText="Identificación">
+                                            <h:outputText value="#{itemIns.identificacion}" />
+                                        </p:column>
+                                        <p:column headerText="Placa Agente">
+                                            <h:outputText value="#{itemIns.placaChaleco}" />
+                                        </p:column>
+                                        <p:column headerText="# de Chaleco">
+                                            <h:outputText value="#{itemIns.chaleco}" />
+                                        </p:column>
+                                        <p:column headerText="Unidad Movil">
+                                            <h:outputText value="#{itemIns.unidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Placa U.M">
+                                            <h:outputText value="#{itemIns.placaUnidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Número">
+                                            <h:outputText value="#{itemIns.numeroUnidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-ins"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventInspectores(itemIns)}"
+                                                             update="form-info-master:acc-panel:panel-ins"
+                                                             process="@this" />
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterInspectores.size()} INSPECTORES AGREGADOS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="8. RECOMOTOS">
+                                <div jsf:id="panel-rec">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-8">
+                                            <p:inputText id="nombres-recomotos"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterRecomotos.nombres}"
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRES" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="recomotos-chaleco"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterRecomotos.chaleco}"
+                                                         maxlength="45"
+                                                         placeholder="CHALECO" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="recomotos-placa"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterRecomotos.placaChaleco}"
+                                                         maxlength="45"
+                                                         placeholder="PLACA Chal." />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="recomotos-cedula"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterRecomotos.identificacion}"
+                                                         maxlength="45"
+                                                         placeholder="IDENTIFICACIÓN" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="recomotos-unidad"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterRecomotos.unidadMovil}"
+                                                         maxlength="45"
+                                                         placeholder="UNIDAD MÓVIL" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="recomotos-placa-unidad"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterRecomotos.placaUnidadMovil}"
+                                                         maxlength="15"
+                                                         placeholder="PLACA U.M" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="recomotos-numero"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterRecomotos.numeroUnidadMovil}"
+                                                         maxlength="15"
+                                                         placeholder="NÚMERO U.M" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6">
+                                            <p:commandButton id="guardar-recomotos"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-rec,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarRecomoto()}"
+                                                             process="form-info-master:acc-panel:panel-rec,@this"
+                                                             class="cssWhite GreenButton"/>
+                                            <p:spacer width="5" />
+                                            <p:commandButton id="calcel-recomotos"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="form-info-master:acc-panel:panel-rec"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="form-info-master:acc-panel:panel-rec" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-recomotos"
+                                                 var="itemRec" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterRecomotos}" 
+                                                 rowKey="#{rowIdxR + 1}"
+                                                 rowIndexVar="rowIdxR"
+                                                 rows="3"
+                                                 paginator="true"
+                                                 reflow="true" 
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            RECOMOTOS
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdxR + 1}" />
+                                        </p:column>
+                                        <p:column headerText="Nombres">
+                                            <h:outputText value="#{itemRec.nombres}" />
+                                        </p:column>
+                                        <p:column headerText="Chaleco">
+                                            <h:outputText value="#{itemRec.chaleco}" />
+                                        </p:column>
+                                        <p:column headerText="Placa de Chaleco">
+                                            <h:outputText value="#{itemRec.placaChaleco}" />
+                                        </p:column>
+                                        <p:column headerText="Identificación">
+                                            <h:outputText value="#{itemRec.identificacion}" />
+                                        </p:column>
+                                        <p:column headerText="Unidad Movil">
+                                            <h:outputText value="#{itemRec.unidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Placa U.M">
+                                            <h:outputText value="#{itemRec.placaChaleco}" />
+                                        </p:column>
+                                        <p:column headerText="Numero U.M">
+                                            <h:outputText value="#{itemRec.numeroUnidadMovil}" />
+                                        </p:column>
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-reco"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventRecomotos(itemRec)}"
+                                                             update="form-info-master:acc-panel:panel-rec"
+                                                             process="@this" />
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterRecomotos.size()} RECOMOTOS AGREGADOS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="9. TESTIGO">
+                                <div jsf:id="panel-tes">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-8">
+                                            <p:inputText id="nombres-testigos"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterTestigo.nombres}"
+                                                         maxlength="60"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO Y NOMBRES" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <h:outputText value="VÍDEO DE TESTIGO:" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="testigo-video" value="#{accInformeMasterEditarJSF.accInformeMasterTestigo.video}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <p:ajax global="false" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-4">
+                                            <p:inputMask id="testigo-hora"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterTestigo.horaVideo}"
+                                                         placeholder="HORA (horas:minutos)"
+                                                         mask="99:99" />
+
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                            <p:inputText id="testigos-direccion"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterTestigo.direccion}"
+                                                         maxlength="45"
+                                                         placeholder="DIRECCIÓN" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-4 ui-lg-4">
+                                            <p:inputNumber id="testigos-identificacion"
+                                                           value="#{accInformeMasterEditarJSF.accInformeMasterTestigo.identificacion}"
+                                                           maxlength="45"
+                                                           placeholder="IDENTIFICACIÓN" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-4 ui-lg-4">
+                                            <p:inputNumber id="testigos-telefono"
+                                                           value="#{accInformeMasterEditarJSF.accInformeMasterTestigo.telefono}"
+                                                           maxValue="99999999999999"
+                                                           placeholder="TÉLEFONO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g" >
+                                        <div class="ui-g-12 ui-md-12 ui-lg-6" >
+                                            <p:commandButton id="btn-cargar-video-testigo"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-tes,form-info-msg,form-video-testigo"
+                                                             process="form-info-master:acc-panel:panel-tes,@this"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarTestigo()}"
+                                                             class="cssWhite GreenButton" />
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-testigos"
+                                                 var="itemTes" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterTestigoVideo}" 
+                                                 rows="3"
+                                                 rowIndexVar="rowIdxT"
+                                                 paginator="true"
+                                                 reflow="true" 
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            TESTIGOS
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdxT + 1}" />
+                                        </p:column>
+                                        <p:column headerText="Nombres">
+                                            <h:outputText value="#{itemTes.accInformeMasterTestigo.nombres}" />
+                                        </p:column>
+                                        <p:column headerText="Identificación">
+                                            <h:outputText value="#{itemTes.accInformeMasterTestigo.identificacion}" />
+                                        </p:column>
+                                        <p:column headerText="Dirección">
+                                            <h:outputText value="#{itemTes.accInformeMasterTestigo.direccion}" />
+                                        </p:column>
+                                        <p:column headerText="Teléfono">
+                                            <h:outputText value="#{itemTes.accInformeMasterTestigo.telefono}" />
+                                        </p:column>
+                                        <p:column headerText="Vídeo">
+                                            <h:outputText value="#{itemTes.accInformeMasterTestigo.video == 1 ? 'SÍ' : 'NO'}" />
+                                        </p:column>
+                                        <p:column headerText="Hora">
+                                            <h:outputText value="#{itemTes.accInformeMasterTestigo.video == 1 ? itemTes.accInformeMasterTestigo.horaVideo : 'NO APLICA'}" />
+                                        </p:column>
+                                        <p:column headerText="Vídeo">
+                                            <p:commandButton id="openVideo" 
+                                                             ajax="false" 
+                                                             icon="fa fa-external-link" 
+                                                             rendered="#{itemTes.accInformeMasterTestigo.pathVideo != null}"
+                                                             class="OrangeButton cssWhite" 
+                                                             onclick="target = '_blank'">
+                                                <p:fileDownload value="#{accInformeMasterEditarJSF.prepDownloadLocal(itemTes.accInformeMasterTestigo.pathVideo)}" 
+                                                                contentDisposition="inline"/>
+                                            </p:commandButton>
+                                        </p:column>                                    
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-test"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventTestigo(itemTes)}"
+                                                             update="form-info-master:acc-panel:panel-tes"
+                                                             process="@this" />
+                                        </p:column>                                  
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterTestigoVideo.size()} TESTIGOS AGREGADOS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="10. DESCRIPCIÓN DEL EVENTO - VERSIÓN OPERADOR MASTER">
+                                <div jsf:id="tab10">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputTextarea id="version-master"
+                                                             maxlength="64000"
+                                                             value="#{accInformeMasterEditarJSF.accInformeMaster.versionMaster}"
+                                                             rows="7"
+                                                             placeholder="VERSIÓN DEL OPERADOR MASTER" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-4">
+                                            <p:commandButton id="btn-tab10"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-victima,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.actualizar()}"
+                                                             process="tab10,@this"
+                                                             class="GreenButton cssWhite" />
+                                            <p:spacer width="2"/>
+                                            <p:commandButton id="btn-tb10"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="tab10"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="tab10" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:tab>
+                            <p:tab title="11. DESCRIPCIÓN DEL EVENTO - VERSIÓN OPERADOR">
+                                <div jsf:id="panel-version-ope">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputTextarea id="version-operador"
+                                                             maxlength="64000"
+                                                             value="#{accInformeMasterEditarJSF.accInformeMaster.versionOperador}"
+                                                             rows="7"
+                                                             placeholder="VERSIÓN DEL OPERADOR" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <h:outputText value="VÍDEO DEL OPERADOR:" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="video-ope" value="#{accInformeMasterEditarJSF.accInformeMaster.videoOperador}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:inputMask id="video-hora"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.horaVideo}"
+                                                         placeholder="HORA (horas:minutos)"
+                                                         mask="99:99" />
+
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <h:outputText value="AUTORIZA SU GRABACIÓN:" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="autoriza" value="#{accInformeMasterEditarJSF.accInformeMaster.autorizaGrabacion}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <h:outputText value="COLILLA TACÓGRAFO:" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="tacografo" value="#{accInformeMasterEditarJSF.accInformeMaster.colillaTacografo}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <h:outputText value="TELEMÉTRIA:" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="telemetria" value="#{accInformeMasterEditarJSF.accInformeMaster.telemetria}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="SÍ" itemValue="1" />
+                                                <f:selectItem itemLabel="NO" itemValue="0" />
+                                                <f:selectItem itemLabel="NA" itemValue="#{null}" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-6">
+                                            <p:commandButton id="btn-cargar-video"
+                                                             icon="fa fa-upload"
+                                                             type="button"
+                                                             onclick="PF('videoDlg').show()"
+                                                             value="Cargar vídeo"
+                                                             class="cssWhite GreenButton" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-4">
+                                            <p:commandButton id="btn-tab11"
+                                                             icon="fa fa-save"
+                                                             update="panel-version-ope,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.actualizar()}"
+                                                             process="panel-version-ope,@this"
+                                                             class="GreenButton cssWhite" />
+                                            <p:spacer width="2"/>
+                                            <p:commandButton id="btn-tb11"
+                                                             icon="fa fa-times"
+                                                             process="@this"
+                                                             global="false"
+                                                             update="panel-version-ope"
+                                                             class="cssWhite RedButton">
+                                                <p:resetInput target="panel-version-ope" />
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:tab>
+                            <p:tab title="12. MASTER PRIMER RESPONSABLE">
+                                <div jsf:id="panel-master">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-8 ui-lg-8">
+                                            <p:inputText id="firma-nombres"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.idEmpleadoMaster.apellidos.concat(' ').concat(accInformeMasterEditarJSF.accInformeMaster.idEmpleadoMaster.nombres)}"
+                                                         readonly="true"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO, NOMBRES" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="firma-cedula"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.idEmpleadoMaster.identificacion}"
+                                                         readonly="true"
+                                                         placeholder="CÉDULA" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputNumber id="firma-cod"
+                                                           value="#{accInformeMasterEditarJSF.accInformeMaster.idEmpleadoMaster.codigoTm}"
+                                                           readonly="true"
+                                                           maxValue="999999999"
+                                                           placeholder="CÓD TM" />
+                                        </div>
+                                        <div class="ui-g-2 ui-md-2 ui-lg-2">
+                                            <p:commandButton id="btn-buscar-master"
+                                                             icon="fa fa-search"
+                                                             disabled="true"
+                                                             process="form-info-master:acc-panel:firma-cod,@this"
+                                                             update="form-info-master:acc-panel:panel-master,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.buscarMaster(true)}"
+                                                             class="cssWhite OrangeButton" />
+                                        </div>
+                                        <div class="ui-g-2 ui-md-2 ui-lg-2">
+                                            <p:inputText id="firma-grupo"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMaster.idEmpleadoMaster.pmGrupoList.get(0).nombreGrupo}"
+                                                         readonly="true"
+                                                         placeholder="EQUIPO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:signature id="firma" 
+                                                     style="width: 400px; height: 100px" 
+                                                     widgetVar="firmaSig"
+                                                     readonly="true"
+                                                     value="#{accInformeMasterEditarJSF.accInformeMaster.firmaMaster}"
+                                                     guideline="false" />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                        <p:commandButton icon="fa fa-times" 
+                                                         type="button" 
+                                                         disabled="true"
+                                                         onclick="PF('firmaSig').clear()" 
+                                                         class="cssWhite OrangeButton"/>
+                                        FIRMA
+                                    </div>
+                                </div>
+                            </p:tab>
+                            <p:tab title="13. MASTER DE APOYO">
+                                <div jsf:id="panel-master-apoyo">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-8 ui-lg-8">
+                                            <p:inputText id="ope-master-aux-nombres"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterApoyo.idMaster.apellidos.concat(' ').concat(accInformeMasterEditarJSF.accInformeMasterApoyo.idMaster.nombres)}"
+                                                         readonly="true"
+                                                         placeholder="1er APELLIDO, 2do APELLIDO, NOMBRES" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputText id="ope-master-aux-cedula"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterApoyo.idMaster.identificacion}"
+                                                         readonly="true"
+                                                         placeholder="CÉDULA" />
+                                        </div>
+                                        <div class="ui-g-4 ui-md-4 ui-lg-4">
+                                            <p:inputNumber id="ope-master-aux-cod"
+                                                           value="#{accInformeMasterEditarJSF.i_codTmMaster}"
+                                                           maxValue="999999999"
+                                                           placeholder="CÓD TM" />
+                                        </div>
+                                        <div class="ui-g-2 ui-md-2 ui-lg-2">
+                                            <p:commandButton id="btn-buscar"
+                                                             icon="fa fa-search"
+                                                             process="form-info-master:acc-panel:ope-master-aux-cod,@this"
+                                                             update="form-info-master:acc-panel:panel-master-apoyo,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.buscarMaster(false)}"
+                                                             class="cssWhite OrangeButton" />
+                                        </div>
+                                        <div class="ui-g-2 ui-md-2 ui-lg-2">
+                                            <p:inputText id="ope-master-aux-grupo"
+                                                         readonly="true"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterApoyo.idMaster.pmGrupoList.get(0).nombreGrupo}"
+                                                         placeholder="EQUIPO" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:signature id="ope-master-aux" 
+                                                         style="width: 400px; height: 100px" 
+                                                         widgetVar="opeMasterAux" 
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterApoyo.firma}"
+                                                         guideline="false" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:commandButton icon="fa fa-times" 
+                                                             type="button"
+                                                             onclick="PF('opeMasterAux').clear()" 
+                                                             class="cssWhite OrangeButton"/>
+                                            FIRMA
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:commandButton id="guardar-apoyo"
+                                                             icon="fa fa-save"
+                                                             update="form-info-master:acc-panel:panel-master-apoyo,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarApoyo()}"
+                                                             process="form-info-master:acc-panel:panel-master-apoyo,@this"
+                                                             class="cssWhite GreenButton"/>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-ope-apoyo"
+                                                 var="itemMasA" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterApoyo}" 
+                                                 rows="3"
+                                                 rowIndexVar="rowIdxAp"
+                                                 paginator="true"
+                                                 reflow="true" 
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            OPERADORES MASTER DE APOYO
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdxAp + 1}" />
+                                        </p:column>
+                                        <p:column headerText="Nombres">
+                                            <h:outputText value="#{itemMasA.idMaster.apellidos} #{itemMasA.idMaster.nombres}" />
+                                        </p:column>
+                                        <p:column headerText="Código">
+                                            <h:outputText value="#{itemMasA.idMaster.codigoTm}" />
+                                        </p:column>
+                                        <p:column headerText="Equipo">
+                                            <h:outputText value="#{itemMasA.idMaster.pmGrupoList.get(0).nombreGrupo}" />
+                                        </p:column> 
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-accion-apoyo"
+                                                             icon="fa fa-trash"
+                                                             update="form-info-master:acc-panel:panel-master-apoyo,form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventMasterApoyo(itemMasA)}"
+                                                             process="@this"
+                                                             class="cssWhite RedButton" >
+                                                <p:confirm header="Confirmación" message="Está seguro de desvincular este máster del caso?" icon="fa fa-exclamation-triangle" />
+                                            </p:commandButton>
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterApoyo.size()} OPERADORES MASTER DE APOYO AGREGADOS
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="14. ÁLBUM FOTOGRÁFICO">
+                                <div jsf:id="album">
+                                    <div class="Fright">
+                                        <p:commandButton id="limpiar-album"
+                                                         global="false"
+                                                         update=":form-info-master:acc-panel:album"
+                                                         process="@this"
+                                                         icon="fa fa-paint-brush"
+                                                         class="cssWhite OrangeButton"
+                                                         title="Limpiar formulario" />
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <h:outputText value="TECNOLOGÍA: (*obligatorio)" class="cssBlack" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:selectOneRadio id="tecnologia" value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.tecnologia}" layout="responsive" columns="1">
+                                                <f:selectItem itemLabel="DIGITAL" itemValue="1" />
+                                                <f:selectItem itemLabel="ANÁLOGA" itemValue="0" />
+                                            </p:selectOneRadio>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="instrumentos"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.instrumentos}"
+                                                         maxlength="60"
+                                                         placeholder="INSTRUMENTOS UTILIZADOS (*obligatorio)" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-2">
+                                            <p:inputText id="marca"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.marca}"
+                                                         maxlength="45"
+                                                         placeholder="MARCA (*obligatorio)" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-2">
+                                            <p:inputText id="referencia"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.referencia}"
+                                                         maxlength="45"
+                                                         placeholder="REFERENCIA (*obligatorio)" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-2">
+                                            <p:inputText id="lente"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.lente}"
+                                                         maxlength="45"
+                                                         placeholder="LENTE" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-2">
+                                            <p:inputText id="zoom"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.zoom}"
+                                                         maxlength="15"
+                                                         placeholder="ZOOM" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-2">
+                                            <p:inputText id="iso"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.iso}"
+                                                         maxlength="15"
+                                                         placeholder="ISO" />
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-2">
+                                            <p:inputText id="tarjeta"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.tarjeta}"
+                                                         maxlength="45"
+                                                         placeholder="TARJETA" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputText id="tp-imagen"
+                                                         value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.tipoFoto}"
+                                                         maxlength="45"
+                                                         placeholder="TIPO DE FOTOGRAFÍA (*obligatorio)" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                            <p:inputTextarea id="txt-pie-img"
+                                                             value="#{accInformeMasterEditarJSF.accInformeMasterAlbum.descripcion}"
+                                                             rows="4"
+                                                             maxlength="65000"
+                                                             placeholder="DESCRIPCIÓN DE LA IMAGEN (*obligatorio)" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g" >
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6" >
+                                            <p:commandButton id="btn-cargar"
+                                                             icon="fa fa-upload"
+                                                             process="form-info-master:acc-panel:album"
+                                                             update=":form-info-master:msg"
+                                                             actionListener="#{accInformeMasterEditarJSF.agregarAlbum()}"
+                                                             value="Buscar Foto"
+                                                             class="cssWhite GreenButton" />
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="tabla-fotos"
+                                                 var="itemAlbum" 
+                                                 value="#{accInformeMasterEditarJSF.listAccInformeMasterAlbumFoto}" 
+                                                 rowIndexVar="rowIdxAlb"
+                                                 rows="3"
+                                                 paginator="true"
+                                                 reflow="true" 
+                                                 style="margin-top:20px">
+                                        <f:facet name="header">
+                                            FOTOS
+                                        </f:facet>
+                                        <p:column headerText="#">
+                                            <h:outputText value="#{rowIdxAlb + 1}" />
+                                        </p:column>
+                                        <p:column headerText="Tecnología">
+                                            <h:outputText value="#{itemAlbum.accInformeMasterAlbum.tecnologia == 1 ? 'Digital' : 'Análoga'}" />
+                                        </p:column>
+                                        <p:column headerText="Tipo Fotografía">
+                                            <h:outputText value="#{itemAlbum.accInformeMasterAlbum.tipoFoto}" />
+                                        </p:column>
+                                        <p:column headerText="Descrpción">
+                                            <h:outputText value="#{itemAlbum.accInformeMasterAlbum.descripcion}" />
+                                        </p:column>
+                                        <p:column headerText="Foto">
+                                            <p:commandButton id="openDoc" 
+                                                             ajax="false" 
+                                                             icon="fa fa-external-link" 
+                                                             class="OrangeButton cssWhite" 
+                                                             onclick="target = '_blank'">
+                                                <p:fileDownload value="#{accInformeMasterEditarJSF.prepDownloadLocal(itemAlbum.accInformeMasterAlbum.pathFoto)}" 
+                                                                contentDisposition="inline"/>
+                                            </p:commandButton>
+                                        </p:column>
+                                        <p:column headerText="Acción">
+                                            <p:commandButton id="btn-event-album"
+                                                             icon="fa fa-pencil"
+                                                             class="OrangeButton cssWhite"
+                                                             actionListener="#{accInformeMasterEditarJSF.eventAlbum(itemAlbum)}"
+                                                             update="form-info-master:acc-panel:album"
+                                                             process="@this" />
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            #{accInformeMasterEditarJSF.listAccInformeMasterAlbumFoto.size()} FOTOGRAFÍAS CARGADAS A LA LISTA
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </p:tab>
+                            <p:tab title="15. BOSQUEJO TOPOGRÁFICO - EVENTO VIAL">
+                                <div class="ui-g" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-6" >
+                                        <p:commandButton id="btn-cargar-bosquejo"
+                                                         icon="fa fa-upload"
+                                                         type="button"
+                                                         onclick="PF('bosquejoDlg').show()"
+                                                         value="Cargar Bosquejo Topográfico"
+                                                         class="cssWhite GreenButton" />
+                                    </div>
+                                </div>
+                            </p:tab>
+                        </p:accordionPanel>
+                    </p:panel>
+                </div>
+            </h:form>
+        </div>
+        <ui:include src="modal/cargarFoto.xhtml" />
+        <ui:include src="modal/cargarBosquejo.xhtml" />
+        <ui:include src="modal/listaStopPoint.xhtml" />
+        <ui:include src="modal/cargarVideo.xhtml" />
+        <ui:include src="modal/cargarVideoTestigo.xhtml" />
+    </ui:define>
+</ui:composition>

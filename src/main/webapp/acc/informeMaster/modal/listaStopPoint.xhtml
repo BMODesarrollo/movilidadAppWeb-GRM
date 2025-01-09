@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+
+    <p:dialog id="stopPoint" closeOnEscape="true" widgetVar="dlgStopPoint" modal="true" 
+              resizable="false" appendTo="@(body)" closable="false"  responsive="true">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            parada
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('dlgStopPoint').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="form-estacion-cerca">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Un click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="StopPoint" id="tablaStopPoint" value="#{accidenteLugarJSF.listPrgStopPoint}"  
+                         selectionMode="single"                
+                         rowIndexVar="nroFila"
+                         filterDelay="3000"
+                         widgetVar="tablaStopPointWV"
+                         rows="5"
+                         reflow="true"
+                         paginator="true"
+                         rowKey="#{StopPoint.idPrgStoppoint}"
+                         emptyMessage="No existen Paradas registradas"       >
+                <p:ajax event="rowSelect" listener="#{accInformeMasterJSF.obtenerParada}" update="form-info-master:acc-panel:estacion-cerca,form-info-master:msg" />
+                <f:facet name="header">
+                    <p:outputPanel>
+                        <p:inputText id="globalFilter" onkeyup="PF('tablaStopPointWV').filter()" style="width:150px" placeholder="Filtrar paradas"/>
+                    </p:outputPanel>
+                </f:facet>
+                <p:column headerText="#">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column  headerText="Nombre" filterBy="#{StopPoint.name}" filterMatchMode="contains">
+                    <h:outputText  value="#{StopPoint.name}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

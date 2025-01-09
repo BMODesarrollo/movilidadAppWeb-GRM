@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-rol" closeOnEscape="true" widgetVar="rolDlg" modal="true" header="#{userAuthorityJSF.userAuthority.idUserAuthority != null ? 'EDITAR ROL' : 'NUEVO ROL'}"
+              resizable="false" appendTo="@(body)" position="center top" responsive="true">
+        <h:form id="form-rol">
+            <div class="ui-fluid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Rol *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="rol"
+                                         maxlength="45"
+                                         required="true"
+                                         requiredMessage="Rol es requerido"
+                                         value="#{userAuthorityJSF.userAuthority.authority}" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Página Principal *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="pagina"
+                                         readonly="true"
+                                         value="#{userAuthorityJSF.userAuthority.landPage}" />
+                            <div class="botonFloat">
+                                <p:commandButton id="btn-list-op"
+                                                 process="@this"
+                                                 actionListener="#{userAuthorityJSF.cargarListOpcion()}"
+                                                 update=":formOpcion"
+                                                 style="margin: 0px"
+                                                 class="cssWhite"
+                                                 icon="fa fa-list-ul"
+                                                 title="Lista de opciones"
+                                                 oncomplete="PF('opcionDlg').show()"
+                                                 global="false" />
+                            </div>
+                        </div>
+                    </div>
+                    <p:remoteCommand id="btn-guardar"
+                                     name="rc_user_auth"
+                                     rendered="#{empty userAuthorityJSF.userAuthority.idUserAuthority}"
+                                     action="#{userAuthorityJSF.guardar()}"
+                                     update=":RolListForm,@form"/>
+                    <p:remoteCommand id="btn-editar"
+                                     name="rc_user_auth_update"
+                                     rendered="#{not empty userAuthorityJSF.userAuthority.idUserAuthority}"
+                                     action="#{userAuthorityJSF.editar()}"
+                                     update=":RolListForm"/>
+                </div>
+            </div>
+            <h:inputHidden id="pagina-hi"
+                           required="true"
+                           requiredMessage="Página Principal es requerido"
+                           value="#{userAuthorityJSF.userAuthority.landPage}" />
+        </h:form>
+        <f:facet name="footer" >
+            <p:commandButton icon="fa fa-save"
+                             rendered="#{empty userAuthorityJSF.userAuthority.idUserAuthority}"
+                             value="Guardar" 
+                             class="cssWhite" 
+                             onclick="rc_user_auth()"/>
+            <p:commandButton icon="fa fa-save"
+                             rendered="#{not empty userAuthorityJSF.userAuthority.idUserAuthority}"
+                             value="Actualizar" 
+                             class="cssWhite" 
+                             onclick="rc_user_auth_update()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

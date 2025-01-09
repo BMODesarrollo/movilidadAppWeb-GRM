@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .rechazado{
+                background: red !important;
+            }
+            .aprobado{
+                background: green !important;
+            }
+            .pendiente{
+                background: rgb(84, 129, 232) !important;
+            }
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="AccPreListForm">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Pre - Accidentalidad">
+                <p:dataTable id="datalist" 
+                             value="#{accPreBean.lstAccPre}"
+                             var="item"
+                             paginator="true"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             emptyMessage="No existen registros"
+                             scrollable="true"
+                             scrollHeight="1000"
+                             >
+
+                    <f:facet name="header">
+                        <h:outputText value="Fechas: " title="Fecha Inicio"
+                                      />&nbsp;&nbsp;
+                        <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                    value="#{accPreBean.fechaInicio}"
+                                    placeholder="Fecha Ini"
+                                    showOn="button"
+                                    readonlyInput="true"
+                                    maxdate="today"
+                                    pattern="dd-MM-yyyy" locale="es">
+                        </p:calendar>
+                        -
+                        <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                    value="#{accPreBean.fechaFin}"
+                                    showOn="button"
+                                    readonlyInput="true"
+                                    placeholder="Fecha Fin"
+                                    maxdate="today"
+                                    pattern="dd-MM-yyyy" locale="es">
+                        </p:calendar>
+                        <p:spacer width="10"/>
+                        <p:commandButton
+                            icon="fa fa-search"
+                            value="Buscar"
+                            actionListener="#{accPreBean.consultar()}"
+                            class="cssWhite"
+                            update="datalist,:msgs"
+                            >
+                        </p:commandButton>    
+                    </f:facet>
+
+
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column width="150" styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Fecha"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idNovedad.fecha}">
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Vehículo" 
+                              filterBy="#{item.idNovedad.idVehiculo.codigo}" 
+                              filterMatchMode="contains"
+                              styleClass="text-center"
+                              >
+                        <h:outputText value="#{item.idNovedad.idVehiculo.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Accidente" filterBy="#{item.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"/>
+                    </p:column>
+                    <p:column headerText="Estado" styleClass="#{item.estado == 1 ? 'aprobado text-center' :item.estado == 2 ? 'rechazado text-center':item.estado == 0 ? 'pendiente text-center':'' }">
+                        <h:outputText value="APROBADO" rendered="#{item.estado == 1}" styleClass="cssWhite"/>
+                        <h:outputText value="RECHAZADO" rendered="#{item.estado == 2}" styleClass="cssWhite"/>
+                        <h:outputText value="PENDIENTE" rendered="#{item.estado == 0}" styleClass="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Descripción" class="cortar">
+                        <h:outputText value="#{item.idNovedad.observaciones}"/>
+                    </p:column>
+                    <p:column headerText="Creado por" width="150">
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column headerText="Autorizado por" width="150">
+                        <h:outputText value="#{item.usernameModifica}"/>
+                    </p:column>
+                    <p:column headerText="Acción">
+                        <div align="left" >
+                            <p:commandButton id="aprobadoButton"   
+                                             value="Aprobar" 
+                                             actionListener="#{accPreBean.cambiarEstado(1,item)}" 
+                                             update="@form"
+                                             disabled="#{item.estado eq 1 }"
+                                             process="@this"
+                                             icon="fa fa-thumbs-up" 
+                                             class="GreenButton cssWhite">
+                                <p:confirm header="Confirmación" message="Está seguro de aprobar éste registro?" icon="fa fa-exclamation-triangle" />
+                            </p:commandButton>
+                            <p:commandButton id="rechazadoButton"   
+                                             value="Rechazar" 
+                                             actionListener="#{accPreBean.cambiarEstado(2,item)}" 
+                                             update="@form" 
+                                             disabled="#{item.estado eq 1 or item.estado eq 2}"
+                                             process="@this"
+                                             icon="fa fa-thumbs-down" 
+                                             class="cssWhite RedButton">
+                                <p:confirm header="Confirmación" message="Está seguro de rechazar éste registro?" icon="fa fa-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

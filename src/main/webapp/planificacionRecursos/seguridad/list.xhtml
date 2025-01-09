@@ -1,0 +1,216 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="content">
+        <h:form id="carga-info-seguridad"  enctype="multipart/form-data">
+            <p:panel header="Carga Registros Seguridad"
+                     toggleable="true" 
+                     toggleSpeed="500" 
+                     closeSpeed="500"  
+                     collapsed="true"
+                     widgetVar="panel" 
+                     style="margin-bottom:20px">
+                <p:messages id="messages" escape="false" showDetail="true" closable="true">
+                </p:messages>
+                <h:panelGrid columns="2" style="text-align: center; margin: 0 auto">
+                    <p:fileUpload fileUploadListener="#{plaRecuSeguridadBean.cargarSeguridad}" mode="advanced" dragDropSupport="false"
+                                  update="messages" sizeLimit="2000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/" 
+                                  label="Buscar archivo" uploadLabel="Cargar" cancelLabel="Cancelar carga"
+                                  invalidFileMessage="Debe cargar un archivo excel válido"
+                                  invalidSizeMessage="El archivo no debe ser mayor a 2mb"
+                                  oncomplete="PF('w_seguridadList').clearFilters(); PF('w_seguridadList').filter();"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+        <h:form id="formSeguridad">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Seguridad">
+
+                <p:dataTable id="seguridadList" 
+                             value="#{plaRecuSeguridadBean.listPlaRecuSeguridad}" 
+                             var="item"
+                             rowKey="#{item.idPlaRecuSeguridad}"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             tableStyle="table-layout:fixed"
+                             reflow="true"
+                             filterDelay="1000"
+                             rows="25"
+                             selectionMode="single"
+                             widgetVar="w_seguridadList"
+                             rowsPerPageTemplate="25,50,100,200,500"
+                             sortBy="#{item.empleado.idEmpleadoEstado.nombre}"
+                             sortOrder="ascending">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="seguridadList" fileName="Seguridad"/>
+                        </h:commandLink>
+                    </f:facet>
+
+                    <f:facet name="header">       
+                        <div align="right">
+                            <p:outputLabel value="Semana a Programar " class="cssWhite Fs20" for="desde" />
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{plaRecuSeguridadBean.desde}"
+                                        pattern="yyyy-MM-dd"
+                                        style="width: 100px;"
+                                        mindate="#{plaRecuSeguridadBean.dia_inicio}"
+                                        maxdate="#{plaRecuSeguridadBean.dia_fin}">
+                                <p:ajax event="dateSelect" listener="#{plaRecuSeguridadBean.consultarFecha()}" 
+                                        update="seguridadList"></p:ajax>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{plaRecuSeguridadBean.hasta}"
+                                        pattern="yyyy-MM-dd"
+                                        mindate="#{plaRecuSeguridadBean.dia_inicio}"
+                                        maxdate="#{plaRecuSeguridadBean.dia_fin}"
+                                        style="margin-left: 5px; width: 160px;">
+                                <p:ajax event="dateSelect" listener="#{plaRecuSeguridadBean.consultar()}" 
+                                        update="seguridadList"></p:ajax>
+                            </p:calendar>
+
+                            <h:outputText value="Unidad Funcional" class="cssWhite"/>
+                            <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                             filter="true" 
+                                             rendered="#{uniFuncSessionBean.filtradoUF}"
+                                             style="width: 200px; margin-left: 9px;"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                               var="uniFunc" 
+                                               itemLabel="#{uniFunc.nombre}"
+                                               itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                <p:ajax process="@this"
+                                        event="change"
+                                        listener="#{plaRecuSeguridadBean.filtrarPorUF()}"
+                                        update="formSeguridad:seguridadList"/>
+                            </p:selectOneMenu>
+
+                            <p:commandButton id="plantalla_id"
+                                             value="Plantilla"
+                                             icon="fa fa-download"
+                                             ajax="false"
+                                             class="cssWhite GreenButton"
+                                             actionListener="#{plaRecuSeguridadBean.prepDownloadLocal('PLANTILLA_CARGA_RECURSOS_SEGURIDAD')}">
+                                <p:fileDownload value="#{viewDocuJSFMB.download}" />
+                            </p:commandButton>
+                            <p:commandButton id="crear_seguridad"
+                                             icon="fa fa-plus"
+                                             value="Seguridad"
+                                             title="Crear nuevo registro de 'Seguridad'"
+                                             update="dlgPlaRecuSeguridad"
+                                             actionListener="#{plaRecuSeguridadBean.preGestionar()}"
+                                             class="cssWhite"
+                                             style="margin-left: 5px; width: 160px;"
+                                             oncomplete="PF('wvPlaRecuSeguridad').show()" />
+
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="seguridadList" trigger="toggler" />
+
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Código TM" filterBy="#{item.empleado.codigoTm}" filterMatchMode="contains">
+                        <h:outputText  value="#{item.empleado.codigoTm}" />
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.identificacion}"
+                              filterMatchMode="contains"
+                              headerText="Cédula">
+                        <h:outputText value="#{item.empleado.identificacion}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.nombres}"
+                              filterMatchMode="contains"
+                              headerText="Nombres">
+                        <h:outputText value="#{item.empleado.nombres}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Apellidos">
+                        <h:outputText value="#{item.empleado.apellidos}" />
+                    </p:column>
+                    <p:column filterBy="#{item.empleado.idEmpleadoCargo.nombreCargo}"
+                              filterMatchMode="contains"
+                              headerText="Cargo">
+                        <h:outputText value="#{item.empleado.idEmpleadoCargo.nombreCargo}"/>
+                    </p:column>
+                    <p:column headerText="Estado Empleado"
+                              filterBy="#{item.empleado.idEmpleadoEstado.nombre}"
+                              filterMatchMode="contains"
+                              styleClass="#{item.empleado.idEmpleadoEstado.nombre eq 'Activo' ? 'cssGreen' : 'cssRed'}"
+                              sortBy="#{item.empleado.idEmpleadoEstado.nombre}"
+                              sortable="true">
+                        <h:outputText value="#{item.empleado.idEmpleadoEstado.nombre}"
+                                      style="color: white;"/>
+                    </p:column>
+                    <p:column headerText="Motivo" filterBy="#{item.idMotivo.descripcion}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idMotivo.motivo}" title="Ruta" />
+                    </p:column>
+                    <p:column headerText="Ruta" filterBy="#{item.idPlaRecuRuta}" filterMatchMode="contains">
+                        <h:outputText value="#{item.idPlaRecuRuta.ruta}" title="NOvedad que se asocia a la ejecución" />
+                    </p:column>
+                    <p:column headerText="F. Inicio" filterBy="#{item.fechaInicio}" filterMatchMode="contains">
+                        <h:outputText value="#{item.fechaInicio}" title="Fecha de inicio de la ejecución">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>    
+                    </p:column>
+                    <p:column headerText="F. Fin" filterBy="#{item.fechaFin}" filterMatchMode="contains">
+                        <h:outputText value="#{item.fechaFin}" title="Fecha de finalización de la ejecución">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>    
+                    </p:column>
+
+                    <p:column headerText="Descripción"  filterBy="#{item.descripcion}" filterMatchMode="contains">
+                        <h:outputText value="#{item.descripcion}" title="Descripción de la ejecución"/>
+                    </p:column>
+                    <p:column headerText="Vigente"
+                              styleClass="#{plaRecuSeguridadBean.getVigencia(item.fechaFin) eq 'VIGENTE' ? 'cssGreen' : 'cssRed'}"
+                              filterBy="#{plaRecuSeguridadBean.getVigencia(item.fechaFin)}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{plaRecuSeguridadBean.getVigencia(item.fechaFin)}"
+                                      style="color: white;"/>
+                    </p:column>
+                    <p:column headerText="User create" filterBy="#{item.usernameCreate}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.usernameCreate}" title="nombre del usuario que creó el registro"/>
+                    </p:column>
+                    <p:column headerText="Date create" filterBy="#{item.creado}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.creado}" title="Fecha de creación del registro">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="User modify" filterBy="#{item.usernameEdit}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.usernameEdit}" title="nombre del último usuario que modifica el registro"/>
+                    </p:column>
+                    <p:column headerText="Date modify" filterBy="#{item.modificado}" filterMatchMode="contains" visible="false" >
+                        <h:outputText value="#{item.modificado}" title="Fecha de la última modificación del registro">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Opción">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite" 
+                                         title="Modificar Registro" 
+                                         process="@this"
+                                         actionListener="#{plaRecuSeguridadBean.editar(item)}"
+                                         update="dlgPlaRecuSeguridad"
+                                         oncomplete="PF('wvPlaRecuSeguridad').show()"
+                                         disabled="#{item.empleado.idEmpleadoEstado.nombre eq 'Retirado'}"> 
+                        </p:commandButton>          
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>

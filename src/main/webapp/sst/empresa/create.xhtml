@@ -1,0 +1,438 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="empresa"
+              widgetVar="wlvEmpresas" 
+              modal="true" 
+              class="mr1024_70 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{sstEmpresaBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{sstEmpresaBean.selected != null}">
+            <f:facet name="header">
+                EDITAR DATOS : #{sstEmpresaBean.selected.razonSocial.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <h:form id="frmEmpresa">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1">
+                        <p:fieldset legend="Empresa" toggleable="true">
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Nit ó Cédula" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        requiredMessage="Debe ingresar NIT ó Cédula"
+                                        value="#{sstEmpresaBean.nitCedula}" 
+                                        />
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Razón social" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        requiredMessage="Debe ingresar razón social"
+                                        value="#{sstEmpresaBean.razonSocial}" 
+                                        />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Dirección empresa" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        requiredMessage="Debe ingresar dirección de la empresa"
+                                        value="#{sstEmpresaBean.sstEmpresa.direccionEmpresa}" 
+                                        />
+                                </div>
+                            </div>
+
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Teléfono empresa" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputMask 
+                                        required="true"
+                                        requiredMessage="Debe ingresar teléfono de la empresa"
+                                        value="#{sstEmpresaBean.sstEmpresa.telefonoEmpresa}"
+                                        mask="9999999">
+                                    </p:inputMask>
+                                </div>
+                            </div>
+
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="E-mail empresa" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        requiredMessage="Debe ingresar e-mail de la empresa"
+                                        value="#{sstEmpresaBean.sstEmpresa.emailEmpresa}" 
+                                        validatorMessage="E-mail NO válido"
+                                        >
+                                        <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+                                    </p:inputText>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Arl" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu  
+                                        style="width: 99.999%"
+                                        filter="true"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una ARL"
+                                        value="#{sstEmpresaBean.i_Arl}">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                        <f:selectItems 
+                                            var="arl"
+                                            value="#{sstEmpresaBean.lstSstArls}"
+                                            itemLabel="#{arl.nombre}"
+                                            itemValue="#{arl.idSstArl}"
+                                            />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Tipo de empresa" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu 
+                                        style="width: 99.999%"
+                                        filter="true"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar un tipo de empresa"
+                                        value="#{sstEmpresaBean.i_TipoEmpresa}">
+                                        <f:selectItem itemLabel="Seleccione uno" 
+                                                      itemDisabled="true"
+                                                      itemValue="#{null}" />
+                                        <f:selectItems 
+                                            var="tipoEmpresa"
+                                            value="#{sstEmpresaBean.lstSstEmpresaTipos}"
+                                            itemLabel="#{tipoEmpresa.nombre}"
+                                            itemValue="#{tipoEmpresa.idSstEmpresaTipo}"
+                                            />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <p:fieldset legend="Representante legal" toggleable="true">
+                                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                            <p:outputLabel value="Tipo Documento" for="@next"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <p:selectOneMenu 
+                                                style="width: 99.999%"
+                                                required="true"
+                                                value="#{sstEmpresaBean.i_TipoIdRepresentante}"
+                                                requiredMessage="Debe seleccionar un tipo de documento para el representante legal">
+                                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                                <f:selectItems 
+                                                    var="tipoDoc"
+                                                    value="#{sstEmpresaBean.lstTiposIdentificacion}"
+                                                    itemLabel="#{tipoDoc.nombre}"
+                                                    itemValue="#{tipoDoc.idSstTipoIdentificacion}"
+                                                    />
+                                            </p:selectOneMenu>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <p:outputLabel value="Número Documento" for="@next"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <p:inputText 
+                                                required="true"
+                                                requiredMessage="Debe ingresar número de documento"
+                                                value="#{sstEmpresaBean.sstEmpresa.numeroDocRepresentante}" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <p:outputLabel value="Nombre completo" for="@next"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <p:inputText 
+                                                required="true"
+                                                requiredMessage="Debe ingresar nombre completo del representante"
+                                                value="#{sstEmpresaBean.sstEmpresa.nombreRepresentante}" 
+                                                />
+                                        </div>
+                                    </div>
+                                </p:fieldset>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1">
+                        <p:fieldset legend="Responsable SST" toggleable="true">
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Tipo Documento" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu  
+                                        style="width: 99.999%"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar un tipo de documento para el responsable SST"
+                                        value="#{sstEmpresaBean.i_TipoIdResponsable}">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                        <f:selectItems 
+                                            var="tipo"
+                                            value="#{sstEmpresaBean.lstTiposIdentificacion}"
+                                            itemLabel="#{tipo.nombre}"
+                                            itemValue="#{tipo.idSstTipoIdentificacion}"
+                                            />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Número Documento" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        requiredMessage="Debe ingresar número de documento"
+                                        value="#{sstEmpresaBean.sstEmpresa.numeroDocResponsable}" 
+                                        />
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Nombre completo" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        requiredMessage="Debe ingresar nombre completo del responsable"
+                                        value="#{sstEmpresaBean.sstEmpresa.nombreResponsable}" 
+                                        />
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Teléfono fijo" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputMask 
+                                        required="true"
+                                        requiredMessage="Debe ingresar teléfono fijo del responsable"
+                                        value="#{sstEmpresaBean.sstEmpresa.telefonoFijoResponsable}" 
+                                        mask="9999999">
+                                    </p:inputMask>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Teléfono móvil" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputMask 
+                                        required="true"
+                                        requiredMessage="Debe ingresar teléfono móvil del responsable"
+                                        value="#{sstEmpresaBean.sstEmpresa.telefonoMovilResponsable}"
+                                        mask="9999999999">
+                                    </p:inputMask>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Nombre usuario" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        requiredMessage="Debe ingresar nombre de usuario"
+                                        value="#{sstEmpresaBean.sstEmpresa.usrNombre}" 
+                                        />
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Correo electrónico" for="@next"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        requiredMessage="Debe ingresar correo electrónico del responsable"
+                                        value="#{sstEmpresaBean.sstEmpresa.emailResponsable}" 
+                                        validatorMessage="E-mail NO válido"
+                                        >
+                                        <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+                                        <p:ajax event="blur" 
+                                                global="false"
+                                                process="@form"
+                                                update="docsEmpresa"
+                                                listener="#{sstEmpresaBean.validarCamposOnBlur()}"/>
+                                    </p:inputText>
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                </div>
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1" jsf:id="docsEmpresa">
+                        <p:fieldset legend="Documentos empresa" rendered="#{sstEmpresaBean.mostrarListaDocumentos()}">
+                            <p:dataTable id="dtDocumentos" 
+                                         rowIndexVar="index"
+                                         var="documento" 
+                                         scrollable="true"
+                                         widgetVar="dtDocumento"
+                                         scrollHeight="600"
+                                         disabledTextSelection="false"
+                                         reflow="true"
+                                         rows="10"
+                                         filterDelay="1700"
+                                         paginator="true"
+                                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="10,50,100"
+                                         emptyMessage="No existen registros"
+                                         value="#{sstEmpresaBean.lstDocumentosArchivos}">
+
+                                <p:column headerText="Nombre"
+                                          style="text-align: center;">
+                                    <h:outputText value="#{documento.empresaDoc.idSstEmpresaTipoDoc.tipoDocumento}"/>
+                                </p:column>
+                                <p:column headerText="Número"
+                                          style="text-align: center;">
+                                    <h:outputText 
+                                        value="#{documento.empresaDoc.numero}"
+                                        rendered="#{documento.empresaDoc.numero != null}"
+                                        />
+                                    <h:outputText value="N/A" rendered="#{documento.empresaDoc.numero == null}"/>
+                                </p:column>
+                                <p:column headerText="Desde"
+                                          style="text-align: center;">
+                                    <h:outputText 
+                                        value="#{documento.empresaDoc.desde}"
+                                        rendered="#{documento.empresaDoc.desde != null}"
+                                        >
+                                        <f:convertDateTime type="date" pattern="YYYY-MM-dd"/>
+                                    </h:outputText>
+                                    <h:outputText value="N/A" rendered="#{documento.empresaDoc.desde == null}"/>
+                                </p:column>
+                                <p:column headerText="Hasta"
+                                          style="text-align: center;">
+                                    <h:outputText 
+                                        value="#{documento.empresaDoc.hasta}"
+                                        rendered="#{documento.empresaDoc.hasta != null}"
+                                        >
+                                        <f:convertDateTime type="date" pattern="YYYY-MM-dd"/>
+                                    </h:outputText>
+                                    <h:outputText value="N/A" rendered="#{documento.empresaDoc.hasta == null}"/>
+                                </p:column>
+                                <p:column style="text-align: center;" styleClass="text-word-wrap">
+                                    <f:facet name="header">
+                                        <h:outputText value="Descripción"/>
+                                    </f:facet>
+                                    <h:outputText value="#{documento.empresaDoc.idSstEmpresaTipoDoc.descripcion}"/>
+                                </p:column>
+
+                                <p:column style="text-align: center;"
+                                          width="10%"
+                                          styleClass="#{documento.empresaDoc.idSstEmpresaTipoDoc.requerido == 1 ? 'cssGreen texto-blanco' : documento.empresaDoc.idSstEmpresaTipoDoc.requerido == 0 ? 'cssRed texto-blanco' : null}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Requerido"/>
+                                    </f:facet>
+                                    <h:outputText value="Si" style="color: white; font-weight: bolder" rendered="#{documento.empresaDoc.idSstEmpresaTipoDoc.requerido == 1}"/>
+                                    <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{documento.empresaDoc.idSstEmpresaTipoDoc.requerido == 0}"/>
+                                </p:column>
+
+                                <p:column headerText="Agregar documento" style="text-align: center;"
+                                          width="10%"
+                                          exportable="false">
+                                    <div class="ui-g Padding0">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:commandButton styleClass="cssWhite GreenButton"
+                                                             title="Agregar"
+                                                             process="@this"
+                                                             update=":frmAddFiles,:frmDatosEmpresa"
+                                                             oncomplete="PF('AddFilesListDialog').show();"
+                                                             icon="fa fa-plus">
+                                                <p:resetInput target=":frmDatosEmpresa:pGridDatos"/>
+                                                <f:setPropertyActionListener value="#{index}" target="#{sstEmpresaBean.i_ArchivoIndex}"/>
+                                                <f:setPropertyActionListener value="#{documento.empresaDoc}" target="#{sstEmpresaBean.sstEmpresaDocs}"/>
+                                            </p:commandButton>
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                            <p:commandButton styleClass="cssWhite RedButton"
+                                                             title="Cancelar Subida"
+                                                             process="@this"
+                                                             disabled="#{documento.file == null}"
+                                                             actionListener="#{sstEmpresaBean.cancelarArchivo(index)}"
+                                                             update="dtDocumentos,:msgs"
+                                                             icon="fa fa-times">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </p:column>
+
+                                <p:column style="text-align: center;"
+                                          width="10%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Subido" />
+                                    </f:facet>
+                                    <i class="fa fa-check GreenButton" jsf:rendered="#{documento.file != null}"></i>
+                                </p:column>
+                            </p:dataTable>
+                        </p:fieldset>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update=":msgs,pGridDatos,:frmPrincipal:dtEmpresas" 
+                             action="#{sstEmpresaBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmPrincipal:dtEmpresas"
+                             action="#{sstEmpresaBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{sstEmpresaBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{sstEmpresaBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="modal/AddFiles.xhtml"/>
+</ui:composition>     

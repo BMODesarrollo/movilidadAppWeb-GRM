@@ -1,0 +1,163 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="audi_tipo_respuesta">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Tipo de Respuesta">
+                <p:dataTable id="datalist" 
+                             value="#{audiTipoRespuestaJSFMB.list}"
+                             var="item"
+                             widgetVar="datalist_wv"
+                             paginator="true"
+                             rowKey="#{rVar + 1}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             filterDelay="2000"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen registros"
+                             scrollable="true"
+                             scrollHeight="1000">
+                    <p:column style="width:30px">
+                        <p:rowToggler class="cssBlack" />
+                    </p:column>
+                    <p:column headerText="Nombre" width="40%">
+                        <h:outputText value="#{item.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Selección Múltiple" visible="false">
+                        <h:outputText value="#{item.seleccionMultiple}"/>
+                    </p:column>
+                    <p:column headerText="Documento" visible="false">
+                        <h:outputText value="#{item.documento}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.seleccionMultiple}" 
+                              exportable="false"
+                              headerText="Selección Múltiple"
+                              styleClass="#{item.seleccionMultiple eq 1 ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('datalist_wv').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.seleccionMultiple==1 ? 'Sí' : 'No'}" />
+                    </p:column>
+                    <p:column filterBy="#{item.observacion}" 
+                              exportable="false"
+                              headerText="Observación"
+                              styleClass="#{item.observacion eq 1 ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('datalist_wv').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.observacion==1 ? 'Sí' : 'No'}" />
+                    </p:column>
+                    <p:column filterBy="#{item.abierta}" 
+                              exportable="false"
+                              headerText="Abierta"
+                              styleClass="#{item.abierta eq 1 ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('datalist_wv').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.abierta==1 ? 'Sí' : 'No'}" />
+                    </p:column>
+                    <p:column filterBy="#{item.documento}" 
+                              exportable="false"
+                              headerText="Documento"
+                              styleClass="#{item.documento eq 1 ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('datalist_wv').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.documento==1 ? 'Sí' : 'No'}" />
+                    </p:column>
+                    <p:column headerText="Acciones" width="7%" exportable="false">
+                        <p:commandButton id="editButton"   
+                                         update="crear_audi_tipo_pregunta_id_dialog,
+                                         crear_audi_tipo_pregunta_id_dialog,
+                                         create_edit_dialog_form:alternativa_id,msgs" 
+                                         icon="fa fa-pencil" 
+                                         actionListener="#{audiTipoRespuestaJSFMB.preEdit(item)}"
+                                         class="cssWhite GreenButton">
+                            <p:resetInput target="create_edit_dialog_form"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:rowExpansion>
+                        <p:dataTable var="obj" value="#{audiTipoRespuestaJSFMB.getListaAlternativas(item)}">
+                            <p:column headerText="Número">
+                                <h:outputText value="#{obj.numero}" />
+                            </p:column>
+                            <p:column headerText="Enunciado">
+                                <h:outputText value="#{obj.enunciado}" />
+                            </p:column>
+                            <p:column headerText="Descripción">
+                                <h:outputText value="#{obj.descripcion}" />
+                            </p:column>
+                            <p:column headerText="Valor">
+                                <h:outputText value="#{obj.valor}" />
+                            </p:column>
+                            <p:column headerText="Genera Novedad">
+                                <h:outputText value="#{obj.generaNovedad?'Si':'No'}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:rowExpansion>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             actionListener="#{audiTipoRespuestaJSFMB.preGuardar()}" 
+                                             update="crear_audi_tipo_pregunta_id_dialog,crear_audi_tipo_pregunta_id_dialog" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             oncomplete="PF('crear_audi_tipo_pregunta_dialog_wv').show()">
+                                <p:resetInput target="create_edit_dialog_form"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="parametros area usuario #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/createEdit.xhtml"/>
+        <ui:include src="modal/agregarAlternativa.xhtml"/>
+    </ui:define>
+</ui:composition>

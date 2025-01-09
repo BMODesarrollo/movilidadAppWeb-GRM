@@ -1,0 +1,507 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="crear_audi_id_dialog"
+              widgetVar="crear_audi_dialog_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_70 mr500_100"
+              fitViewport="true"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Auditoría"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('crear_audi_dialog_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <p:ajax event="close" listener="#{auditoriaJSFMB.onCerrar()}"
+                update="audi_form:datalist"/>
+        <h:form id="create_edit_dialog_form">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <p:tabView id="tabView_id">
+                        <p:tab title="Información" id="tab_id">
+                            <div class="ui-g-3 ui-md-4 ui-lg-3 Padding5">
+                                <p:outputLabel for="input_codigo" value="Código"/>
+                                <p:inputText id="input_codigo" 
+                                             readonly="true"
+                                             value="#{auditoriaJSFMB.auditoria.codigo}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-8 ui-lg-4 Padding5" jsf:rendered="false">
+                                <p:outputLabel for="input_nombre" value="Nombre de Auditoría"/>
+                                <p:inputText id="input_nombre" 
+                                             maxlength="45"
+                                             value="#{auditoriaJSFMB.auditoria.nombre}" />
+                            </div>
+                            <div class="ui-g-9 ui-md-8 ui-lg-9 Padding5">
+                                <p:outputLabel for="input_nombre_encabezado" value="Título de Encabezado"/>
+                                <p:inputText id="input_nombre_encabezado" maxlength="100" required="true"
+                                             value="#{auditoriaJSFMB.auditoriaEncabezado.titulo}" />
+                            </div>
+
+                            <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5">
+                                <p:outputLabel for="select_tipo_auditoria" value="Tipo Auditoría" />
+                                <p:selectOneMenu id="select_tipo_auditoria" 
+                                                 value="#{auditoriaJSFMB.i_tipo_auditoria}" 
+                                                 filter="true"
+                                                 style="width: 99.9999%"
+                                                 required="true"
+                                                 filterMatchMode="contains">
+                                    <p:ajax global="false" process="@this"/>
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="" noSelectionOption="true"/>
+                                    <f:selectItems value="#{auditoriaJSFMB.listTipoAuditoria}" 
+                                                   var="item"
+                                                   itemDescription="#{item.descripcion}"
+                                                   itemLabel="#{item.nombre}"
+                                                   itemValue="#{item.idAuditoriaTipo}"/>
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5">
+                                <p:outputLabel for="select_lugar_auditoria" value="Lugar Auditoría"  />
+                                <p:selectOneMenu id="select_lugar_auditoria" 
+                                                 value="#{auditoriaJSFMB.i_lugar_auditoria}" 
+                                                 filter="true"
+                                                 style="width: 99.9999%"
+                                                 required="true"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}"/>
+                                    <f:selectItems value="#{auditoriaJSFMB.listLugarAuditoria}" 
+                                                   var="item"
+                                                   itemDescription="#{item.descripcion}"
+                                                   itemLabel="#{item.nombre}"
+                                                   itemValue="#{item.idAuditoriaLugar}"/>
+                                    <p:ajax listener="#{auditoriaJSFMB.cargarComponente()}" 
+                                            global="false" 
+                                            event="change"
+                                            update="create_edit_dialog_form:tabView_id:tipoVehiculo"/>
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-3 Padding5"
+                                 jsf:rendered="#{auditoriaJSFMB.b_user_generico}">
+                                <p:outputLabel for="select_nov_gen" value="Tipo Novedad"  />
+                                <p:selectOneMenu id="select_nov_gen" 
+                                                 value="#{auditoriaJSFMB.i_idNovedadTipo}" 
+                                                 filter="true"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}"/>
+                                    <f:selectItems value="#{auditoriaJSFMB.listTipoNov}" 
+                                                   var="item"
+                                                   itemDescription="#{item.descripcionTipoNovedad}"
+                                                   itemLabel="#{item.nombreTipoNovedad}"
+                                                   itemValue="#{item.idGenericaTipo}"/>
+                                    <p:ajax listener="#{auditoriaJSFMB.cargarTipoDetalle()}" 
+                                            update="create_edit_dialog_form:tabView_id:select_nov_tipo_det_gen"
+                                            global="false"/>
+
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" 
+                                 jsf:rendered="#{!auditoriaJSFMB.b_user_generico}">
+                                <p:outputLabel for="select_nov" value="Tipo Novedad"  />
+                                <p:selectOneMenu id="select_nov" 
+                                                 value="#{auditoriaJSFMB.i_idNovedadTipo}" 
+                                                 filter="true"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}"/>
+                                    <f:selectItems value="#{auditoriaJSFMB.listTipoNov}" 
+                                                   var="item"
+                                                   itemDescription="#{item.descripcionTipoNovedad}"
+                                                   itemLabel="#{item.nombreTipoNovedad}"
+                                                   itemValue="#{item.idNovedadTipo}"/>
+                                    <p:ajax listener="#{auditoriaJSFMB.cargarTipoDetalle()}"
+                                            update="create_edit_dialog_form:tabView_id:select_nov_tipo_det" 
+                                            global="false"/>
+
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5" 
+                                 jsf:rendered="#{!auditoriaJSFMB.b_user_generico}">
+                                <p:outputLabel for="select_nov_tipo_det" value="Det. Tipo Novedad"  />
+                                <p:selectOneMenu id="select_nov_tipo_det" 
+                                                 value="#{auditoriaJSFMB.i_idNovedadTipoFDe}" 
+                                                 filter="true"
+                                                 title="Detalle de tipo de novedad"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}"/>
+                                    <f:selectItems value="#{auditoriaJSFMB.listTipoDetNov}" 
+                                                   var="item"
+                                                   itemDescription="#{item.descripcionTipoNovedad}"
+                                                   itemLabel="#{item.tituloTipoNovedad}"
+                                                   itemValue="#{item.idNovedadTipoDetalle}"/>
+                                    <p:ajax process="@this" global="false"/>
+
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-3 Padding5" 
+                                 jsf:rendered="#{auditoriaJSFMB.b_user_generico}">
+                                <p:outputLabel for="select_nov_tipo_det_gen" value="Detalle Tipo Novedad"  />
+                                <p:selectOneMenu id="select_nov_tipo_det_gen" 
+                                                 value="#{auditoriaJSFMB.i_idNovedadTipoFDe}" 
+                                                 filter="true"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}"/>
+                                    <f:selectItems value="#{auditoriaJSFMB.listTipoDetNov}" 
+                                                   var="item"
+                                                   itemDescription="#{item.descripcionTipoGenerica}"
+                                                   itemLabel="#{item.tituloTipoGenerica}"
+                                                   itemValue="#{item.idGenericaTipoDetalle}"/>
+                                    <p:ajax process="@this" global="false"/>
+
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5">
+                                <p:outputLabel for="id_fecha_desde" value="Fecha Desde"/>
+                                <p:calendar id="id_fecha_desde" 
+                                            pattern="yyyy/MM/dd HH:mm" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Fecha Inicio es requerido"
+                                            title="año/mes/día hora:minutos"
+                                            showOn="button"
+                                            timeInput="true"
+                                            timeControlType="select"
+                                            mask="true"
+                                            value="#{auditoriaJSFMB.auditoriaEncabezado.fechaDesde}"  >
+                                    <p:ajax event="dateSelect" process="id_fecha_desde" listener="#{auditoriaJSFMB.updateFechaDesde}"/>
+                                </p:calendar>
+                            </div>
+                            <div class="ui-g-6 ui-md-4 ui-lg-3 Padding5">
+                                <p:outputLabel for="id_fecha_hasta" value="Fecha Hasta"/>
+                                <p:calendar id="id_fecha_hasta" 
+                                            pattern="yyyy/MM/dd HH:mm" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Fecha Inicio es requerido"
+                                            title="año/mes/día hora:minutos"
+                                            showOn="button"
+                                            timeInput="true"
+                                            timeControlType="select"
+                                            mask="true"
+                                            value="#{auditoriaJSFMB.auditoriaEncabezado.fechaHasta}"  >
+                                    <p:ajax event="dateSelect" process="id_fecha_hasta" listener="#{auditoriaJSFMB.updateFechaHasta}"/>
+                                </p:calendar>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <p:outputLabel for="@next" value="Unidad Funcional"/>
+                                <ui:include src="../../zComponent/selectUnidadFuncional.xhtml"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5 ">
+                                <p:outputLabel for="descripcion_encabezado" value="Descripción"/>
+                                <p:inputTextarea id="descripcion_encabezado" 
+                                                 required="true" 
+                                                 maxlength="300"
+                                                 style="width: 100%; height: 150px; max-height: 150px"
+                                                 value="#{auditoriaJSFMB.auditoriaEncabezado.descripcion}"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4  Padding5">
+                                <p:commandButton id="todas_preguntas_id" 
+                                                 class="cssWhite PurpleButton"
+                                                 update="create_edit_dialog_form:tabView_id:checkbox_pregunta"
+                                                 icon="fa fa-search"
+                                                 process="@this"
+                                                 title="Consultar todas las preguntas registradas en el sistema."
+                                                 action="#{auditoriaJSFMB.consultarPregunta(2)}"
+                                                 value="Todas las Preguntas" />
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <p:commandButton id="not_in_preguntas_id" 
+                                                 class="cssWhite GreenButton"
+                                                 update="create_edit_dialog_form:tabView_id:checkbox_pregunta"
+                                                 icon="fa fa-search"
+                                                 process="@this"
+                                                 title="Consultar todas las preguntas que NO se han utilizado en auditorías"
+                                                 action="#{auditoriaJSFMB.consultarPregunta(1)}"
+                                                 value="Preguntas No Utilizadas" />
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4  Padding5">
+                                <p:commandButton id="in_preguntas_id" 
+                                                 class="cssWhite OrangeButton"
+                                                 update="create_edit_dialog_form:tabView_id:checkbox_pregunta"
+                                                 icon="fa fa-search"
+                                                 process="@this"
+                                                 title="Consultar todas las preguntas que se han utilizado en auditorías"
+                                                 action="#{auditoriaJSFMB.consultarPregunta(0)}"
+                                                 value="Preguntas Utilizadas" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                                <p:dataTable id="checkbox_pregunta" 
+                                             var="pregunta" 
+                                             rows="20"
+                                             rowIndexVar="varr"
+                                             tableStyle="table-layout:auto"
+                                             paginatorPosition="bottom"
+                                             paginator="true"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} Preguntas"
+                                             filterDelay="1000"
+                                             rowsPerPageTemplate="20,30,50,100"
+                                             value="#{auditoriaJSFMB.listPreguntas}" 
+                                             selection="#{auditoriaJSFMB.selectPreguntas}" 
+                                             rowKey="#{pregunta.idAuditoriaPregunta}" 
+                                             emptyMessage="No existen registros">
+                                    <f:facet name="header">
+                                        Preguntas
+                                    </f:facet>
+                                    <p:column selectionMode="multiple"/>
+                                    <p:column headerText="Número" sortBy="#{pregunta.numero}">
+                                        <h:outputText value="#{pregunta.numero}"/>
+                                    </p:column>
+                                    <p:column headerText="Código" 
+                                              filterMatchMode="contains" 
+                                              filterBy="#{pregunta.codigo}">
+                                        <h:outputText value="#{pregunta.codigo}" />
+                                    </p:column>
+                                    <p:column headerText="Enunciado" 
+                                              filterMatchMode="contains"
+                                              filterBy="#{pregunta.codigo}">
+                                        <h:outputText value="#{pregunta.enunciado}" />
+                                    </p:column>
+                                    <p:column headerText="Tipo Respuesta">
+                                        <h:outputText value="#{pregunta.idAuditoriaTipoRespuesta.nombre}" />
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </p:tab>
+                        <p:tab title="Costo" >
+                            <div class="ui-g-6 ui-md-6 ui-lg-2 Padding5 ">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                    <p:outputLabel for="@next" value="Desde"/>
+                                </div>
+                                <p:calendar id="desde" required="true"
+                                            value="#{audiCostoBean.desde}"
+                                            navigator="true"
+                                            locale="es"
+                                            pattern="dd/MM/yyyy"
+                                            mask="99/99/9999"
+                                            placeholder="DD/MM/AAAA"
+                                            showOtherMonths="true">
+                                    <p:ajax event="dateSelect" update="hasta" process="desde" global="false"/>
+                                </p:calendar>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-2 Padding5 ">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                    <p:outputLabel for="@next" value="Hasta"/>
+                                </div>
+                                <p:calendar id="hasta" required="true"
+                                            value="#{audiCostoBean.hasta}"
+                                            navigator="true"
+                                            locale="es"
+                                            pattern="dd/MM/yyyy"
+                                            mask="99/99/9999"
+                                            placeholder="DD/MM/AAAA"
+                                            showOtherMonths="true">
+                                    <p:ajax event="dateSelect" process="hasta" global="false"/>
+                                </p:calendar>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-2 Padding5 ">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                    <p:outputLabel for="@next" value="Valor"/>
+                                </div>
+                                <p:inputNumber decimalSeparator="," 
+                                               maxlength="6"
+                                               decimalPlaces="0"
+                                               id="costo" 
+                                               value="#{audiCostoBean.valor}">  
+                                </p:inputNumber>  
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-2 Padding5 ">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Tipo Costo" for="@next" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:selectOneMenu id="tipoCosto" 
+                                                     value="#{audiCostoBean.idAuditoriaCostoTipo}" 
+                                                     filter="true"
+                                                     required="true"
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains">
+                                        <p:ajax listener="#{audiCostoBean.cargarVehiculoTipo}" process="@this" global="false" update="tipo_vehiculo"/>
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                        <f:selectItems value="#{audiCostoBean.lstCostoTipo}" 
+                                                       var="costo"
+                                                       itemLabel="#{costo.nombre}"
+                                                       itemDescription="#{costo.nombre}"
+                                                       itemValue="#{costo.idAuditoriaCostoTipo}"/>
+                                        <p:ajax event="change" listener="#{audiCostoBean.cargarCostoTipoFor()}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-6 ui-md-6 ui-lg-2 Padding5 " jsf:id="tipo_vehiculo">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " jsf:rendered="#{!audiCostoBean.reqTipoVehiculo}">
+                                    <p:outputLabel value="Tipo Vehículo" for="tipoVehiculo" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{!audiCostoBean.reqTipoVehiculo}">
+                                    <p:selectOneMenu id="tipoVehiculo" 
+                                                     value="#{audiCostoBean.idVehiculoTipo}" 
+                                                     filter="true"
+                                                     disabled="#{audiCostoBean.b_vehiculoTipo}"
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains">
+                                        <p:ajax/>
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                        <f:selectItems value="#{audiCostoBean.lstVehiculoTipo}" 
+                                                       var="tipo"
+                                                       itemLabel="#{tipo.nombreTipoVehiculo}"
+                                                       itemDescription="#{tipo.descripcionTipoVehiculo}"
+                                                       itemValue="#{tipo.idVehiculoTipo}"/>
+                                        <p:ajax event="change" listener="#{audiCostoBean.cargarVehiculoTipoFor()}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-2 Padding5 ">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 ">
+                                    <p:outputLabel value="-" style="visibility: hidden"/>
+                                </div>
+                                <p:commandButton value="#{audiCostoBean.b_addOrUpdate ? 'Agregar':'Actualizar'}" 
+                                                 title="Agregar el costo de auditoría a la lista" 
+                                                 icon="fa fa-plus"
+                                                 id="id_add_update"
+                                                 process="create_edit_dialog_form:tabView_id:desde,
+                                                 create_edit_dialog_form:tabView_id:hasta,
+                                                 create_edit_dialog_form:tabView_id:costo,
+                                                 create_edit_dialog_form:tabView_id:tipo_vehiculo,
+                                                 create_edit_dialog_form:tabView_id:tipoCosto,@this"
+                                                 action="#{audiCostoBean.addToListOrUpdate()}"
+                                                 update="create_edit_dialog_form:tabView_id:id_dt_costo_auditoria,
+                                                 msgs,@this"
+                                                 class="cssWhite GreenButton"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <p:dataTable id="id_dt_costo_auditoria" var="item" 
+                                             scrollable="true"
+                                             widgetVar="wlVid_dt_costo_auditoria"
+                                             scrollHeight="600"
+                                             disabledTextSelection="false"
+                                             reflow="true"
+                                             rowKey="#{item.idAuditoriaCosto}"
+                                             rows="10"
+                                             filterDelay="1000"
+                                             paginator="true"
+                                             paginatorPosition="top"
+                                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             rowsPerPageTemplate="10,50,100"
+                                             emptyMessage="No existen registros"
+                                             value="#{audiCostoBean.lstAutidoriaCosto}">
+                                    <p:column headerText="Desde" >
+                                        <h:outputText  value="#{item.desde}">
+                                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="Hasta" >
+                                        <h:outputText  value="#{item.hasta}">
+                                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column filterBy="#{item.idVehiculoTipo.nombreTipoVehiculo}" 
+                                              filterMatchMode="contains"
+                                              headerText="Tipo de Vehiculo">
+                                        <h:outputText  value="#{item.idVehiculoTipo.nombreTipoVehiculo}"/>
+                                    </p:column>
+                                    <p:column filterBy="#{item.idAuditoriaCostoTipo.nombre}" 
+                                              filterMatchMode="contains"
+                                              headerText="Tipo Costo">
+                                        <h:outputText  value="#{item.idAuditoriaCostoTipo.nombre}"/>
+                                    </p:column>
+                                    <p:column headerText="Costo"
+                                              filterBy="#{item.valor}"
+                                              filterMatchMode="contains"
+                                              sortBy="#{item.valor}"
+                                              sortable="true">
+                                        <h:outputText  value="#{item.valor}" />
+                                    </p:column>
+                                    <p:column headerText="Acción"
+                                              exportable="false">
+                                        <p:commandButton title="Eliminar Costo de la lista"
+                                                         action="#{audiCostoBean.deleteFromList(item)}"
+                                                         update="create_edit_dialog_form:tabView_id:id_dt_costo_auditoria"
+                                                         icon="fa fa-close"
+                                                         global="false"
+                                                         class="RedButton cssWhite"
+                                                         process="@this"/>
+                                        <p:commandButton title="Preparar para modificar Costo de auditoria"
+                                                         action="#{audiCostoBean.prepareEdit(item)}"
+                                                         update="create_edit_dialog_form:tabView_id:desde,
+                                                         create_edit_dialog_form:tabView_id:hasta,
+                                                         create_edit_dialog_form:tabView_id:costo,
+                                                         create_edit_dialog_form:tabView_id:tipo_vehiculo,
+                                                         create_edit_dialog_form:tabView_id:tipoCosto,
+                                                         create_edit_dialog_form:tabView_id:id_add_update"
+                                                         icon="fa fa-pencil"
+                                                         global="false"
+                                                         rendered="#{item.idAuditoriaCosto!=null}"
+                                                         class="GreenButton cssWhite"
+                                                         process="@this"/>
+                                    </p:column>
+                                    <f:facet name="footer">
+                                        En total existen #{audiCostoBean.lstAutidoriaCosto.size()} registros.
+                                        <div style="float: right;padding-bottom: 5px">
+                                            <h:commandLink>
+                                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                                     alt="excel" style="width: 24px;height: 24px"/>
+                                                <p:dataExporter type="xlsx" target="id_dt_costo_auditoria" 
+                                                                fileName="Vehiculos de Atención"/>
+                                            </h:commandLink>
+                                        </div>
+                                    </f:facet>
+                                </p:dataTable>
+                            </div>
+                        </p:tab>
+                    </p:tabView>
+
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{auditoriaJSFMB.guardar()}"
+                             rendered="#{auditoriaJSFMB.auditoria.idAuditoria==null}"
+                             process="@this,create_edit_dialog_form:tabView_id:tab_id"
+                             update="msgs,@form,create_edit_dialog_form,audi_form:datalist"/>
+            <p:remoteCommand name="rcc" 
+                             class="cssWhite"
+                             action="#{auditoriaJSFMB.edit()}"
+                             rendered="#{auditoriaJSFMB.auditoria.idAuditoria!=null}"
+                             process="@this,create_edit_dialog_form:tabView_id:tab_id"
+                             update="msgs,@form,create_edit_dialog_form,audi_form:datalist"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarL" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             rendered="#{auditoriaJSFMB.auditoria.idAuditoria==null}"
+                             onclick="rc()"/>
+            <p:commandButton id="btnGuardarLC" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{auditoriaJSFMB.auditoria.idAuditoria!=null}"
+                             value="Actualizar" 
+                             onclick="rcc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

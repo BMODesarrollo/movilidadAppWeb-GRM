@@ -1,0 +1,161 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgForDesEntregaOperador"
+              widgetVar="wvForDesEntregaOperador"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{plaRecuEntregaOperadorBean.b_editar ? 'Editar Entrega Operador':'Crear Entrega Operador'}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvForDesEntregaOperador').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-entrega-operador">
+            <p:messages id="msgs_create_entrega_operador" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Código TM *" />
+                        <p:inputText id="codigoTM_id" required="true" placeholder="Ingrese un valor numérico"
+                                     title="Código Transmilenio que identifica al colaborador (número de cédula para cargos administrativos)" 
+                                     requiredMessage="Debe ingresar 'Código TM'"
+                                     value="#{plaRecuEntregaOperadorBean.codigo_TM}">
+                            <p:ajax update="form-registrar-entrega-operador:cedula_id,form-registrar-entrega-operador:nombre_id,form-registrar-entrega-operador:cargo_id,
+                                    form-registrar-entrega-operador:telefono_id,form-registrar-entrega-operador:email_id,
+                                    form-registrar-entrega-operador:contrato_id, btnGuardarEntregaOp,msgs" 
+                                    listener="#{plaRecuEntregaOperadorBean.cargarEmpleado()}"/>
+                        </p:inputText>
+                        <div class="botonFloat" >
+                            <p:commandButton process="codigoTM_id,@this" 
+                                             style="margin: 0px"
+                                             update="form-registrar-entrega-operador:cedula_id,form-registrar-entrega-operador:nombre_id,form-registrar-entrega-operador:cargo_id,
+                                             form-registrar-entrega-operador:telefono_id,form-registrar-entrega-operador:email_id,
+                                             form-registrar-entrega-operador:contrato_id,btnGuardarEntregaOp,msgs"
+                                             action="#{plaRecuEntregaOperadorBean.cargarEmpleado()}"
+                                             icon="fa fa-search"
+                                             class="cssWhite"/>
+                            <p:remoteCommand process="codigoTM_id,@this" 
+                                             name="cargarEmpleado"
+                                             action="#{plaRecuEntregaOperadorBean.cargarEmpleado()}"/>
+                        </div>    
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cédula" />
+                        <p:inputText id="cedula_id" disabled="true"
+                                     title="Número del documento de identidad del colaborador" 
+                                     value="#{plaRecuEntregaOperadorBean.forDesEntregaOperador.empleado.identificacion}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Nombre" />
+                        <p:inputText id="nombre_id" disabled="true"
+                                     title="Nombre completo del colaborador" 
+                                     value="#{plaRecuEntregaOperadorBean.forDesEntregaOperador.empleado.nombresApellidos}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cargo" />
+                        <p:inputText id="cargo_id" disabled="true"
+                                     title="Nombre del cargo del colaborador" 
+                                     value="#{plaRecuEntregaOperadorBean.forDesEntregaOperador.empleado.idEmpleadoCargo.nombreCargo}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Telefono" />
+                        <p:inputText id="telefono_id" disabled="true"
+                                     title="Número de telefono móvil del empleado" 
+                                     value="#{plaRecuEntregaOperadorBean.forDesEntregaOperador.empleado.telefonoMovil}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Email" />
+                        <p:inputText id="email_id" disabled="true"
+                                     title="Correo corporativo del empleado" 
+                                     value="#{plaRecuEntregaOperadorBean.forDesEntregaOperador.empleado.emailCorporativo}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Fecha Contrato" />
+                        <p:inputText id="contrato_id" disabled="true"
+                                     title="Fecha de ingreso del empleado" 
+                                     value="#{plaRecuEntregaOperadorBean.forDesEntregaOperador.empleado.fechaIngreso}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </p:inputText>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Entrega Programacion" for="fecha_entrega_programacion_id"/>
+                        <p:calendar id="fecha_entrega_programacion_id" required="true" 
+                                    requiredMessage="'Fecha Entrega Programación' es requerido"
+                                    value="#{plaRecuEntregaOperadorBean.forDesEntregaOperador.fechaEntregaProgramacion}"
+                                    locale="es"
+                                    mindate="#{plaRecuEjecucionBean.dia_inicio}"
+                                    maxdate="#{plaRecuEjecucionBean.dia_fin}"
+                                    pattern="yyyy-MM-dd">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Ascenso Nómina" for="fecha_ascenso_nomina_id"/>
+                        <p:calendar id="fecha_ascenso_nomina_id" required="true" 
+                                    requiredMessage="'Fecha Ascenso Nómina' es requerido"
+                                    value="#{plaRecuEntregaOperadorBean.forDesEntregaOperador.fechaAscensoNomina}"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Categoría" for="categoriaItem"/>
+                        <p:selectOneMenu  
+                            filter="true" id="categoriaItem" required="true" 
+                            requiredMessage="'Categoría' es requerido"
+                            style="width: 99.9999%"
+                            value="#{plaRecuEntregaOperadorBean.categoriaSelectedId}">
+                            <f:selectItem itemLabel="Seleccione Categoría" itemValue="" />
+                            <f:selectItems 
+                                var="user"
+                                value="#{plaRecuEntregaOperadorBean.listCategoria}" 
+                                itemLabel="#{user.name}"
+                                itemValue="#{user.idPlaRecuCategoria}"
+                                />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuEntregaOperadorBean.crearEntregaOperador()}"
+                             process="@form"
+                             rendered="#{!plaRecuEntregaOperadorBean.b_editar}"
+                             update="formEntregaOperador,:formEntregaOperador:entrega-operadorList,:formEntregaOperador:cj-grow, @form,:msgs"/>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuEntregaOperadorBean.editarEntregaOperador()}"
+                             process="@form"
+                             rendered="#{plaRecuEntregaOperadorBean.b_editar}"
+                             update="formEntregaOperador,:formEntregaOperador:entrega-operadorList,:formEntregaOperador:cj-grow, @form,:msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarEntregaOp" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,162 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="parametro"
+              widgetVar="parametroDlg" 
+              modal="true" 
+              closable="true"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              class="mr1024_30 mr500_90" 
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{parametroBean.selected == null}">
+            <f:facet name="header">
+                NUEVO CUMPLIMIENTO DE SERVICIO
+            </f:facet>
+        </c:if>
+        <c:if test="#{parametroBean.selected != null}">
+            <f:facet name="header">
+                EDITAR CUMPLIMIENTO DE SERVICIO
+            </f:facet>
+            <p:ajax event="close" update="frmParametro,frmParametroList:dtParametros" listener="#{parametroBean.handleClose}" />
+        </c:if>
+        <h:form id="frmParametro">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Periodo: "/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="periodo" 
+                                         required="true"
+                                         requiredMessage="Debe ingresar un periodo"
+                                         value="#{parametroBean.periodo}">
+                                <p:keyFilter regEx="/[\d]/"/>  
+                            </p:inputText>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Tipo Día:" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="tipo_dia" 
+                                             value="#{parametroBean.cumplimientoServicio.tipoDia}"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             style="width: 99.9999%"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar tipo de día">
+                                <f:selectItem itemLabel="Seleccione género" itemValue="" />
+                                <f:selectItem itemLabel="Hábil" itemValue="H" />
+                                <f:selectItem itemLabel="Sábado" itemValue="S" />
+                                <f:selectItem itemLabel="Domingo" itemValue="D" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Nombre: "/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nombre"
+                                         required="true"
+                                         requiredMessage="Debe ingresar nombre"
+                                         value="#{parametroBean.cumplimientoServicio.nombre}"
+                                         />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="hora_inicio" value="Hora Inicio:" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="hora_inicio" value="#{parametroBean.hora_inicio}"  
+                                         required="true" 
+                                         requiredMessage="Hora invalida"
+                                         mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="hora_inicio"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="hora_fin" value="Hora Fin:" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="hora_fin" value="#{parametroBean.hora_fin}"  
+                                         required="true"
+                                         requiredMessage="Hora invalida" 
+                                         mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="hora_fin"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desde: " for="@next"/>
+
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="desde" 
+                                        autocomplete="off"
+                                        readonlyInput="true"
+                                        value="#{parametroBean.cumplimientoServicio.desde}" 
+                                        pattern="yyyy-MM-dd" 
+                                        title="Fecha de Inicio"
+                                        mask="true"
+                                        locale="es"
+                                        navigator="true"
+                                        showOn="button"
+                                        maxdate="today">
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Hasta: " for="@next"/>
+
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hasta" 
+                                        autocomplete="off"
+                                        readonlyInput="true"
+                                        value="#{parametroBean.cumplimientoServicio.hasta}" 
+                                        pattern="yyyy-MM-dd" 
+                                        title="Fecha Fin"
+                                        mask="true"
+                                        locale="es"
+                                        navigator="true"
+                                        showOn="button"
+                                        maxdate="today"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="messages,pGridDatos,:frmParametroList:dtParametros" 
+                             action="#{parametroBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs"
+                             action="#{parametroBean.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{parametroBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{parametroBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

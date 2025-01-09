@@ -1,0 +1,73 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <p:dialog widgetVar="eliminarAdicional" id="modaleliminarAdicional" 
+              modal="true" closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)"
+              class="mr1024_30 mr500_90" position="center top">
+        <f:facet name="header">
+            Eliminar servicio adicional
+        </f:facet>
+        <h:form id="frmEliminarAdicional">
+            <p:panel id="panel">
+                <f:facet name="footer">
+                    <p:commandButton value="Eliminar" 
+                                     icon="fa fa-ban"
+                                     class="cssWhite RedButton"
+                                     update=":frmConciliacion:pGridResumen,
+                                     :frmConciliacion:pGridData,
+                                     :frmConciliacion:pGridEstado,
+                                     :messages"
+                                     actionListener="#{prgTcResumenBean.eliminarAdicional()}"
+                                     rendered="#{prgTcResumenBean.selected != null }"
+                                     >
+                        <p:confirm header="Confirmación"
+                                   message="Ésta seguro de eliminar servicio adicional?" 
+                                   icon="fa fa-exclamation-triangle"/>
+                    </p:commandButton>
+                </f:facet>
+                <h3 align="center">Datos del servicio</h3>
+                <div align="center">
+                    <h:panelGrid columns="2" class="ui-noborder">
+                        <h:outputLabel value="Bus: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.idVehiculo.codigo}"/>
+                        <h:outputLabel value="H. ini: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.timeOrigin}"/>
+                        <h:outputLabel value="H. fin: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.timeDestiny}"/>
+                        <h:outputLabel value="Servicio: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.idRuta.name}" 
+                                      rendered="#{prgTcResumenBean.selected.idRuta != null}"/>
+                        <h:outputText value="No tiene" 
+                                      rendered="#{prgTcResumenBean.selected.idRuta == null}"/>
+                        <h:outputLabel value="Tarea: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.idTaskType.tarea}"/>
+                        <h:outputLabel value="Punto ini: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.fromStop.name}"/>
+                        <h:outputLabel value="Punto fin: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.toStop.name}"/>
+                        <h:outputLabel value="Distancia: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.distance}"/>
+                        <p:outputLabel for="responsable" value="Responsable: " />
+                        <p:selectOneMenu id="responsable"
+                                         value="#{prgTcResumenBean.i_codResponsable}"
+                                         effect="fade" filter="true" 
+                                         style="width: 200px"
+                                         required="true"
+                                         requiredMessage="Debe seleccionar un responsable"
+                                         filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="Seleccione responsable" itemValue=""  />
+                            <f:selectItems value="#{prgTcResumenBean.lstResponsable}" 
+                                           var="res" itemLabel="#{res.responsable}" 
+                                           itemValue="#{res.idPrgTcResponsable}" />
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                </div>
+            </p:panel>
+        </h:form>
+    </p:dialog>
+</ui:composition>

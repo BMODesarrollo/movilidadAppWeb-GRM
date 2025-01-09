@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="Causa" 
+              widgetVar="causaDlg" 
+              modal="true" 
+              closeOnEscape="true"
+              closable="false"
+              responsive="true"
+              class="mr1024_30 mr500_90" 
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+        <p:ajax event="close" listener="#{accCausaBean.setSelected(null)}" update=":frmCausa:dtArbol"/>
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{accCausaBean.selected == null}">
+                                Nueva Causa
+                            </c:if>
+                            <c:if test="#{accCausaBean.selected != null}">
+                                Editar Causa : #{accCausaBean.selected.causa.toUpperCase()}
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('causaDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="form-causa">
+            <div class="ui-fluid">
+                <p:messages id="msgs" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="arbol" value="Árbol: " />
+
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="arbol" 
+                                             value="#{accCausaBean.arbol}"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             style="width: 99.9999%"
+                                             required="true" 
+                                             requiredMessage="Debe seleccionar un árbol">
+                                <f:selectItem itemLabel="Seleccione árbol" itemValue="" />
+                                <f:selectItems value="#{accArbolBean.lista}" var="arb" 
+                                               itemLabel="#{arb.arbol}" itemValue="#{arb.idAccArbol}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Causa: *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="causa_raiz"
+                                         value="#{accCausaBean.causa.causa}" 
+                                         maxlength="60"
+                                         required="true"
+                                         requiredMessage="Causa es requerida"
+                                         />
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción: *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea  id="descripcion" 
+                                              maxlength="65000" 
+                                              class="cssBlack"
+                                              value="#{accCausaBean.causa.descripcion}" 
+                                              required="true" 
+                                              requiredMessage="Descripción es requerida"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             actionListener="#{accCausaBean.guardar()}" 
+                             rendered="#{accCausaBean.selected == null}"
+                             process="@this,@form"
+                             update=":frmCausa,@form"/>
+            <p:remoteCommand name="editar" 
+                             actionListener="#{accCausaBean.actualizar()}" 
+                             process="@this,@form"
+                             rendered="#{accCausaBean.selected != null}"
+                             update=":frmCausa,:msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-guardar"
+                             value="Guardar"
+                             class="cssWhite"
+                             rendered="#{accCausaBean.selected == null}"
+                             icon="fa fa-save"
+                             onclick="guardar()"/>
+            <p:commandButton id="btn-editar"
+                             value="Actualizar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{accCausaBean.selected != null}"
+                             onclick="editar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition> 

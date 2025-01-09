@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <script>
+            function deshabilitarBoton(id) {
+                var v = document.getElementById(id);
+                v.setAttribute("disabled", "true");
+            }
+            function habilitarBoton(id) {
+                var v = document.getElementById(id);
+                v.removeAttribute("disabled");
+            }
+
+            window.onscroll = function () {
+                scrollFunction()
+            };
+
+            function scrollFunction() {
+                var mybutton = document.getElementById("btnUp");
+                if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                    mybutton.style.display = "block";
+                } else {
+                    mybutton.style.display = "none";
+                }
+            }
+
+            function upFunction() {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
+        </script>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <title>Rigel</title>
+        <h:outputScript name="js/layout.js" library="sentinel-layout" />
+        <h:outputScript name="js/espanolCalendario.js" library="sentinel-layout" />
+        <h:outputScript name="js/calc_height_pp_dt.js" library="sentinel-layout" />
+
+        <ui:insert name="head" />
+        <link rel="shortcut icon" href="#{application.contextPath}/resources/sentinel-layout/images/logo_III.png" />
+    </h:head>
+
+
+    <h:body style="margin-bottom: 20px; height: 92%"> 
+        <p:remoteCommand   autoRun="true" action="#{loginFacade.comprobar()}"></p:remoteCommand>
+
+        <p:growl id="growl" life="3000" showDetail="true"/>
+        <p:growl id="msgs" life="5000" showDetail="true"/>
+
+        <ui:include src="topbar.xhtml" />
+
+        <ui:include src="leftmenu.xhtml" />
+        <ui:include src="../geo/mapGeoAll.xhtml"/>
+        <ui:include src="../geo/mapGeoRecVehEspe.xhtml"/>
+        <ui:include src="../vehiculos/vehiculoParrillaEstado.xhtml"/>
+        <ui:include src="../empleado/empleadoInfoParilla.xhtml"/>
+        <ui:include src="../geo/mapGeo.xhtml"/>
+        <div id="layout-portlets-cover" class="fontRegular">
+            <ui:insert name="content" />
+            <!--<ui:include src="footer.xhtml" />-->
+        </div>
+
+        <p:ajaxStatus  onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+        <p:dialog widgetVar="statusDialog" modal="true" responsive="true" 
+                  draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:graphicImage name="images/load_gm.gif" height="21" library="sentinel-layout"/>
+        </p:dialog>
+        <p:confirmDialog global="true" closable="false" showEffect="fade" hideEffect="fade" responsive="true" closeOnEscape="true" appendTo="@(boby)">
+            <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes cssWhite" icon="fa fa-check"/>
+            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no RedButton cssWhite" icon="fa fa-close"/>
+        </p:confirmDialog> 
+        <h:outputScript name="js/espanolCalendario.js" library="sentinel-layout" />
+        <h:outputScript name="js/Util.js" library="sentinel-layout" />
+        <h:outputStylesheet name="css/font-icon-layout.css" library="sentinel-layout" />
+        <h:outputStylesheet name="css/sentinel-layout.css" library="sentinel-layout" />
+        <h:outputStylesheet name="css/core-layout.css" library="sentinel-layout" />
+        <h:outputStylesheet name="css/sentinel_green.css" library="sentinel-layout" />
+
+        <button onclick="upFunction()" id="btnUp" title="Ir Arriba"><i class="fa fa-arrow-up"></i></button>
+    </h:body>
+
+</html>

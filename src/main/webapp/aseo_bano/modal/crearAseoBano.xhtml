@@ -1,0 +1,140 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="aseo_bano_dialog_wv" id="aseo_bano_dialog_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top" class="mr1024_50 mr500_90"
+              height="auto" header="Gestión Aseo Baño">
+        <h:form id="aseo_bano_dialog_form">
+            <div class="ui-fluid">
+                <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                        <p:outputLabel for="fecha_ini" value="Fecha Inicio:" />
+                        <p:calendar id="fecha_ini" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Fecha Inicio es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    timeControlType="select"
+                                    mask="true"
+                                    value="#{aseoBanoJSFMB.aseoBano.fechaHoraIni}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                        <p:outputLabel for="fecha_fin" value="Fecha Fin:" />
+                        <p:calendar id="fecha_fin" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Fecha Fin es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{aseoBanoJSFMB.aseoBano.fechaHoraFin}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Responsable" for="@next"/>
+                        </div>
+                        <div class="ui-g-10 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="label_responsable"
+                                         readonly="true"
+                                         disabled="#{aseoBanoJSFMB.aseoBano.idAseoBano!=null}"
+                                         value="#{aseoBanoJSFMB.responsable.numeroDocumento} #{aseoBanoJSFMB.responsable.nombre} #{aseoBanoJSFMB.responsable.apellidos}"/>
+                            <div class="botonFloat" >
+                                <p:commandButton icon="fa fa-qrcode"
+                                                 action="#{aseoBanoJSFMB.prepareLeerQR(1)}"
+                                                 onclick="load()"
+                                                 title="Click para leer código qr"
+                                                 disabled="#{aseoBanoJSFMB.aseoBano.idAseoBano!=null}"
+                                                 style="margin: 0px"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Área Actividad" for="@next"/>
+                        </div>
+                        <div class="ui-g-10 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="label_area"
+                                         readonly="true"
+                                         disabled="#{aseoBanoJSFMB.aseoBano.idAseoBano!=null}"
+                                         value="#{aseoBanoJSFMB.aseoParamArea.codigo} #{aseoBanoJSFMB.aseoParamArea.nombre}"/>
+                            <div class="botonFloat" >
+                                <p:commandButton icon="fa fa-qrcode"
+                                                 action="#{aseoBanoJSFMB.prepareLeerQR(2)}"
+                                                 onclick="load()"
+                                                 title="Click para leer código qr"
+                                                 disabled="#{aseoBanoJSFMB.aseoBano.idAseoBano!=null}"
+                                                 style="margin: 0px"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Fotos actividad">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{aseoBanoJSFMB.handleFileUpload}"
+                                              id="foto"
+                                              style="width: 99.9999%"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="@form"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5" align="center" jsf:id="label_codigo_plantilla">
+                        <p:outputLabel value="#{aseoBanoJSFMB.aseoBano.codigoPlanilla}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_save_aseo_bano" 
+                             class="cssWhite"
+                             actionListener="#{aseoBanoJSFMB.guardar()}"  
+                             process="aseo_bano_dialog_form"
+                             rendered="#{aseoBanoJSFMB.aseoBano.idAseoBano==null}"
+                             update="msgs,codigo_plantilla_id,form_aseo_bano:dt_aseo_bano_id"  >
+            </p:remoteCommand>
+            <p:remoteCommand name="rc_update_aseo_bano" 
+                             class="cssWhite"
+                             actionListener="#{aseoBanoJSFMB.actulizar()}"  
+                             process="aseo_bano_dialog_form"
+                             rendered="#{aseoBanoJSFMB.aseoBano.idAseoBano!=null}"
+                             update="msgs,form_aseo_bano:dt_aseo_bano_id"  >
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn_save_aseo_bano" icon="fa fa-save" value="Guardar" 
+                             rendered="#{aseoBanoJSFMB.aseoBano.idAseoBano==null}"
+                             class="cssWhite" onclick="rc_save_aseo_bano()"/>
+            <p:commandButton id="btn_update_aseo_bano" icon="fa fa-save" value="Actualizar" 
+                             rendered="#{aseoBanoJSFMB.aseoBano.idAseoBano!=null}"
+                             class="cssWhite" onclick="rc_update_aseo_bano()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="leerQr.xhtml"/>
+    <ui:include src="codigoPlanilla.xhtml"/>
+</ui:composition>

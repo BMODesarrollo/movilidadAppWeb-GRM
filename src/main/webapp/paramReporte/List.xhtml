@@ -1,0 +1,105 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="form-param-horas">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <div class="Padding5">
+                <p:dataTable id="datalist" 
+                             value="#{paramReporteHorasJSF.listParamReporteHoras}"
+                             var="item"
+                             paginator="true"
+                             rowKey="#{item.idParamReporteHoras}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             editable="true" 
+                             editMode="cell" 
+                             widgetVar="horasWV"
+                             emptyMessage="No existen registros">
+                    <f:facet name="header">
+                        <div style="text-transform: uppercase;text-align: left">
+                            Parametrización Reporte de Horas
+                        </div>
+                    </f:facet>
+
+                    <p:ajax event="cellEdit" listener="#{paramReporteHorasJSF.onCellEdit}" update="datalist,form-param-horas:msg" />
+
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Tipo de Hora" filterBy="#{item.tipoHora}" filterMatchMode="contains">
+                        <h:outputText value="#{item.tipoHora}"/>
+                    </p:column>
+                    <p:column headerText="Recargo" id="recargo" ariaHeaderText="3" style="width: 100px">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.recargo}" /></f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramReporteHorasJSF.cNuevoVal}" 
+                                             style="width:80%" 
+                                             label="Concepto" 
+                                             placeholder="#{item.recargo}"
+                                             maxlength="45">
+                                    <p:keyFilter regEx="/[0-9]/i"/>  
+                                </p:inputText>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Concepto" id="concepto" ariaHeaderText="1">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.concepto}" /></f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramReporteHorasJSF.cNuevoVal}" 
+                                             style="width:96%" 
+                                             label="Concepto" 
+                                             placeholder="#{item.concepto}"
+                                             maxlength="45"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Código" id="codigo" ariaHeaderText="2"> 
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.codigo}" /></f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{paramReporteHorasJSF.cNuevoVal}"  
+                                             style="width:96%" 
+                                             label="Código"
+                                             placeholder="#{item.codigo}"
+                                             maxlength="10"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Username" filterBy="#{item.username}" filterMatchMode="contains">
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="parametros reporte horas #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="parametros reporte horas #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="parametros reporte horas #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </div>
+            <p:contextMenu for="datalist" widgetVar="cMenu">   
+                <p:menuitem value="Editar Valor" icon="fa fa-search" onclick="PF('horasWV').showCellEditor();return false;"/>  
+                <p:menuitem value="Cerrar Menú" icon="fa fa-times" onclick="PF('cMenu').hide()"/>  
+            </p:contextMenu> 
+        </h:form>
+    </ui:define>
+</ui:composition>

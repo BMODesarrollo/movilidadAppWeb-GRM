@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition template="../WEB-INF/template.xhtml">
+
+
+        <ui:define name="title">
+            <h:outputText value="Salidas Programadas"></h:outputText>
+        </ui:define>
+
+        <ui:define name="content">
+
+            <h:form id="SerconListForm">
+                <p:panel   menuTitle="Fecha de Consulta">
+                    <f:facet name="header">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="prgtcSinBuslist" fileName="SalidasProgramadas #{now}"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <p:panelGrid  columns="2" style="width: 100%;"
+                                  columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4,ui-grid-col-4" 
+                                  layout="grid" styleClass="ui-panelgrid-blank ui-fluid">
+                        <p:outputLabel value="Seleccione Una Fecha:" for="fecha"></p:outputLabel>
+                        <p:calendar id="fecha" label="Fecha de Consulta de Servicios" 
+                                    value="#{prgTcAsigna.fechaConsulta}" locale="es">
+                            <p:ajax event="dateSelect" 
+                                    listener="#{prgTcAsigna.listarServiciosSinBus()}" 
+                                    update="prgtcSinBuslist"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel header="Salidas Programadas">
+                    <p:dataTable id="prgtcSinBuslist" value="#{prgTcAsigna.listPrgTc}" var="item"
+                                 emptyMessage="No hay registros que mostrar!!"
+                                 paginator="true"
+                                 rowKey="#{item.idPrgTc}"
+                                 rows="100"
+                                 rowsPerPageTemplate="100,200,500" filterDelay="1000">
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Fecha"/>
+                            </f:facet>
+                            <h:outputText  value="#{item.fecha}">
+                                <f:convertDateTime pattern="dd-MM-yyyy" type="date"></f:convertDateTime>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column filterBy="#{item.servbus}"
+                                  filterMatchMode="contains" headerText="Servbus">
+                            <h:outputText value="#{item.servbus}"/>
+                        </p:column>
+
+                        <p:column filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains" headerText="Vehículo">
+                            <h:outputText value="#{item.idVehiculo.codigo}"/>
+                        </p:column>
+
+                        <p:column filterBy="#{item.timeOrigin}"
+                                  filterMatchMode="contains" headerText="Hora Salida">
+                            <h:outputText value="#{item.timeOrigin}"/>
+                        </p:column>
+
+                        <p:column filterBy="#{item.fromStop.name}"
+                                  filterMatchMode="contains" headerText="Patio Salida">
+                            <h:outputText value="#{item.fromStop.name}"/>
+                        </p:column>
+
+                        <p:column filterBy="#{item.toStop.name}"
+                                  filterMatchMode="contains" headerText="Estación">
+                            <h:outputText value="#{item.toStop.name}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.sercon}"
+                                  filterMatchMode="contains" headerText="Sercon">
+                            <h:outputText value="#{item.idEmpleado.codigoTm}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.sercon}"
+                                  filterMatchMode="contains" headerText="Codigo TM">
+                            <h:outputText value="#{item.idEmpleado.codigoTm}"/>
+                        </p:column>
+                        <p:column headerText="Nombres">
+                            <h:outputText value="#{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+
+
+        </ui:define>
+    </ui:composition>
+
+</html>
+

@@ -1,0 +1,423 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <div class="ui-fluid" jsf:id="btns_panel_izq">
+        <div class="ui-g">
+            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding2">
+                <p:commandButton value="Servicio(s)" 
+                                 rendered="#{prgTcJSFMB.flagRol}"
+                                 title="Adicionar nuevos servicios"
+                                 disabled="#{prgTcJSFMB.flagConciliado or prgTcJSFMB.flagTurnoCerrado}"
+                                 actionListener="#{prgTcJSFMB.prepareAddServiceFromButton()}"
+                                 process="@this" 
+                                 update="msgs,formAdicionServicio" 
+                                 class="cssWhite GreenButton" 
+                                 icon="fa fa-plus"/>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding2">
+                <p:commandButton value="Vehículo" 
+                                 title="Asignar vehículo a Servbus"
+                                 rendered="#{prgTcJSFMB.flagRol}"
+                                 disabled="#{prgTcJSFMB.flagConciliado or prgTcJSFMB.flagTurnoCerrado}"
+                                 actionListener="#{busToServbusBean.prepareAsignar(prgTcJSFMB.fechaConsulta)}"
+                                 process="@this"
+                                 update="msgs,idAsignarDialog" 
+                                 class="cssWhite OrangeButton" 
+                                 icon="fa fa-bus"/>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding2">
+                <p:commandButton value="Servbus" 
+                                 title="Gestión Servbus, eliminar o asignar sobre servbus sin Vehículo"
+                                 rendered="#{prgTcJSFMB.flagRol}"
+                                 disabled="#{prgTcJSFMB.flagConciliado or prgTcJSFMB.flagTurnoCerrado}"
+                                 action="#{prgServiciosSinAsignarJSF.consultarServiciosSinAisgnar()}"
+                                 actionListener="#{prgServiciosSinAsignarJSF.setFecha(prgTcJSFMB.fechaConsulta)}"
+                                 oncomplete="PF('serviciosSinAsignarWV').show()"
+                                 process="@this"
+                                 update=":msgs,idServiciosSinAsignar" 
+                                 class="cssWhite CyanButton" 
+                                 icon="fa fa-bus"/>
+            </div>
+        </div>
+    </div>
+
+    <h:form id="prgtcForm">
+        <p:remoteCommand name="rcBorrar"
+                         global="false"
+                         delay="none"
+                         update="msgs,prgtcForm:tablaPrtTc,
+                         prgtcForm:servicioPrtTc,
+                         prgtcForm:servBusPrtTc,
+                         prgtcForm:vehiculoPrtTc,
+                         prgtcForm:operadorPrtTc,
+                         prgtcForm:serconPrtTc" 
+                         action="#{prgTcJSFMB.borrarCampos()}" />
+        <p:remoteCommand name="listarSinBus"
+                         update="tab_pp:frmSinBus,tab_pp:headSinBus"
+                         action="#{prgTcJSFMB.listarSinBus()}"/>
+        <p:remoteCommand name="listarSinOperador"
+                         update="tab_pp:frmSinOpe,tab_pp:headSinOp"
+                         action="#{prgTcJSFMB.listarSinOperador()}"/>
+        <p:remoteCommand name="listarVehiculoDispo"
+                         update="frmVDispo"
+                         action="#{prgTcJSFMB.listarVehiculoDispo()}"/>
+        <p:remoteCommand name="validarDiaConcilidado"
+                         update="prgtcForm:msgsPrgTc,btns_panel_izq,prgtcForm:tblPrgTc,btns_panel_central"
+                         action="#{prgTcJSFMB.validarDiaConsiliado()}"/>
+        <p:messages id="msgsPrgTc" showDetail="true" showIcon="true"/>
+        <div class="ui-fluid fecha_pp">
+            <div class="ui-g">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding2" 
+                     jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                    <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                     filter="true" 
+                                     style="width: 99.9999%"
+                                     filterMatchMode="contains">
+                        <f:selectItem itemLabel="SELECCIONE UNA UNIDAD FUNCIONAL" itemValue="#{null}" />
+                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                       var="uniFunc" 
+                                       itemLabel="#{uniFunc.nombre}"
+                                       itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                        <p:ajax event="change" process="@this" global="true"
+                                update="relog_id"
+                                listener="#{selectUnidFuncBean.setterNombre}"
+                                oncomplete="consultaAlSeleccionarUF();validarDiaConcilidado()"/>
+                    </p:selectOneMenu>
+                </div>
+                <div class="ui-g-5 ui-md-5 ui-lg-5">
+                    <p:calendar id="CFechaConsulta" required="true"
+                                value="#{prgTcJSFMB.fechaConsulta}"
+                                navigator="true"
+                                locale="es"
+                                timeZone="America/Bogota"
+                                pattern="dd/MM/yyyy"
+                                requiredMessage="Seleccionar la fecha para consultar"
+                                mask="99/99/9999"
+                                placeholder="DD/MM/AAAA"
+                                showOtherMonths="true" showOn="button" >
+                        <p:ajax event="dateSelect" listener="#{prgTcJSFMB.validarDiaBloqueado()}" 
+                                process="@this" update="fechaC,btns_panel_izq,prgtcForm:tblPrgTc,btns_panel_central"/>
+                    </p:calendar>
+                </div>
+                <div jsf:id="fechaC" class="ui-g-7 ui-md-7 ui-lg-7 ">
+                    <p:outputLabel class="Fs25 #{prgTcJSFMB.colorFecha== 0 ? 'red' : prgTcJSFMB.colorFecha== 1 ? 'hardblue' : 'gray'}" 
+                                   value="#{prgTcJSFMB.fechaConsulta}" 
+                                   style="font-weight: bold !important;">
+                        <f:convertDateTime pattern="dd-MMMM-yyyy" locale="es" timeZone="America/Bogota"/>
+                    </p:outputLabel>
+                </div>
+            </div>
+        </div>
+        <div class="ui-fluid btns_i">
+            <div class="ui-g">
+                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding1">
+                    <p:inputText id="tablaPrtTc" placeholder="Tabla"
+                                 value="#{prgTcJSFMB.i_tabla}" maxlength="3"  onkeypress="if (event.keyCode === 32) {
+                                             rcBorrar();
+                                             return;
+                                         }"/>
+                </div>
+                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding1">
+
+                    <p:inputText id="servicioPrtTc" placeholder="Servicio"
+                                 value="#{prgTcJSFMB.i_servicio}" maxlength="10"  onkeypress="if (event.keyCode === 32) {
+                                             rcBorrar();
+                                             return;
+                                         }"/>               
+                </div>
+
+                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding1">
+                    <p:inputText id="servBusPrtTc" placeholder="ServBus"
+                                 value="#{prgTcJSFMB.servBus}" maxlength="10" onkeypress="if (event.keyCode === 32) {
+                                             rcBorrar();
+                                             return;
+                                         }"/>     
+                </div>
+                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding1">
+
+                    <p:inputText id="vehiculoPrtTc" placeholder="Vehículo"
+                                 value="#{prgTcJSFMB.vehiculoC}" maxlength="12"  onkeypress="if (event.keyCode === 32) {
+                                             rcBorrar();
+                                             return;
+                                         }"/>
+                </div>
+                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding1">
+                    <p:inputText id="operadorPrtTc" placeholder="CodOp"
+                                 value="#{prgTcJSFMB.codigoOperador}" maxlength="10"  onkeypress="if (event.keyCode === 32) {
+                                             rcBorrar();
+                                             return;
+                                         }"/>
+                </div>
+                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding1">
+                    <p:inputText id="serconPrtTc" placeholder="SerCon"
+                                 value="#{prgTcJSFMB.sercon}" maxlength="30" onkeypress="if (event.keyCode === 32) {
+                                             rcBorrar();
+                                             return;
+                                         }"/>
+                    <div class="botonFloat">
+                        <p:commandButton title="Consultar Servicios"
+                                         icon="fa fa-search"
+                                         id="botonCPrgTc"
+                                         process="@form,prgtcForm:tblPrgTc"
+                                         class="cssWhite"
+                                         style="margin: 0px"
+                                         oncomplete="calcularhe();"
+                                         update="prgtcForm:tblPrgTc"
+                                         action="#{prgTcJSFMB.findServiceBy()}">
+                        </p:commandButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p:keyFilter for="tablaPrtTc" mask="num"/>
+        <!--<p:keyFilter for="operadorPrtTc" mask="num"/>-->
+
+        <p:hotkey bind="space" global="false" 
+                  delay="none"
+                  update="msgs,tablaPrtTc,servicioPrtTc,servBusPrtTc,vehiculoPrtTc,operadorPrtTc,serconPrtTc" 
+                  actionListener="#{prgTcJSFMB.borrarCampos()}"/>
+        <p:dataTable id="tblPrgTc" var="prgtc" selection="#{prgTcJSFMB.prgTc}"
+                     widgetVar="tblPrgTcWV"
+                     style="border: none;padding: 0;"
+                     selectionMode="single"
+                     scrollable="true"
+                     scrollHeight="600"
+                     rowIndexVar="nroFila"
+                     rowKey="#{prgtc.idPrgTc}"
+                     value="#{prgTcJSFMB.listPrgTc}">
+            <f:facet name="footer">
+                <h:commandLink>
+                    <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                    <p:dataExporter type="xlsx" target="tblPrgTc" fileName="programacion"/>
+                </h:commandLink>
+            </f:facet>
+            <p:ajax event="rowSelect" update="prgtcForm:IdcontextMenu,formConsultaEmpl"
+                    listener="#{prgTcJSFMB.onRowlClckSelect}"/>
+            <p:column headerText="Servicios" exportable="false">
+                <div id="#{nroFila}_id" class="BordRad3">
+                    <p:inputText value="#{prgtc.fecha}" 
+                                 id="fecha_id" 
+                                 style="display: none">
+                        <f:convertDateTime 
+                            type="date"
+                            pattern="yyyy-MM-dd"/>
+                    </p:inputText>
+                    <ui:fragment>
+                        <script type="text/javascript">$(function () {
+                                var fDate, lDate, cDate;
+                                fDate = Date.parse(document.getElementById('prgtcForm:tblPrgTc:0:fecha_id').value + ' ' + '#{prgtc.timeOrigin}');
+                                lDate = Date.parse(document.getElementById('prgtcForm:tblPrgTc:0:fecha_id').value + ' ' + '#{prgtc.timeDestiny}');
+                                cDate = Date.parse(new Date());
+                                if (dateBetween(fDate, lDate, cDate)) {
+                                    document.getElementById('#{prgtc.idPrgTc}').scrollIntoViewIfNeeded({
+                                        behavior: 'smooth',
+                                        block: 'center',
+                                        inline: 'center'
+                                    });
+                                    noEsEliminado(#{nroFila},#{prgtc.estadoOperacion});
+                                } else {
+                                    if (#{prgtc.estadoOperacion} > 0) {
+                                        alertaServicio(#{nroFila},#{prgtc.estadoOperacion});
+                                    }
+                                }
+                            });</script>
+
+                    </ui:fragment>
+                    <span class="ui-fluid" >
+                        <span class="ui-g" id="#{prgtc.idPrgTc}" style="align-items: flex-start;">
+                            <span class="ui-g-2 ui-md-2 ui-lg-1 Padding2" title="#{prgtc.idVehiculo.idGopUnidadFuncional.codigo}" >
+                                <span  class="Fs20  #{prgtc.idVehiculo.idVehiculoTipo.idVehiculoTipo==1 ? 'redCar fa fa-bus': prgtc.idVehiculo.idVehiculoTipo.idVehiculoTipo==2 ?  'yellowCar fa fa-bus' : 'white fa fa-bus'}" ></span>
+                                <div class="battery" title="#{prgtc.bateria} %">
+                                    <div class="#{prgTcJSFMB.getBatteryLevelClass(prgtc.bateria)}" 
+                                         style="height: #{prgTcJSFMB.getBatteryHeight(prgtc.bateria)};">
+                                    </div>
+                                </div>
+
+                            </span>
+
+                            <span class="ui-g-4 ui-md-4 ui-lg-2 Padding2">
+                                <span class="Fs12" style="font-weight: bold;">#{prgtc.timeOrigin}<br/><span class="Fs12 ">#{prgtc.timeDestiny}</span></span>
+                            </span>
+                            <span class="ui-g-4 ui-md-4 ui-lg-3 Padding2 #{prgtc.toStop.isDepot eq 1 ?'yellowBackgroung':''}" >
+                                <span class="Fs12" style="font-weight: bold;">#{prgtc.fromStop.name}<br/><span class="Fs12 ">#{prgtc.toStop.name}</span></span>
+                            </span>
+
+                            <span class="ui-g-4 ui-md-4 ui-lg-2 Padding2" >
+                                <span class="Fs13" style="font-weight: bold;">#{prgtc.idTaskType.tarea}<br/><span class="Fs12 ">#{prgtc.tabla}</span></span>
+                            </span>
+
+                            <span class="ui-g-4 ui-md-4 ui-lg-2 Padding2" >
+                                <span class="Fs12" style="font-weight: bold;">#{prgtc.servbus}<br/><span class="Fs12 ">#{prgtc.idVehiculo.codigo}</span></span>
+                            </span>
+                            <span class="ui-g-4 ui-md-4 ui-lg-2 Padding2" title="#{prgtc.idEmpleado.nombres} #{prgtc.idEmpleado.apellidos}">
+                                <span class="Fs12  #{prgtc.idEmpleado == null ? 'rebackgroung' : ''}" style="font-weight: bold;">#{prgtc.sercon}<br/><span class="Fs12 ">#{prgtc.idEmpleado.codigoTm}</span></span>
+                            </span>
+                        </span>
+                    </span>
+                </div>
+            </p:column>
+            <p:column headerText="Hora Inicio" visible="false">
+                <h:outputText value="#{prgtc.timeOrigin}"/>
+            </p:column>
+            <p:column headerText="Hora Fin" visible="false">
+                <h:outputText value="#{prgtc.timeDestiny}"/>
+            </p:column>
+            <p:column headerText="Punto Inicio" visible="false">
+                <h:outputText value="#{prgtc.fromStop.name}"/>
+            </p:column>
+            <p:column headerText="Punto Fin" visible="false">
+                <h:outputText value="#{prgtc.toStop.name}"/>
+            </p:column>
+            <p:column headerText="Servicio" visible="false">
+                <h:outputText value="#{prgtc.idTaskType.tarea}"/>
+            </p:column>
+            <p:column headerText="Tabla" visible="false">
+                <h:outputText value="#{prgtc.tabla}"/>
+            </p:column>
+            <p:column headerText="Servbus" visible="false">
+                <h:outputText value="#{prgtc.servbus}"/>
+            </p:column>
+            <p:column headerText="Vehículo" visible="false">
+                <h:outputText value="#{prgtc.idVehiculo.codigo}"/>
+            </p:column>
+            <p:column headerText="Sercon" visible="false">
+                <h:outputText value="#{prgtc.sercon}"/>
+            </p:column>
+            <p:column headerText="Código Operador" visible="false">
+                <h:outputText value="#{prgtc.idEmpleado.codigoTm}"/>
+            </p:column>
+            <p:column headerText="Operador" visible="false" >
+                <h:outputText value="#{prgtc.idEmpleado.nombres} #{prgtc.idEmpleado.apellidos}"/>
+            </p:column>
+            <p:column headerText="Bateria" visible="false" >
+                <h:outputText value="#{prgtc.bateria}"/>
+            </p:column>
+            <f:facet name="footer">
+                #{prgTcJSFMB.listPrgTc.size()} servicios Consultados.
+            </f:facet>
+        </p:dataTable>
+        <p:contextMenu id="IdcontextMenu" for="tblPrgTc" rendered="#{prgTcJSFMB.flagRol and !prgTcJSFMB.flagTurnoCerrado}">
+            <p:menuitem value="Gestión Servicio(s)" 
+                        title="Eliminar, reasignar operador o vehículo"  
+                        rendered="#{prgTcJSFMB.flagViewOption and !prgTcJSFMB.flagAsignarOperador}" 
+                        class="cssMenuItem" style="color: black" 
+                        actionListener="#{prgTcJSFMB.prepareGestionServicio(0)}" 
+                        process="@this" 
+                        update="msgs, formGestionPrgTc" 
+                        icon="fa fa-heartbeat"/>
+            <p:menuitem value="Asignar Operador" 
+                        class="cssMenuItem" 
+                        style="color: black"
+                        rendered="#{prgTcJSFMB.flagAsignarOperador}" 
+                        actionListener="#{prgTcJSFMB.prgAsignarOperador()}" 
+                        process="@this" update="msgs, formGestionPrgTc" icon="fa fa-user-plus"/> 
+            <p:menuitem value="Asignar Vehículo" 
+                        class="cssMenuItem" 
+                        style="color: black"
+                        rendered="#{prgTcJSFMB.flagAsignarVehiculo}" 
+                        actionListener="#{prgTcJSFMB.prgAsignarVehiculo()}" 
+                        process="@this" 
+                        update="msgs, frmConfirmDialogAsignarVehiculo" 
+                        icon="fa fa-bus"/> 
+            <p:menuitem value="Eliminar x Operador" 
+                        title="Eliminar Servicios sin Operador" 
+                        class="cssMenuItem" 
+                        style="color: black"
+                        rendered="#{prgTcJSFMB.flagEliminarXOperador}" 
+                        actionListener="#{prgTcJSFMB.EliminarXOperador()}" 
+                        process="@this" 
+                        update="msgs, frmConfirmDialogEliminarXOperador" 
+                        icon="fa fa-bus"/> 
+
+            <p:menuitem value="Eliminar x Vehículo" 
+                        title="Eliminar Servicios sin Vehículo" 
+                        class="cssMenuItem" 
+                        style="color: black"
+                        rendered="#{prgTcJSFMB.flagEliminarXVehiculo}" 
+                        actionListener="#{prgTcJSFMB.EliminarXVehiculo()}" 
+                        process="@this" 
+                        update="msgs, frmConfirmDialogEliminarXVehiculo" 
+                        icon="fa fa-bus"/> 
+
+            <p:menuitem value="Revertir" 
+                        title="Deshacer servicio eliminado" 
+                        style="background-color: green; color: white" 
+                        rendered="#{!prgTcJSFMB.flagViewOption}" 
+                        class="cssMenuItem" actionListener="#{prgTcJSFMB.revertir()}" 
+                        process="@this" 
+                        update="msgs, frmConfirmDialogRevivirServicio" 
+                        icon="fa fa-times"/>
+            <p:menuitem value="Cambiar Horario" 
+                        class="cssMenuItem" 
+                        style="color: black" 
+                        actionListener="#{prgTcJSFMB.prepareCambioHorario()}" 
+                        process="@this" 
+                        update="msgs,formGestionPrgTc" 
+                        icon="fa fa-clock-o"/>
+            <p:menuitem value="Adicionar Servicio(s)"  
+                        class="cssMenuItem" style="color: black" 
+                        actionListener="#{prgTcJSFMB.prepareAddService()}" 
+                        process="@this" 
+                        update="msgs,formAdicionServicio" 
+                        icon="fa fa-plus"/>
+            <p:menuitem value="Multa"  class="cssMenuItem" 
+                        style="color: black" 
+                        actionListener="#{multaController.prepareCreatePrgTc(false)}" 
+                        process="@this" 
+                        rendered="#{prgTcJSFMB.flagRol and multaController.viewCreateMultaPP}"
+                        update=":MultaCreateForm,msgs" 
+                        icon="fa fa-ticket"/>
+            <p:menuitem value="Accidente"  class="cssMenuItem" 
+                        rendered="#{prgTcJSFMB.flagViewOption}" 
+                        style="color: black" 
+                        icon="fa fa-bullhorn"
+                        actionListener="#{prgTcJSFMB.prepareGestionServicio(1)}" 
+                        process="@this" 
+                        update="msgs, formGestionPrgTc" />
+            <p:menuitem value="Copiar Servbus" 
+                        class="cssMenuItem" 
+                        style="color: black" 
+                        actionListener="#{prgTcJSFMB.copiarServbus()}" 
+                        process="@this" 
+                        update="msgs,tablaPrtTc,servicioPrtTc,servBusPrtTc,vehiculoPrtTc,operadorPrtTc,serconPrtTc"
+                        icon="fa fa-files-o"/>
+            <p:menuitem value="Copiar Cod Ope" 
+                        class="cssMenuItem" 
+                        style="color: black" 
+                        actionListener="#{prgTcJSFMB.copiarCodTm()}" 
+                        process="@this" 
+                        update="msgs,tablaPrtTc,servicioPrtTc,servBusPrtTc,vehiculoPrtTc,operadorPrtTc,serconPrtTc"
+                        icon="fa fa-files-o"/>
+            <p:menuitem value="Copiar Sercon" 
+                        class="cssMenuItem" 
+                        style="color: black" 
+                        actionListener="#{prgTcJSFMB.copiarSerconPLeft()}" 
+                        process="@this" 
+                        update="msgs,tablaPrtTc,servicioPrtTc,servBusPrtTc,vehiculoPrtTc,operadorPrtTc,serconPrtTc"
+                        icon="fa fa-files-o"/>
+            <p:menuitem value="Ver Ubicación" 
+                        class="cssMenuItem" 
+                        style="color: purple" 
+                        actionListener="#{prgTcJSFMB.prepareMapGeo()}" 
+                        process="@this" 
+                        update="msgs,map_geo"
+                        icon="fa fa-map-marker"/>
+            <p:menuitem value="Ver Recorrido" 
+                        class="cssMenuItem" 
+                        style="color: orange"
+                        rendered="#{prgTcJSFMB.flagViewVerRecorrido}"
+                        actionListener="#{prgTcJSFMB.prepareMapGeoVehEspecifico()}" 
+                        process="@this" 
+                        update="msgs,map_geo_rec_veh_esp"
+                        icon="fa fa-map-marker"/>
+        </p:contextMenu>
+    </h:form>
+    <ui:include src="../prgTc/modal/confirmarRevivirServicio.xhtml"/>
+    <ui:include src="../prgTc/modal/confirmarAsignarVehiculo.xhtml"/>
+    <ui:include src="../prgTc/modal/confirmarEliminarXOperador.xhtml"/>
+    <ui:include src="../prgTc/modal/confirmarEliminarXVehiculo.xhtml"/>
+</ui:composition>

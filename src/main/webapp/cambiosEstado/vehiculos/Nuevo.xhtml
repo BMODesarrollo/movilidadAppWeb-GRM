@@ -1,0 +1,169 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="cambioVehiculo" 
+              id="modalCambioVehiculo" 
+              header="Cambio de estado"
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)"
+              position="center top">
+        <h:form id="frmCambioVehiculo">
+            <div class="ui-fluid" id="panel">
+                <p:messages id="messages" showDetail="true" closable="true"/>
+                <div class="Padding0" jsf:id="pGrid">
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-ml-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="vehiculo" value="Vehículo"/>
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:inputText placeholder="Vehículo"
+                                             id="vehiculo"
+                                             required="true"
+                                             autocomplete="off"
+                                             maxlength="5"
+                                             requiredMessage="Debe ingresar el código del vehículo"
+                                             value="#{cambioVehiculoBean.s_codVehiculo}"
+                                             >
+                                    <p:ajax process="@this" 
+                                            listener="#{cambioVehiculoBean.buscarVehiculo()}"/>
+                                </p:inputText>
+                                <div class="Padding0" style="margin-top: -33.5px;float: right">
+                                    <p:commandButton process="vehiculo,@this" 
+                                                     style="margin: 0"
+                                                     update="messages"
+                                                     actionListener="#{cambioVehiculoBean.buscarVehiculo()}"
+                                                     icon="fa fa-search"
+                                                     class="cssWhite"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-ml-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="estado" value="Estado: " />
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu id="estado" 
+                                                 style="width: 99.9999%"
+                                                 value="#{cambioVehiculoBean.i_EstadoVehiculo}"
+                                                 filter="true">
+                                    <f:selectItem itemLabel="Seleccione uno" 
+                                                  itemValue=""
+                                                  itemDisabled="true"/>
+                                    <f:selectItems value="#{cambioVehiculoBean.lstEstadoVehiculos}"
+                                                   var="estado"
+                                                   itemValue="#{estado.idVehiculoTipoEstado}" 
+                                                   itemLabel="#{estado.nombreTipoEstado}"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-ml-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="desde" value="Desde:" />
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:calendar id="desde" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{cambioVehiculoBean.vehiculoInactivo.fromDate}"
+                                            locale="es"
+                                            mindate="today"
+                                            showTodayButton="true"
+                                            readonlyInput="true"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha de inicio"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                                }"
+                                            >
+                                    <p:ajax event="dateSelect" update="hasta"/>
+                                </p:calendar>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-ml-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="hasta" value="Hasta:" />
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:calendar id="hasta" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{cambioVehiculoBean.vehiculoInactivo.toDate}"
+                                            mindate="#{cambioVehiculoBean.vehiculoInactivo.fromDate}"
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha fin"
+                                            readonlyInput="true"
+                                            showTodayButton="true"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                                }"
+                                            >
+                                </p:calendar>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding5">
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="descripcion" value="Descripción:" />
+                            </div>
+                            <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                                <p:inputTextarea id="descripcion" 
+                                                 rows="4"
+                                                 value="#{cambioVehiculoBean.vehiculoInactivo.descripcion}"
+                                                 required="true" 
+                                                 requiredMessage="Debe ingresar una descripción" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <c:if test="#{cambioVehiculoBean.selected.activo == 1}">
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="observaciones" value="Observaciones:" />
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="observaciones" 
+                                             rows="4"
+                                             value="#{cambioVehiculoBean.vehiculoInactivo.observaciones}"
+                                             required="true" 
+                                             onkeypress="if (event.keyCode === 13 { return false; })"
+                                             requiredMessage="Debe ingresar una descripción" />
+                        </div>
+                    </div>
+                </c:if>
+            </div>
+            <p:remoteCommand name="rc"
+                             action="#{cambioVehiculoBean.guardar()}"
+                             update=":frmPrincipal:dtvehiculoInactivo,
+                             pGrid,messages"
+                             rendered="#{cambioVehiculoBean.selected == null }"/>
+            <p:remoteCommand name="rc_u"
+                             action="#{cambioVehiculoBean.actualizar()}"
+                             update=":frmPrincipal,:messages"
+                             rendered="#{cambioVehiculoBean.selected != null }"/>
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             onclick="rc()"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             rendered="#{cambioVehiculoBean.selected == null }">
+            </p:commandButton>
+            <p:commandButton value="Actualizar" 
+                             onclick="rc_u()"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             rendered="#{cambioVehiculoBean.selected != null }"/>
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

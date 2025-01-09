@@ -1,0 +1,188 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="head">
+        <style>
+            @media (min-width: 960px) {
+                .dialog-responsive-rigel {
+                    width: 500px! important;
+                }
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="audi_encabezado_form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Encabezado para Auditoría">
+                <p:dataTable id="datalist" 
+                             widgetVar="encabezado_audi_wv"
+                             value="#{audiEncabezadoJSFMB.list}"
+                             var="item"
+                             paginator="true"
+                             rowIndexVar="rVar"
+                             rowKey="#{rVar}"
+                             rows="20"
+                             filterDelay="1000"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen registros"
+                             scrollable="true"
+                             scrollHeight="1000">
+                    <p:column headerText="Nombre"
+                              filterBy="#{item.titulo}" 
+                              width="10%"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.titulo}"/>
+                    </p:column>
+                    <p:column headerText="Descripción"
+                              filterBy="#{item.descripcion}" 
+                              width="20%"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Auditoría"
+                              filterBy="#{item.idAuditoriaTipo.nombre}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idAuditoriaTipo.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Lugar"
+                              filterBy="#{item.idAuditoriaLugar.nombre}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idAuditoriaLugar.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Desde">
+                        <h:outputText value="#{item.fechaDesde}">
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Hasta">
+                        <h:outputText value="#{item.fechaHasta}">
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.activa}" 
+                              exportable="false"
+                              headerText="Activa"
+                              styleClass="#{item.activa eq 1 ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('encabezado_audi_wv').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.activa==1 ? 'Sí' : 'No'}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idAuditoriaLugar.bus}" 
+                              exportable="false"
+                              headerText="Bus?"
+                              styleClass="#{item.idAuditoriaLugar.bus  ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('encabezado_audi_wv').filter()" 
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{true}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{false}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.idAuditoriaLugar.bus ? 'Sí' : 'No'}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idAuditoriaLugar.estacion}" 
+                              exportable="false"
+                              headerText="Estación?"
+                              styleClass="#{item.idAuditoriaLugar.estacion ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('encabezado_audi_wv').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{true}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{false}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.idAuditoriaLugar.estacion ? 'Sí' : 'No'}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idAuditoriaLugar.areaComun}" 
+                              exportable="false"
+                              headerText="Área Común?"
+                              styleClass="#{item.idAuditoriaLugar.areaComun ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('encabezado_audi_wv').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{true}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{false}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.idAuditoriaLugar.areaComun ? 'Sí' : 'No'}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idAuditoriaLugar.empleado}" 
+                              exportable="false"
+                              headerText="Empleado?"
+                              styleClass="#{item.idAuditoriaLugar.empleado ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('encabezado_audi_wv').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{true}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{false}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.idAuditoriaLugar.empleado ? 'Sí' : 'No'}" />
+                    </p:column>
+
+
+
+                    <p:column headerText="Acciones" class="TexAlCenter" exportable="false">
+                        <p:commandButton id="editButton"   
+                                         update="msgs,crear_audi_encabezado_id_dialog,create_edit_dialog_form" 
+                                         icon="fa fa-pencil" 
+                                         actionListener="#{audiEncabezadoJSFMB.preEdit(item)}"
+                                         class="cssWhite GreenButton">
+                        </p:commandButton>
+                    </p:column>
+                    <!--                    <f:facet name="header" >
+                                            <div align="right">
+                                                <p:commandButton id="createButton"   
+                                                                 value="Nuevo" 
+                                                                 actionListener="#{audiEncabezadoJSFMB.preGuardar()}" 
+                                                                 update="crear_audi_encabezado_id_dialog,create_edit_dialog_form" 
+                                                                 icon="fa fa-plus" 
+                                                                 class="cssWhite"
+                                                                 oncomplete="PF('crear_audi_encabezado_dialog_wv').show()">
+                                                    <p:resetInput target="create_edit_dialog_form"/>
+                                                </p:commandButton>
+                                            </div>
+                                        </f:facet>-->
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="parametros area usuario #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/createEdit.xhtml"/>
+    </ui:define>
+</ui:composition>

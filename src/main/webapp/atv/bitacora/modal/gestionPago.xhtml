@@ -1,0 +1,73 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="Gestión Pago"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid Padding0">
+                <div class="ui-g Padding5">
+                    <h:outputText value="Aprobado para pago *"/> <br/>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:selectOneMenu id="s-tp-pago" value="#{atvNovedadJSF.novedadSelect.aceptarPagoAtv}"
+                                         style="width: 99.999%">
+                            <f:selectItem itemLabel="Sí" itemValue="0" />
+                            <f:selectItem itemLabel="No" itemValue="1" />
+                            <p:ajax process="@this" global="false" update="@form"/>
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Valor a liquidar - (Monto parametrizado: #{atvNovedadJSF.findCostoParam(atvNovedadJSF.novedadSelect)})" for="@next"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputNumber id="costo-liq"
+                                       maxValue="9999999"
+                                       minValue="0"
+                                       symbol="$"
+                                       decimalPlaces="0"
+                                       value="#{atvNovedadJSF.novedadSelect.costoLiquidadoAtv}"/>
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Descripción" for="descripcion"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputTextarea id="descripcion"
+                                         maxlength="65000"
+                                         required="#{atvNovedadJSF.novedadSelect.aceptarPagoAtv == 1}"
+                                         requiredMessage="Descripción es requerido"
+                                         value="#{atvNovedadJSF.novedadSelect.aceptarPagoObsAtv}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardarPago"
+                             process="@form,@this" 
+                             update=":form,@form,:msgs"
+                             actionListener="#{atvNovedadJSF.guardarGestionPago()}" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" 
+                             icon="fa fa-save"
+                             class="cssWhite" 
+                             onclick="guardarPago()">
+                <p:confirm header="Confirmacíon"
+                           message="Está seguro que desea liquidar el servicio de: #{atvNovedadJSF.novedadSelect.idAtvTipoAtencion.nombre}, para el vehículo: #{atvNovedadJSF.novedadSelect.idVehiculo.codigo} #{atvNovedadJSF.novedadSelect.idVehiculo.placa}?" 
+                           icon="fa fa-exclamation-triangle" />                    
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

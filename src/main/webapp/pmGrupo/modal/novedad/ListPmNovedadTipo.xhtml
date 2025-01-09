@@ -1,0 +1,61 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="PmNovedadTipoListDlg" widgetVar="PmNovedadTipoListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" closable="false"
+              class="mr1024_70 mr500_90" responsive="true" position="center top" closeOnEscape="true">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Tipos de novedad
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('PmNovedadTipoListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="frmPmNovedadTipoList">
+            <p:dataTable var="novedadTipo" value="#{gestionDanoNovPuntBean.lstNovedadTipos}"
+                         id="dtNovedadTipo" widgetVar="dtNovedadTipos"
+                         selectionMode="single" selection="#{gestionDanoNovPuntBean.novedadTipo}"                       
+                         rowIndexVar="nroFila"
+                         filterDelay="1000"
+                         paginator="true"
+                         rows="8"
+                         rowKey="#{novedadTipo.idNovedadTipo}"
+                         emptyMessage="No existen tipos de novedades registradas">
+                <p:ajax event="rowSelect" 
+                        listener="#{gestionDanoNovPuntBean.onRowNovedadTipoClckSelect}"
+                        update=":frmNovedadesPm:novedad_tipo,
+                        :frmNovedadesPm:novedad_tipo_detalleBtn,
+                        :frmNovedadesPm:novedad_tipo_detalle"
+                        oncomplete="PF('PmNovedadTipoListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" width="10%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Nombre tipo novedad" 
+                          filterBy="#{novedadTipo.nombreTipoNovedad}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipo.nombreTipoNovedad}" />
+                </p:column>
+                <p:column headerText="Descripción tipo novedad" filterBy="#{novedadTipo.descripcionTipoNovedad}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipo.descripcionTipoNovedad}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

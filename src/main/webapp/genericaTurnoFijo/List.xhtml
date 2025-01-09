@@ -1,0 +1,115 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="gen_turno_fijo_form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Genérica Turno Fijo">
+                <p:dataTable id="datalist" 
+                             value="#{genTurnoFijoMB.list}"
+                             var="item"
+                             paginator="true"
+                             rowKey="#{rVar + 1}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             filterDelay="2000"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             emptyMessage="No existen registros"
+                             scrollable="true"
+                             scrollHeight="1000"
+                             >
+                    <p:column exportable="false" filterBy="#{item.idEmpleado.identificacion} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Empleado">
+                        <h:outputText value="#{item.idEmpleado.identificacion}" class="cssBlack"/>
+                        <h:outputText value=" #{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Nombre">
+                        <h:outputText value="#{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Jornada"
+                              filterBy="#{item.idGenericaJornadaTipo.descripcion}"
+                              sortBy="#{item.idGenericaJornadaTipo.descripcion}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.idGenericaJornadaTipo.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Hora Inicio"
+                              filterBy="#{item.idGenericaJornadaTipo.hiniT1}"
+                              sortBy="#{item.idGenericaJornadaTipo.hiniT1}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.idGenericaJornadaTipo.hiniT1}"/>
+                    </p:column>
+                    <p:column headerText="Hora Fin"
+                              filterBy="#{item.idGenericaJornadaTipo.hfinT1}"
+                              sortBy="#{item.idGenericaJornadaTipo.hfinT1}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.idGenericaJornadaTipo.hfinT1}"/>
+                    </p:column>
+                    <p:column headerText="Descanso"
+                              filterBy="#{item.idGenericaJornadaTipo.descanso}"
+                              sortBy="#{item.idGenericaJornadaTipo.descanso}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.idGenericaJornadaTipo.descanso}"/>
+                    </p:column>
+                    <p:column headerText="Activo" styleClass="#{item.activo eq 0 ? 'cssGreen' : 'cssRed'}">
+                        <h:outputText value="Sí" rendered="#{item.activo == 0}" class="cssWhite" />
+                        <h:outputText value="No" rendered="#{item.activo == null || item.activo == 1}" class="cssWhite" />
+                    </p:column>
+                    <p:column headerText="Observación"
+                              filterBy="#{item.descripcion}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.descripcion}"/>
+                    </p:column>
+
+                    <p:column headerText="Acciones" style="width: 70px" exportable="false">
+                        <p:commandButton id="editButton"   
+                                         update=":create_edit_dialog_form,crear_turno_id_dialog" 
+                                         icon="fa fa-pencil" 
+                                         actionListener="#{genTurnoFijoMB.preEdit(item)}"
+                                         class="cssWhite GreenButton"
+                                         oncomplete="PF('create_edit_dialog_wv').show()">
+                            <p:resetInput target="create_edit_dialog_form"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="createButton"   
+                                             value="Nuevo" 
+                                             actionListener="#{genTurnoFijoMB.preGuardar()}" 
+                                             update=":create_edit_dialog_form,crear_turno_id_dialog" 
+                                             icon="fa fa-plus" 
+                                             class="cssWhite"
+                                             oncomplete="PF('create_edit_dialog_wv').show()">
+                                <p:resetInput target="create_edit_dialog_form"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="parametros area usuario #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="parametros area usuario #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/createEdit.xhtml"/>
+        <ui:include src="modal/listaEmpleados.xhtml"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="dialog_nov_tipo_det"
+              closeOnEscape="true"
+              widgetVar="dialog_nov_tipo_det_wv"
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)"
+              closable="false"
+              class="mr1024_50 mr500_90"
+              responsive="true" 
+              position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Detalles tipo de novedad" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('dialog_nov_tipo_det_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <p:cache disabled="true"/>
+        <h:form id="dialog_nov_tipo_det_form">
+            <p:dataTable var="novedadTipoDetalle" 
+                         value="#{novTipoAndDetBean.lstNovedadTipoDetalles}"
+                         id="dialog_nov_tipo_det_dt"
+                         widgetVar="dialog_nov_tipo_det_dt_wv"
+                         selectionMode="single" 
+                         selection="#{novTipoAndDetBean.novedadTipoDet}"                       
+                         rowIndexVar="nroFila"
+                         liveScroll="true"
+                         paginator="true"
+                         filterDelay="500"
+                         rows="10"
+                         rowKey="#{novedadTipoDetalle.idNovedadTipoDetalle}"
+                         emptyMessage="No existen detalles de tipo novedad registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{novTipoAndDetBean.onRowSelectNovTipoDet}"
+                        update="#{novTipoAndDetBean.compUpdateVistaCreateNov}"
+                        oncomplete="PF('dialog_nov_tipo_det_wv').hide()"/>
+                <p:column headerText="#" width="7%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Titulo tipo novedad" 
+                          width="30%"
+                          filterBy="#{novedadTipoDetalle.tituloTipoNovedad}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipoDetalle.tituloTipoNovedad}" />
+                </p:column>
+                <p:column headerText="Descripción tipo novedad" filterBy="#{novedadTipoDetalle.descripcionTipoNovedad}"
+                          width="60%"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadTipoDetalle.descripcionTipoNovedad}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

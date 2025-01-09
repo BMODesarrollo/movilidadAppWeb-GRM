@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <style>
+        .ui-galleria-caption  {
+            width: 973.98px;
+            height: 40px;
+            visibility: hidden  
+        }
+        .ui-galleria-filmstrip-wrapper {
+            overflow: hidden;
+            margin: 5px auto;
+            position: fixed;
+        }
+        .ui-galleria {
+            overflow: initial;
+            visibility: hidden;
+            position: relative;
+        }
+    </style>
+
+    <p:dialog id="DocumentoListDlg" widgetVar="DocumentoListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="#{archivosBean.modalHeader}"
+              closeOnEscape="true" responsive="true" position="center top"
+              class="mr1024_70 mr500_90"
+              >
+        <h:form id="frmDocumento">
+            <div align="center">
+                <p:galleria var="img_"
+                            value="#{pdMaestroSeguimientoBean.fotosNovedades}"
+                            showCaption="true" autoPlay="false" rendered="#{!empty(pdMaestroSeguimientoBean.fotosNovedades) and archivosBean.extension != 'pdf'}">
+                    <p:graphicImage cache="false" style="width: 100%"  value="#{archivosBean.galeriaImagenes}">
+                        <f:param name="nombre_imagen" value="#{img_}"/>
+                    </p:graphicImage>
+                </p:galleria>
+                <p:graphicImage cache="false"  value="#{archivosBean.imagenCompleta}"
+                                rendered="#{archivosBean.extension != 'pdf' and empty(pdMaestroSeguimientoBean.fotosNovedades)}">
+                </p:graphicImage>
+            </div>
+            <p:media value="#{archivosBean.documento}"
+                     cache="false" player="pdf" width="100%"
+                     style="height: 90vh"
+                     rendered="#{archivosBean.extension.contains('pdf')}"/>
+
+            <p:outputLabel value="El documento ó imágen a cargar no existe"
+                           rendered="#{pdMaestroSeguimientoBean.fotosNovedades.size() eq 0 and archivosBean.documento eq null}"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>

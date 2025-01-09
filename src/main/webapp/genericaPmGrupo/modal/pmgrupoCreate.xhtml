@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog header="PM Grupo" id="genPmGrupoDialogId" widgetVar="genPmGrupoDialog"
+              modal="true"  
+              closeOnEscape="true"
+              appendTo="@(body)"
+              class="mr1024_80 mr500_90"
+              responsive="true" minimizable="true"
+              position="top">
+
+        <p:messages id="msgsLocal" showDetail="true" closable="true"/>
+        <h:form id="frmGenPmgrupoCreate" >
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 Padding0 ">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:dataTable id="tblMasterDialog" var="master"  editable="true" 
+                                         paginator="true"
+                                         rows="5"
+                                         filterDelay="1000"
+                                         paginatorTemplate="{PreviousPageLink} {CurrentPageReport} {NextPageLink}"
+                                         paginatorPosition="top"
+                                         value="#{genPmGrupoJSF.listMaster}" 
+                                         widgetVar="tblMasterkMWV">
+                                <f:facet name="header">
+                                    <p:outputLabel value="Empleado Lider" class="cssWhite"/>
+                                </f:facet>
+                                <p:column filterBy="#{master.identificacion}#{master.nombres} #{master.apellidos}" filterMatchMode="contains" headerText="Código" >
+                                    <h:outputText  value="#{master.identificacion}-
+                                                   #{master.nombres} #{master.apellidos}"/>
+                                </p:column>
+                                <p:column style="width: 20%">
+                                    <p:commandButton icon="fa fa-user-plus" 
+                                                     title="Asignar Operador" 
+                                                     process="@this"
+                                                     class="cssWhite"
+                                                     update="empleadoAddPmGrupo,msgs,tblMasterDialog"
+                                                     actionListener="#{genPmGrupoJSF.addMaster(master)}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:dataTable id="tblOperadorDialog" var="empleado"  editable="true" 
+                                         value="#{genPmGrupoJSF.listOperadores}" 
+                                         paginator="true"
+                                         rows="5"
+                                         filterDelay="1000"
+                                         paginatorTemplate="{PreviousPageLink} {CurrentPageReport} {NextPageLink}"
+                                         paginatorPosition="top"
+                                         widgetVar="tblOPkMWV">
+                                <f:facet name="header">
+                                    <p:outputLabel value="Empleado" class="cssWhite"/>
+                                </f:facet>
+                                <p:column filterBy="#{empleado.identificacion}#{empleado.nombres} #{empleado.apellidos}" filterMatchMode="contains" headerText="Código" >
+                                    <h:outputText  value="#{empleado.identificacion}-
+                                                   #{empleado.nombres} #{empleado.apellidos}"/>
+                                </p:column>
+                                <p:column style="width: 20%">
+                                    <p:commandButton icon="fa fa-user-plus" 
+                                                     title="Asignar Operador" 
+                                                     process="@this"
+                                                     class="cssWhite"
+                                                     update="empleadoAddPmGrupo,msgs"
+                                                     actionListener="#{genPmGrupoJSF.preAddOperador(empleado)}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-9 ui-lg-9 Padding5">
+                        <p:fieldset  id="genPmGrupoDescricion" toggleable="true"  legend="Datos de Grupo">
+                            <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" 
+                                 jsf:rendered="#{genPmGrupoJSF.genPmGrup.idEmpleado!=null}">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1">
+                                    <h:outputLabel value="#{genPmGrupoJSF.genPmGrup.idEmpleado.identificacion}"/>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1">
+                                    <p:graphicImage cache="false"
+                                                    dir="#{genPmGrupoJSF.genPmGrup.idEmpleado.identificacion}"
+                                                    style="border:1px solid #106ebc; border-radius: 0px;"
+                                                    value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                    width="100">
+                                        <f:param name="path_foto" value="#{genPmGrupoJSF.genPmGrup.idEmpleado.pathFoto}"/>
+                                    </p:graphicImage>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 1px;">
+                                    <h:outputLabel style="font-size: 13px" value="#{genPmGrupoJSF.genPmGrup.idEmpleado.nombres} 
+                                                   #{genPmGrupoJSF.genPmGrup.idEmpleado.apellidos}" />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                                        <p:outputLabel for="txtNomreGrupo" value="Nombre"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                                        <p:inputText id="txtNomreGrupo" requiredMessage="Error. Se debe agregar un nombre para el grupo"
+                                                     value="#{genPmGrupoJSF.genPmGrup.nombreGrupo}" maxlength="50"  required="true"/>
+                                    </div>  
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                                    <p:outputLabel for="PmGDescripcion"  
+                                                   value="Descripción:"/>
+                                    <p:inputTextarea id="PmGDescripcion" 
+                                                     counter="display" 
+                                                     value="#{genPmGrupoJSF.genPmGrup.descripcion}" 
+                                                     maxlength="100"
+                                                     counterTemplate="{0} caracteres restantes." 
+                                                     autoResize="false" />
+                                    <p:outputLabel/>
+                                    <p:outputLabel id="display" />
+                                </div>
+                            </div>
+                        </p:fieldset>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:dataGrid var="operador" id="idTablaPmGrupoDialog" 
+                                        value="#{genPmGrupoJSF.listGenPmGrupDet}"
+                                        columns="6" layout="grid"
+                                        rowIndexVar="indexgd">
+                                <p:commandLink title="Click para eliminar" 
+                                               process="@this"  
+                                               update="frmGenPmgrupoCreate:tblOperadorDialog,
+                                               frmGenPmgrupoCreate:idTablaPmGrupoDialog"
+                                               action="#{genPmGrupoJSF.delete(indexgd)}">
+                                    <p:panel>
+                                        <div class="TexAlCenter">
+                                            <div>
+                                                <p:graphicImage cache="false"
+                                                                style="border:1px solid #106ebc; border-radius: 0px;"
+                                                                value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                                width="80">
+                                                    <f:param name="path_foto" value="#{operador.idEmpleado.pathFoto}" />
+                                                </p:graphicImage>
+                                                <span class="Fs14 DispBlock hardblue">
+                                                    #{operador.idEmpleado.identificacion}
+                                                    <span class="Fs12 softgray">
+                                                        #{operador.idEmpleado.nombres} #{operador.idEmpleado.apellidos}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </p:panel> 
+                                </p:commandLink>  
+
+                                <f:facet name="footer">
+                                    En total existen #{genPmGrupoJSF.listGenPmGrupDet.size()} registros.
+                                </f:facet>
+                            </p:dataGrid>
+                        </div>
+                        <p:remoteCommand name="rc"
+                                         process="frmGenPmgrupoCreate,frmGenPmgrupoCreate:PmGDescripcion,frmGenPmgrupoCreate:txtNomreGrupo"
+                                         update="formTablaGenPmGrupos,msgs,frmGenPmgrupoCreate" action="#{genPmGrupoJSF.guardar()}" />
+                    </div>                        
+                </div>                        
+            </div>                 
+        </h:form>
+
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarPm" 
+                             icon="fa fa-save" value="Guardar" 
+                             style="color: white" onclick="rc()"/>
+        </f:facet>
+
+    </p:dialog>
+    <ui:include src="../modal/modalFechaIngreso.xhtml"/>
+</ui:composition>
+
+
+

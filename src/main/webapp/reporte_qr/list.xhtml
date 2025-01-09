@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <ui:define name="head">
+        <style>
+            @media all {
+                div.saltopagina{
+                    display: none;
+                }
+            }
+            @media print{
+                body{
+                    height: 99%;
+                    min-width: 1024px;
+                    font-size: 80px !important;
+                    font-family: sans-serif !important;
+                }
+                .no-print{
+                    display: none !important;
+                }
+                .noNone{
+                    display: initial !important;
+                }
+                div.saltopagina{
+                    display:block !important;
+                    page-break-after: always !important;
+                }
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Generación códigos QR" class="no-print">
+            <div class="ui-fluid">
+                <h:form id="frmPrincipal">
+                    <div class="ui-g">
+                        <div class="ui-g-2 ui-md-2 ui-lg-2"></div>
+                        <div class="ui-g-8 ui-md-8 ui-lg-8 Padding5" jsf:id="botones">
+                            <div class="#{reporteQrBean.flagAreasAseo or reporteQrBean.flagVisitante ? 'ui-g-4 ui-md-4 ui-lg-4' : 'ui-g-6 ui-md-6 ui-lg-6'}">
+                                <p:commandButton 
+                                    value="Listado Áreas Aseo"
+                                    title="Reporte códigos QR Áreas de aseo"
+                                    styleClass="cssWhite"
+                                    action="#{reporteQrBean.obtenerAreasAseo()}"
+                                    update=":panel-imprimir-aseo,:panel-imprimir-visitante,
+                                    botones,:panel-imprimir-visitante-individual,
+                                    :panel-imprimir-aseo-individual,frmBusquedaIndividual:btnImprimirAseo,
+                                    frmBusquedaIndividual:btnImprimirVisitante"
+                                    >
+                                </p:commandButton>
+                            </div>
+                            <div class="#{reporteQrBean.flagAreasAseo or reporteQrBean.flagVisitante ? 'ui-g-4 ui-md-4 ui-lg-4' : 'ui-g-6 ui-md-6 ui-lg-6'}">
+                                <p:commandButton 
+                                    value="Listado de Terceros"
+                                    title="Reporte códigos QR terceros"
+                                    styleClass="cssWhite"
+                                    action="#{reporteQrBean.obtenerVisitantes()}"
+                                    update=":panel-imprimir-visitante,:panel-imprimir-aseo,botones,
+                                    :panel-imprimir-visitante-individual,:panel-imprimir-aseo-individual,
+                                    frmBusquedaIndividual:btnImprimirVisitante,frmBusquedaIndividual:btnImprimirAseo"
+                                    />
+                            </div>
+
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{reporteQrBean.flagAreasAseo}">
+                                <p:commandButton 
+                                    process="@this"
+                                    value="Imprimir"
+                                    styleClass="cssWhite OrangeButton"
+                                    >
+                                    <p:printer target=":panel-imprimir-aseo" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{reporteQrBean.flagVisitante}">
+                                <p:commandButton 
+                                    process="@this"
+                                    value="Imprimir"
+                                    styleClass="cssWhite OrangeButton"
+                                    >
+                                    <p:printer target=":panel-imprimir-visitante" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2"></div>
+                    </div>
+                </h:form>
+                <h:form id="frmBusquedaIndividual">
+                    <div class="ui-g">
+
+                        <p:messages id="messages" showDetail="true" closable="true">
+                            <p:effect type="pulsate" event="load" delay="500" />
+                        </p:messages>
+
+                        <div class="ui-g-2 ui-md-2 ui-lg-2"></div>
+                        <div class="ui-g-4 ui-md-4 ui-lg-4 Padding5">
+                            <p:fieldset legend="Consulta QR por código (ÁREAS DE ASEO)">
+                                <div class="ui-g-10 ui-md-10 ui-lg-10 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Código" for="@next"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:inputText id="codigoAseo"
+                                                     value="#{reporteQrBean.codAreaAseo}"
+                                                     autocomplete="off"
+                                                     required="true"
+                                                     requiredMessage="Debe ingresar un código"/>
+                                        <div class="botonFloat" >
+                                            <p:commandButton icon="fa fa-search"
+                                                             action="#{reporteQrBean.obtenerAreaAseo()}"
+                                                             update=":msgs,messages,:panel-imprimir-aseo-individual,:panel-imprimir-visitante-individual,
+                                                             frmPrincipal,@form,:panel-imprimir-aseo,:panel-imprimir-visitante"
+                                                             process="@this,codigoAseo"
+                                                             style="margin: 0px"
+                                                             styleClass="cssWhite"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="-" style="visibility: hidden"/>
+                                    </div>
+                                    <p:commandButton title="Listar Áreas de Aseo"
+                                                     action="#{reporteQrBean.prepareListAseoParamArea()}"
+                                                     oncomplete="PF('wlvAseoParamArea').show();"
+                                                     process="@this"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite">
+                                    </p:commandButton>
+                                </div>
+
+                                <div class="EmptyBox10"></div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="btnImprimirAseo">
+                                    <p:commandButton 
+                                        rendered="#{reporteQrBean.flagAreasAseoIndividual}"
+                                        process="@this"
+                                        value="Imprimir"
+                                        styleClass="cssWhite OrangeButton"
+                                        >
+                                        <p:printer target=":panel-imprimir-aseo-individual" />
+                                    </p:commandButton>
+                                </div>
+                            </p:fieldset>
+                        </div>
+                        <div class="ui-g-4 ui-md-4 ui-lg-4 Padding5">
+                            <p:fieldset legend="Consulta QR por número de documento (TERCEROS)">
+                                <div class="ui-g-10 ui-md-10 ui-lg-10 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Número documento" for="@next"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:inputText id="numeroDocumento"
+                                                     value="#{reporteQrBean.docVisitante}"
+                                                     required="true"
+                                                     autocomplete="off"
+                                                     requiredMessage="Debe ingresar un número de documento"/>
+                                        <div class="botonFloat" >
+                                            <p:commandButton icon="fa fa-search"
+                                                             action="#{reporteQrBean.obtenerVisitante()}"
+                                                             update="messages,:msgs,:panel-imprimir-visitante-individual,
+                                                             :panel-imprimir-aseo-individual,frmPrincipal,@form,
+                                                             :panel-imprimir-aseo,:panel-imprimir-visitante"
+                                                             process="@this,numeroDocumento"
+                                                             style="margin: 0px"
+                                                             styleClass="cssWhite"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="-" style="visibility: hidden"/>
+                                    </div>
+                                    <p:commandButton title="Listar Terceros"
+                                                     action="#{reporteQrBean.prepareListVisitantes()}"
+                                                     oncomplete="PF('wlvVisitante').show();"
+                                                     process="@this"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite">
+                                    </p:commandButton>
+                                </div>
+
+                                <div class="EmptyBox10"></div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="btnImprimirVisitante">
+                                    <p:commandButton 
+                                        rendered="#{reporteQrBean.flagVisitanteIndividual}"
+                                        process="@this"
+                                        value="Imprimir"
+                                        styleClass="cssWhite OrangeButton"
+                                        >
+                                        <p:printer target=":panel-imprimir-visitante-individual" />
+                                    </p:commandButton>
+                                </div>
+                            </p:fieldset>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2"></div>
+                    </div>
+                </h:form>
+            </div>
+        </p:panel>
+        <ui:include src="child/qr_areas_aseo.xhtml" rendered="#{reporteQrBean.flagAreasAseo}"/>
+        <ui:include src="child/qr_visitantes.xhtml" rendered="#{reporteQrBean.flagVisitante}"/>
+        <ui:include src="child/qr_areas_aseo_individual.xhtml" rendered="#{reporteQrBean.flagAreasAseoIndividual}"/>
+        <ui:include src="child/qr_visitantes_individual.xhtml" rendered="#{reporteQrBean.flagVisitanteIndividual}"/>
+        <ui:include src="modal/ListaAseoParamArea.xhtml"/>
+        <ui:include src="modal/ListaSstEmpresaVisitante.xhtml"/>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <h:form id="frmByVehiculolist">
+            <p:hotkey bind="ctrl+shift+q" 
+                      update="frmByVehiculolist:kmByVehiculolist,
+                      frmByVehiculolist:fechaFin" 
+                      action="#{kilometroBean.clearFiltersVehiculo()}"/>
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Kilómetros por vehículo
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="kmByVehiculolist" 
+                                            listener="#{kilometroBean.obtenerKmByVehiculo()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:panel>
+                    <f:facet name="header">
+                        <div align="center">
+                            <p:outputLabel for="@next" value="FECHA INICIO:"
+                                           styleClass="cssWhite"/>
+                            <p:spacer width="5"/>
+                            <p:calendar id="fechaIncio" label="Fecha de Consulta" 
+                                        value="#{kilometroBean.fecha}"
+                                        pattern="dd-MM-yyyy"
+                                        locale="es"
+                                        maxdate="today"
+                                        readonlyInput="true"
+                                        showOn="button"
+                                        title="Fecha Inicio"
+                                        navigator="true">
+                            </p:calendar>
+                            <p:spacer width="20"/>
+                            <p:outputLabel value=" - " styleClass="cssWhite"/>
+                            <p:spacer width="20"/>
+                            <p:outputLabel for="fechaFin" value="FECHA FIN:"
+                                           styleClass="cssWhite"/>
+                            <p:spacer width="5"/>
+                            <p:calendar id="fechaFin" label="Fecha de Consulta" 
+                                        value="#{kilometroBean.fechaFin}"
+                                        locale="es"
+                                        pattern="dd-MM-yyyy"
+                                        readonlyInput="true"
+                                        title="Fecha Fin"
+                                        maxdate="today"
+                                        showOn="button"
+                                        navigator="true">
+                            </p:calendar>
+                            <p:spacer width="20"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                actionListener="#{kilometroBean.obtenerKmByVehiculo()}"
+                                class="cssWhite"
+                                update="kmByVehiculolist"
+                                >
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:dataTable id="kmByVehiculolist" value="#{kilometroBean.lstKmsVehiculos}" 
+                                 var="item" widgetVar="dtkmByVehiculolist"
+                                 emptyMessage="No hay registros que mostrar!!"
+                                 paginator="true"
+                                 rows="100"
+                                 filterDelay="1700"
+                                 rowsPerPageTemplate="100,200,500"
+                                 >
+
+                        <f:facet name="paginatorTopRight">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="kmByVehiculolist" 
+                                                fileName="Kilómetros por vehiculo #{now}"
+                                                postProcessor="#{kilometroBean.postProcessXLSVehiculo}"/>
+                            </h:commandLink>
+                        </f:facet>
+
+                        <p:column headerText="Fecha">
+                            <h:outputText value="#{item.fecha}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column filterBy="#{item.codigo_vehiculo}"
+                                  sortBy="#{item.codigo_vehiculo}"
+                                  filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Vehículo"/>
+                            </f:facet>
+                            <h:outputText value="#{item.codigo_vehiculo}"/>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Comercial"/>
+                            </f:facet>
+                            <h:outputText value="#{item.comercial}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Hlp_Prg"/>
+                            </f:facet>
+                            <h:outputText value="#{item.hlp_prg}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Adicionales"/>
+                            </f:facet>
+                            <h:outputText value="#{item.adicionales}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Vac. Comerciales"/>
+                            </f:facet>
+                            <h:outputText value="#{item.vaccom}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Comercial_Eliminados"/>
+                            </f:facet>
+                            <h:outputText value="#{item.comercial_Eliminados}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Hlp_Eliminados"/>
+                            </f:facet>
+                            <h:outputText value="#{item.hlp_Eliminados}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Vacíos"/>
+                            </f:facet>
+                            <h:outputText value="#{item.vac}">
+                                <f:converter converterId="javax.faces.Long"/> 
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Total" title="Total con resta de eliminados"/>
+                            </f:facet>
+                            <h:outputText value="#{item.total_mts}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Total_KM" title="Total en kilómetros"/>
+                            </f:facet>
+                            <h:outputText value="#{item.total_km}"/>
+                        </p:column>
+                        <f:facet name="footer">
+                            <div align="center">
+                                En total existen #{kilometroBean.lstKmsVehiculos.size()} registro(s)
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

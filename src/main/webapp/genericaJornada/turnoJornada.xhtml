@@ -1,0 +1,138 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="turno_jornada_form">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Genérica Jornada Turno">
+                <p:dataTable id="turno_jornada_id_dt" 
+                             value="#{genTurnoJornadaMB.listJornadaTurno}" 
+                             var="item"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             reflow="true"
+                             scrollHeight="600"
+                             rowIndexVar="index"
+                             filterDelay="1000"
+                             rowKey="#{item.idGenericaTurnoJornada}"
+                             rows="20"
+                             widgetVar="jornada_t_wv"
+                             rowsPerPageTemplate="20,30,50,100">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="turno_jornada_id_dt" fileName="Turno Jornada"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton 
+                                value="Nuevo" 
+                                class="cssWhite"
+                                icon="fa fa-plus"
+                                action="#{genTurnoJornadaMB.preCreate()}"
+                                update="msgs,form_jornada_t_dialog">
+                            </p:commandButton>
+
+                        </div>
+                    </f:facet>
+                    <p:column style="width:30px">
+                        <p:rowToggler class="cssBlack" />
+                    </p:column>
+                    <p:column headerText="Tipo Jornada"
+                              style="text-align: center"
+                              filterBy="#{item.idGenericaJornadaTipo.descripcion}"
+                              sortBy="#{item.idGenericaJornadaTipo.descripcion}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.idGenericaJornadaTipo.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Hora Inicio"
+                              style="text-align: center"
+                              filterBy="#{item.idGenericaJornadaTipo.hiniT1}"
+                              sortBy="#{item.idGenericaJornadaTipo.hiniT1}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.idGenericaJornadaTipo.hiniT1}"/>
+                    </p:column>
+                    <p:column headerText="Hora Fin"
+                              style="text-align: center"
+                              filterBy="#{item.idGenericaJornadaTipo.hfinT1}"
+                              sortBy="#{item.idGenericaJornadaTipo.hfinT1}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.idGenericaJornadaTipo.hfinT1}"/>
+                    </p:column>
+                    <p:column headerText="Descanso"
+                              style="text-align: center"
+                              filterBy="#{item.idGenericaJornadaTipo.descanso}"
+                              sortBy="#{item.idGenericaJornadaTipo.descanso}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.idGenericaJornadaTipo.descanso}"/>
+                    </p:column>
+                    <p:column headerText="Dia Habil"
+                              footerText="#{genTurnoJornadaMB.totalColaboradoresHabilRegistrados} / #{genTurnoJornadaMB.idTotalEmpleadoArea}"
+                              style="text-align: center"
+                              filterBy="#{item.diaHabil}"
+                              sortBy="#{item.diaHabil}"
+                              filterMatchMode="contains">
+                        <h:outputText  value="#{item.diaHabil}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.diaFeriado}"
+                              footerText="#{genTurnoJornadaMB.totalColaboradoresFariadoRegistrados} / #{genTurnoJornadaMB.idTotalEmpleadoArea}"
+                              style="text-align: center"
+                              sortBy="#{item.diaFeriado}"
+                              filterMatchMode="contains"
+                              headerText="Día Feriado">
+                        <h:outputText value="#{item.diaFeriado}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.color}"
+                              filterMatchMode="contains"
+                              style="background-color: ##{item.color};text-align: center"
+                              headerText="Color">
+                    </p:column>
+                    <p:column filterBy="#{item.prioridad}"
+                              sortBy="#{item.prioridad}"
+                              style="text-align: center"
+                              filterMatchMode="contains"
+                              headerText="Prioridad">
+                        <h:outputText value="#{item.prioridad}"/>
+                    </p:column>
+                    <p:column exportable="false"  headerText="Acción" style="text-align: center">
+                        <p:commandButton action="#{genTurnoJornadaMB.onGenericaJornadaTurno(item)}"
+                                         icon="fa fa-pencil"
+                                         class="cssWhite GreenButton"
+                                         update="form_jornada_t_dialog,turno_jornada_id_dialog"
+                                         title="Autorizar">
+                        </p:commandButton>
+                        <p:commandButton action="#{genTurnoJornadaMB.onAgregarDetalle(item)}"
+                                         icon="fa fa-list"
+                                         class="cssWhite "
+                                         update="adicionar_detalle_dialog,adicionar_detalle_form"
+                                         title="Agregar detalle o ver detalle">
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:rowExpansion>
+                        <p:dataTable var="obj" value="#{genTurnoJornadaMB.getGenericaTurnoJorDet(item)}">
+                            <p:column headerText="Cargo">
+                                <h:outputText value="#{obj.idEmpleadoTipoCargo.nombreCargo}" />
+                            </p:column>
+                            <p:column headerText="Cant. Habil">
+                                <h:outputText value="#{obj.cantidadHabil}" />
+                            </p:column>
+                            <p:column headerText="Cant. Feriado/Domingo">
+                                <h:outputText value="#{obj.cantidadFeriada}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/createJornadaTurno.xhtml"/>
+        <ui:include src="modal/adicionarDetalle.xhtml"/>
+    </ui:define>
+</ui:composition>

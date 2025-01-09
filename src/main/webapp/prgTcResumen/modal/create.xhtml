@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="id_create_dlg" 
+              closeOnEscape="true" 
+              widgetVar="wv_create_dlg" modal="true" 
+              class="mr1024_30 mr500_90"
+              header="Gestión Param Tiempo Cierre"
+              position="center top" >
+        <h:form id="form_create_dlg">
+            <p:messages showDetail="true" id="msgs_create_dlg">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>  
+            <div class="ui-fluid" >
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="input_time"  value="Tiempo(Min)" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="input_time"
+                                         mask="99:99:99"
+                                         value="#{ParamTiempoCierreBean.tiempo}"
+                                         required="true"
+                                         requiredMessage="Tiempo es requerido">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="@next"  value="Unidad Funcional" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <ui:include src="../../zComponent/selectUnidadFuncional.xhtml"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="descripcion" value="Descripción"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             maxlength="255"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             value="#{ParamTiempoCierreBean.descripción}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc"
+                             process="@this,form_create_dlg:descripcion,
+                             form_create_dlg:input_time"
+                             rendered="#{ParamTiempoCierreBean.gopParamTiempoCierre.idGopParamTiempoCierre==null}"
+                             update="msgs,ptc_form" 
+                             action="#{ParamTiempoCierreBean.guardar()}" />
+            <p:remoteCommand name="rc"
+                             process="@this,form_create_dlg:descripcion,
+                             form_create_dlg:input_time"
+                             rendered="#{ParamTiempoCierreBean.gopParamTiempoCierre.idGopParamTiempoCierre!=null}"
+                             update="msgs,ptc_form" 
+                             action="#{ParamTiempoCierreBean.editar()}" />
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarPrgTc" 
+                             icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc()">
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+
+
+

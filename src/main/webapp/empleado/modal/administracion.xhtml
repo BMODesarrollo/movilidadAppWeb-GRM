@@ -1,0 +1,144 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="dial-emp-cargo" 
+              closeOnEscape="true" 
+              closable="false"
+              widgetVar="empCargoDlg"
+              modal="true"
+              resizable="false"
+              appendTo="@(body)"
+              class="mr1024_30 mr500_90"
+              position="center top"
+              responsive="true">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{empleadoCargoCostoJSF.empleadoCargoCosto.idEmpleadoCargoCosto != null ? 'EDITAR RELACIÓN CARGO - COSTO' : 'NUEVA RELACIÓN CARGO - COSTO'}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('empCargoDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-emp-cargo">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="cargo" value="Cargo *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="cargo" 
+                                             value="#{empleadoCargoCostoJSF.i_idParamCargo}" 
+                                             style="width: 99.9999%"
+                                             filter="true" 
+                                             filterMatchMode="contains" 
+                                             rendered="true" 
+                                             requiredMessage="Cargo es requerido">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{empleadoCargoCostoJSF.listEmpleadoTipo}" 
+                                               var="listCargo" 
+                                               itemLabel="#{listCargo.nombreCargo}" 
+                                               itemDescription="#{listCargo.nombreCargo}"
+                                               itemValue="#{listCargo.idEmpleadoTipoCargo}" />
+                                <p:ajax event="change" 
+                                        listener="#{empleadoCargoCostoJSF.recomendarFecha()}" 
+                                        update="panel-fecha" 
+                                        process="@this"
+                                        global="false" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div jsf:id="panel-fecha">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="desde" value="Fecha Desde:" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:calendar id="desde" 
+                                            value="#{empleadoCargoCostoJSF.empleadoCargoCosto.desde}" 
+                                            locale="es"
+                                            showOn="button"
+                                            navigator="true"
+                                            pattern="yyyy-MM-dd" 
+                                            mask="true" 
+                                            required="true"
+                                            requiredMessage="Fecha Desde es requerido" >
+                                    <p:ajax global="false" />
+                                </p:calendar>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="hasta" value="Fecha Hasta" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:calendar id="hasta" 
+                                            value="#{empleadoCargoCostoJSF.empleadoCargoCosto.hasta}" 
+                                            locale="es"
+                                            showOn="button"
+                                            navigator="true"
+                                            pattern="yyyy-MM-dd" 
+                                            mask="true" 
+                                            required="true"
+                                            requiredMessage="Fecha Hasta es requerido" >
+                                    <p:ajax global="false" />
+                                </p:calendar>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="costo" value="Costo: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="costo"
+                                           minValue="0"
+                                           value="#{empleadoCargoCostoJSF.empleadoCargoCosto.costo}"
+                                           maxValue="999999999"
+                                           required="true"
+                                           requiredMessage="Costo es requerido" />
+                        </div>
+                    </div>
+                    <p:remoteCommand id="btn-guardar"
+                                     name="rc_cc"
+                                     action="#{empleadoCargoCostoJSF.guardar()}"
+                                     update=":empleado-cargo-form,@form"
+                                     process="@form" />
+                    <p:remoteCommand id="btn-editar"
+                                     name="rc_cc_update"
+                                     value="Actualizar"
+                                     rendered="#{not empty empleadoCargoCostoJSF.empleadoCargoCosto.idEmpleadoCargoCosto}"
+                                     action="#{empleadoCargoCostoJSF.editar()}"
+                                     update=":empleado-cargo-form,@form"/>
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                rendered="#{empty empleadoCargoCostoJSF.empleadoCargoCosto.idEmpleadoCargoCosto}"
+                icon="fa fa-save"
+                value="Guardar"
+                class="cssWhite"
+                onclick="rc_cc();"/>
+            <p:commandButton 
+                rendered="#{not empty empleadoCargoCostoJSF.empleadoCargoCosto.idEmpleadoCargoCosto}"
+                icon="fa fa-save"
+                value="Actualizar"
+                class="cssWhite"
+                onclick="rc_cc_update();"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

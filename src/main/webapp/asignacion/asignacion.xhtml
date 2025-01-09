@@ -1,0 +1,730 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <style>
+            .ui-datatable table tbody tr td {
+                color: #2a2626;
+                border: solid 1px #E5EBF0;
+                -webkit-transition: all 0.2s ease;
+                -moz-transition: all 0.2s ease;
+                -ms-transition: all 0.2s ease;
+                -o-transition: all 0.2s ease;
+                transition: all 0.2s ease;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+
+        <p:panel >
+            <h:form id="frm_resumen">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px" jsf:id="id_resumen">
+                            <div class="ui-g-12 ui-md-4 ui-lg-4" style="padding: 2px">
+                                <p:staticMessage severity="info" id="SM_total" summary="Total Servbus" detail="#{asignacionJSFMB.servTotalesIV}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4" style="padding: 2px">
+                                <p:staticMessage severity="#{asignacionJSFMB.servTotalesIV > asignacionJSFMB.servAsignadosIV ? 'error' : 'info'}" id="SM_asignados" summary="Asignados" detail="#{asignacionJSFMB.servAsignadosIV}" />
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4" style="padding: 2px">
+                                <p:staticMessage severity="info" id="SM_vehiculos" summary="Vehículos" detail="#{asignacionJSFMB.vehiculosIV}" />
+                            </div>
+                            <p:repeat  value="#{asignacionJSFMB.listaResumen}" 
+                                       var="resumen"
+                                       varStatus="index">
+                                <div class="ui-g-12 ui-md-3 ui-lg-3" style="padding: 2px">
+                                    <p:staticMessage severity="warn"  summary="#{resumen.name}" detail="#{resumen.asignados}" />
+                                </div>
+                            </p:repeat>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+            <f:facet name="header" >
+                <h:outputText value="Asignación " />
+                <h:outputText value="#{asignacionJSFMB.fechaPost}" style="text-align: center;font-size: 20px;
+                              background-color: #165785;
+                              border-radius: 15px;
+                              padding-left: 10px;
+                              padding-right: 10px;">
+                    <f:convertDateTime type="date" pattern="yyyy-MMMM-dd" />
+                </h:outputText>
+            </f:facet>
+
+            <div align="center">
+                <p:messages id="messages" showDetail="true" >
+                    <p:effect type="pulsate" event="load" delay="500"/>
+                </p:messages>
+                <p:tabView id="tabView_id">
+                    <p:ajax event="tabChange" listener="#{asignacionJSFMB.onTabChange}"
+                            update="msgs,frm_resumen:id_resumen"/>
+                    <p:tab id="paso_x_i" title="Tareas En Patio">
+                        <h:form id="frm_tab_i">
+                            <div class="ui-fluid">
+                                <div class="ui-g">
+                                    <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                        <p:outputLabel for="SOMPatios"  value="Patio" />
+                                        <p:selectOneMenu id="SOMPatios"
+                                                         filterMatchMode="contains" filter="true"
+                                                         value="#{asignacionJSFMB.i_idPatio}">
+                                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                                            <f:selectItems value="#{asignacionJSFMB.listPatios}"
+                                                           var="p" itemLabel="#{p.idFromDepot.name}"
+                                                           itemValue="#{p.idFromDepot.idPrgStoppoint}" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-2 ui-lg-2">
+
+                                        <p:outputLabel for="addServ_hIni" value="Hora-Ini"/>
+                                        <p:inputMask id="addServ_hIni" 
+                                                     value="#{asignacionJSFMB.horaInicioString}" 
+                                                     requiredMessage="Hora invalida" mask="99:99:99" >
+                                            <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" 
+                                                             for="addServ_hIni"/>
+                                        </p:inputMask>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-2 ui-lg-2">
+
+
+                                        <p:outputLabel for="addServ_hFin" value="Hora-fin"/>
+                                        <p:inputMask id="addServ_hFin" 
+                                                     value="#{asignacionJSFMB.horaFinString}" 
+                                                     requiredMessage="Hora invalida" mask="99:99:99" >
+                                            <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" 
+                                                             for="addServ_hFin"/>
+                                        </p:inputMask>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-4 ui-lg-4">
+
+                                        <p:outputLabel value="boton" style="visibility: hidden"/>
+                                        <p:commandButton  
+                                            id="btnFind"
+                                            class="cssWhite" 
+                                            update="msgs,tabView_id:frm_tab_i:mtto_a_id"
+                                            process="@this,
+                                            tabView_id:frm_tab_i:addServ_hIni,
+                                            tabView_id:frm_tab_i:addServ_hFin,
+                                            tabView_id:frm_tab_i:SOMPatios"
+                                            icon="fa fa-search"
+                                            value="Consultar"
+                                            action="#{asignacionJSFMB.consultarServiciosPasoI()}"
+                                            title="Consultar servicio en patio" />
+                                    </div>
+
+                                </div>
+                            </div>
+                            <p:panel id="mtto_a_id" header="Tareas en patio">
+                                <p:scrollPanel mode="native" style="width:99%;
+                                               max-height: 600px;
+                                               border-bottom: white;
+                                               border-left: white;
+                                               border-right: white;
+                                               border-top: white;">
+
+                                    <p:repeat  value="#{asignacionJSFMB.listaPasoI}" 
+                                               var="mtto_a_id"
+                                               varStatus="index">
+                                        <div class="ui-fluid" style="#{asignacionJSFMB.esPar(index.index)}">
+                                            <div class="ui-g">
+                                                <div class="ui-g-12 ui-md-2 ui-lg-2">
+                                                    <p:outputLabel style="color: red;" value="#{mtto_a_id.prgVehicleStatus.timeOrigin} -"/>
+                                                    <p:outputLabel style="color: red;" value="#{mtto_a_id.prgVehicleStatus.timeDestiny}"/>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-2 ui-lg-2">
+                                                    <p:outputLabel class="cssBlack" 
+                                                                   style="font-size: 17px;" 
+                                                                   value="#{mtto_a_id.prgVehicleStatus.servbus}"/>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-2 ui-lg-2">
+                                                    <p:outputLabel class="cssBlack" 
+                                                                   style="font-size: 17px;" 
+                                                                   value="#{asignacionJSFMB.toEntero(mtto_a_id.prgVehicleStatus.productionDistance)} KMtrs">
+                                                    </p:outputLabel>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-2 ui-lg-2">
+                                                    <p:inputText value="#{mtto_a_id.mttoAsig.idVehiculo.codigo}" 
+                                                                 maxlength="6" 
+                                                                 placeholder="Vehículo"
+                                                                 required="false"
+                                                                 style="text-transform: uppercase;"
+                                                                 class="cssBlack">
+                                                        <p:ajax event="keyup" global="false" process="@this"/>
+                                                    </p:inputText>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-1 ui-lg-1">
+
+                                                    <p:outputLabel for="SOMTarea"  value="Tarea:" />
+                                                </div>
+                                                <div class="ui-g-12 ui-md-3 ui-lg-3">
+
+                                                    <p:selectOneMenu id="SOMTarea"
+                                                                     filterMatchMode="contains" filter="true"
+                                                                     value="#{mtto_a_id.mttoAsig.idMttoTarea.idMttoTarea}">
+                                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                                        <f:selectItems value="#{asignacionJSFMB.listTareas}"
+                                                                       var="t" itemLabel="#{t.nombreMttoTarea}"
+                                                                       itemValue="#{t.idMttoTarea}" />
+                                                        <p:ajax event="valueChange" global="false" process="@this"/>
+                                                    </p:selectOneMenu>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </p:repeat>
+                                </p:scrollPanel>
+                                <f:facet name="footer" >
+                                    <div align="center">
+                                        <p:commandButton  
+                                            id="btnFinda"
+                                            rendered="#{asignacionJSFMB.listaPasoI.size() != 0}"
+                                            class="cssWhite GreenButton" 
+                                            update="msgs,tabView_id:frm_tab_i:mtto_a_id,
+                                            frm_resumen:id_resumen"
+                                            process="@this"
+                                            icon="fa fa-save"
+                                            value="Guardar"
+                                            action="#{asignacionJSFMB.savePasoI()}"
+                                            title="Guardar todo" />
+                                    </div>
+                                </f:facet>
+                            </p:panel>
+                        </h:form>
+                    </p:tab>
+                    <p:tab id="paso_x_iv" title="Asignar Tareas">
+                        <h:form id="frm_tab_iv">
+                            <div class="ui-fluid">
+                                <div class="ui-g">
+                                    <div class="ui-g-12 ui-md-7 ui-lg-7">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 0px" jsf:id="id_campos">
+                                            <div class="ui-g-12 ui-md-6 ui-lg-6" style="padding: 3px; " >
+                                                <div class="ui-g-6 ui-md-12 ui-lg-12" style="padding: 0px; text-align: left" >
+                                                    <p:outputLabel for="id_vehiculo" value="Vehiculo: *"/>
+                                                    <div class="ui-g-11 ui-md-11 ui-lg-11" style="padding: 0px; " >
+                                                        <p:inputText placeholder="Código vehículo"
+                                                                     id="id_vehiculo"
+                                                                     value="#{asignacionJSFMB.codigoVehiculo}"/>
+                                                    </div>
+                                                    <div class="ui-g-1 ui-md-1 ui-lg-1" style="padding: 0px; " >
+                                                        <p:commandButton title="Consultar vehículo"
+                                                                         icon="fa fa-search"
+                                                                         class="cssWhite"
+                                                                         process="@this,tabView_id:frm_tab_iv:id_vehiculo"
+                                                                         action="#{asignacionJSFMB.consultarVehiculo()}"
+                                                                         update="msgs,tabView_id:frm_tab_iv:id_campos"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-6" style="padding: 3px;text-align: left">
+                                                <p:outputLabel for="SOMTarea_iv" value="Tarea: *"/>
+
+                                                <p:selectOneMenu id="SOMTarea_iv"
+                                                                 filterMatchMode="contains" filter="true"
+                                                                 value="#{asignacionJSFMB.id_tarea_iv}">
+                                                    <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                                    <f:selectItems value="#{asignacionJSFMB.listTareas}"
+                                                                   var="t" itemLabel="#{t.nombreMttoTarea}"
+                                                                   itemValue="#{t.idMttoTarea}" />
+                                                    <p:ajax event="valueChange" global="false" process="@this"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-6" style="padding: 3px;text-align: left">
+                                                <p:outputLabel for="SOMFrom_depot_iv" value="Patio Inicio *"/>
+
+                                                <p:selectOneMenu id="SOMFrom_depot_iv"
+                                                                 filterMatchMode="contains" filter="true"
+                                                                 value="#{asignacionJSFMB.id_from_depot_iv}">
+                                                    <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                                    <f:selectItems value="#{asignacionJSFMB.listaPatiosPato_iv}"
+                                                                   var="from_var" itemLabel="#{from_var.name}"
+                                                                   itemValue="#{from_var.idPrgStoppoint}" />
+                                                    <p:ajax event="valueChange" global="false" 
+                                                            listener="#{asignacionJSFMB.cargarPatio(0)}" process="@this"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-6" style="padding: 3px;text-align: left">
+                                                <p:outputLabel for="SOMTo_depot_iv" value="Patio Fin *"/>
+
+                                                <p:selectOneMenu id="SOMTo_depot_iv"
+                                                                 filterMatchMode="contains" filter="true"
+                                                                 value="#{asignacionJSFMB.id_to_depot_iv}">
+                                                    <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                                    <f:selectItems value="#{asignacionJSFMB.listaPatiosPato_iv}"
+                                                                   var="to_var" itemLabel="#{to_var.name}"
+                                                                   itemValue="#{to_var.idPrgStoppoint}" />
+                                                    <p:ajax event="valueChange" global="false"
+                                                            listener="#{asignacionJSFMB.cargarPatio(1)}" process="@this"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div align="center">
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding-top: 15px">
+                                                    <p:commandButton icon="fa fa-plus"
+                                                                     class="cssWhite GreenButton"
+                                                                     value="Agregar"
+                                                                     style="width: 30%"
+                                                                     process="@this,tabView_id:frm_tab_iv:id_campos"
+                                                                     action="#{asignacionJSFMB.guardarAsigTarea()}"
+                                                                     oncomplete="PF('wvpaso_iv_v').clearFilters()"
+                                                                     update="msgs,
+                                                                     tabView_id:frm_tab_iv:dtpaso_iv,
+                                                                     tabView_id:frm_tab_iv:id_campos,
+                                                                     frm_resumen:id_resumen"/>
+                                                </div>      
+                                            </div>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 0px">
+                                            <p:dataTable id="dtpaso_iv"
+                                                         paginator="true"
+                                                         widgetVar="wvpaso_iv"
+                                                         rows="5"
+                                                         scrollHeight="600"
+                                                         scrollable="true"
+                                                         rowIndexVar="numIV"
+                                                         rowKey="#{item_iv.idVehiculo.idVehiculo}"
+                                                         filterDelay="1000"
+                                                         paginatorPosition="top"
+                                                         rowsPerPageTemplate="5,10,20"
+                                                         var="item_iv"
+                                                         editable="true" editMode="cell"
+                                                         rowStyleClass="text-center"
+                                                         value="#{asignacionJSFMB.listaPasoIV}"
+                                                         emptyMessage="No hay vehículos registrados">
+                                                <f:facet name="header" >
+                                                    #{asignacionJSFMB.listaPasoIV.size()} registros.
+                                                </f:facet>
+                                                <p:column width="25%" headerText="Vehículo" 
+                                                          sortBy="#{item_iv.idVehiculo.codigo}"
+                                                          filterBy="#{item_iv.idVehiculo.codigo}"
+                                                          filterMatchMode="contains">
+                                                    <h:outputText value="#{item_iv.idVehiculo.codigo}" />
+                                                </p:column>
+                                                <p:column width="25%" headerText="Tarea" 
+                                                          sortBy="#{item_iv.idMttoTarea.nombreMttoTarea}"
+                                                          filterBy="#{item_iv.idMttoTarea.nombreMttoTarea}"
+                                                          filterMatchMode="contains">
+                                                    <h:outputText value="#{item_iv.idMttoTarea.nombreMttoTarea}" />
+                                                </p:column>
+                                                <p:column headerText="Patio Salida"
+                                                          width="25%">
+                                                    <h:outputText value="#{asignacionJSFMB.patio(item_iv.idFromDepot)}" />
+                                                </p:column>
+                                                <p:column width="10%">
+                                                    <p:commandButton icon="fa fa-close"
+                                                                     class="cssWhite RedButton"
+                                                                     process="@this"
+                                                                     action="#{asignacionJSFMB.eliminarAsigTarea(item_iv)}"
+                                                                     oncomplete="PF('wvpaso_iv_v').clearFilters()"
+                                                                     update="msgs,
+                                                                     tabView_id:frm_tab_iv:dtpaso_iv"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-5 ui-lg-5">
+
+                                        <p:dataTable id="dtpaso_iv_v"
+                                                     scrollHeight="600"
+                                                     scrollable="true"
+                                                     filterDelay="1000"
+                                                     var="item_iv_v"
+                                                     paginator="true"
+                                                     paginatorPosition="top"
+                                                     rows="50"
+                                                     selectionMode="single"
+                                                     selection="#{asignacionJSFMB.selectedVehiculo}"
+                                                     rowsPerPageTemplate="50,100,200,500"
+                                                     widgetVar="wvpaso_iv_v"
+                                                     rowIndexVar="num"
+                                                     rowStyleClass="text-center"
+                                                     rowKey="#{item_iv_v.idVehiculo.idVehiculo}"
+                                                     value="#{asignacionJSFMB.listVehiculosKmPatioPasoIII}"
+                                                     emptyMessage="No hay vehículos registrados">
+                                            <f:facet name="header" >
+                                                #{asignacionJSFMB.listVehiculosKmPatioPasoIII.size()} vehículos en este patio.
+                                            </f:facet>
+                                            <p:ajax event="rowSelect" listener="#{asignacionJSFMB.onRowSelect}" 
+                                                    update="msgs,tabView_id:frm_tab_iv:id_campos" />
+                                            <p:column headerText="Vehículo" 
+                                                      width="33%"
+                                                      sortBy="#{item_iv_v.idVehiculo.codigo}"
+                                                      filterBy="#{item_iv_v.idVehiculo.codigo}"
+                                                      filterMatchMode="contains">
+                                                <h:outputText value="#{item_iv_v.idVehiculo.codigo}"/>
+                                            </p:column>
+
+                                            <p:column headerText="Patio" width="33%">
+                                                <h:outputText value="#{item_iv_v.patio.name}"/>
+                                            </p:column>
+                                            <p:column headerText="Distancia(KMts)" width="33%">
+                                                <h:outputText value="#{item_iv_v.kmPorRecorrer}">
+                                                    <f:convertNumber pattern="#0" />
+                                                </h:outputText>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+                    </p:tab>
+                    <p:tab id="paso_x_ii" title="Tareas en expedición">
+                        <h:form id="frm_tab_ii">
+                            <div class="ui-fluid" >
+                                <div class="ui-g">
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6" jsf:id="id_resumen">
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                            <p:staticMessage severity="info" id="SM_total" summary="Total Servbus" detail="#{asignacionJSFMB.servTotalesII}" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                            <p:staticMessage severity="info" id="SM_asignados" summary="Asignados" detail="#{asignacionJSFMB.servAsignadosII}" />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                            <p:staticMessage severity="info" id="SM_vehiculos" summary="Vehículos" detail="#{asignacionJSFMB.vehiculosII}" />
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+
+                                            <p:selectOneMenu id="SOMPatios_pasoII"
+                                                             filterMatchMode="contains" filter="true"
+                                                             value="#{asignacionJSFMB.i_idPatio_paso_II}">
+                                                <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                                                <f:selectItems value="#{asignacionJSFMB.listPatios}"
+                                                               var="p" itemLabel="#{p.idFromDepot.name}"
+                                                               itemValue="#{p.idFromDepot.idPrgStoppoint}" />
+                                                <p:ajax event="valueChange"
+                                                        listener="#{asignacionJSFMB.consultarServiciosPasoII()}"  
+                                                        process="@this"
+                                                        update="tabView_id:frm_tab_ii:dt_paso_II,
+                                                        tabView_id:frm_tab_ii:dt_paso_II_v"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-6">
+
+                                            <p:commandButton  
+                                                id="btnEnlace"
+                                                class="cssWhite OrangeButton" 
+                                                update="msgs,tabView_id:frm_tab_ii:dt_paso_II,
+                                                tabView_id:frm_tab_ii:dt_paso_II_v,
+                                                tabView_id:frm_tab_ii:id_resumen,
+                                                frm_resumen:id_resumen"
+                                                process="@this"
+                                                icon="fa fa-puzzle-piece"
+                                                value="Enlazar"
+                                                action="#{asignacionJSFMB.enlazar()}"
+                                                title="Enlazar servicios a vehículos" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="ui-fluid">
+                                <div class="ui-g">
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                        <p:dataTable id="dt_paso_II"
+                                                     scrollHeight="600"
+                                                     scrollable="true"
+                                                     filterDelay="1000"
+                                                     selectionMode="single"
+                                                     var="itemII"
+                                                     paginator="true"
+                                                     paginatorPosition="top"
+                                                     rows="50"
+                                                     rowsPerPageTemplate="50,100,200,500"
+                                                     widgetVar="cellIzq"
+                                                     rowIndexVar="numII"
+                                                     rowKey="#{itemII.prgVehicleStatus.servbus}"
+                                                     editable="true" editMode="cell"
+                                                     value="#{asignacionJSFMB.listaPasoII}"
+                                                     emptyMessage="No hay vehículos registrados">
+                                            <f:facet name="header" >
+                                                #{asignacionJSFMB.listaPasoII.size()} servicios conminezan en este patio.
+                                            </f:facet>
+                                            <p:ajax event="cellEdit" listener="#{asignacionJSFMB.onCellEdit}" update="msgs,
+                                                    tabView_id:frm_tab_ii:dt_paso_II,
+                                                    tabView_id:frm_tab_ii:dt_paso_II_v,
+                                                    tabView_id:frm_tab_ii:id_resumen,frm_resumen:id_resumen" />
+
+
+
+                                            <p:column headerText="Servbus" 
+                                                      width="20%"
+                                                      sortBy="#{itemII.prgVehicleStatus.servbus}"
+                                                      filterBy="#{itemII.mttoAsig.servbus}"
+                                                      filterMatchMode="contains">
+                                                <h:outputText value="#{itemII.mttoAsig.servbus}"/>
+                                            </p:column>
+                                            <p:column headerText="Tarea" 
+                                                      width="27%">
+                                                <div class="ui-fluid">
+                                                    <div class="ui-g">
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 0px;">
+                                                            <h:outputText value="#{itemII.mttoAsig.idMttoTarea.nombreMttoTarea}"/>
+                                                        </div>
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-6" style="padding: 0px;">
+                                                            <p:outputLabel style="color: red;" value="#{itemII.mttoAsig.timeOrigin}"/>
+                                                        </div>
+                                                        <div class="ui-g-12 ui-md-12 ui-lg-6" style="padding: 0px;">
+                                                            <p:outputLabel style="color: red;" value="#{itemII.mttoAsig.timeDestiny}"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </p:column>
+                                            <p:column headerText="Patio" width="25%" >
+                                                <h:outputText value="#{itemII.prgVehicleStatus.idFromDepot.name}"/>
+                                            </p:column>
+
+                                            <p:column headerText="Distancia (KMts)"
+                                                      sortBy="#{itemII.prgVehicleStatus.productionDistance}"
+                                                      width="12%">
+                                                <h:outputText style="font-size: 19px" 
+                                                              value="#{itemII.prgVehicleStatus.productionDistance/1000}">
+                                                    <f:convertNumber pattern="#0" />
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column width="15%" headerText="Vehículo"
+                                                      sortBy="#{itemII.mttoAsig.idVehiculo.codigo}"
+                                                      filterBy="#{itemII.mttoAsig.idVehiculo.codigo}"
+                                                      filterMatchMode="contains">
+                                                <p:cellEditor>
+
+                                                    <f:facet name="output">
+                                                        <h:outputText value="#{itemII.mttoAsig.idVehiculo.codigo}" />
+                                                    </f:facet>
+                                                    <f:facet name="input">
+                                                        <p:inputText id="itemIIid" 
+                                                                     placeholder="Código Vehículo"
+                                                                     value="#{itemII.mttoAsig.idVehiculo.codigo}" 
+                                                                     style="width:96%"/>
+                                                    </f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+
+                                        <p:dataTable id="dt_paso_II_v"
+                                                     scrollHeight="600"
+                                                     scrollable="true"
+                                                     filterDelay="1000"
+                                                     var="item"
+                                                     paginator="true"
+                                                     paginatorPosition="top"
+                                                     rows="50"
+                                                     rowsPerPageTemplate="50,100,200,500"
+                                                     widgetVar="cellDer"
+                                                     rowIndexVar="num"
+                                                     rowStyleClass="text-center"
+                                                     rowKey="#{item.idVehiculo.idVehiculo}"
+                                                     value="#{asignacionJSFMB.listVehiculosKmPatio}"
+                                                     emptyMessage="No hay vehículos registrados">
+                                            <f:facet name="header" >
+                                                #{asignacionJSFMB.listVehiculosKmPatio.size()} vehículos en este patio.
+                                            </f:facet>
+                                            <p:column headerText="Vehículo" 
+                                                      width="33%"
+                                                      sortBy="#{item.idVehiculo.codigo}"
+                                                      filterBy="#{item.idVehiculo.codigo}"
+                                                      filterMatchMode="contains">
+                                                <h:outputText value="#{item.idVehiculo.codigo}"/>
+                                            </p:column>
+
+                                            <p:column headerText="Patio" width="33%">
+                                                <h:outputText value="#{item.patio.name}"/>
+                                            </p:column>
+                                            <p:column headerText="Distancia(KMts)" width="33%"
+                                                      sortBy="#{item.kmPorRecorrer}"
+                                                      filterBy="#{item.kmPorRecorrer}">
+                                                <h:outputText value="#{item.kmPorRecorrer}">
+                                                    <f:convertNumber pattern="#0" />
+                                                </h:outputText>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+
+                    </p:tab>
+
+                    <p:tab id="paso_x_iii" title="Pre-Asignación">
+                        <h:form id="frm_tab_iii">
+                            <div class="ui-fluid">
+                                <div class="ui-g">
+
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                        <p:dataTable id="dtpaso_iii"
+                                                     paginator="true"
+                                                     widgetVar="wvpaso_iii"
+                                                     rows="50"
+                                                     scrollHeight="600"
+                                                     scrollable="true"
+                                                     selectionMode="single"
+                                                     rowIndexVar="numIII"
+                                                     rowKey="#{serv.mttoAsig.servbus==null ? numIII:serv.mttoAsig.servbus}"
+                                                     filterDelay="1000"
+                                                     paginatorPosition="top"
+                                                     rowsPerPageTemplate="50,100,200,500"
+                                                     var="serv"
+                                                     editable="true" editMode="cell"
+                                                     rowStyleClass="text-center"
+                                                     value="#{asignacionJSFMB.listaPasoIII}"
+                                                     emptyMessage="No hay vehículos registrados">
+                                            <p:ajax event="cellEdit" 
+                                                    process="tabView_id:frm_tab_iii:dtpaso_iii"
+                                                    listener="#{asignacionJSFMB.onCellEditPasoIII}" 
+                                                    oncomplete="PF('wvpaso_iii_v').clearFilters();"
+                                                    update="msgs,
+                                                    tabView_id:frm_tab_iii:dtpaso_iii,
+                                                    frm_resumen:id_resumen" />
+                                            <f:facet name="footer" >
+                                                <h:commandLink >
+                                                    <img src="../resources/img/excel.png" title="Exportar a Excel" 
+                                                         class="iconexporter" alt="Exportar a Excel"></img>
+                                                    <p:dataExporter type="xlsx" target="dtpaso_iii"
+                                                                    fileName="Asignación "/>
+                                                </h:commandLink>
+                                            </f:facet>
+                                            <p:column headerText="Fecha" visible="false">
+                                                <h:outputText value="#{serv.mttoAsig.fecha}">
+                                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column width="25%" headerText="Vehículo" 
+                                                      sortBy="#{serv.mttoAsig.idVehiculo.codigo}"
+                                                      filterBy="#{serv.mttoAsig.idVehiculo.codigo}"
+                                                      filterMatchMode="contains">
+                                                <p:cellEditor>
+                                                    <f:facet name="output">
+                                                        <h:outputText value="#{serv.mttoAsig.idVehiculo.codigo}" />
+                                                    </f:facet>
+                                                    <f:facet name="input">
+                                                        <p:inputText id="itemIIid" 
+                                                                     placeholder="Código Vehículo"
+                                                                     rendered="#{serv.mttoAsig.servbus!=null}"
+                                                                     value="#{serv.mttoAsig.idVehiculo.codigo}" 
+                                                                     style="width:96%"/>
+                                                    </f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+                                            <p:column headerText="Servbus"
+                                                      width="25%"
+                                                      sortBy="#{serv.mttoAsig.servbus==null ?
+                                                                serv.mttoAsig.idMttoTarea.nombreMttoTarea:serv.mttoAsig.servbus}"
+                                                      filterBy="#{serv.mttoAsig.servbus==null ?
+                                                                  serv.mttoAsig.idMttoTarea.nombreMttoTarea:serv.mttoAsig.servbus}"
+                                                      filterMatchMode="contains">
+                                                <h:outputText value="#{serv.mttoAsig.servbus==null ?
+                                                                       serv.mttoAsig.idMttoTarea.nombreMttoTarea:serv.mttoAsig.servbus}"/>
+                                            </p:column>
+
+                                            <p:column exportable="false" width="25%" 
+                                                      headerText="Distancia de Producción">
+                                                <h:outputText value="#{serv.prgVehicleStatus.productionDistance/1000}">
+                                                    <f:convertNumber pattern="#0" />
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column headerText="Inicia"
+                                                      exportable="true"
+                                                      visible="false">
+                                                <h:outputText value="#{asignacionJSFMB.patio(serv.prgVehicleStatus.idFromDepot)}" />
+                                            </p:column>
+                                            <p:column headerText="Termina"
+                                                      exportable="true"
+                                                      visible="false">
+                                                <h:outputText value="#{asignacionJSFMB.patio(serv.prgVehicleStatus.idToDepot)}" />
+                                            </p:column>
+                                            <p:column headerText="Entra" visible="false" exportable="true">
+                                                <h:outputLabel  value="#{serv.mttoAsig.timeOrigin}"/>
+                                            </p:column>
+                                            <p:column headerText="Sale" visible="false" exportable="true">
+                                                <h:outputLabel value="#{serv.mttoAsig.timeDestiny}"/>
+                                            </p:column>
+                                            <p:column headerText="Inicia"
+                                                      exportable="false"
+                                                      width="25%"
+                                                      filterBy="#{asignacionJSFMB.patio(serv.prgVehicleStatus.idFromDepot)}" 
+                                                      filterMatchMode="exact">
+                                                <f:facet name="filter">
+                                                    <p:selectOneMenu onchange="PF('wvpaso_iii').filter()" 
+                                                                     styleClass="custom-filter" 
+                                                                     filter="true" 
+                                                                     filterMatchMode="contains" 
+                                                                     style="width: auto" title="Seleccione Uno..">
+                                                        <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.."/>
+                                                        <f:selectItems value="#{asignacionJSFMB.patiosFromDepot_iii()}"/>
+                                                    </p:selectOneMenu>
+                                                </f:facet>
+                                                <h:outputText value="#{asignacionJSFMB.patio(serv.prgVehicleStatus.idFromDepot)}" />
+                                            </p:column>
+                                            <p:column headerText="Termina"
+                                                      exportable="false"
+                                                      width="25%"
+                                                      filterBy="#{asignacionJSFMB.patio(serv.prgVehicleStatus.idToDepot)}" 
+                                                      filterMatchMode="exact">
+                                                <f:facet name="filter">
+                                                    <p:selectOneMenu onchange="PF('wvpaso_iii').filter()" 
+                                                                     styleClass="custom-filter" 
+                                                                     filter="true" 
+                                                                     filterMatchMode="contains" 
+                                                                     style="width: auto" title="Seleccione Uno..">
+                                                        <f:selectItem itemLabel="-" itemDescription="Seleccione Uno.."/>
+                                                        <f:selectItems value="#{asignacionJSFMB.patiosToDepot_iii()}"/>
+                                                    </p:selectOneMenu>
+                                                </f:facet>
+                                                <h:outputText value="#{asignacionJSFMB.patio(serv.prgVehicleStatus.idToDepot)}" />
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                        <p:dataTable id="dtpaso_iii_v"
+                                                     scrollHeight="600"
+                                                     scrollable="true"
+                                                     filterDelay="1000"
+                                                     var="item"
+                                                     paginator="true"
+                                                     paginatorPosition="top"
+                                                     rows="50"
+                                                     rowsPerPageTemplate="50,100,200,500"
+                                                     widgetVar="wvpaso_iii_v"
+                                                     rowIndexVar="num"
+                                                     rowStyleClass="text-center"
+                                                     rowKey="#{item.idVehiculo.idVehiculo}"
+                                                     value="#{asignacionJSFMB.listVehiculosKmPatioPasoIII}"
+                                                     emptyMessage="No hay vehículos registrados">
+                                            <f:facet name="header" >
+                                                #{asignacionJSFMB.listVehiculosKmPatioPasoIII.size()} vehículos en este patio.
+                                            </f:facet>
+                                            <p:column headerText="Vehículo" 
+                                                      width="33%"
+                                                      sortBy="#{item.idVehiculo.codigo}"
+                                                      filterBy="#{item.idVehiculo.codigo}"
+                                                      filterMatchMode="contains">
+                                                <h:outputText value="#{item.idVehiculo.codigo}"/>
+                                            </p:column>
+
+                                            <p:column headerText="Patio" width="33%">
+                                                <h:outputText value="#{item.patio.name}"/>
+                                            </p:column>
+                                            <p:column headerText="Distancia(KMts)" width="33%">
+                                                <h:outputText value="#{item.kmPorRecorrer}">
+                                                    <f:convertNumber pattern="#0" />
+                                                </h:outputText>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </p:panel>
+    </ui:define>
+</ui:composition>

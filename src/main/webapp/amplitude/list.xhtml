@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="head">
+        <style>
+            .ui-datatable table tbody tr td {
+                color: #165785;
+                border: solid 1px #E5EBF0;
+                -webkit-transition: all 0.2s ease;
+                -moz-transition: all 0.2s ease;
+                -ms-transition: all 0.2s ease;
+                -o-transition: all 0.2s ease;
+                transition: all 0.2s ease;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .text-left {
+                text-align: left;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="formLiqjornada">
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Reporte Amplitude
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="serconlist_id" 
+                                            listener="#{amplitudeJSFMB.cargarDatos()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:dataTable id="serconlist_id" 
+                             reflow="true"
+                             value="#{amplitudeJSFMB.listPrgSercon}" 
+                             var="item"
+                             rowKey="#{amplitudeJSFMB.listPrgSercon.get(item)}"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             scrollable="true"
+                             scrollHeight="600"
+                             filterDelay="1700"
+                             rowStyleClass="text-center"
+                             rowIndexVar="index"
+                             rows="50"
+                             widgetVar="dtserconlistWV"
+                             rowsPerPageTemplate="50,100,200,500">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="serconlist_id" fileName="Amplitud"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:outputLabel value="Desde: " class="cssWhite" for="desde"></p:outputLabel>
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta desde: " 
+                                        value="#{amplitudeJSFMB.fechaDesde}"
+                                        pattern="yyyy-MM-dd"
+                                        locale="es">
+                                <p:ajax event="dateSelect" listener="#{amplitudeJSFMB.cargarDatos()}" update="serconlist_id,hasta"></p:ajax>
+                            </p:calendar>
+                            <p:spacer width="10"/>
+
+                            <p:outputLabel value="Hasta: " class="cssWhite" for="hasta"></p:outputLabel>
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta hasta: " 
+                                        value="#{amplitudeJSFMB.fechaHasta}"
+                                        pattern="yyyy-MM-dd"
+                                        locale="es">
+                                <p:ajax event="dateSelect" listener="#{amplitudeJSFMB.cargarDatos()}" update="serconlist_id"></p:ajax>
+                            </p:calendar>
+
+                            <p:spacer width="10"/>
+
+                            <p:commandButton id="toggler_id" type="button" 
+                                             title="Columnas"
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="serconlist_id" trigger="toggler_id" />
+
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha"
+                              style="width: 7%"
+                              >
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.codigo_tm}"
+                              filterMatchMode="contains"
+                              headerText="Código"
+                              style="width: 7%">
+                        <h:outputText value="#{item.codigo_tm}" class="cssBlack"/>
+                    </p:column>
+                    <p:column headerText="Cédula">
+                        <h:outputText value="#{item.identificacion}"/>
+                    </p:column>
+                    <p:column headerText="Operador" styleClass="text-left"
+                              filterBy="#{item.nombres.concat(' ').concat(item.apellidos)}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.nombres.concat(' ').concat(item.apellidos)}"/>
+                    </p:column>
+                    <p:column headerText="Amplitud">
+                        <h:outputText value="#{item.amplitude}"/>
+                    </p:column>
+                    <p:column headerText="Nro de veces">
+                        <h:outputText value="#{item.veces}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

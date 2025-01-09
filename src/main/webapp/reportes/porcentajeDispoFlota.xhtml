@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel >
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Porcentaje Disponibilida Flota."/>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Una unidad funcional" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax global="false"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="form_rpt_porcent_dispo_flota">
+                <p:dataTable id="db_porcent_dispo_flota_id" 
+                             widgetVar="wlVdb_porcent_dispo_flota_id"
+                             var="item" 
+                             paginator="true"
+                             filterDelay="700"
+                             emptyMessage="No existen registros"
+                             tableStyle="table-layout:auto"
+                             rows="20"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             rowStyleClass="text-center"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             value="#{porcentajeDispoBean.list}">
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                            <p:calendar id="fecha_desde" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{porcentajeDispoBean.desde}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:calendar id="fecha_hasta" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{porcentajeDispoBean.hasta}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:inputMask id="hora_corte"
+                                         mask="99:99:99"
+                                         style="width: 90px"
+                                         value="#{porcentajeDispoBean.horaCorte}"
+                                         required="true"
+                                         requiredMessage="Hora corte es requerido">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                            </p:inputMask>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Consultar"
+                                actionListener="#{porcentajeDispoBean.consultar()}"
+                                class="cssWhite"
+                                update="msgs,form_rpt_porcent_dispo_flota:db_porcent_dispo_flota_id"/>   
+                        </div>
+                    </f:facet>
+                    <p:column headerText="FECHA" width="15%"  style="text-align: center">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="UNIDAD FUNCIONAL"
+                              sortable="true"
+                              rendered="#{uniFuncSessionBean.filtradoUF}"
+                              class="TexAlCenter"
+                              sortBy="#{item.nombreUf}">
+                        <h:outputText value="#{item.nombreUf}" />
+                    </p:column>
+                    <p:column headerText="TIPO DÍA"  style="text-align: center">
+                        <h:outputText value="#{porcentajeDispoBean.getTipoDia(item.fecha)}" />
+                    </p:column>
+                    <p:column headerText="% DISPONIBILIDAD"
+                              sortable="true"
+                              style="text-align: center"
+                              sortBy="#{item.porcentajeDispo}">
+                        <h:outputText value="#{item.porcentajeDispo}" />
+                    </p:column>
+                    <p:column headerText="TIPOLOGÍA"  style="text-align: center">
+                        <h:outputText value="#{item.nombreTipoVehiculo}" />
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{porcentajeDispoBean.list.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="db_porcent_dispo_flota_id" 
+                                                fileName="Porcentaje de diponibilidad de flota"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

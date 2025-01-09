@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel > 
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Senior Grupos"/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-5 ui-lg-4 Padding0">
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 autoWidth="true"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax process="@this"
+                                            event="change"
+                                            listener="#{pmGrupJSFMB.consultar()}"
+                                            update="formTablaPmGrupos:tblOPkM"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="formTablaPmGrupos" >
+                <p:dataTable id="tblOPkM" var="pmGrupoVar"  editable="true" 
+                             value="#{pmGrupJSFMB.listPmGrup}" rows="15"
+                             paginator="true"
+                             widgetVar="tblOPkMWVNew"
+                             tableStyle="table-layout:auto"
+                             rowIndexVar="nroFila"
+                             filterDelay="1000"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15,25">
+                    <f:facet name="header">
+                        <f:facet name="footer">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                                <p:dataExporter type="xlsx" target="tblOPkM" fileName="PM Grupos"/>
+                            </h:commandLink>
+                        </f:facet>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="btnAdd"
+                                             value="Nuevo"
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             process="@this"
+                                             update="frmPmgrupoCreate,msgs"
+                                             actionListener="#{pmGrupJSFMB.openDialog()}">
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" >
+                        <h:outputText value="#{nroFila+1}"/>
+                    </p:column>
+                    <p:column headerText="Nombre" filterBy="#{pmGrupoVar.nombreGrupo}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{pmGrupoVar.nombreGrupo}" />
+                    </p:column>
+                    <p:column headerText="Código Senior" visible="false">
+                        <h:outputText  value="#{pmGrupoVar.idEmpleado.codigoTm}"/>
+                    </p:column>
+                    <p:column headerText="Nombre Senior" visible="false">
+                        <h:outputText  value="#{pmGrupoVar.idEmpleado.nombres} #{pmGrupoVar.idEmpleado.apellidos}"/>
+                    </p:column>
+                    <p:column filterBy="#{pmGrupoVar.idEmpleado.codigoTm} #{pmGrupoVar.idEmpleado.nombres} #{pmGrupoVar.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              exportable="false"
+                              headerText="Senior">
+                        <h:outputText  value="#{pmGrupoVar.idEmpleado.codigoTm}-#{pmGrupoVar.idEmpleado.nombres} #{pmGrupoVar.idEmpleado.apellidos}"/>
+                    </p:column>
+                    <p:column filterBy="#{pmGrupoVar.descripcion}"
+                              filterMatchMode="contains"
+                              headerText="Descripción">
+                        <h:outputText value="#{pmGrupoVar.descripcion}"/>
+                    </p:column>
+                    <p:column filterBy="#{pmGrupJSFMB.nOpe(pmGrupoVar)}"
+                              filterMatchMode="contains"
+                              headerText="# Operadores">
+                        <h:outputText value="#{pmGrupJSFMB.nOpe(pmGrupoVar)}"/>
+                    </p:column>
+                    <p:column filterBy="#{pmGrupoVar.idGopUnidadFuncional.nombre}"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <div class="cortar_header">
+                                <h:outputText value="Unidad Funcional" />
+                            </div>
+                        </f:facet>
+                        <h:outputText value="#{pmGrupoVar.idGopUnidadFuncional.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Opciones" exportable="false" >
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         update="frmPmgrupoCreate,msgs"
+                                         process="@this"
+                                         actionListener="#{pmGrupJSFMB.editar(pmGrupoVar)}"
+                                         title="Modificar" 
+                                         disabled="#{pmGrupoVar.estadoReg==1}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/pmgrupoCreate.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+
+

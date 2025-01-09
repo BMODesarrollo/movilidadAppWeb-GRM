@@ -1,0 +1,342 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:panel id="info-master" 
+             style="border: none;margin: 0;padding: 0" 
+             rendered="#{accImprimirInformeJSF.accInformeMaster != null}">
+        <div class="ui-g Padding0">
+            <p:fieldset legend="Información del Evento - Informe Operador Máster" style="width: 100%">
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="Evento" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="Fecha del Evento" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idAccidente.fechaAcc}" >
+                        <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss" />
+                    </h:outputText>
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="Vehículo" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idAccidente.idVehiculo.codigo}" />
+                </div>
+                <hr/>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="Lugar" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.lugar}" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="Estación Cerca" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.idPrgStoppoint.name}" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="Hora del evento" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.horaEvento}" title="Hora:Minutos" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="Tiempo de Reacción" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.tiempoReaccion}" title="Hora:Minutos"/>
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="Hora Fin del Evento" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.horaFinEvento}" title="Hora:Minutos"/>
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <p:commandButton id="btn-mast-lugar"
+                                     icon="fa fa-share"
+                                     class="cssWhite OrangeButton"
+                                     actionListener="#{migrarInformeMaestroJSF.migrarLugarMaster()}"
+                                     process="@this"
+                                     onclick="changeColor(this)"
+                                     update=":list-accidente:msg" />
+                    <p:tooltip id="tBtMastLug" for="btn-mast-lugar" value="Los datos de 'Lugar' se asociarán al accidente siempre y cuando &#10;este no cuente con estos aún." position="top"/>
+                </div>
+            </p:fieldset>
+        </div>
+        <div class="EmptyBox5" />
+        <div class="ui-g Padding0">
+            <p:carousel id="table-master-veh"
+                        headerText="Vehículos y Conductores Involucrados" 
+                        var="vehCond" 
+                        value="#{accImprimirInformeJSF.accInformeMasterVehCondList}" 
+                        rendered="#{accImprimirInformeJSF.accInformeMasterVehCondList.size() > 0}"
+                        itemStyle="height:100%" 
+                        numVisible="1" 
+                        easing="easeOutBounce" 
+                        style="width:100%" 
+                        circular="true">
+                <div class="ui-g Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                        <h:outputText class="cssBlack" value="Conductor" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Nombres" class="cssBlack"/>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.nombres} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Código" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.codigoTm != null ? vehCond.codigoTm : 'NO APLICA'} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Identificación" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.identificacion} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Teléfono(s)" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.telefono} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Sexo" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.sexo} " />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                        <h:outputText class="cssBlack" value="Vehículo" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Placa" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.placa} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Color" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.color} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Modelo" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.modelo} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Inmovilizado" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.inmovilizado != null ? (vehCond.inmovilizado == 1 ? 'Sí' : 'NO') : 'NA'}" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Codigo de Hipotesis" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vehCond.codigoHipotesis} " />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <h:outputText class="cssBlack" value="Hipotesis" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                        <h:outputText value="#{vehCond.hipotesis} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <p:commandButton id="btn-mast-veh"
+                                         icon="fa fa-share"
+                                         class="cssWhite OrangeButton"
+                                         actionListener="#{migrarInformeMaestroJSF.migrarMasterVehCond(vehCond)}"
+                                         process="@this"
+                                         onclick="changeColor(this)"
+                                         update=":list-accidente:msg" />
+                        <p:tooltip id="tBtMastVeh" for="btn-mast-veh" value="Los datos de 'Vehículo y Conductor' se asociarán al accidente siempre y cuando &#10;este no cuente con estos aún." position="top"/>
+                    </div>
+                </div>
+            </p:carousel>          
+        </div>
+        <div class="EmptyBox5" />
+        <div class="ui-g Padding0">
+            <p:carousel id="table-master-vict"
+                        headerText="Víctimas" 
+                        var="vict" 
+                        value="#{accImprimirInformeJSF.accInformeMasterVicList}" 
+                        rendered="#{accImprimirInformeJSF.accInformeMasterVicList.size() > 0}"
+                        itemStyle="height:100%" 
+                        numVisible="1" 
+                        easing="easeOutBounce" 
+                        style="width:100%" 
+                        circular="true">
+                <div class="ui-g Padding0">
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Nombres" class="cssBlack"/>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.nombres} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.idTipoIdentificacion != null ? vict.idTipoIdentificacion.nombre : 'Identificación'} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.nroDoc} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Fecha de Nacimiento" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.fechaNac}" >
+                            <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                        </h:outputText>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Sexo" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.sexo} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Dirección" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.direccion} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Ciudad" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.ciudad} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Teléfono(s)" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.telefono} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Tipo Víctima" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.idAccTipoVictima != null ? vict.idAccTipoVictima.tipo : 'NA'}" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Gravedad" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.gravedad != null ? (vict.gravedad == 1 ? 'Herido' : 'Muerto') : 'NA'}" class="cssBlack" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Eps" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{vict.eps} " />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12">
+                        <h:outputText class="cssBlack" value="Diagnóstico" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                        <h:outputText value="#{vict.diagnostico} " />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <p:commandButton id="btn-mast-vic"
+                                         icon="fa fa-share"
+                                         class="cssWhite OrangeButton"
+                                         actionListener="#{migrarInformeMaestroJSF.migrarMasterVictimas(vict)}"
+                                         process="@this"
+                                         onclick="changeColor(this)"
+                                         update=":list-accidente:msg" />
+                        <p:tooltip id="tBtMastVic" for="btn-mast-vic" value="Los datos de 'Víctimas' se asociarán al accidente siempre y cuando &#10;este no cuente con estos aún." position="top"/>
+                    </div>
+                </div>
+            </p:carousel>
+        </div>
+        <div class="EmptyBox5" />
+        <div class="ui-g Padding0">
+            <p:carousel id="table-master-test"
+                        headerText="Testigos" 
+                        var="test" 
+                        value="#{accImprimirInformeJSF.accInformeMasterTestigoList}" 
+                        rendered="#{accImprimirInformeJSF.accInformeMasterTestigoList.size() > 0}"
+                        itemStyle="height:100%" 
+                        numVisible="1" 
+                        easing="easeOutBounce" 
+                        style="width:100%" 
+                        circular="true">
+                <div class="ui-g Padding0">
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Nombres" class="cssBlack"/>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{test.nombres}" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Dirección" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{test.direccion}" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Identificación" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{test.identificacion}" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="Teléfono" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <h:outputText value="#{test.telefono}" />
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6">
+                        <p:commandButton id="btn-mast-test"
+                                         icon="fa fa-share"
+                                         class="cssWhite OrangeButton"
+                                         actionListener="#{migrarInformeMaestroJSF.migrarMasterTestigo(test)}"
+                                         process="@this"
+                                         onclick="changeColor(this)"
+                                         update=":list-accidente:msg" />
+                        <p:tooltip id="tBtMastTest" for="btn-mast-test" value="Los datos de 'Testigos' se asociarán al accidente siempre y cuando &#10;este no cuente con estos aún." position="top"/>
+                    </div>
+                </div>
+            </p:carousel>
+        </div>
+        <div class="EmptyBox5" />
+        <div class="ui-g">
+            <p:fieldset legend="Versiones" style="width: 100%">
+                <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center">
+                    <h:outputText class="cssBlack" value="Versión del Operador Máster" />
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.versionMaster}" />/
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: center;margin-top: 10px">
+                    <h:outputText class="cssBlack" value="Versión del Operador" />
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12" style="text-align: justify">
+                    <h:outputText value="#{accImprimirInformeJSF.accInformeMaster.versionOperador}" />
+                </div>
+                <div class="ui-g-6 ui-md-6 ui-lg-6">
+                    <h:outputLink id="leer2" value="#">
+                        <h:outputText value="Leer" class="cssBlack" />
+                    </h:outputLink>
+                    <p:tooltip id="toolTipFade2" for="leer2" value="El sistema no puede establecer una realación de estos datos en Maestro Accidentalidad, pero esta disponible para copiar y asociarlo al campo que usted crea conveniente" position="top"/>
+                </div>
+            </p:fieldset>
+        </div>
+    </p:panel>
+</ui:composition>

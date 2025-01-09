@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../../../public/template/template-aseo.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <script >
+            function ii() {
+
+            }
+        </script>
+        <style>
+            video {
+                border-radius: 2pc;
+                border: dashed #a99d9e 7px;
+                width: 100%;height: auto
+            }
+        </style>
+        <h:outputScript name="js/leerQr.js" library="sentinel-layout" />
+        <h:outputScript name="js/gestionQr.js" library="sentinel-layout" />
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Aseos Varios">
+            <h:form id="form_aseo">
+                <div class="ui-g">
+                    <p:dataTable id="dt_aseo_id" var="aseo" 
+                                 scrollable="true"
+                                 widgetVar="wlVdt_aseo_id"
+                                 scrollHeight="600"
+                                 disabledTextSelection="false"
+                                 reflow="true"
+                                 rows="10"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,50,100"
+                                 emptyMessage="No existen registros"
+                                 value="#{aseoJSFMB.listAseo}">
+
+                        <f:facet name="header">
+                            <div align="right" jsf:id="botones">
+                                <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                                <p:calendar id="fecha_desde" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{aseoJSFMB.fechaDesde}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect" update="dt_aseo_id" process="@this" listener="#{aseoJSFMB.consultar()}"/>
+                                </p:calendar>
+                                <p:calendar id="fecha_hasta" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{aseoJSFMB.fechaHasta}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect" update="dt_aseo_id" process="@this" listener="#{aseoJSFMB.consultar()}"/>
+                                </p:calendar>
+                                <p:commandButton
+                                    icon="fa fa-plus"
+                                    value="Nuevo"
+                                    actionListener="#{aseoJSFMB.nuevo()}"
+                                    class="cssWhite"
+                                    update="dt_aseo_id,aseo_dialog_form"/>   
+                            </div>
+                        </f:facet>
+
+
+                        <p:column headerText="Fecha Ini" styleClass="text-center">
+                            <h:outputText value="#{aseo.fechaIni}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha Fin" styleClass="text-center">
+                            <h:outputText value="#{aseo.fechaFin}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Estación" styleClass="text-word-wrap">
+                            <h:outputText value="#{aseo.aseoParamArea.idCableEstacion.nombre}" />
+                        </p:column>
+
+                        <p:column headerText="Responsable" styleClass="text-center">
+                            <h:outputText value="#{aseo.sstEmpresaVisitante.numeroDocumento} #{aseo.sstEmpresaVisitante.nombre} #{aseo.sstEmpresaVisitante.apellidos}" />
+                        </p:column>
+
+                        <p:column headerText="Tipo Aseo" styleClass="text-word-wrap">
+                            <h:outputText value="#{aseo.aseoTipo.nombre}" />
+                        </p:column>
+
+                        <p:column headerText="Area de actividad" styleClass="text-word-wrap">
+                            <h:outputText value="#{aseo.aseoParamArea.nombre}" />
+                        </p:column>
+                        <p:column headerText="usuario" styleClass="text-word-wrap">
+                            <h:outputText value="#{aseo.username}" />
+                        </p:column>
+
+                        <f:facet name="footer">
+                            En total existen #{aseoJSFMB.listAseo.size()} registros.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="dt_aseo_id" 
+                                                    fileName="Aseos"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/crearAseo.xhtml"/>
+    </ui:define>
+</ui:composition>

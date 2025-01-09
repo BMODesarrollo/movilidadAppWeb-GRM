@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="NovedadDocumentosListDlg" widgetVar="NovedadDocumentosListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de documentos"
+              class="mr1024_60 mr500_90"
+              closeOnEscape="true" responsive="true" position="center top"
+              >
+        <h:form id="frmNovedadDocumentosList">
+            <p:dataTable id="dtNovedadDocumentos" widgetVar="dtNovedadesDocumento" 
+                         var="documento" value="#{pqrMaestroDocBean.lstDocumentos}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         rowStyleClass="text-center"
+                         reflow="true"
+                         rowIndexVar="nroFila"
+                         emptyMessage="No existen documentos anexados a la novedad">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton actionListener="#{pqrMaestroDocBean.nuevo()}"
+                                         oncomplete="PF('novedadDocumentos').show();"
+                                         title="Agregar nuevo documento" 
+                                         icon="fa fa-plus"
+                                         class="cssWhite"
+                                         update=":frmNuevoDocumento,:modalDocumentos"
+                                         value="Nuevo documento">
+                            <p:resetInput target=":frmNuevoDocumento:panel" />
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+                <p:column headerText="#">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Creado" >
+                    <h:outputText value="#{documento.creado}" >
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Tipo Archivo">
+                    <h:outputText value="#{pqrMaestroDocBean.retornarTipoArchivo(documento.pathDocumento) }"/>
+                </p:column>
+                <p:column headerText="Documento cierre PQR" 
+                          styleClass="text-center">
+                    <h:outputText value="#{documento.tipoDocumento eq 0 ? 'NO':'SI'}" />
+                </p:column>
+                <p:column headerText="Archivo">
+                    <p:commandButton action="#{pqrMaestroDocBean.obtenerDocumento()}"
+                                     oncomplete="PF('DocumentoListDialog').show()" 
+                                     value="Abrir" update="frmDocumento,DocumentoListDlg">
+                        <f:setPropertyActionListener value="#{documento}" target="#{pqrMaestroDocBean.selected}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column headerText="Usuario">
+                    <h:outputText value="#{documento.usuario}"/>
+                </p:column>
+                <p:column headerText="Acciones">
+                    <p:commandButton action="#{pqrMaestroDocBean.editar()}"
+                                     icon="fa fa-pencil"
+                                     class="cssWhite GreenButton" 
+                                     title="Editar documento" 
+                                     update=":frmNuevoDocumento,:modalDocumentos,msgs">
+                        <f:setPropertyActionListener value="#{documento}" target="#{pqrMaestroDocBean.selected}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+    <ui:include src="Create.xhtml"/>
+    <ui:include src="ModalDocumento.xhtml"/>
+</ui:composition>

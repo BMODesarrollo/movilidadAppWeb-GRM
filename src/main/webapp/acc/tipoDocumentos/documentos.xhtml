@@ -1,0 +1,130 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="param-docs">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000" />
+            <p:panel header="Asignar documentos" id="panel-doc">
+                <h:panelGrid columns="1" style="width: 100%" id="param-doc">
+                    <h:outputText value="Tipo de Accidente" />
+                    <p:selectOneMenu id="t-eve" value="#{accidenteJSF.i_idAccNovTipDet}" required="true" requiredMessage="Tipo de evento es requrido" style="width: 50%">
+                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                        <f:selectItems value="#{accidenteJSF.listNovedadTipoDetalles}" 
+                                       var="listntd" 
+                                       itemLabel="#{listntd.tituloTipoNovedad}" 
+                                       itemDescription="#{listntd.descripcionTipoNovedad}"
+                                       itemValue="#{listntd.idNovedadTipoDetalle}" />
+                    </p:selectOneMenu>
+                    <h:outputText value="Tipo de Documento" />
+                    <p:selectOneMenu id="t-doc" value="#{accidenteJSF.i_idAccNovTipDet}" required="true" requiredMessage="Tipo de Documento es requrido" style="width: 50%">
+                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                        <f:selectItems value="#{accidenteJSF.listNovedadTipoDetalles}" 
+                                       var="listntd" 
+                                       itemLabel="#{listntd.tituloTipoNovedad}" 
+                                       itemDescription="#{listntd.descripcionTipoNovedad}"
+                                       itemValue="#{listntd.idNovedadTipoDetalle}" />
+                    </p:selectOneMenu>
+                    <p:commandButton id="btn-carga"
+                                     value="Cargar"
+                                     icon="fa fa-upload"
+                                     class="cssWhite OrangeButton"
+                                     type="button"
+                                     onclick="PF('docDlg').show();" />
+                    <p:spacer/>
+                    <h:panelGrid columns="2">
+                        <p:commandButton id="btn-guardar"
+                                         value="Guardar"
+                                         process="@this,@form"
+                                         update="@form"
+                                         rendered="true"
+                                         icon="fa fa-check"
+                                         class="cssWhite GreenButton" />
+                        <p:commandButton id="btn-actualizar"
+                                         value="Actualizar"
+                                         process="@this,@form"
+                                         update="@form"
+                                         rendered="false"
+                                         icon="fa fa-check"
+                                         class="cssWhite GreenButton" />
+                        <p:commandButton id="btn-cancel"
+                                         value="Cancelar"
+                                         process="@this"
+                                         update="@form"
+                                         icon="fa fa-times"
+                                         class="cssWhite" />
+                    </h:panelGrid>
+                    <p:spacer/>
+                </h:panelGrid>
+                <p:separator>
+                    <div style="float: right">
+                        <p:commandButton id="btn-nuevo"
+                                         value="Nuevo"
+                                         icon="fa fa-plus"
+                                         class="cssWhite"
+                                         update="@form"
+                                         process="@this" />
+                    </div>
+                </p:separator>
+                <p:dataTable id="tabla"
+                             value="#"
+                             style="margin-top: 40px"
+                             var="item"
+                             rowKey="#"
+                             rowIndexVar="indItem"
+                             reflow="true"
+                             emptyMessage="No existen registros"
+                             filterDelay="1500"
+                             widgetVar="tableVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100,150"
+                             selectionMode="single">
+
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText value="#{indItem + 1}"/>
+                    </p:column>
+                    <p:column headerText="Tipo De Accidente">
+                        <h:outputText value="" />
+                    </p:column>
+                    <p:column headerText="Tipo de Documento">
+                        <h:outputText value="" />
+                    </p:column>
+                    <p:column headerText="Acciones" style="width: 200px">
+                        <p:commandButton id="view"
+                                         icon="fa fa-eye"
+                                         class="cssWhite"
+                                         title="Visualizar Documento"
+                                         oncomplete="PF('vistaDocDlg').show();"
+                                         process="@this">
+                        </p:commandButton>
+                        <p:commandButton id="descargar-doc" 
+                                         title="Descargar Documento" 
+                                         ajax="false"
+                                         class="cssWhite GreenButton"
+                                         icon="fa fa-arrow-circle-o-down">
+                        </p:commandButton> 
+                        <p:commandButton id="editar"
+                                         title="Editar de la lista"
+                                         process="@this"
+                                         update="@form"
+                                         class="cssWhite OrangeButton"
+                                         icon="fa fa-pencil" />
+                        <p:commandButton id="eliminar"
+                                         title="Eliminar de la lista"
+                                         process="@this"
+                                         class="cssWhite RedButton"
+                                         icon="fa fa-trash" >
+                            <p:confirm header="Confirmación" message="Seguro de quitar este registro de documentos?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/uploadFileDoc.xhtml" />
+        <ui:include src="modal/vistaDoc.xhtml" />
+    </ui:define>
+</ui:composition>

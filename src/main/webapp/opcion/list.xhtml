@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:growl id="messages" showDetail="true" />
+        <h:form id="formOpcion">
+            <p:dataTable id="tblPar" var="opcion"  editable="true" 
+                         value="#{opcionJSFMB.listOpcion}" rows="20"
+                         paginator="true"
+                         filterDelay="1000"
+                         rowIndexVar="nroFila"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                         {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="20,30,40">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton id="btnNuevo"
+                                         icon="fa fa-plus" style="color: white"
+                                         value="Nuevo"
+                                         action="#{opcionJSFMB.prepareNewOpcion()}"
+                                         class="cssWhite"
+                                         update="frmCreateOpcion"
+                                         oncomplete="PF('wvOpcionDialog').show()"
+                                         process="@this">
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+                <p:column headerText="#" width="5%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column filterBy="#{opcion.descripcion}"
+                          filterMatchMode="contains"
+                          headerText="Menú" >
+                    <h:outputText value="#{opcion.descripcion}"/>
+                </p:column>
+                <p:column filterBy="#{opcion.nameop}"
+                          filterMatchMode="contains"
+                          headerText="Opción" >
+                    <h:outputText value="#{opcion.nameop}"/>
+                </p:column>
+                <p:column filterBy="#{opcion.recurso}"
+                          width="30%"
+                          filterMatchMode="contains"
+                          headerText="Recurso" >
+                    <h:outputText value="#{opcion.recurso}"/>
+                </p:column>
+                <p:column filterBy="#{opcion.iconChild}"
+                          filterMatchMode="contains"
+                          headerText="Icon Child" >
+                    <h:outputText value="#{opcion.iconChild}"/>
+                </p:column>
+                <p:column filterBy="#{opcion.iconParent}"
+                          filterMatchMode="contains"
+                          headerText="Icon Parent" >
+                    <h:outputText value="#{opcion.iconParent}"/>
+                </p:column>
+                <p:column headerText="Opciones" exportable="false" width="7%" style="text-align: center">
+                    <p:commandButton icon="fa fa-pencil" 
+                                     class="GreenButton cssWhite"
+                                     action="#{opcionJSFMB.prepareEditOpcion(opcion)}" 
+                                     title="Modificar"
+                                     update="frmCreateOpcion"
+                                     oncomplete="PF('wvOpcionDialog').show()"
+                                     process="@this"/>
+                </p:column>
+                <f:facet name="footer">
+
+                    <h:commandLink>
+                        <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                             alt="excel" style="width: 24px;height: 24px"/>
+                        <p:dataExporter type="xlsx" target="tblPar" fileName="Opciones" />
+                    </h:commandLink>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>

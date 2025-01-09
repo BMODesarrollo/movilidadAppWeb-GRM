@@ -1,0 +1,126 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="form-accBorrador">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Solicitudes Caso Accidentalidad - Eliminar de Maestro de Accidentalidad">
+                <p:dataTable id="datalist" 
+                             value="#{accidenteBorradorJSF.listAccidenteBorrador}"
+                             var="item"
+                             paginator="true"
+                             rowKey="#{rVar + 1}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             filterDelay="2000"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             emptyMessage="No existen registros"
+                             scrollable="true"
+                             scrollHeight="1000"
+                             >
+                    <p:column headerText="#" style="width: 30px">
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Fecha Accidente">
+                        <h:outputText value="#{item.idAccidente.fechaAcc}">
+                            <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Evento" 
+                              filterBy="#{item.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idAccidente.idNovedadTipoDetalle.tituloTipoNovedad}"/>
+                    </p:column>
+                    <p:column headerText="Fecha de Solicitud">
+                        <h:outputText value="#{item.fechaSolicitado}">
+                            <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Solicitado Por"
+                              filterBy="#{item.userSolicitado}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.userSolicitado}"/>
+                    </p:column>
+                    <p:column headerText="Descripción Usuario Solicitante">
+                        <h:outputText value="#{item.descripcionSolicitado}"/>
+                    </p:column>
+                    <p:column headerText="Fecha de Aprobación">
+                        <h:outputText value="#{item.fechaAprobado}">
+                            <f:convertDateTime pattern="yyyy-MMMM-dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Aprobado Por"
+                              filterBy="#{item.userAprobado}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.userAprobado}"/>
+                    </p:column>
+                    <p:column headerText="Descripción Usuario Aprobado Por">
+                        <h:outputText value="#{item.descripcionAprobado}"/>
+                    </p:column>
+                    <p:column headerText="Acciones" exportable="false">
+                        <p:commandButton id="bnt-apro"
+                                         value="Aprobar"
+                                         class="cssWhite GreenButton"
+                                         icon="fa fa-check"
+                                         rendered="#{item.idAccidente.estadoReg != 3}"
+                                         actionListener="#{accidenteBorradorJSF.accidenteAprobado(item)}"
+                                         process="@this"
+                                         update=":form-aprobacion" />
+                        <h:outputText value="SOLICITUD APROBADA"  rendered="#{item.idAccidente.estadoReg == 3}" class="cssBlack" />
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:calendar id="fec-ini" 
+                                        value="#{accidenteBorradorJSF.fechaIni}" 
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        locale="es"
+                                        title="Fecha Inicio"/> -
+                            <p:calendar id="fec-fin" 
+                                        value="#{accidenteBorradorJSF.fechaFin}" 
+                                        pattern="yyyy-MM-dd"
+                                        locale="es"
+                                        navigator="true"
+                                        title="Fecha Fin"/>
+                            <p:spacer width="4" />
+                            <p:commandButton id="buscar"   
+                                             value="Buscar" 
+                                             actionListener="#{accidenteBorradorJSF.busquedaList()}" 
+                                             update="@form" 
+                                             title="La búsqueda se realiza por fecha del caso de accidentalidad"
+                                             icon="fa fa-search" 
+                                             process="@form"
+                                             class="cssWhite OrangeButton" />
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        UNA VEZ APROBADA LA SOLICITUD, EL CASO NO SE VISUALIZARÁ EN EL MAESTRO DE ACCIDENTALIDAD, NI SE PODRÁ REALIZAR INFORMES SOBRE ESTE.
+                        <div align="right">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="datalist" fileName="solicitud accidentalidad #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="datalist" fileName="solicitud accidentalidad #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="datalist" fileName="solicitud accidentalidad #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/NewSolicitud.xhtml"/>
+    </ui:define>
+</ui:composition>

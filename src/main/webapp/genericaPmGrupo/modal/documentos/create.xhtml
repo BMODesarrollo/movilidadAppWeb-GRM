@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="novedadDocumentos" id="modalDocumentos" modal="true" 
+              closeOnEscape="true"
+              header="Novedad Documento"
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              resizable="false" appendTo="@(body)" position="center,top">
+        <h:form id="frmNuevoDocumento">
+            <p:panel id="panel">
+                <p:messages id="messages" showDetail="true" closable="true"/>
+                <div class="ui-fluid" jsf:id="idBtnss">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="pGrid">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Tipo de documento:" for="tipo_documento"/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText placeholder="Tipo de documento"
+                                                 id="tipo_documento"
+                                                 value="#{genGruposNovMB.nombreNovedaTipoDocu}"
+                                                 required="true"
+                                                 requiredMessage="Debe seleccionar un tipo de documento"
+                                                 styleClass="readonly"
+                                                 readonly="#{not facesContext.postback or facesContext.renderResponse}" 
+                                                 onmouseover="return false;"/>
+                                    <div class="botonFloat">
+                                        <p:commandButton title="Seleccione tipo de documento"
+                                                         icon="fa fa-search"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         actionListener="#{genGruposNovMB.cargarTDocu()}"
+                                                         oncomplete="PF('NovedadTipoDocumentosListDialog').show()"
+                                                         update="frmNovedadTipoDocumentosList:dtNovedadDocumentos"
+                                                         process="@this">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <div align="center">
+                                <p:commandButton title="Cargar documento de la novedad"
+                                                 icon="fa fa-upload"
+                                                 value="Cargar Documentos"
+                                                 class="cssWhite OrangeButton"
+                                                 style="width: 40%"
+                                                 process="@this"
+                                                 update="frmAddFiles"
+                                                 oncomplete="PF('AddFilesListDialog').show()">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p:panel>
+            <p:remoteCommand name="g"
+                             process="@this"
+                             update="frmNovedadDocumentosList:dtNovedadDocumentos,msgs"
+                             action="#{genGruposNovMB.guardarNovedadDocumento()}"/>
+            <p:remoteCommand name="a"
+                             process="frmNovedadDocumentosList:dtNovedadDocumentos,@this"
+                             update="msgs"
+                             action="#{genGruposNovMB.actualizarNovedadDocumento()}"/>
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarAddD" 
+                             icon="fa fa-save" value="Guardar" 
+                             rendered="#{genGruposNovMB.selectedDocumento.idGenericaDocumento==null}"
+                             style="color: white" onclick="g()"/>
+            <p:commandButton id="btnActualizarAddD" 
+                             rendered="#{genGruposNovMB.selectedDocumento.idGenericaDocumento!=null}"
+                             icon="fa fa-save"  value="Actualizar" 
+                             style="color: white" onclick="a()"/>
+        </f:facet>
+    </p:dialog> 
+    <ui:include src="listaNovedadTipoDocumento.xhtml"/>
+    <ui:include src="addFile.xhtml"/>
+</ui:composition>

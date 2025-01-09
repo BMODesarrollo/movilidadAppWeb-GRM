@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <p:panel header="Tipos de documentos">
+            <h:form id="frmPrincipalVhclTipDocu">
+                <p:dataTable var="vehiculoTipoDocumento" value="#{vehiculoTipoDocumentoBean.lista}"
+                             id="dtTipo"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="10"
+                             tableStyle="table-layout:auto"
+                             filterDelay="1000"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,20"
+                             emptyMessage="No existen tipos de documento registrados">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton action="#{vehiculoTipoDocumentoBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo tipo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":frmNuevoTipo"
+                                             value="Nuevo">
+                                <p:resetInput target="frmNuevoTipo" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#" >
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Código" filterBy="#{vehiculoTipoDocumento.codigo}">
+                        <h:outputText value="#{vehiculoTipoDocumento.codigo}" />
+                    </p:column>
+                    <p:column headerText="Nombre" filterBy="#{vehiculoTipoDocumento.nombreTipoDocumento}">
+                        <h:outputText value="#{vehiculoTipoDocumento.nombreTipoDocumento}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="No tiene" rendered="#{empty(vehiculoTipoDocumento.descripcionTipoDocumento)}" />
+                        <h:outputText value="#{vehiculoTipoDocumento.descripcionTipoDocumento}" rendered="#{vehiculoTipoDocumento.descripcionTipoDocumento!=null}" />
+                    </p:column>
+                    <p:column headerText="Obligatorio"
+                              styleClass="#{vehiculoTipoDocumento.obligatorio gt 0 ? 'cssGreen': vehiculoTipoDocumento.obligatorio eq 0 ? 'cssRed' : ''}">
+                        <h:outputText value="Sí" rendered="#{vehiculoTipoDocumento.obligatorio == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{vehiculoTipoDocumento.obligatorio == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column headerText="Vencimiento"
+                              styleClass="#{vehiculoTipoDocumento.vencimiento gt 0 ? 'cssGreen': vehiculoTipoDocumento.vencimiento eq 0 ? 'cssRed' : ''}">
+                        <h:outputText value="Sí" rendered="#{vehiculoTipoDocumento.vencimiento == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{vehiculoTipoDocumento.vencimiento == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column headerText="Acción" >
+                        <p:commandButton icon="fa fa-pencil"
+                                         title="Editar registro"
+                                         class="GreenButton cssWhite"
+                                         action="#{vehiculoTipoDocumentoBean.editar()}"
+                                         update=":frmNuevoTipo:modal,:frmNuevoTipo:pGrid"
+                                         oncomplete="PF('mtipo').show();"
+                                         >
+                            <f:setPropertyActionListener target="#{vehiculoTipoDocumentoBean.selected}" value="#{vehiculoTipoDocumento}"/>
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-refresh"
+                                         title="Cambiar estado"
+                                         action="#{vehiculoTipoDocumentoBean.cambiarEstado()}"
+                                         update=":frmNuevoTipo:modal,:frmNuevoTipo:messages,dtTipo"
+                                         rendered="false">
+                            <f:setPropertyActionListener target="#{vehiculoTipoDocumentoBean.selected}" value="#{vehiculoTipoDocumento}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{vehiculoTipoDocumentoBean.lista.size()} tipos.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <h:form id="frmNuevoTipo">
+                <p:dialog widgetVar="mtipo" id="modal" modal="true" 
+                          position="center,top"
+                          class="mr1024_30 mr500_90"
+                          resizable="false"
+                          closeOnEscape="true" responsive="true">
+                    <c:if test="#{vehiculoTipoDocumentoBean.selected == null }">
+                        <f:facet name="header">
+                            Nuevo tipo de documento
+                        </f:facet>
+                    </c:if>
+                    <c:if test="#{vehiculoTipoDocumentoBean.selected != null }">
+                        <f:facet name="header">
+                            Editar tipo de documento: #{vehiculoTipoDocumentoBean.selected.nombreTipoDocumento.toUpperCase()}
+                        </f:facet>
+                    </c:if>
+                    <p:messages id="messages" showDetail="true" closable="true">
+                    </p:messages>
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar"
+                                         class="cssWhite"
+                                         icon="fa fa-check"
+                                         actionListener="#{vehiculoTipoDocumentoBean.guardar()}"
+                                         update=":frmPrincipalVhclTipDocu:dtTipo,messages,frmNuevoTipo,msgs"
+                                         rendered="#{vehiculoTipoDocumentoBean.selected == null }"
+                                         >
+                        </p:commandButton>
+                        <p:commandButton value="Actualizar" 
+                                         class="cssWhite"
+                                         icon="fa fa-check"
+                                         actionListener="#{vehiculoTipoDocumentoBean.actualizar()}"
+                                         update=":frmPrincipalVhclTipDocu:dtTipo,messages,msgs"
+                                         rendered="#{vehiculoTipoDocumentoBean.selected != null }"
+                                         />
+                    </f:facet>
+                    <div class="ui-fluid" jsf:id="pGrid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Código"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText id="code"
+                                                 value="#{vehiculoTipoDocumentoBean.vehiculoTipoDocumento.codigo}"
+                                                 required="true" requiredMessage="Código es obligatorio"
+                                                 maxlength="60"
+                                                 />
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Nombre:" for="nombre"/>
+                                </div>
+                                <p:inputText id="nombre" value="#{vehiculoTipoDocumentoBean.vehiculoTipoDocumento.nombreTipoDocumento}"
+                                             required="true" requiredMessage="El nombre del tipo es obligatorio"/>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Obligatorio:" for="obligatorio"/>
+                                </div>
+                                <p:selectBooleanButton id="obligatorio" 
+                                                       value="#{vehiculoTipoDocumentoBean.obligatorio}" 
+                                                       onLabel="Sí" offLabel="No"
+                                                       offIcon="fa fa-times"
+                                                       onIcon="fa fa-check"
+                                                       class="cssWhite"
+                                                       required="true"
+                                                       requiredMessage="Campo obligatiorio"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Vencimiento:" for="vencimiento"/>
+                                </div>
+                                <p:selectBooleanButton id="vencimiento" 
+                                                       value="#{vehiculoTipoDocumentoBean.vencimiento}" 
+                                                       onLabel="Sí" offLabel="No"
+                                                       required="true"
+                                                       offIcon="fa fa-times"
+                                                       onIcon="fa fa-check"
+                                                       class="cssWhite"
+                                                       requiredMessage="Debe especificar vencimiento" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Descripción:" for="descripcion"/>
+                                </div>
+                                <p:inputTextarea id="descripcion"
+                                                 value="#{vehiculoTipoDocumentoBean.vehiculoTipoDocumento.descripcionTipoDocumento}"/>
+                            </div>
+                        </div>
+                    </div>
+                </p:dialog>  
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

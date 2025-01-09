@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="VisitantesListDlg" widgetVar="VisitantesListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de visitantes"
+              class="modalResponsivo" closeOnEscape="true" responsive="true" position="center top">
+        <h:form id="frmVisitanteList">
+            <p:dataTable var="visitante" value="#{sstAutorizacionPublicoJSF.lstEmpresaVisitantes}" 
+                         id="dtVisitantes"
+                         widgetVar="wVVisitantesListDialog"
+                         selectionMode="single" 
+                         selection="#{sstAutorizacionPublicoJSF.sstEmpresaVisitante}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         rowIndexVar="nroFila"
+                         rowKey="#{visitante.idSstEmpresaVisitante}"
+                         emptyMessage="No existen visitantes registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{sstAutorizacionPublicoJSF.onRowVisitanteClckSelect}"
+                        update=":frmAutorizacion:materiales,
+                        :frmAutorizacion:nomVisitante"
+                        oncomplete="PF('VisitantesListDialog').hide()"
+                        global="false" />
+                <p:column  headerText="Empresa">
+                    <h:outputText value="#{visitante.idSstEmpresa.razonSocial}"/>
+                </p:column>    
+                <p:column headerText="Tipo Documento">
+                    <h:outputText value="Cédula de ciudadanía" rendered="#{visitante.tipoDocumento eq 'cc'}"/>
+                    <h:outputText value="Cédula de extranjería" rendered="#{visitante.tipoDocumento eq 'ce'}"/>
+                </p:column>    
+                <p:column headerText="Visitante" 
+                          exportable="false"
+                          filterBy="#{visitante.numeroDocumento} #{visitante.nombre} #{visitante.apellidos}">
+                    <h:outputText 
+                        value="#{visitante.numeroDocumento} - "
+                        styleClass="cssBlack"
+                        />
+                    <h:outputText value="#{visitante.nombre} #{visitante.apellidos}"/>
+                </p:column>  
+                <p:column headerText="Nivel Riesgo ARL">
+                    <h:outputText value="#{visitante.nivelRiesgoArl}"/>
+                </p:column>    
+                <p:column headerText="Nombre Contacto">
+                    <h:outputText value="#{visitante.nombreContactoEmergencia}"/>
+                </p:column>    
+                <p:column headerText="Teléfono fijo contacto">
+                    <h:outputText value="#{visitante.telefonoFijoContactoEmergencia}"/>
+                </p:column>    
+                <p:column headerText="Teléfono móvil contacto">
+                    <h:outputText value="#{visitante.telefonoMovilContactoEmergencia}"/>
+                </p:column>    
+                <p:column headerText="EPS">
+                    <h:outputText value="#{visitante.idSstEps.nombre}"/>
+                </p:column>    
+                <p:column headerText="Tipo Vehículo">
+                    <h:outputText value="#{visitante.idSstVehiculoTipo.tipo}"/>
+                </p:column>    
+                <p:column headerText="Placa">
+                    <h:outputText value="#{visitante.placaVehiculo}"/>
+                </p:column>    
+                <p:column headerText="Marca Vehículo">
+                    <h:outputText value="#{visitante.idSstVehiculoMarca.marca}"/>
+                </p:column>    
+                <p:column headerText="Color Vehículo">
+                    <h:outputText value="#{visitante.colorVehiculo}"/>
+                </p:column>
+                <p:column headerText="Estado"
+                          styleClass="#{visitante.visitanteAprobado gt 0 ? 'cssGreen': 'cssRed'}">
+                    <h:outputText value="Aprobado" rendered="#{visitante.visitanteAprobado gt 0}"
+                                  style=" color: white;"/>
+                    <h:outputText value="No aprobado" rendered="#{visitante.visitanteAprobado eq 0}"
+                                  style=" color: white;"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

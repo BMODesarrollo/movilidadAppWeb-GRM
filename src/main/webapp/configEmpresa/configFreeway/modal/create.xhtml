@@ -1,0 +1,124 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="id_dialog_tipoConduta"
+              widgetVar="wv_config_freeway" 
+              modal="true" 
+              class="mr1024_30 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              closable="false"
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{configFreewayBean.selected == null 
+                                                    ? 'NUEVO REGISTRO' 
+                                                    : 'EDITAR REGISTRO'}"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wv_config_freeway').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form_config_freeway_cd">
+            <div class="ui-fluid">
+                <p:messages id="messages" showDetail="true" closable="true"/>
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Unidad Funcional *" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <ui:include src="../../../zComponent/selectUnidadFuncional.xhtml"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Código Solución" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true"
+                                placeholder="123"
+                                requiredMessage="Debe ingresar un código de solución"
+                                maxlength="15"
+                                value="#{configFreewayBean.codSolucion}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Usuario Freeway" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true"
+                                placeholder="username"
+                                requiredMessage="Debe ingresar un usuario para Freeway"
+                                maxlength="45"
+                                value="#{configFreewayBean.userFreeway}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Contraseña Freeway" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true"
+                                placeholder="password"
+                                requiredMessage="Debe ingresar una contraseña para Freeway"
+                                maxlength="45"
+                                value="#{configFreewayBean.passwordFreeway}"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Url Servicio" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea autoResize="false"
+                                             value="#{configFreewayBean.urlServicio}"
+                                             required="true"
+                                             placeholder="http://url.com"
+                                             maxlength="150"
+                                             requiredMessage="Debe ingresar una url para el servicio"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardarcf"
+                             process="form_config_freeway_cd,@this"
+                             update="messages,
+                             msgs,
+                             form_config_freeway:id_dt_config_freeway,
+                             form_config_freeway_cd" 
+                             action="#{configFreewayBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="#{configFreewayBean.selected == null ? 'Guardar':'Actualizar'}" 
+                             icon="fa fa-save"
+                             class="cssWhite" onclick="guardarcf()">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro que desea guardar esta información?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

@@ -1,0 +1,61 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <p:dialog widgetVar="deshacerEliminado" id="modaldeshacerEliminado" 
+              modal="true" closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)"
+              class="mr1024_30 mr500_90" position="center top">
+        <f:facet name="header">
+            Deshacer servicio eliminado
+        </f:facet>
+        <h:form id="frmDeshacerEliminado">
+            <p:panel id="panel">
+                <f:facet name="footer">
+                    <p:commandButton value="Deshacer" 
+                                     icon="fa fa-retweet"
+                                     class="cssWhite OrangeButton"
+                                     update=":frmConciliacion:pGridResumen,
+                                     :frmConciliacion:pGridData,
+                                     :frmConciliacion:pGridEstado,
+                                     :messages"
+                                     actionListener="#{prgTcResumenBean.deshacerElim()}"
+                                     rendered="#{prgTcResumenBean.selected != null }"
+                                     oncomplete="PF('deshacerEliminado').hide()"
+                                     >
+                        <p:confirm header="Confirmación"
+                                   message="Ésta seguro de deshacer el servicio eliminado?" 
+                                   icon="fa fa-exclamation-triangle"/>
+                    </p:commandButton>
+                </f:facet>
+                <h3 align="center">Datos del servicio</h3>
+                <div align="center">
+                    <h:panelGrid columns="2" class="ui-noborder">
+                        <h:outputLabel value="Bus: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.idVehiculo.codigo}"/>
+                        <h:outputLabel value="H. ini: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.timeOrigin}"/>
+                        <h:outputLabel value="H. fin: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.timeDestiny}"/>
+                        <h:outputLabel value="Servicio: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.idRuta.name}" 
+                                      rendered="#{prgTcResumenBean.selected.idRuta != null}"/>
+                        <h:outputText value="No tiene" 
+                                      rendered="#{prgTcResumenBean.selected.idRuta == null}"/>
+                        <h:outputLabel value="Tarea: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.idTaskType.tarea}"/>
+                        <h:outputLabel value="Punto ini: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.fromStop.name}"/>
+                        <h:outputLabel value="Punto fin: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.toStop.name}"/>
+                        <h:outputLabel value="Distancia: "/>
+                        <h:outputText value="#{prgTcResumenBean.selected.distance}"/>
+                    </h:panelGrid>
+                </div>
+            </p:panel>
+        </h:form>
+    </p:dialog>
+</ui:composition>

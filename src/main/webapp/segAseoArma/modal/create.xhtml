@@ -1,0 +1,218 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="create_aseo_arma_dialog" 
+              widgetVar="create_aseo_arma_wv" 
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)" 
+              header="Gestión Aseo Armamento"
+              class="mr1024_70 mr500_90" closeOnEscape="true" responsive="true" position="center,top">
+        <h:form id="form_create_aseo_arma" enctype="multipart/form-data">
+            <p:messages id="armero_msgs" showDetail="true" closable="false">
+                <p:autoUpdate />
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <p:outputLabel for="fecha_hora_ini" value="Fecha Hora Inicio " />
+                        <p:calendar id="fecha_hora_ini" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Fecha y Hora Inicio es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{segAseoArmaJSF.segAseoArma.fechaInicio}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <p:outputLabel for="fecha_hora_fin" value="Fecha Hora Fin " />
+                        <p:calendar id="fecha_hora_fin" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Fecha y Hora Fin es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{segAseoArmaJSF.segAseoArma.fechaFin}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="i_numero_documento"  value="Armero "/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:inputText id="i_numero_documento" placeholder="Número Documento"
+                                         value="#{segAseoArmaJSF.numeroDocumento}" >
+                            </p:inputText>
+                            <div class="botonFloat" >
+                                <p:commandButton title="Consultar Armero"
+                                                 icon="fa fa-search"
+                                                 class="cssWhite"
+                                                 style="margin: 0px"
+                                                 process="@this,i_numero_documento"
+                                                 action="#{segAseoArmaJSF.buscarArmero()}"
+                                                 update="i_numero_documento,msgs,armero_msgs">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMUbicacion" value="Ubicación *"/>
+                        <p:selectOneMenu id="SOMUbicacion"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{segAseoArmaJSF.i_idCableUbicacion}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{segAseoArmaJSF.listCableUbicacion}"
+                                           var="ubicacion" itemLabel="#{ubicacion.idCableEstacion.nombre} - #{ubicacion.nombre}"
+                                           itemValue="#{ubicacion.idCableUbicacion}" />
+                            <p:ajax process="@this" update="id_armamento" listener="#{segAseoArmaJSF.cargarUbicacionArmamento()}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5" >
+                        <p:outputLabel for="id_armamento" value="Armamento *"/>
+                        <p:inputText id="id_armamento" 
+                                     readonly="true"
+                                     value="#{segAseoArmaJSF.armamento.marca} #{segAseoArmaJSF.armamento.calibre} #{segAseoArmaJSF.armamento.serial}"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Registro Foto Actividad">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{segAseoArmaJSF.handleFileUpload}"
+                                              id="upload_I"
+                                              mode="advanced"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG"
+                                              process="@this"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="@form"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{segAseoArmaJSF.segAseoArma.idSegAseoArmamento!=null}">
+                        <p:staticMessage severity="warn" summary="Informacion!" detail="Para Eliminar un archivo, hacer clic sobre el" />
+                        <p:dataGrid var="url_foto" id="id_tabla_fotos" 
+                                    value="#{segAseoArmaJSF.listFotospath_fotos}"
+                                    columns="6" layout="grid"
+                                    rowIndexVar="indexgd">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="form_create_aseo_arma:id_tabla_fotos"
+                                           action="#{segAseoArmaJSF.delete(url_foto)}">
+                                <p:panel>
+                                    <div class="TexAlCenter">
+                                        <div>
+                                            <p:graphicImage cache="false"
+                                                            style="border:1px solid #106ebc; border-radius: 0px;"
+                                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                            width="80">
+                                                <f:param name="path_foto" value="#{url_foto}" />
+                                            </p:graphicImage>
+                                        </div>
+                                    </div>
+                                </p:panel> 
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{segAseoArmaJSF.listFotospath_fotos.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Registro Foto Minuta">
+                            <div align="center">
+
+                                <p:fileUpload fileUploadListener="#{segAseoArmaJSF.handleFileUpload}"
+                                              id="upload_II"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG"
+                                              process="@this"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="@form"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{segAseoArmaJSF.segAseoArma.idSegAseoArmamento!=null}">
+                        <p:staticMessage severity="warn" summary="Informacion!" detail="Para Eliminar un archivo, hacer clic sobre el" />
+                        <p:dataGrid var="url_foto_I" id="id_tabla_fotos_I" 
+                                    value="#{segAseoArmaJSF.listFotospath_planilla}"
+                                    columns="6" layout="grid"
+                                    rowIndexVar="indexgd_I">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="form_create_aseo_arma:id_tabla_fotos_I"
+                                           action="#{segAseoArmaJSF.delete(url_foto_I)}">
+                                <p:panel>
+                                    <div class="TexAlCenter">
+                                        <div>
+                                            <p:graphicImage cache="false"
+                                                            style="border:1px solid #106ebc; border-radius: 0px;"
+                                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                            width="80">
+                                                <f:param name="path_foto" value="#{url_foto_I}" />
+                                            </p:graphicImage>
+                                        </div>
+                                    </div>
+                                </p:panel> 
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{segAseoArmaJSF.listFotospath_planilla.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="observaciones" value="Observaciones: " />
+                        <p:inputTextarea id="observaciones" 
+                                         value="#{segAseoArmaJSF.segAseoArma.observacion}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una observación"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             actionListener="#{segAseoArmaJSF.guardar()}"  
+                             value="Guardar" 
+                             update="msgs,form_aseo_arma:dt_aseo_arma_id"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer" >
+            <p:commandButton id="btnGuardar" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

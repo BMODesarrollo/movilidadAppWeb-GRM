@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{cableAccInformePreguntaJSF.cableAccInformePregunta.idCableAccInformePregunta != null ? 'EDITAR PARAMETRIZACIÓN ACC INFORME PREGUNTA' : 'NUEVA PARAMETRIZACIÓN ACC INFORME PREGUNTA'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)" 
+              fitViewport="true"
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid Padding0">
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Pregunta *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputText id="nombre"
+                                     maxlength="45"
+                                     required="true"
+                                     requiredMessage="Nombre es requerido"
+                                     value="#{cableAccInformePreguntaJSF.cableAccInformePregunta.pregunta}" />
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Es requerida *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:selectBooleanButton id="bnt-requerido" 
+                                               value="#{cableAccInformePreguntaJSF.bRequerido}"
+                                               class="cssWhite"
+                                               onLabel="Sí" 
+                                               offLabel="No" 
+                                               onIcon="fa fa-check" 
+                                               offIcon="fa fa-times" />
+                    </div>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Descripción *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputTextarea id="descripcion"
+                                         maxlength="255"
+                                         required="true"
+                                         requiredMessage="Descripción es requerido"
+                                         value="#{cableAccInformePreguntaJSF.cableAccInformePregunta.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="@form" 
+                             rendered="#{empty cableAccInformePreguntaJSF.cableAccInformePregunta.idCableAccInformePregunta}"
+                             update=":form,@form"
+                             actionListener="#{cableAccInformePreguntaJSF.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             rendered="#{not empty cableAccInformePreguntaJSF.cableAccInformePregunta.idCableAccInformePregunta}"
+                             process="@form,@this"
+                             update=":form,@form"
+                             actionListener="#{cableAccInformePreguntaJSF.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" 
+                             icon="fa fa-save"
+                             rendered="#{empty cableAccInformePreguntaJSF.cableAccInformePregunta.idCableAccInformePregunta}"
+                             class="cssWhite" 
+                             onclick="guardar()"/>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-save"
+                             rendered="#{not empty cableAccInformePreguntaJSF.cableAccInformePregunta.idCableAccInformePregunta}"
+                             class="cssWhite" 
+                             onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

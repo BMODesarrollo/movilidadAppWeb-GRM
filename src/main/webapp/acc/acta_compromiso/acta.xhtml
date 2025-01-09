@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <ui:define name="content">
+        <p:layout style="min-width:400px;min-height:1000px">
+            <p:layoutUnit position="west" resizable="true" size="500" minSize="400" maxSize="900" collapsible="true" >
+                <h:form id="list-accidente">
+                    <p:panel id="panel-busqueda" header="Búsqueda caso de acidentalidad" toggleable="true" style="width: 100%">
+                        <div class="ui-fluid ui-g">
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <p:calendar id="fechaIni" 
+                                            value="#{accidenteJSF.fechaIni}" 
+                                            pattern="yyyy-MM-dd" 
+                                            title="Fecha de Inicio"
+                                            mask="true"
+                                            locale="es"
+                                            navigator="true"
+                                            showOn="button"
+                                            maxdate="today"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <p:calendar id="fechaFin" 
+                                            value="#{accidenteJSF.fechaFin}" 
+                                            pattern="yyyy-MM-dd" 
+                                            mask="true"
+                                            locale="es"
+                                            navigator="true"
+                                            title="Fecha Fin"
+                                            showOn="button"
+                                            maxdate="today"/>
+                            </div>
+                            <p:separator/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <p:selectOneMenu id="t-even" value="#{accidenteJSF.i_auxNovDet}" style="width: 99.9999%">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                    <f:selectItems value="#{accidenteJSF.listNovedadTipoDetalles}" 
+                                                   var="listntd" 
+                                                   itemLabel="#{listntd.tituloTipoNovedad}" 
+                                                   itemDescription="#{listntd.descripcionTipoNovedad}"
+                                                   itemValue="#{listntd.idNovedadTipoDetalle}" />
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <p:inputText id="cod-ope"
+                                             value="#{accidenteJSF.i_codOpe}" 
+                                             placeholder="Código de Operador"
+                                             title="Código Operador"
+                                             maxlength="10">
+                                    <p:keyFilter regEx="/[0-9]/i"/> 
+                                </p:inputText>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                <p:inputText id="cod-veh"
+                                             value="#{accidenteJSF.c_codVeh}" 
+                                             placeholder="Código de Vehiculo"
+                                             title="Código Vehículo"
+                                             maxlength="10"/>
+                            </div>
+                        </div>
+                        <f:facet name="footer">
+                            <div align="center">
+                                <p:commandButton id="buscar"
+                                                 actionListener="#{accidenteJSF.buscarAccidente(0)}"
+                                                 icon="fa fa-search"
+                                                 value="Buscar"
+                                                 class="cssWhite GreenButton"
+                                                 update=":list-accidente:table-accidente"
+                                                 process="@form" />
+                                <p:commandButton id="limpiar"
+                                                 actionListener="#{accidenteJSF.limpiar()}"
+                                                 icon="fa fa-remove"
+                                                 value="Limpiar"
+                                                 class="cssWhite"
+                                                 update=":list-accidente:panel-busqueda"
+                                                 process="@this" />
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                    <p:dataTable id="table-accidente" 
+                                 var="acc" 
+                                 value="#{accidenteJSF.listAccidente}" 
+                                 selectionMode="single" 
+                                 scrollHeight="700"
+                                 rows="5"
+                                 style="width: 100%"
+                                 scrollable="true"
+                                 paginator="true"
+                                 emptyMessage="No existen registros"
+                                 reflow="true"
+                                 selection="#{accidenteJSF.accidente}" 
+                                 rowKey="#{acc.idAccidente}">
+                        <f:facet name="header">
+                            Registros encontrados: #{accidenteJSF.listAccidente.size()}
+                        </f:facet>
+                        <p:ajax event="rowSelect" listener="#{actaCompromisoBean.onRowSelect}" update="list-accidente:panel-busqueda,:banner-form,:panel" />
+                        <p:ajax event="rowUnselect" listener="#{actaCompromisoBean.reset()}" update="list-accidente:panel-busqueda,:banner-form,:panel" />
+                        <p:column>
+                            <h:outputText value="Tipo Evento: "/>
+                            <h:outputText value="#{acc.idNovedadTipoDetalle.tituloTipoNovedad}" class="Fs21" style="color: red;font-weight: bold"/><br/>
+                            <h:outputText value="Vehículo: "/>
+                            <h:outputText value="#{acc.idVehiculo.codigo}" style="font-weight: bold" /><br/>
+                            <h:outputText value="Código Ope: "/> 
+                            <h:outputText value="#{acc.idEmpleado.codigoTm}" 
+                                          title="#{acc.idEmpleado.nombres.concat(' ').concat(acc.idEmpleado.apellidos)}" 
+                                          style="font-weight: bold"/><br/>
+                            <h:outputText value="Fecha y Hora: "/>
+                            <h:outputText value="#{acc.fechaAcc}" style="font-weight: bold">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ssS"/>
+                            </h:outputText>
+                        </p:column>
+                        <f:facet name="footer">
+                            <h:outputText value="#{accidenteJSF.accidente.idNovedad.observaciones}" />
+                        </f:facet>
+                    </p:dataTable>
+                </h:form> 
+            </p:layoutUnit>
+
+            <p:layoutUnit position="center" size="600" minSize="500" 
+                          maxSize="900" resizable="true">
+                <ui:include src="child/create.xhtml"/>
+            </p:layoutUnit>
+        </p:layout>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="AddFilesListDlg" 
+              widgetVar="AddFilesListDialog" 
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)" 
+              header="Agregar documentos de empresa"
+              class="mr1024_40 mr500_90"
+              closeOnEscape="true" 
+              responsive="true" 
+              position="center,top">
+        <p:ajax event="close" listener="#{sstEmpresaBean.onCloseAddFileModal()}"/>
+        <h:form id="frmDatosEmpresa">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo documento"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel 
+                                styleClass="cssBlack"
+                                value="#{sstEmpresaBean.sstEmpresaDocs.idSstEmpresaTipoDoc.tipoDocumento.toUpperCase()}"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" 
+                         jsf:rendered="#{sstEmpresaBean.sstEmpresaDocs.idSstEmpresaTipoDoc.numero eq 1}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Numero
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                value="#{sstEmpresaBean.sstEmpresaDocs.numero}"
+                                type="number"
+                                required="true" 
+                                requiredMessage="Debe ingresar nombre del tipo de documento"
+                                >
+                                <p:ajax global="false" event="keyup" update=":frmEmpresa:dtDocumentos"/>
+                            </p:inputText>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5"
+                         jsf:rendered="#{sstEmpresaBean.sstEmpresaDocs.idSstEmpresaTipoDoc.vigencia eq 1}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Desde
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="desde" 
+                                        value="#{sstEmpresaBean.sstEmpresaDocs.desde}" 
+                                        pattern="yyyy/MM/dd" 
+                                        navigator="true"
+                                        title="Fecha"
+                                        readonlyInput="true"
+                                        mask="true"
+                                        locale="es"
+                                        showOn="button"
+                                        >
+                                <p:ajax event="dateSelect" update=":frmEmpresa:dtDocumentos"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5"
+                         jsf:rendered="#{sstEmpresaBean.sstEmpresaDocs.idSstEmpresaTipoDoc.vigencia eq 1}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Hasta
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hasta" 
+                                        value="#{sstEmpresaBean.sstEmpresaDocs.hasta}" 
+                                        pattern="yyyy/MM/dd" 
+                                        navigator="true"
+                                        title="Fecha"
+                                        readonlyInput="true"
+                                        mask="true"
+                                        locale="es"
+                                        showOn="button"
+                                        >
+                                <p:ajax global="false" event="dateSelect" update=":frmEmpresa:dtDocumentos"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="actualizar" 
+                             update=":msgs,:frmEmpresaDocs:dtDoc" 
+                             action="#{sstEmpresaBean.actualizarSinCambioDeArchivo()}"/>
+        </h:form>
+        <h:form id="frmAddFiles" enctype="multipart/form-data">
+            <p:fieldset legend="Seleccione Archivo">
+                <div align="center">
+                    <p:fileUpload fileUploadListener="#{sstEmpresaBean.handleFileUpload}"
+                                  id="documento"
+                                  mode="advanced"
+                                  multiple="true" sizeLimit="#{sstEmpresaBean.tamanoArchivo}"
+                                  allowTypes="/(\.|\/)(jpg|jpe?g|png|pdf|JPG|JPE?G|PNG|PDF|xlsx|xls|docx|doc)$/"
+                                  update="@form,:frmEmpresaDocs:dtDoc,:msgs"
+                                  uploadLabel="Cargar"    
+                                  cancelLabel="Cancelar"
+                                  label="Buscar archivo(s)" 
+                                  required="true"
+                                  requiredMessage="Debe seleccionar un documento a cargar"
+                                  invalidFileMessage="Debe seleccionar un documento válido (imágen,pdf, Archivo excel,Archivo word)"
+                                  invalidSizeMessage="El archivo debe ser máximo de #{sstEmpresaBean.tamanoArchivo.split('0')[0]}MB"/>
+
+                </div>
+            </p:fieldset>
+        </h:form>
+        <p:resizable for="frmAddFiles" />
+        <f:facet name="footer">
+            <p:commandButton value="Actualizar sin cambio de documento"
+                             onclick="actualizar()"
+                             icon="fa fa-check"
+                             styleClass="CssWhite"
+                             rendered="#{sstEmpresaBean.isEditingArchivo}"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

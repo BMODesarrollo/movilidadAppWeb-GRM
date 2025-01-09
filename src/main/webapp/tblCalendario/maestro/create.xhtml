@@ -1,0 +1,199 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="tblCalendario"
+              widgetVar="wlgTblCalendario" 
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closable="false"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{tblCalendarioBean.selected == null}">
+                                <p:outputLabel value="NUEVO REGISTRO" class="cssWhite"/>
+                            </c:if>
+                            <c:if test="#{tblCalendarioBean.selected != null}">
+                                <p:outputLabel value="EDITAR REGISTRO" class="cssWhite"/>
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wlgTblCalendario').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmTblCalendario">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        disabled="#{not(tblCalendarioBean.flagProfPrg)}"
+                                        readonlyInput="true"
+                                        value="#{tblCalendarioBean.fecha}">
+                                <p:ajax process="@this" 
+                                        event="dateSelect"
+                                        listener="#{tblCalendarioBean.asignarTipoDia()}"
+                                        update="tipoDia"
+                                        />
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="tipoDia">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Día" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 text-center">
+                            <p:inputText value="#{tblCalendarioBean.tipoDia}"
+                                         disabled="true"
+                                         readonly="true"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Característica" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu 
+                                styleClass="custom-filter" 
+                                filter="true" 
+                                value="#{tblCalendarioBean.i_CaracteristicaDia}"
+                                filterMatchMode="contains" 
+                                required="#{not(tblCalendarioBean.flagProfPrg)}"
+                                requiredMessage="Debe seleccionar una característica"
+                                style="width: 99.999%" title="Seleccione Uno..">
+                                <f:selectItem itemLabel="Seleccione tipo" 
+                                              itemValue="#{null}"
+                                              itemDisabled="true"
+                                              itemDescription="Seleccione Uno.."/>
+                                <f:selectItems value="#{tblCalendarioBean.lstCaracteristicasDia}"
+                                               var="cdia" itemLabel="#{cdia.nombre}"
+                                               itemValue="#{cdia.idTblCalendarioCaracteristicaDia}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" 
+                         jsf:rendered="#{tblCalendarioBean.flagProfPrg}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Estacionalidad" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton value="#{tblCalendarioBean.b_Estacionalidad}"
+                                                   id="estacionalidad"
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   styleClass="cssWhite">
+                                <p:ajax update="desde,hasta" process="@this"/>
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5"
+                         jsf:id="desde">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{tblCalendarioBean.b_Estacionalidad}">
+                            <p:outputLabel value="Desde" for="clDesde"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{tblCalendarioBean.b_Estacionalidad}">
+                            <p:calendar showOn="button" 
+                                        id="clDesde"
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha desde"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{tblCalendarioBean.tblCalendario.desde}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" 
+                         jsf:id="hasta">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{tblCalendarioBean.b_Estacionalidad}">
+                            <p:outputLabel value="Hasta" for="clHasta"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{tblCalendarioBean.b_Estacionalidad}">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        id="clHasta"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha hasta"
+                                        pattern="yyyy-MM-dd"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{tblCalendarioBean.tblCalendario.hasta}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Observación" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea autoResize="false"
+                                             maxlength="240"
+                                             counterTemplate="Quedan {0} carácteres disponibles"
+                                             value="#{tblCalendarioBean.tblCalendario.observacion}"
+                                             required="true"
+                                             counter="counter"
+                                             requiredMessage="Debe ingresar texto"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel id="counter"/>
+                    </div>
+
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="messages,:msgs,pGridDatos,:frmPrincipal:dtTablaCalendario" 
+                             action="#{tblCalendarioBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update="messages,:msgs,:frmPrincipal:dtTablaCalendario"
+                             action="#{tblCalendarioBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{tblCalendarioBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{tblCalendarioBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

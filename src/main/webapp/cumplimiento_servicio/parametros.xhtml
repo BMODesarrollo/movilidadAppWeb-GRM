@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="PARÁMETROS PARA CUMPLIMIENTO DE SERVICIOS">
+            <h:form id="frmParametroList">
+                <p:dataTable id="dtParametros" var="parametro" 
+                             widgetVar="dtParametro"
+                             value="#{parametroBean.lstCumplimientoServicios}"
+                             selectionMode="single" 
+                             sortBy="#{parametro.periodo}"
+                             selection="#{parametroBean.selected}" 
+                             rowKey="#{parametro.idParamCumplimientoServicio}"
+                             reflow="true"
+                             emptyMessage="No se encontraron registros!!">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton oncomplete="PF('parametroDlg').show()"
+                                             action="#{parametroBean.nuevo()}"
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             update=":parametro,:frmParametro,dtParametros"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmParametro:pGridDatos"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column colspan="5"/>
+                            <p:column headerText="Vigencia" colspan="2"/>
+                        </p:row>
+                        <p:row>
+                            <p:column headerText="Periodo" 
+                                      filterBy="#{parametro.periodo}"
+                                      filterMatchMode="contains"/>
+                            <p:column headerText="Tipo Día" filterBy="#{parametro.tipoDia}">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('dtParametro').filter()">
+                                        <f:selectItem itemLabel="Seleccione tipo día" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItem itemLabel="Hábil" itemValue="H"/>
+                                        <f:selectItem itemLabel="Sábado" itemValue="S" />
+                                        <f:selectItem itemLabel="Domingo" itemValue="D" />
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:column>
+                            <p:column headerText="Nombre" 
+                                      filterBy="#{parametro.nombre}"
+                                      filterMatchMode="contains"/>
+                            <p:column headerText="Hora Inicio" />
+                            <p:column headerText="Hora Fin" />
+                            <p:column headerText="Desde" />
+                            <p:column headerText="Hasta" />
+                        </p:row>
+                    </p:columnGroup>
+
+                    <p:column styleClass="text-center">
+                        <h:outputText value="#{parametro.periodo}" />
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <h:outputText value="Hábil" rendered="#{parametro.tipoDia eq 'H'}" />
+                        <h:outputText value="Sábado" rendered="#{parametro.tipoDia eq 'S'}" />
+                        <h:outputText value="Domingo" rendered="#{parametro.tipoDia eq 'D'}" />
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{parametro.nombre}" />
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <h:outputText value="#{parametro.horaInicio}" />
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <h:outputText value="#{parametro.horaFin}">
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <h:outputText value="#{parametro.desde}">
+                            <f:convertDateTime type="date" pattern="YYYY-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <h:outputText value="#{parametro.hasta}">
+                            <f:convertDateTime type="date" pattern="YYYY-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+                <p:contextMenu for="dtParametros">
+                    <p:menuitem value="Editar" action="#{parametroBean.editar()}" 
+                                update=":parametro,:frmParametro" icon="fa fa-pencil">
+                        <p:resetInput target=":frmParametro:pGridDatos"/>
+                    </p:menuitem>
+                </p:contextMenu>
+            </h:form>
+        </p:panel>
+        <ui:include src="child/create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

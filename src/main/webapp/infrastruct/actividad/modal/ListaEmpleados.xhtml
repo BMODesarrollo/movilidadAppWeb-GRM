@@ -1,0 +1,49 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-emple" 
+              closeOnEscape="true" 
+              widgetVar="listEmpDlg" 
+              modal="true" 
+              header="Lista de Empleados"
+              resizable="false" 
+              class="mr1024_50 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-emp-list">
+            <p:dataTable id="tabla-emple"
+                         var="emp" 
+                         value="#{actividadInfraDiariaJSF.listEmpleado}"  
+                         paginator="true"
+                         selectionMode="single"
+                         filterDelay="2000"
+                         rows="10"
+                         rowsPerPageTemplate="10,20,50"
+                         reflow="true"
+                         rowIndexVar="nroeFila"
+                         rowKey="#{emp.idEmpleado}"
+                         widgetVar="wvEmp"
+                         emptyMessage="No existen empleados registrados">
+
+                <p:ajax event="rowSelect"
+                        update=":form-modal:nombre-emp,:form-modal:msgs_adm,:form:msg"
+                        listener="#{actividadInfraDiariaJSF.onSelectEmpleado}"/>
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroeFila+1}" />
+                </p:column>
+                <p:column headerText="Cédula" filterBy="#{emp.identificacion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{emp.identificacion}" />
+                </p:column>
+                <p:column headerText="Nombre Completo" filterBy="#{emp.nombres} #{emp.apellidos}"
+                          filterMatchMode="contains">
+                    <br/>
+                    <h:outputText value="#{emp.nombres} #{emp.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

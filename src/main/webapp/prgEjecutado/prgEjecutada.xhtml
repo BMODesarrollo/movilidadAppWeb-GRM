@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                >
+
+
+    <ui:define name="title">
+        <h:outputText value="Servicios Conductor"></h:outputText>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="SerconListForm">
+            <p:panel   menuTitle="Fecha de Consulta">
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Servicios Ejecutados
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="serconlist" 
+                                            listener="#{prgTcEjecutado.consultarporSalidas()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+            </p:panel>
+            <p:panel>
+                <f:facet name="header">
+                    <div style="float: right">
+                        <div class="ui-fluid">
+                            <div class="ui-g">
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                    <p:outputLabel value="Tipo servicio" class="cssWhite"/>
+                                    <p:selectOneMenu styleClass="custom-filter" 
+                                                     filter="true"
+                                                     value="#{prgTcEjecutado.tipoServicio}"
+                                                     filterMatchMode="contains"
+                                                     style="width: 99.9999%">
+                                        <f:selectItem itemLabel="Todos" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItem itemValue="#{0}" itemLabel="Programado"/>
+                                        <f:selectItem itemValue="#{1}" itemLabel="Ejecutado"/>
+                                        <f:selectItem itemValue="#{2}" itemLabel="Ejecutado Parcial"/>
+                                        <f:selectItem itemValue="#{3}" itemLabel="Adicional"/>
+                                        <f:selectItem itemValue="#{4}" itemLabel="Adicional Parcial"/>
+                                        <f:selectItem itemValue="#{5}" itemLabel="Eliminado"/>
+                                        <f:selectItem itemValue="#{6}" itemLabel="Vacío Comercial"/>
+                                        <f:selectItem itemValue="#{7}" itemLabel="Vacío"/>
+                                        <f:selectItem itemValue="#{8}" itemLabel="Vacío No Pago Eliminado"/>
+                                        <p:ajax listener="#{prgTcEjecutado.consultarporSalidas()}" update="serconlist"></p:ajax>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                    <p:outputLabel value="Seleccione Una Fecha: " for="fecha" class="cssWhite"/>
+                                    <p:calendar id="fecha" title="Selecione fecha a consultar" 
+                                                locale="es" navigator="true"
+                                                value="#{prgTcEjecutado.fecha}" placeholder="Fecha">
+                                        <p:ajax event="dateSelect" listener="#{prgTcEjecutado.consultarporSalidas()}" update="serconlist"></p:ajax>
+                                    </p:calendar>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                <p:dataTable id="serconlist" value="#{prgTcEjecutado.tcEjecutada}" var="item"
+                             emptyMessage="No hay registros que mostrar!!!"
+                             paginator="true"
+                             rowKey="#{item.idPrgTc}"
+                             rows="100"
+                             rowsPerPageTemplate="100,200,500"
+                             >
+                    <f:facet name="paginatorTopRight">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" style="width: 24px;height: 24px; float: right;" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="serconlist" 
+                                            fileName="ServiciosEjecutados #{prgTcEjecutado.fecha}"
+                                            postProcessor="#{prgTcEjecutado.postProcessXLS}"/>
+                        </h:commandLink>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Fecha"/>
+                        </f:facet>
+                        <h:outputText  value="#{item.fecha}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" type="date"></f:convertDateTime>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Servbus"/>
+                        </f:facet>
+                        <h:outputText value="#{item.servbus}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Sercon"/>
+                        </f:facet>
+                        <h:outputText value="#{item.sercon}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Código"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idEmpleado.codigoTm}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Operador"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos) }"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Tarea"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idTaskType.tarea}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Servicio"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idRuta.name}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Tabla"/>
+                        </f:facet>
+                        <h:outputText value="#{item.tabla}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Hora Inicio"/>
+                        </f:facet>
+                        <h:outputText value="#{item.timeOrigin}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Hora Fin"/>
+                        </f:facet>
+                        <h:outputText value="#{item.timeDestiny}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Patio Inicio"/>
+                        </f:facet>
+                        <h:outputText value="#{item.fromStop.name}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Patio Fin"/>
+                        </f:facet>
+                        <h:outputText value="#{item.toStop.name}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Servbus"/>
+                        </f:facet>
+                        <h:outputText value="#{item.servbus}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Bus"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idVehiculo.codigo}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Tipo"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idVehiculoTipo.descripcionTipoVehiculo}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Distancia"/>
+                        </f:facet>
+                        <h:outputText value="#{item.distance}">
+                            <f:converter converterId="javax.faces.Long"/> 
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="TipoServicio"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idTaskType.comercial eq 1?'Comercial':'Vacio No Pago'}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Estado_Operacion"/>
+                        </f:facet>
+                        <h:outputText value="#{item.estadoOperacion}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Usuario"/>
+                        </f:facet>
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Observaciones"/>
+                        </f:facet>
+                        <h:outputText value="#{item.observaciones}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Responsable"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idPrgTcResponsable.responsable}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Clasificación"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idPrgClasificacionMotivo.nombre}"/>
+                    </p:column>
+
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,236 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="mtipo" 
+              id="modalDano"
+              modal="true" 
+              class="mr1024_60 mr500_90"
+              closable="false"
+              closeOnEscape="true"
+              responsive="true"
+              position="center top"
+              resizable="false" 
+              appendTo="@(body)"
+              onShow="setTimeout(initVectorSelection, 100)"> 
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{novedadDanoBean.selected == null }">
+                                <p:outputLabel value="Nueva novedad de daño" class="cssWhite"/>
+                            </c:if>
+                            <c:if test="#{novedadDanoBean.selected != null }">
+                                <p:outputLabel
+                                    value="Editar novedad de daño a: #{novedadDanoBean.selected.idEmpleado.nombres.toUpperCase()} #{novedadDanoBean.selected.idEmpleado.apellidos.toUpperCase()}"
+                                    class="cssWhite"/>
+                            </c:if>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmDano">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid" jsf:id="pGrid">
+                <div class="ui-g">
+                    <div class="ui-g-6 ui-md-6 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha" value="Fecha:" />
+                        <p:calendar id="fecha" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{novedadDanoBean.novedadDano.fecha}"
+                                    maxdate="today"
+                                    showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar una fecha"
+                                    showTodayButton="true"
+                                    navigator="true">
+                            <p:ajax process="@this"
+                                    update="fecha,msgs"
+                                    event="dateSelect"
+                                    listener="#{novedadDanoBean.validarOperacionCerrada()}"/>
+                        </p:calendar>
+                    </div>                         
+                    <div class="ui-g-6 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="vehiculo" value="Vehículo"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText placeholder="Cód de vehículo"
+                                             title="Ingrese código de vehículo"
+                                             id="vehiculo"
+                                             value="#{novedadDanoBean.vehiculo.codigo}"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un vehículo para realizar la novedad"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Seleccione vehículo"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     process="@this"
+                                                     style="margin: 0px"
+                                                     update="frmPrincipalListVehiculo,frmPrincipalListVehiculo:dtVehiculos"
+                                                     action="#{novedadDanoBean.prepareListVehiculos}"
+                                                     oncomplete="PF('VehiculoListDialog').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Operador:" for="operador"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText placeholder="Código TM operador"
+                                             id="operador"
+                                             value="#{novedadDanoBean.empleado.nombres} #{novedadDanoBean.empleado.apellidos}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Seleccione empleado"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     process="@this"
+                                                     style="margin: 0px"
+                                                     update="frmEmpleadoList:dt_mpleadoList"
+                                                     actionListener="#{novedadDanoBean.prepareListEmpleados}"                                     
+                                                     oncomplete="PF('EmpleadoListDialog').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-6 ui-md-6 ui-lg-12 Padding0">
+                            <p:outputLabel value="S" style="visibility: hidden"/>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" >
+                            <p:commandButton title="Cargar foto(s) de la novedad"
+                                             icon="fa fa-file-image-o"
+                                             value="Cargar Foto(s)"
+                                             class="cssWhite OrangeButton"
+                                             update="frmAddFilesDano"
+                                             oncomplete="PF('AddFilesListDanoDialog').show()"
+                                             >
+                            </p:commandButton>
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0" >
+                            <div align="center">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                    <p:commandButton id="btnPiezas"
+                                                     title="Selección de piezas"
+                                                     icon="fa fa-file-image-o"
+                                                     value="Selección de piezas"
+                                                     rendered="#{!novedadDanoBean.flagSelectedPiezas}"
+                                                     update="frmDanoB frmDanoP"
+                                                     class="cssWhite OrangeButton"
+                                                     oncomplete="#{novedadDanoBean.vehiculo.idVehiculoTipo.idVehiculoTipo == 1 ? 'PF(\'BusetonDanoVectorDialog\').show()' : 'PF(\'PadronDanoVectorDialog\').show()'}">
+                                        <p:ajax event="click" listener="#{novedadDanoBean.validarExistenciaAccidente}" process="@this" />
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <p:outputLabel rendered="#{novedadDanoBean.selected == null}" id="lblPiezas" value="¿Piezas seleccionadas? #{novedadDanoBean.flagSelectedPiezas ? 'SI' : 'NO'}" />
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <p:outputLabel for="descripcion" value="Descripción" />
+                        <p:inputTextarea id="descripcion" 
+                                         value="#{novedadDanoBean.novedadDano.descripcion}"
+                                         autoResize="true"
+                                         style="width: 100%;height: 100px ;font-size: 16px"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"
+                                         />
+                    </div>
+
+                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="addServ_ruta" value="Ruta"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="addServ_ruta" 
+                                             value="#{novedadDanoBean.idRutaSelected}" 
+                                             filterMatchMode="contains" 
+                                             filter="true" 
+                                             style="width: 99.9999%"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar una ruta">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+
+                                <f:selectItems  value="#{novedadDanoBean.lstRutas}" 
+                                                var="ruta" itemLabel="#{ruta.name}" 
+                                                itemValue="#{ruta.idPrgRoute}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="addServ_ruta" value="¿Vandalismo?"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="addVandalismo" 
+                                             value="#{novedadDanoBean.flagVandalismo}" 
+                                             filterMatchMode="contains" 
+                                             filter="true" 
+                                             style="width: 99.9999%"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar una ruta">
+                                <f:selectItem itemLabel="Sí" itemValue="true" />
+                                <f:selectItem itemLabel="No" itemValue="false" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_dan"
+                             process="@this,frmDano"
+                             update=":msgs,pGrid,messages,frmDano"
+                             action="#{novedadDanoBean.guardar()}"
+                             rendered="#{novedadDanoBean.selected == null }"/>
+            <p:remoteCommand name="rc_dan_upd"
+                             process="@this,frmDano"
+                             update=":msgs,messages"
+                             action="#{novedadDanoBean.actualizar()}" 
+                             rendered="#{novedadDanoBean.selected != null }"/>
+        </h:form>
+        <f:facet name="footer">
+            <center>
+                <p:commandButton value="Guardar"
+                                 icon="fa fa-save"
+                                 onclick="rc_dan()"
+                                 id="btnGuardarNovedadDano"
+                                 class="cssWhite"
+                                 rendered="#{novedadDanoBean.selected == null }">
+                    <p:confirm header="Confirmación"
+                               message="Ésta seguro de asignar la novedad al operador: #{novedadDanoBean.empleado.nombres} #{novedadDanoBean.empleado.apellidos}?" 
+                               icon="fa fa-exclamation-triangle"/>
+                </p:commandButton>
+                <p:commandButton value="Actualizar"
+                                 class="cssWhite"
+                                 onclick="rc_dan_upd()"
+                                 icon="fa fa-save"
+                                 rendered="#{novedadDanoBean.selected != null }"
+                                 />
+                <p:commandButton value="Cerrar" icon="fa fa-times" action="#{novedadDanoBean.cerrar()}"
+                                 class="cssWhite RedButton" onclick="PF('mtipo').hide()"  >
+                </p:commandButton>
+            </center>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="AddFiles.xhtml" />
+    <ui:include src="DanoVectorBuseton.xhtml" />
+    <ui:include src="DanoVectorPadron.xhtml" />
+    <ui:include src="../../../vehiculos/modals/ListVehiculos.xhtml" />
+    <ui:include src="ListaEmpleados.xhtml" />
+</ui:composition>

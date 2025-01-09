@@ -1,0 +1,462 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="novedadesPM" 
+              id="modalnovedadesPM" 
+              modal="true" closeOnEscape="true"
+              responsive="true" closable="false"
+              resizable="false" appendTo="@(body)"
+              class="mr1024_60 mr500_90" position="center top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{novedadIncapacidadBean.selected == null }">
+                                <p:outputLabel value="Nueva novedad programa máster" class="cssWhite"/>
+                            </c:if>
+                            <c:if test="#{novedadIncapacidadBean.selected != null }">
+                                <p:outputLabel
+                                    value="Editar novedad programa máster"
+                                    class="cssWhite"/>
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('novedadesPM').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNovedadesPm">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+
+            <div class="ui-fluid">
+                <div class="ui-g">
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Agregar archivo(s) novedad (IMÁGEN Ó PDF)">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{novedadIncapacidadBean.handleFileUpload}"
+                                              id="archivos"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="4000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG|pdf|PDF)$/"
+                                              update="@this"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG,.pdf,.PDF"
+                                              process="@this"
+                                              disabled="#{novedadIncapacidadBean.isEditing}"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 4mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+
+                    <br/>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha" value="Fecha:" />
+                        <p:calendar id="fecha" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{novedadIncapacidadBean.novedad.fecha}"
+                                    showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    maxdate="today"
+                                    disabled="#{novedadIncapacidadBean.isEditing}"
+                                    requiredMessage="Debe seleccionar una fecha"
+                                    showTodayButton="true"
+                                    navigator="true"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }"
+                                    >
+                            <p:ajax listener="#{novedadIncapacidadBean.validarOperacionCerrada()}"
+                                    event="dateSelect"
+                                    process="@this"
+                                    update="fecha,msgs"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="novedad_tipo" value="Tipo de novedad: *"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText placeholder="Seleccione tipo de novedad"
+                                             id="novedad_tipo"
+                                             value="#{novTipoAndDetBean.novedadTipo.nombreTipoNovedad}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+
+                                    <p:commandButton title="Cargar tipo de novedad"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipo()}"
+                                                     oncomplete="PF('dialog_nov_tipo_wv').show()"
+                                                     >
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="novedad_tipo_detalle" value="Detalle de tipo novedad:*"/> 
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione detalle tipo de novedad"
+                                             id="novedad_tipo_detalle"
+                                             value="#{novTipoAndDetBean.novedadTipoDet.tituloTipoNovedad != null? novTipoAndDetBean.novedadTipoDet.tituloTipoNovedad : ''}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }">
+                                </p:inputText>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar detalle tipo de novedad"
+                                                     id="novedad_tipo_detalleBtn"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     disabled="#{not(novTipoAndDetBean.novedadTipo.idNovedadTipo gt 0) or
+                                                                 novTipoAndDetBean.novedadTipo.nombreTipoNovedad.contains('Daño') }"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipoDetalle()}"
+                                                     oncomplete="PF('dialog_nov_tipo_det_wv').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="desde_grp">
+                        <p:outputLabel for="desde" value="Desde:" />
+                        <p:calendar id="desde" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{novedadIncapacidadBean.novedad.desde}"
+                                    showOn="button" 
+                                    locale="es"
+                                    showTodayButton="true"
+                                    readonlyInput="true"
+                                    required="#{novTipoAndDetBean.novedadTipoDet.fechas == 1}"
+                                    requiredMessage="Fecha desde es requerida"
+                                    disabled="#{not(novTipoAndDetBean.novedadTipoDet.fechas == 1)}"
+                                    navigator="true"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }"
+                                    >
+                            <p:ajax event="dateSelect" process="@this" update="hasta"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5"  jsf:id="hasta_grp">
+                        <p:outputLabel for="hasta" value="Hasta:" />
+                        <p:calendar id="hasta" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{novedadIncapacidadBean.novedad.hasta}"
+                                    mindate="#{novedadIncapacidadBean.novedad.desde}"
+                                    showOn="button" 
+                                    locale="es"
+                                    required="#{novTipoAndDetBean.novedadTipoDet.fechas == 1}"
+                                    requiredMessage="Fecha hasta es requerida"
+                                    disabled="#{not(novTipoAndDetBean.novedadTipoDet.fechas == 1)}"
+                                    readonlyInput="true"
+                                    showTodayButton="true"
+                                    navigator="true"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }"
+                                    >
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="vehiculo" >
+                            <p:outputLabel value="Vehículo" for="@next"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText placeholder="Vehículo"
+                                             disabled="#{novedadIncapacidadBean.isEditing}"
+                                             required="#{novTipoAndDetBean.novedadTipoDet.reqVehiculo eq 1}"
+                                             requiredMessage="Debe asighnar un vehículo a la novedad"
+                                             value="#{novedadIncapacidadBean.c_vehiculo}"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }">
+                                </p:inputText>
+                                <div class="botonFloat" >
+
+                                    <p:commandButton process="vehiculo,@this" 
+                                                     actionListener="#{novedadIncapacidadBean.cargarVehiculo()}"
+                                                     icon="fa fa-search"
+                                                     style="margin: 0px"
+                                                     class="cssWhite"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Operador: *" for="operador"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Nombre completo de operador"
+                                             id="operador"
+                                             value="#{novedadIncapacidadBean.empleado.nombres} #{novedadIncapacidadBean.empleado.apellidos}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar lista de operadores"
+                                                     icon="fa fa-list"
+                                                     process="@this"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     onclick="PF('wVPmEmpleadosListDialog').getPaginator().setPage(0);"
+                                                     update="frmPmEmpleadoList:dtEmpleados"
+                                                     action="#{novedadIncapacidadBean.prepareListEmpleados}"                                     
+                                                     oncomplete="PF('PmEmpleadosListDialog').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="hora_inicio_grp">
+                            <p:outputLabel for="hora_inicio" value="Hora-Ini"/>
+                            <p:inputMask id="hora_inicio" validatorMessage="Hora inicio invalida"  
+                                         value="#{novedadIncapacidadBean.novedad.horaInicio}" 
+                                         required="#{novTipoAndDetBean.novedadTipoDet.reqHoras == 1}"
+                                         disabled="#{not(novTipoAndDetBean.novedadTipoDet.reqHoras == 1) or novedadIncapacidadBean.isEditing}"
+                                         requiredMessage="Hora invalida" mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="hora_inicio"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="hora_fin_grp">
+                            <p:outputLabel for="hora_fin" value="Hora-fin"/>
+                            <p:inputMask id="hora_fin" validatorMessage="Hora fin invalida"  
+                                         value="#{novedadIncapacidadBean.novedad.horaFin}" 
+                                         required="#{novTipoAndDetBean.novedadTipoDet.reqHoras == 1}"
+                                         requiredMessage="Hora invalida" mask="99:99:99" 
+                                         disabled="#{not(novTipoAndDetBean.novedadTipoDet.reqHoras == 1) or novedadIncapacidadBean.isEditing}">
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="hora_fin"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="sitio_grp">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Sitio" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            id="sitio"
+                            maxlength="150"
+                            required="#{novTipoAndDetBean.novedadTipoDet.reqSitio == 1}"
+                            disabled="#{not(novTipoAndDetBean.novedadTipoDet.reqSitio == 1) or novedadIncapacidadBean.isEditing}"
+                            requiredMessage="Debe ingresar un sitio"
+                            value="#{novedadIncapacidadBean.novedad.sitio}"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="hora_grp">
+                            <p:outputLabel for="hora" value="Hora"/>
+                            <p:inputMask id="hora" validatorMessage="Hora invalida"  
+                                         value="#{novedadIncapacidadBean.novedad.hora}" 
+                                         required="#{novTipoAndDetBean.novedadTipoDet.reqHora == 1}"
+                                         disabled="#{not(novTipoAndDetBean.novedadTipoDet.reqHora == 1) or novedadIncapacidadBean.isEditing}"
+                                         requiredMessage="Hora invalida" mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="hora"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" 
+                         jsf:rendered="#{ajustJorndFromGestionServ.visible()}" 
+                         jsf:id="motivo_grp">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Motivo Ajuste Jornada" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="motivo" 
+                                             value="#{prgSerconMotivoJSF.i_prgSerconMotivo}" 
+                                             filter="true"
+                                             disabled="#{novTipoAndDetBean.visibleMotivoJornada()}"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems value="#{prgSerconMotivoJSF.listPrgSerconMotivo}" 
+                                               var="items"
+                                               itemLabel="#{items.descripcion}"
+                                               itemValue="#{items.idPrgSerconMotivo}"/> 
+                                <p:ajax event="change" process="@this" global="false"
+                                        listener="#{prgSerconMotivoJSF.cargarPrgSerconMotivo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:rendered="#{ausentismosBean.flagGestor}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Laboró" for="b_laboro"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectBooleanButton id="b_laboro"
+                                                   value="#{novedadIncapacidadBean.b_laboro}"
+                                                   onLabel="Sí" 
+                                                   offLabel="No"
+                                                   disabled="#{novedadIncapacidadBean.b_laboroParcial}"
+                                                   class="cssWhite"
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times" >
+                                <p:ajax process="@this" 
+                                        update="b_laboroParcial"/>
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:rendered="#{ausentismosBean.flagGestor}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Laboró parcial" for="b_laboroParcial"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectBooleanButton id="b_laboroParcial"
+                                                   value="#{novedadIncapacidadBean.b_laboroParcial}" 
+                                                   onLabel="Sí" 
+                                                   offLabel="No"
+                                                   disabled="#{novedadIncapacidadBean.b_laboro}"
+                                                   class="cssWhite"
+                                                   onIcon="fa fa-check"
+                                                   offIcon="fa fa-times">
+                                <p:ajax process="@this" 
+                                        update="b_laboro"/>
+                            </p:selectBooleanButton>
+
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" 
+                         jsf:rendered="#{novTipoAndDetBean.visibleDesasignarServicios}"
+                         jsf:id="desasig_servicios">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desasignar Servicios desde fecha inicial" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectBooleanButton offLabel="NO" 
+                                               onLabel="SI"
+                                               class="cssWhite"
+                                               id="clear_services"
+                                               title="Hacer clic para cambiar valor"
+                                               onIcon="fa fa-minus-square"
+                                               offIcon="fa fa-external-link-square"
+                                               value="#{novedadIncapacidadBean.b_DesasignarServicios}"/>
+                        </div>
+                    </div>
+                    
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:rendered="false">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="NO laboró" for="b_noLaboro"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectBooleanButton id="b_noLaboro"
+                                                   value="#{novedadIncapacidadBean.b_laboro}"
+                                                   onLabel="Sí"
+                                                   offLabel="No"
+                                                   disabled="#{novedadIncapacidadBean.b_laboro or novedadIncapacidadBean.b_laboroParcial}"
+                                                   onIcon="fa fa-check"
+                                                   offIcon="fa fa-times"
+                                                   class="cssWhite">
+                                <p:ajax process="@this" 
+                                        update="b_laboro,b_laboroParcial"/>
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:rendered="#{ausentismosBean.flagGestor and novedadIncapacidadBean.isEditing}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Soporte" for="b_soporte"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectBooleanButton id="b_soporte"
+                                                   value="#{novedadIncapacidadBean.b_Soporte}"
+                                                   onLabel="Sí"
+                                                   offLabel="No"
+                                                   onIcon="fa fa-check"
+                                                   offIcon="fa fa-times"
+                                                   class="cssWhite">
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:rendered="#{novedadIncapacidadBean.isEditing}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Número semana" for="b_numeroSemana"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:inputNumber value="#{novedadIncapacidadBean.novedad.numeroSemana}"
+                                           id="b_numeroSemana"
+                                           autocomplete="off"
+                                           />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100">
+                        <p:outputLabel for="observaciones" value="Observaciones:" />
+                        <p:inputTextarea id="observaciones" 
+                                         value="#{novedadIncapacidadBean.novedad.observaciones}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una observación"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_nov"
+                             process="@this,frmNovedadesPm"
+                             update="messages,frmNovedadesPm,
+                             frmPrincipal:dtTipo"
+                             action="#{novedadIncapacidadBean.guardarNovedadPM()}"/>
+            <p:remoteCommand name="rc_nov_upd"
+                             process="@this,frmNovedadesPm"
+                             rendered="#{novedadIncapacidadBean.selected != null and not(novTipoAndDetBean.novedadTipo.nombreTipoNovedad.contains('Daño'))}"
+                             update="msgs,frmNovedadesPm,
+                             frmPrincipal:dtTipo"
+                             action="#{novedadIncapacidadBean.actualizarNovedadPM()}"/>
+            <p:remoteCommand name="validarNovedadDuplicada"
+                             process="@this"
+                             update="msgs"
+                             action="#{novedadIncapacidadBean.validarNovedadDuplicada()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             id="btnGuardarNovedadPM"
+                             icon="fa fa-save"
+                             class="cssWhite"
+                             onclick="rc_nov()"
+                             rendered="#{not(novedadIncapacidadBean.isEditing)}"
+                             oncomplete="actualizarIncapacidades()">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro de asignar la novedad al operador: #{novedadIncapacidadBean.empleado.nombres} #{novedadIncapacidadBean.empleado.apellidos}?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-save"
+                             id="btnActualizarNovedadPM"
+                             class="cssWhite"
+                             rendered="#{novedadIncapacidadBean.isEditing and not(novTipoAndDetBean.novedadTipo.nombreTipoNovedad.contains('Daño'))}"
+                             onclick="rc_nov_upd()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="../../zComponent/dialogListNovedadTipo.xhtml" />
+    <ui:include src="../../zComponent/dialogListNovedadTipoDet.xhtml" />
+    <ui:include src="ListaEmpleados.xhtml" />
+    <ui:include src="verificarNovedadPM.xhtml" />
+</ui:composition>

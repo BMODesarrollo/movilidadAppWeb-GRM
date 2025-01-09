@@ -1,0 +1,333 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <h:outputScript name="js/leerQr.js" library="sentinel-layout" />
+        <h:outputScript name="js/gestionQr.js" library="sentinel-layout" />
+    </ui:define>
+    <ui:define name="content">
+        <p:panel > 
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Técnico de patio
+                        </div>
+
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="formTp">
+                <p:poll interval="40" update="formTp" listener="#{tecnicoPatioController.init()}" global="true" />
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="btns_panel_central">
+                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding1">
+                            <p:commandButton icon="fa fa-qrcode"
+                                             value="Entrada / Salida QR"
+                                             action="#{tecnicoPatioController.prepareLeerQR()}"
+                                             onclick="load()"
+                                             title="Click para leer código qr"
+                                             style="margin: 0px"
+                                             styleClass="cssWhite"/>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding1">
+                            <p:commandButton action="#{novedadDanoBean.nuevo(false,prgTcJSFMB.fechaConsulta)}" 
+                                             title="Agregar nueva novedad de daño" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             disabled="#{prgTcJSFMB.flagConciliado or prgTcJSFMB.flagTurnoCerrado}"
+                                             update="frmDano,modalDano"
+                                             value="Daño">
+                                <p:resetInput target="frmDano,modalDano" />
+                            </p:commandButton>
+                        </div>
+                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding1">
+                            <p:commandButton title="Registro de entradas y salidas" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             oncomplete="PF('mentradasalida').show();"
+                                             update="frmEntradaSalida,modalEntradaSalida"
+                                             value="Entrada / Salida manual">
+                                <p:resetInput target="frmEntradaSalida,modalEntradaSalida" />
+                            </p:commandButton>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding1">
+                            <p:commandButton action="#{tecnicoPatioController.estadoActual()}" 
+                                             title="Estado" 
+                                             icon="fa fa-plus"
+                                             oncomplete="PF('estadpv').show();"
+                                             class="cssWhite"
+                                             update="frmEntradaSalida,modalestado"
+                                             value="Estado">
+                                <p:resetInput target="frmEntradaSalida,modalestado" />
+                            </p:commandButton>
+                        </div>
+                        <div class="ui-g-2 ui-md-2 ui-lg-2 Padding2">
+                            <p:commandButton action="#{tecnicoPatioController.busesDiponibles()}" 
+                                             title="Disponibles" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             oncomplete="PF('disponiblestpv').show();"
+                                             update="frmEntradaSalida,modaldisponibles"
+                                             value="Disponibles">
+                                <p:resetInput target="frmEntradaSalida,modaldisponibles" />
+                            </p:commandButton>
+                        </div>
+                    </div>
+                </div>
+                <p:dataTable id="tbltpOn" 
+                             widgetVar="wlvTblTpOn"
+                             var="tp"  
+                             filterDelay="1000"
+                             value="#{tecnicoPatioController.servicesON}" 
+                             scrollable="true"
+                             scrollHeight="300">
+                    <p:column headerText="Confirmar" styleClass="text-center"   width="5%"
+                              exportable="false">
+                        <div class="ui-g Padding0">                            
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Confirmar"
+                                                 action="#{tecnicoPatioController.Guardar(tp.type_entry,tp.id_prg_tc,0)}"
+                                                 process="@this"
+                                                 update="formTp,msgs"
+                                                 icon="fa fa-check">
+                                    <f:setPropertyActionListener value="#{tp.bus}" target="#{tecnicoPatioController.vehiculo.codigo}"/>
+                                    <p:confirm header="Confirmación"
+                                               message="Ésta seguro que desea realizar la acción sobre el vehículo: #{tp.bus}?" 
+                                               icon="fa fa-exclamation-triangle"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                    <p:column headerText="Novedad" styleClass="text-center"  width="6%"
+                              exportable="false">
+                        <div class="ui-g Padding0">                            
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite"
+                                                 rendered="#{tp.type_exit == 1 and tp.novedad == 0}"
+                                                 title="Novedad"
+                                                 oncomplete="PF('novedadtpv').show();"
+                                                 process="@this"
+                                                 update="formTp,msgs"
+                                                 icon="fa fa-plus">
+                                    <f:setPropertyActionListener value="#{tp.id_prg_tc}" target="#{tecnicoPatioController.idPrgTc}"/>
+                                    <p:confirm header="Confirmación"
+                                               message="Ésta seguro que desea registrar una novedad de salida sobre el vehículo: #{tp.bus}?" 
+                                               icon="fa fa-exclamation-triangle"/>
+                                </p:commandButton>
+                                <h:outputText rendered="#{tp.type_exit== 1 and tp.novedad != 0}" value="#{tecnicoPatioController.nombreNovedadTipo(tp.novedad)}" class="cortar" style="width: 100%; font-size: 10px;"/>
+                            </div>
+                        </div>
+                    </p:column>
+                    <p:column headerText="B" width="2%"> 
+                        <div class="battery" title="#{tp.bateria} %">
+                            <div class="#{prgTcJSFMB.getBatteryLevelClass(tp.bateria)}" 
+                                 style="height: #{prgTcJSFMB.getBatteryHeight(tp.bateria)};">
+                            </div>
+                        </div>
+                    </p:column>
+                    <p:column headerText="Tiempo" width="8%"
+                              filterBy="#{tp.type_entry == 1 ? tp.time_destiny : tp.time_origin}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tp.type_entry == 1 ? tp.time_destiny : tp.time_origin}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Tipo" width="6%"
+                              filterBy="#{tp.type_entry == 1 ? 'Entrada' : 'Salida'}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tp.type_entry == 1 ? 'Entrada' : 'Salida'}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Código" width="6%"
+                              filterBy="#{tp.codigo_tm}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tp.codigo_tm}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Nombre"
+                              filterBy="#{tp.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tp.nombre}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Servbus"
+                              filterBy="#{tp.servbus}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tp.servbus}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Vehículo" width="6%"
+                              filterBy="#{tp.bus}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tp.bus}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Tabla" width="3%"
+                              filterBy="#{tp.tabla}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tp.tabla}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Ruta"
+                              filterBy="#{tp.ruta}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tp.ruta}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Tabla tipo" width="6%"
+                              filterBy="#{tp.type_table}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tp.type_table}" style="font-size: 10px;"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        <div style="float: right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="tblveh" fileName="vehiculo #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="tblveh" fileName="vehiculo #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="tblveh" fileName="vehiculo #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+
+                <p:dataTable id="tbltpOff" 
+                             widgetVar="wlvTblTpOff"
+                             var="tp"  
+                             filterDelay="1000"
+                             value="#{tecnicoPatioController.servicesOFF}" 
+                             scrollable="true"
+                             rowStyleClass="rowGrisTitiStyle"
+                             scrollHeight="300">
+                    <p:column headerText="Confirmar" styleClass="text-center"  width="5%"
+                              exportable="false">
+                        <div class="ui-g Padding0">                            
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite"
+                                                 class="cssWhite RedButton"
+                                                 title="Confirmar"
+                                                 action="#{tecnicoPatioController.Guardar(tp.type_entry,tp.id_prg_tc,0)}"
+                                                 process="@this"
+                                                 update="formTp,msgs"
+                                                 icon="fa fa-check">
+                                    <f:setPropertyActionListener value="#{tp.bus}" target="#{tecnicoPatioController.vehiculo.codigo}"/>
+                                    <p:confirm header="Confirmación"
+                                               message="Ésta seguro que desea realizar la acción sobre el vehículo: #{tp.bus}?" 
+                                               icon="fa fa-exclamation-triangle"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                    <p:column headerText="Novedad" styleClass="text-center" width="6%"
+                              exportable="false">
+                        <div class="ui-g Padding0">                            
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite"
+                                                 class="cssWhite RedButton"
+                                                 rendered="#{tp.type_exit == 1 and tp.novedad == 0}"
+                                                 title="Novedad"
+                                                 oncomplete="PF('novedadtpv').show();"
+                                                 process="@this"
+                                                 update="formTp,msgs"
+                                                 icon="fa fa-plus">
+                                    <f:setPropertyActionListener value="#{tp.id_prg_tc}" target="#{tecnicoPatioController.idPrgTc}"/>
+                                    <p:confirm header="Confirmación"
+                                               message="Ésta seguro que desea registrar una novedad de salida sobre el vehículo: #{tp.bus}?" 
+                                               icon="fa fa-exclamation-triangle"/>
+                                </p:commandButton>
+                                <h:outputText rendered="#{tp.type_exit== 1 and tp.novedad != 0}" value="#{tecnicoPatioController.nombreNovedadTipo(tp.novedad)}" class="cortar" style="width: 100%; font-size: 10px;" />
+                            </div>
+                        </div>
+                    </p:column>
+                    <p:column headerText="B" width="2%"> 
+                        <div class="battery" title="#{tp.bateria} %">
+                            <div class="#{prgTcJSFMB.getBatteryLevelClass(tp.bateria)}" 
+                                 style="height: #{prgTcJSFMB.getBatteryHeight(tp.bateria)};">
+                            </div>
+                        </div>
+                    </p:column>
+                    <p:column headerText="Tiempo" width="8%"
+                              filterBy="#{tp.type_entry == 1 ? tp.time_destiny : tp.time_origin}"
+                              filterMatchMode="contains">
+                        <h:outputText class="cssWhite" value="#{tp.type_entry == 1 ? tp.time_destiny : tp.time_origin}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Tipo" width="6%"
+                              filterBy="#{tp.type_entry == 1 ? 'Entrada' : 'Salida'}"
+                              filterMatchMode="contains">
+                        <h:outputText class="cssWhite"  value="#{tp.type_entry == 1 ? 'Entrada' : 'Salida'}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Código" width="6%"
+                              filterBy="#{tp.codigo_tm}"
+                              filterMatchMode="contains">
+                        <h:outputText class="cssWhite" value="#{tp.codigo_tm}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Nombre"
+                              filterBy="#{tp.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText class="cssWhite" value="#{tp.nombre}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Servbus"
+                              filterBy="#{tp.servbus}"
+                              filterMatchMode="contains">
+                        <h:outputText class="cssWhite" value="#{tp.servbus}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Vehículo" width="6%"
+                              filterBy="#{tp.bus}"
+                              filterMatchMode="contains">
+                        <h:outputText class="cssWhite" value="#{tp.bus}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Tabla" width="3%"
+                              filterBy="#{tp.tabla}"
+                              filterMatchMode="contains">
+                        <h:outputText class="cssWhite" value="#{tp.tabla}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Ruta"
+                              filterBy="#{tp.ruta}" 
+                              filterMatchMode="contains">
+                        <h:outputText class="cssWhite" value="#{tp.ruta}" style="font-size: 10px;"/>
+                    </p:column>
+                    <p:column headerText="Tabla tipo" width="6%"
+                              filterBy="#{tp.type_table}"
+                              filterMatchMode="contains">
+                        <h:outputText class="cssWhite" value="#{tp.type_table}" style="font-size: 10px;"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        <div style="float: right">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="tblveh" fileName="vehiculo #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="tblveh" fileName="vehiculo #{now}" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="tblveh" fileName="vehiculo #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="../novedades/modals/novedadDano/Create.xhtml"/>
+        <ui:include src="../tecnicoPatio/modals/Create.xhtml"/>
+        <ui:include src="../tecnicoPatio/modals/CreatefromQR.xhtml"/>
+        <ui:include src="../tecnicoPatio/modals/estado.xhtml"/>
+        <ui:include src="../tecnicoPatio/modals/disponibles.xhtml"/>
+        <ui:include src="../tecnicoPatio/modals/novedad.xhtml"/>
+        <ui:include src="../tecnicoPatio/modals/lecturaQr.xhtml"/>
+        <ui:include src="../tecnicoPatio/modals/asignarVehiculoToServbus.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+

@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="head">
+        <style>
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                padding: 4px 2px;
+                border-radius: 3px;
+            }
+            .background-vehiculo-via {
+                background-color: #96FFE6 !important;
+                background-image: none !important;
+                color: #000000 !important;
+            }
+        </style>
+        <script>
+            function addListenerMsgs() {
+                var x = document.getElementById('noti_id_container');
+                var y = x.querySelector('div[class="ui-growl-icon-close ui-icon ui-icon-closethick"]');
+                y.addEventListener("click", remoteD, false);
+            }
+            function deshabilitarBoton(id) {
+                var v = document.getElementById(id);
+                v.setAttribute("disabled", "true");
+            }
+            function habilitarBoton(id) {
+                var v = document.getElementById(id);
+                v.removeAttribute("disabled");
+            }
+
+            function dateBetween(fDate, lDate, cDate) {
+                // <![CDATA[
+                return (cDate <= lDate && cDate >= fDate);
+                // ]]>
+            }
+            function alertaServicio(id, value) {
+                var elemento = document.getElementById(id + "_id").parentElement;
+                // <![CDATA[
+                switch (value) {
+                    case 2:
+                        elemento.className += " rowOrangeStyle";
+                        break;
+                    case 5:
+                        elemento.className += " rowRedStyle";
+                        break;
+                    case 8:
+                        elemento.className += " rowRedStyle";
+                        break;
+                    case 7:
+                        elemento.className += " rowGrisOscuroStyle";
+                        break;
+                    case 6:
+                        elemento.className += " rowTurquesaStyle";
+                        break;
+                    case 3:
+                        elemento.className += " rowBlueStyle";
+                        break;
+                    case 4:
+                        elemento.className += " rowBlueStyle";
+                        break;
+                    case 9:
+                        elemento.className += " rowRedStyle";
+                        break;
+                    case 99:
+                        elemento.className += " rowRedStyle";
+                        break;
+                    default:
+                }
+                // ]]>
+            }
+            function noEsEliminado(id, value) {
+                var elemento = document.getElementById(id + "_id").parentElement;
+                // <![CDATA[
+                if (value !== 5 && value !== 8 && value !== 9 && value !== 99) {
+                    // ]]>
+                    elemento.className += " rowGrenStyle";
+                } else {
+                    alertaServicio(id, value);
+                }
+            }
+            function consultaAlSeleccionarUF() {
+                listarSinBus();
+                listarSinOperador();
+                listarVehiculoDispo();
+            }
+        </script>
+        <style>
+
+            .animacion {
+                animation-name: parpadeo;
+                animation-duration: 2s;
+                animation-timing-function: linear;
+                animation-iteration-count: infinite;
+
+                -webkit-animation-name: parpadeo;
+                -webkit-animation-duration: 2s;
+                -webkit-animation-timing-function: linear;
+                -webkit-animation-iteration-count: infinite;
+                background-color: #a2a1a1;
+            }
+
+            @-moz-keyframes parpadeo {
+                0% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+
+            @-webkit-keyframes parpadeo {
+                0% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes parpadeo {
+                0% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+            .ui-panel .ui-panel-content.ui-widget-content {
+                padding: 2px;
+                font-size: 14px;
+            }
+            .ui-datatable .ui-paginator .ui-paginator-current {
+                font-size: 15px;
+                padding: 2px;
+                color: #9fadb5;
+            }
+            .ui-datatable .ui-paginator .ui-paginator-first, .ui-datatable .ui-paginator .ui-paginator-prev, .ui-datatable .ui-paginator .ui-paginator-pages .ui-paginator-page, .ui-datatable .ui-paginator .ui-paginator-next, .ui-datatable .ui-paginator .ui-paginator-last, .ui-datatable .ui-paginator .ui-paginator-rpp-options {
+                font-size: 14px;
+                padding: 2px 1px;
+
+            }
+            .ui-tabs-top {
+                border: none;
+            }
+            .ui-tabs-top:hover {
+                border: none;
+            }
+            .ui-notificationbar {
+                width: 40%;
+                padding: 5px;
+                border-radius: 3px;
+            }
+            .ui-tabs .ui-tabs-panel {
+                padding: 0px 0px;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content" >
+        <p:growl sticky="true" 
+                 globalOnly="true"
+                 id="noti_id" 
+                 showDetail="true"
+                 widgetVar="noti_id_wv"
+                 showSummary="true"/>
+        <div class="ui-fluid" jsf:id="IdPanelPrincipalP" style="min-width:80%;min-height:90%;">
+            <div class="ui-g">
+                <div class="ui-g-12 ui-md-6 ui-lg-4 height_port Padding0" jsf:id="basic" style="padding: 0px;
+                     border: solid 1px #d9cfc1;
+                     border-radius: 3px;">
+                    <p:panel header="Operación" style="border: none" id="header_i">
+                        <ui:include src="child/panelLeft.xhtml" />
+                    </p:panel>
+                </div>
+                <p:resizable for="basic" />
+                <div class="ui-g-12 ui-md-6 ui-lg-4 height_port Padding0" jsf:id="basic_ii" style="border: solid 1px #d9cfc1;border-radius: 3px;">
+                    <p:panel header="Novedades" style="border: none">
+                        <ui:include src="child/panelCentral.xhtml"/>
+                    </p:panel>
+                </div>
+                <p:resizable for="basic_ii" />
+                <div class="ui-g-12 ui-md-12 ui-lg-4 height_port Padding0" jsf:id="basic_iii" style="padding: 0px;border: solid 1px #d9cfc1;border-radius: 3px;">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:panel header="Operador" style="border: none">
+                            <ui:include src="child/empleadoPanelPrincipal.xhtml" />
+                        </p:panel>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <ui:include src="child/panelRitgh.xhtml"/>
+                    </div>
+                </div>
+                <p:resizable for="basic_iii" />
+            </div> 
+        </div> 
+        <ui:include src="../danoFlota/modals/novedadDano/Create.xhtml"/>
+        <ui:include src="../multa/Create.xhtml"/>
+        <ui:include src="prgTc/modal/gestionPrgTc.xhtml"/>
+        <ui:include src="prgTc/modal/adicionarServicios.xhtml"/>
+        <ui:include src="prgTc/modal/listaStopPoint.xhtml"/>
+        <ui:include src="prgTc/modal/asignarVehiculoToServbus.xhtml"/>
+        <ui:include src="prgTc/modal/asignarVehiculoToServbusDesasignado.xhtml"/>
+        <ui:include src="prgTc/novedadPM/CreatePP.xhtml"/>
+        <ui:include src="../duplicidadNov.xhtml"/>
+        <ui:include src="serviciosSinAsignar/modal/gestionServbus.xhtml"/>
+    </ui:define>
+</ui:composition>

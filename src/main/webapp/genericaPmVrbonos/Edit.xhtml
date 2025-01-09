@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmVrbonosEditDlg" 
+              widgetVar="PmVrbonosEditDialog" 
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              closable="false"
+              position="center top"
+              resizable="false" 
+              appendTo="@(body)" header="Editar Pm Valor Bono">
+        <p:ajax event="close" listener="#{genPmVrbonosJSF.reset()}" update=":genPmVrbonosListForm:datalist" />
+        <h:form id="PmVrbonosEditForm">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Desde:" for="desde" />
+                        <p:calendar id="desde"
+                                    pattern="yyyy-MM-dd"
+                                    value="#{genPmVrbonosJSF.selected.desde}"
+                                    required="true"
+                                    requiredMessage="Fecha Desde es requerido"
+                                    readonly="#{facesContext.renderResponse}"
+                                    showOn="button"
+                                    locale="es"
+                                    mindate="#{genPmVrbonosJSF.selected.desde}">
+                            <p:ajax event="dateSelect" update="hasta"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Hasta:" for="hasta" />
+                        <p:calendar id="hasta"
+                                    pattern="yyyy-MM-dd" 
+                                    value="#{genPmVrbonosJSF.selected.hasta}" 
+                                    required="true"
+                                    locale="es"
+                                    requiredMessage="Fecha Hasta es requerido"
+                                    readonly="#{facesContext.renderResponse}"
+                                    showOn="button"
+                                    mindate="#{genPmVrbonosJSF.selected.desde}" >
+                            <p:ajax event="dateSelect"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Valor bono salarial:" for="vrBonoSalarial" />
+                        <p:inputNumber id="vrBonoSalarial" 
+                                       value="#{genPmVrbonosJSF.selected.vrBonoSalarial}" 
+                                       required="true" 
+                                       requiredMessage="Valor Bono Salarial es requerido"
+                                       minValue="0"
+                                       maxValue="9999999"
+                                       decimalPlaces="0"
+                                       symbol="$" >
+                        </p:inputNumber>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Valor bono alimentos:" for="vrBonoAlimentos" />
+                        <p:inputNumber id="vrBonoAlimentos"
+                                       value="#{genPmVrbonosJSF.selected.vrBonoAlimentos}"
+                                       required="true" 
+                                       requiredMessage="Valor Bono Alimentos es requerido"
+                                       minValue="0"
+                                       maxValue="9999999"
+                                       decimalPlaces="0"
+                                       symbol="$">
+                        </p:inputNumber>  
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+
+                        <p:outputLabel value="Tipo cargo:" for="idEmpleadoTipoCargo" />
+                        <p:selectOneMenu id="idEmpleadoTipoCargo" 
+                                         value="#{genPmVrbonosJSF.i_idEmpeladoTipoCargo}"
+                                         required="true" 
+                                         requiredMessage="Empleado es requerido"
+                                         filter="true"
+                                         filterMatchMode="startsWith">
+                            <f:selectItem itemLabel="Seleccionar uno" itemValue=""/>
+                            <f:selectItems value="#{genPmVrbonosJSF.listEmpleadoTC}"
+                                           var="Item"
+                                           itemLabel="#{Item.idEmpleadoTipoCargo.nombreCargo}"
+                                           itemValue="#{Item.idEmpleadoTipoCargo.idEmpleadoTipoCargo}"/>
+                            <p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:staticMessage severity="warn" summary="Tenga en cuenta" detail="Fecha Desde no debe ser mayor a Fecha Hasta" />
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" actionListener="#{genPmVrbonosJSF.guardar()}" 
+                             process="@this,PmVrbonosEditForm"
+                             class="cssWhite"
+                             update="genPmVrbonosListForm:datalist,msgs" />
+            <p:remoteCommand name="rcc"
+                             process="@this"
+                             class="cssWhite"
+                             update=":genPmVrbonosListForm:datalist"
+                             oncomplete="PF('PmVrbonosEditDialog').hide();"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnEdit" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+            <p:commandButton id="btnCancelarEdit" 
+                             class="cssWhite RedButton"
+                             icon="fa fa-close"
+                             value="Cancelar" 
+                             onclick="rcc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

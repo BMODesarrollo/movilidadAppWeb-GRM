@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel >
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Costo de mano de obra, detalle de conceptos, variación mensual"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Una unidad funcional" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax global="false"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form>
+                <div class="ui-fluid">
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-4 Padding3">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                <p:staticMessage severity="warn" summary="ADVERTENCIA!!" 
+                                                 detail="Antes de generar el reporte, los valores de recargo (MÓDULO PARAMETRIZACIÓN HORAS) deben ser diligenciados" />
+                            </div>
+                            <div class="EmptyBox20"></div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                                <p:outputLabel value="Fecha inicio: "/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                                <p:calendar value="#{rIRPT8Bean.desde}"
+                                            locale="es"
+                                            pattern="dd/MM/yyyy"
+                                            readonlyInput="true"
+                                            showOn="button"
+                                            required="true"
+                                            placeholder="Seleccione fecha inicio"
+                                            requiredMessage="Debe seleccionar fecha de inicio">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" global="false"/>
+                                </p:calendar>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                                <p:outputLabel value="Fecha fin: "/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding3">
+                                <p:calendar value="#{rIRPT8Bean.hasta}"
+                                            locale="es"
+                                            pattern="dd/MM/yyyy"
+                                            readonlyInput="true"
+                                            showOn="button"
+                                            required="true"
+                                            placeholder="Seleccione fecha fin"
+                                            requiredMessage="Debe seleccionar fecha fin">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" global="false"/>
+                                </p:calendar>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                <p:commandButton value="Generar reporte" icon="fa fa-download"
+                                                 class="cssWhite"
+                                                 update=":msgs"
+                                                 ajax="false"
+                                                 actionListener="#{rIRPT8Bean.generarReporte()}">
+                                    <p:fileDownload value="#{rIRPT8Bean.file}" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

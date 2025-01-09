@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:poll delay="1500"
+                    id="poll"
+                    global="false"
+                    process="@this"
+                    listener="#{reporteSumDistanciaBttcJSF.consultarReporte()}"
+                    interval="120"
+                    update="servicios" />
+
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <div class="EmptyBox5" />
+            <p:panel class="Wid100">
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                Repote Distancia Vehiculo Día
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <div class="Wid100" jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <ui:include src="../zComponent/selectUnidadFuncional.xhtml" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+
+                <p:dataTable id="servicios" 
+                             value="#{reporteSumDistanciaBttcJSF.vehiculosSumDistancia}"
+                             widgetVar="datalistWV"
+                             var="item"
+                             filterDelay="1000"
+                             paginator="true"
+                             rowKey="#{rVar + 1}"
+                             rowIndexVar="rVar"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             reflow="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} records"
+                             emptyMessage="No existen registros">
+
+                    <f:facet name="paginatorTopRight">
+                        <p:commandButton id="btn-consultar"   
+                                         value="Buscar" 
+                                         actionListener="#{reporteSumDistanciaBttcJSF.consultarReporte()}" 
+                                         update="@form,:msgs" 
+                                         process="@this"
+                                         icon="fa fa-search" 
+                                         class="cssWhite" />
+                        <p:commandButton id="toggle" 
+                                         type="button" 
+                                         title="Columnas" 
+                                         icon="fa fa-align-justify"  
+                                         class="OrangeButton cssWhite"/>
+                        <p:columnToggler datasource="servicios" trigger="toggle" />
+                    </f:facet>
+
+                    <p:column headerText="#" 
+                              visible="false"
+                              style="width: 40px" 
+                              class="TexAlCenter" > 
+                        <p:outputLabel value="#{rVar+1}"/>
+                    </p:column>
+                    <p:column headerText="Vehículo" 
+                              filterBy="#{item.codigoVehiculo}"
+                              filterMatchMode="contains" 
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.codigoVehiculo}"
+                                      title="#{item.tipoVehiculo}"/>
+                    </p:column>
+                    <p:column headerText="Placa" 
+                              visible="false"
+                              filterBy="#{item.placaVehiculo}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.placaVehiculo}"/>
+                    </p:column>
+                    <p:column headerText="Tipo Vehículo"
+                              visible="false"
+                              filterBy="#{item.tipoVehiculo}"
+                              filterMatchMode="contains"
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.tipoVehiculo}"/>
+                    </p:column>
+                    <p:column headerText="Ult. Entrada Patio" class="TexAlCenter">
+                        <h:outputText value="#{item.obtenerHoraEntrada()}"/>
+                    </p:column>
+                    <p:column headerText="Patio" filterBy="#{item.obtenerPatioEntrada()}" filterMatchMode="contains" class="TexAlCenter">
+                        <h:outputText value="#{item.obtenerPatioEntrada()}"/>
+                    </p:column>
+                    <p:column headerText="Carga de Bateria" 
+                              class="TexAlCenter" 
+                              sortBy="#{item.currentStatusVehicleGEO.nivelRestanteEnergia}">
+                        <h:outputText value="#{item.currentStatusVehicleGEO.nivelRestanteEnergia}"/>
+                    </p:column>
+                    <p:column headerText="Criterio" 
+                              class="TexAlCenter #{item.criterio eq 'OK' ? 'cssGreen' : (item.criterio eq 'Revisar' ? 'cssYellow' : (item.criterio eq 'Validar' ? 'cssGray' : 'cssRed'))}" 
+                              filterBy="#{item.criterio}"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('datalistWV').filter()" 
+                                             style="max-width: 400px"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Critico" itemValue="Critico"  />
+                                <f:selectItem itemLabel="Validar" itemValue="Validar"  />
+                                <f:selectItem itemLabel="Revisar" itemValue="Revisar"  />
+                                <f:selectItem itemLabel="OK" itemValue="OK"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.criterio}" class="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Recorrido Faltante" class="TexAlCenter">
+                        <h:outputText value="#{item.distanciaVehiculo}"/>
+                    </p:column>
+                    <p:column headerText="Autonomia * Carga" 
+                              class="TexAlCenter #{item.distanciaVehiculo le item.autonomiaCarga ? 'cssGreen' : 'cssRed'}"
+                              sortBy="#{item.autonomiaCarga}">
+                        <h:outputText value="#{item.autonomiaCarga}" class="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Consumo Energia" 
+                              visible="false"
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.currentStatusVehicleGEO.consumoEnergia}"/>
+                    </p:column>
+                    <p:column headerText="Cargando?" 
+                              filterBy="#{item.currentStatusVehicleGEO.cargando}"
+                              filterMatchMode="exact"
+                              class="TexAlCenter">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('datalistWV').filter()" 
+                                             style="max-width: 400px"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Sí" itemValue="true"  />
+                                <f:selectItem itemLabel="No" itemValue="false"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.currentStatusVehicleGEO.cargando ? 'Sí' : 'No'}"/>
+                    </p:column>
+                    <p:column headerText="Fecha de Lectura" class="TexAlCenter">
+                        <h:outputText value="#{item.currentStatusVehicleGEO.fechaHoraLecturaDato}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Lavado" 
+                              filterBy="#{item.lavadoSiNo}"
+                              filterMatchMode="exact" 
+                              class="TexAlCenter">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('datalistWV').filter()" 
+                                             style="max-width: 400px"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Sí" itemValue="SI"  />
+                                <f:selectItem itemLabel="No" itemValue="NO"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.lavadoSiNo}"/>
+                    </p:column>
+                    <p:column headerText="Fecha Lavado"
+                              visible="false"
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.ultimaFechaLavado}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Estado Vehículo"
+                              filterBy="#{item.estadoVehiculo}"
+                              filterMatchMode="exact" 
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.estadoVehiculo}"/>
+                    </p:column>
+                    <p:column headerText="Novedad"
+                              visible="false"
+                              filterBy="#{item.nombreTipoNovedad}"
+                              filterMatchMode="contains" 
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.nombreTipoNovedad}"/>
+                    </p:column>
+                    <p:column headerText="Detalle Novedad" 
+                              filterBy="#{item.tituloTipoNovedad}"
+                              filterMatchMode="contains" 
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.tituloTipoNovedad}"/>
+                    </p:column>
+                    <p:column headerText="Fecha Novedad"
+                              visible="false"
+                              class="TexAlCenter">
+                        <h:outputText value="#{item.fechaNovedad}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="En Patio?"
+                              filterBy="#{item.currentStatusVehicleGEO.patio}"
+                              filterMatchMode="exact"
+                              class="TexAlCenter">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('datalistWV').filter()" 
+                                             style="max-width: 400px"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Sí" itemValue="true"  />
+                                <f:selectItem itemLabel="No" itemValue="false"  />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.currentStatusVehicleGEO.patio ? 'Sí' : 'No'}"/>
+                    </p:column>
+                    <p:column headerText="Map"
+                              exportable="false"
+                              class="TexAlCenter">
+                        <p:commandButton styleClass="cssWhite"
+                                         title="Ver Ubicación"
+                                         action="#{reporteSumDistanciaBttcJSF.mostrarUbicacionVehiculo(item.codigoVehiculo)}"
+                                         process="@this"
+                                         update=":msgs,:map_geo"
+                                         icon="fa fa-map-marker">
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="servicios" fileName="sum distancias vehiculos" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

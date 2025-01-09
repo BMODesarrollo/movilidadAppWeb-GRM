@@ -1,0 +1,241 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center !important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="CARGA DE HALLAZGOS" 
+                 widgetVar="pnlCarga"
+                 collapsed="true" toggleable="true">
+            <div class="ui-fluid">
+                <h:form id="frmCargaJornada" enctype="multipart/form-data">
+                    <p:messages id="messages" showDetail="true" closable="true">
+                        <p:effect type="pulsate" event="load" delay="500" />
+                    </p:messages>
+
+                    <div class="ui-g">
+                        <div class="ui-g-4 ui-md-4 ui-lg-4"/>
+                        <div class="ui-g-4 ui-md-4 ui-lg-4 TexAlCenter MarTop10">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:outputLabel value="Seleccione archivo Excel: "
+                                               styleClass="cssBlack"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:fileUpload fileUploadListener="#{cargaHallazgoBean.handleFileUpload}"
+                                              id="fCargaJornada"
+                                              auto="true" mode="advanced" 
+                                              dragDropSupport="false" multiple="false"
+                                              update="@this,:msgs,:frmPrincipal:dtHallazgos" 
+                                              sizeLimit="2000000" 
+                                              fileLimit="1" 
+                                              process="@this"
+                                              accept=".xlsx"
+                                              allowTypes="/(\.|\/)(xlsx)$/" 
+                                              label="Buscar archivo" 
+                                              chooseIcon="fa fa-upload"
+                                              invalidFileMessage="Debe cargar un archivo excel válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"
+                                              fileLimitMessage="Solo se permite cargar un archivo"
+                                              >
+                                </p:fileUpload>
+                            </div>
+                        </div>
+                        <div class="ui-g-4 ui-md-4 ui-lg-4"/>
+                    </div>
+                </h:form>
+            </div>
+        </p:panel>
+
+        <!-- CONSULTA DE HALLAZGOS GUARDADOS -->
+
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Consulta de hallazgos
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtHallazgos" var="item" 
+                             scrollable="true"
+                             widgetVar="wlVdt_Hallazgos"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             rows="20"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,60,150"
+                             emptyMessage="No existen registros"
+                             value="#{cargaHallazgoBean.lista}">
+
+                    <f:facet name="header">
+                        <div jsf:id="botones">
+                            <div class="ui-fluid">
+                                <div align="right">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-4 ui-lg-6 Padding5">
+                                        </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-6 TexAlRight">
+                                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Desde: " for="fecha_desde" class="cssWhite"/>
+                                                <p:calendar id="fecha_desde" 
+                                                            maxdate="today"
+                                                            readonlyInput="true"
+                                                            locale="es" navigator="true"
+                                                            value="#{cargaHallazgoBean.desde}" placeholder="Fecha">
+                                                    <p:ajax event="dateSelect" process="@this"/>
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Hasta: " for="fecha_fin" class="cssWhite"/>
+                                                <p:calendar id="fecha_fin"
+                                                            maxdate="today"
+                                                            readonlyInput="true"
+                                                            locale="es" navigator="true"
+                                                            value="#{cargaHallazgoBean.hasta}" placeholder="Fecha">
+                                                    <p:ajax event="dateSelect" process="@this"/>
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-search"
+                                                    value="Buscar"
+                                                    process="@this"
+                                                    action="#{cargaHallazgoBean.consultar()}"
+                                                    class="cssWhite"
+                                                    update="dtHallazgos,:msgs,botones"
+                                                    >
+                                                </p:commandButton>       
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="ID"
+                              filterBy="#{item.consecutivo}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.consecutivo}" />
+                    </p:column>
+
+                    <p:column filterBy="#{item.idHallazgoParamArea.nombre}"
+                              styleClass="text-center"
+                              filterMatchMode="contains"
+                              headerText="Área">
+                        <h:outputText value="#{item.idHallazgoParamArea.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha Identificación"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.fechaIdentificacion}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Hora Hallazgo"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.hora}" />
+                    </p:column>
+
+                    <p:column headerText="Zona"
+                              filterBy="#{item.zona}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.zona}" />
+                    </p:column>
+
+                    <p:column headerText="Código Vehículo"
+                              class="text-center"
+                              filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.codigo}"/>
+                    </p:column>
+
+                    <p:column headerText="Código Conductor"
+                              class="text-center"
+                              filterBy="#{item.idEmpleado.codigoTm}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idEmpleado.codigoTm}"/>
+                    </p:column>
+
+                    <p:column headerText="Código Infracción"
+                              filterBy="#{item.codigoInfraccion}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.codigoInfraccion}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción"
+                              class="cortar" style="max-width: 150px !important">
+                        <h:outputText value="#{item.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="Estado"
+                              class="cortar" style="max-width: 150px !important"
+                              filterBy="#{item.estado}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.estado}" />
+                    </p:column>
+
+                    <p:column headerText="Contestar Antes De"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.fechaContestacion}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Dias Restante Contestar"
+                              width="100"
+                              styleClass="text-center">
+                        <h:outputText value="#{cargaHallazgoBean.calcularDiasRestantes(item.fechaContestacion)}" 
+                                      class="cssBlack"/>
+                    </p:column>
+
+                    <p:column styleClass="text-center" rendered="false">
+                        <f:facet name="header">
+                            <h:outputText value="Usuario"/>
+                        </f:facet>
+                        <h:outputText value="#{item.username}">
+                        </h:outputText>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{cargaHallazgoBean.lista.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtHallazgos" 
+                                                fileName="Listado Hallazgos"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+
+    </ui:define>
+
+</ui:composition>

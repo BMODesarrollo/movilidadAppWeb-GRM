@@ -1,0 +1,364 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../../public/template/template-sst.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .cssAmbos{
+                background-color: #048ABF;
+            }
+            .cssPendiente{
+                background-color: #A7C8F2;
+            }
+
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+
+            .ui-filter-column .ui-column-customfilter .custom-filter {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            @media only screen and (max-width: 600px) {
+                .texto-blanco {
+                    color: white !important;
+                    font-weight: bolder !important;
+                }
+            }
+
+            @media screen and (max-width: 500px ) {
+                .modalResponsivo { width: 90% !important;} 
+                .modalResponsivoMaterial { width: 70% !important; }
+            }
+
+            @media screen and (min-width: 1024px ) {
+                .modalResponsivo { width: 70% !important; }
+                .modalResponsivoMaterial { width: 30% !important; }
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Autorizacion Ingreso/salida">
+            <h:form id="frmAutorizacionList">
+                <p:dataTable id="dtAutorizacion"
+                             var="autorizacion" 
+                             value="#{sstAutorizacionPublicoJSF.lstAutorizaciones}"
+                             scrollable="true"
+                             widgetVar="wlDtAutorizacion"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} autorizaciones"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen autorizaciones registradas">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                process="@this"
+                                actionListener="#{sstAutorizacionPublicoJSF.nuevo()}"
+                                oncomplete="PF('wlVAutorizacion').show();"
+                                class="cssWhite"
+                                update=":autorizacion,:frmAutorizacion"
+                                >
+                                <p:resetInput target=":frmAutorizacion:pGridDatos"/>
+                            </p:commandButton>    
+                        </div>
+                    </f:facet>
+
+                    <p:column width="30" exportable="false">
+                        <p:rowToggler />
+                    </p:column>
+
+                    <p:column headerText="Número Documento Visitante" visible="false">
+                        <h:outputText value="#{autorizacion.idSstEmpresaVisitante.numeroDocumento}"/>
+                    </p:column>    
+                    <p:column headerText="Nombre Visitante" visible="false">
+                        <h:outputText value="#{autorizacion.idSstEmpresaVisitante.nombre}"/>
+                    </p:column>    
+                    <p:column headerText="Apellidos Visitante" visible="false">
+                        <h:outputText value="#{autorizacion.idSstEmpresaVisitante.apellidos}"/>
+                    </p:column>    
+
+                    <p:column headerText="Visitante" 
+                              exportable="false"
+                              filterBy="#{autorizacion.idSstEmpresaVisitante.numeroDocumento} #{autorizacion.idSstEmpresaVisitante.nombre} #{autorizacion.idSstEmpresaVisitante.apellidos}">
+                        <h:outputText 
+                            value="#{autorizacion.idSstEmpresaVisitante.numeroDocumento} - "
+                            styleClass="cssBlack"
+                            />
+                        <h:outputText value="#{autorizacion.idSstEmpresaVisitante.nombre} #{autorizacion.idSstEmpresaVisitante.apellidos}"/>
+                    </p:column>
+
+                    <p:column headerText="Tipo Labor">
+                        <h:outputText value="#{autorizacion.idSstTipoLabor.tipoLabor}" />
+                    </p:column>
+
+                    <p:column headerText="Motivo Visita" styleClass="text-word-wrap">
+                        <h:outputText value="#{autorizacion.motivoVisita}" />
+                    </p:column>
+
+                    <p:column headerText="Área Labor"
+                              styleClass="#{autorizacion.idSstAreaEmpresa eq null ? 'cssPendiente texto-blanco':null}">
+                        <h:outputText value="#{autorizacion.idSstAreaEmpresa.area}"
+                                      rendered="#{autorizacion.idSstAreaEmpresa != null}"/>
+                        <h:outputText value="Pendiente"
+                                      style="color: white; font-weight: bolder"
+                                      rendered="#{autorizacion.idSstAreaEmpresa eq null}"/>
+                    </p:column>
+
+                    <p:column headerText="Número Documento Responsable" visible="false">
+                        <h:outputText value="#{autorizacion.idResponsable.identificacion}"/>
+                    </p:column>    
+                    <p:column headerText="Nombre Responsable" visible="false">
+                        <h:outputText value="#{autorizacion.idResponsable.nombres}"/>
+                    </p:column>    
+                    <p:column headerText="Apellidos Responsable" visible="false">
+                        <h:outputText value="#{autorizacion.idResponsable.apellidos}"/>
+                    </p:column>    
+
+                    <p:column headerText="Responsable" 
+                              styleClass="#{autorizacion.idResponsable eq null ? 'cssPendiente texto-blanco':null}"
+                              exportable="false"
+                              filterBy="#{autorizacion.idResponsable.identificacion} #{autorizacion.idResponsable.nombres} #{autorizacion.idResponsable.apellidos}">
+                        <h:outputText 
+                            value="#{autorizacion.idResponsable.identificacion} - "
+                            rendered="#{autorizacion.idResponsable != null}"
+                            styleClass="cssBlack"
+                            />
+                        <h:outputText 
+                            rendered="#{autorizacion.idResponsable != null}"
+                            value="#{autorizacion.idResponsable.nombres} #{autorizacion.idResponsable.apellidos}"/>
+
+                        <h:outputText 
+                            value="Pendiente"
+                            style="color: white; font-weight: bolder"
+                            rendered="#{autorizacion.idResponsable eq null}"
+                            />
+                    </p:column>
+
+                    <p:column headerText="Fecha/Hora llegada">
+                        <h:outputText value="#{autorizacion.fechaHoraLlegada}"
+                                      rendered="#{autorizacion.fechaHoraLlegada != null}">
+                            <f:convertDateTime type="date" pattern="YYYY-MM-dd HH:mm"/>
+                        </h:outputText>
+
+                        <h:outputText value="N/A"
+                                      rendered="#{autorizacion.fechaHoraLlegada == null}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha/Hora salida">
+                        <h:outputText value="#{autorizacion.fechaHoraSalida}"
+                                      rendered="#{autorizacion.fechaHoraSalida != null}">
+                            <f:convertDateTime type="date" pattern="YYYY-MM-dd HH:mm"/>
+                        </h:outputText>
+
+                        <h:outputText value="N/A"
+                                      rendered="#{autorizacion.fechaHoraSalida == null}"/>
+                    </p:column>
+
+                    <p:column style="text-align: center;"
+                              filterBy="#{autorizacion.visitaAprobada}"
+                              styleClass="#{autorizacion.visitaAprobada == 1 ? 'cssGreen texto-blanco' : autorizacion.visitaAprobada == 0 ? 'cssRed texto-blanco' : 'cssPendiente texto-blanco'}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlDtAutorizacion').filter()" styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Sí" itemValue="#{1}"/>
+                                <f:selectItem itemLabel="No" itemValue="#{0}"/>
+                                <f:selectItem itemLabel="Pendiente" itemValue="#{3}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <f:facet name="header">
+                            <h:outputText value="Visita Aprobada"/>
+                        </f:facet>
+                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{autorizacion.visitaAprobada == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{autorizacion.visitaAprobada == 0}"/>
+                        <h:outputText value="Pendiente" style="color: white; font-weight: bolder" rendered="#{autorizacion.visitaAprobada == 3}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              styleClass="#{autorizacion.visitaActiva == 1 ? 'cssGreen texto-blanco' : autorizacion.visitaActiva == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Visita Activa"/>
+                        </f:facet>
+                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{autorizacion.visitaActiva == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{autorizacion.visitaActiva == 0}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              styleClass="#{autorizacion.ingreso == 1 ? 'cssGreen texto-blanco' : autorizacion.ingreso == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Ingresó"/>
+                        </f:facet>
+                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{autorizacion.ingreso == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{autorizacion.ingreso == 0}"/>
+                    </p:column>
+                    <p:column style="text-align: center;"
+                              styleClass="#{autorizacion.salio == 1 ? 'cssGreen texto-blanco' : autorizacion.salio == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Salió"/>
+                        </f:facet>
+                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{autorizacion.salio == 1}"/>
+                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{autorizacion.salio == 0}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha Aprobación">
+                        <h:outputText value="#{autorizacion.fechaAprobacion}"
+                                      rendered="#{autorizacion.fechaAprobacion != null}">
+                            <f:convertDateTime type="date" pattern="YYYY-MM-dd"/>
+                        </h:outputText>
+                        <h:outputText value="N/A" 
+                                      rendered="#{autorizacion.fechaAprobacion eq null}"/>
+                    </p:column>
+
+                    <p:column headerText="Acciones" 
+                              style="text-align: center;"
+                              width="10%"
+                              exportable="false">
+                        <p:commandButton styleClass="cssWhite GreenButton"
+                                         title="Editar"
+                                         process="@this"
+                                         disabled="#{autorizacion.ingreso != 0 or autorizacion.salio != 0}"
+                                         action="#{sstAutorizacionPublicoJSF.editar()}"
+                                         update=":autorizacion,:frmAutorizacion:pGridDatos"
+                                         oncomplete="PF('wlVAutorizacion').show();"
+                                         icon="fa fa-pencil">
+                            <p:resetInput target=":frmAutorizacion:pGridDatos"/>
+                            <f:setPropertyActionListener value="#{autorizacion}" target="#{sstAutorizacionPublicoJSF.selected}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:rowExpansion>
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12"
+                                 jsf:rendered="#{autorizacion.idSstEsMatEqui eq null or empty(autorizacion.idSstEsMatEqui.sstEsMatEquiDetList)}">
+                                <p:staticMessage severity="info" summary="INFO!" detail="No se encuentran materiales registrados" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12" 
+                                 jsf:rendered="#{autorizacion.idSstEsMatEqui != null and not empty(autorizacion.idSstEsMatEqui.sstEsMatEquiDetList)}">
+
+                                <p:dataTable 
+                                    var="detalles" 
+                                    scrollable="true"
+                                    scrollHeight="200"
+                                    emptyMessage="No se encuentran items registrados"
+                                    rows="10"
+                                    value="#{autorizacion.idSstEsMatEqui.sstEsMatEquiDetList}">
+                                    <p:column style="text-align: center;"
+                                              width="10%"
+                                              styleClass="cssAmbos texto-blanco">
+                                        <f:facet name="header">
+                                            <h:outputText value="Tipo Acceso"/>
+                                        </f:facet>
+                                        <h:outputText value="ENTRADA" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.tipoAcceso == 0}"/>
+                                        <h:outputText value="SALIDA" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.tipoAcceso == 1}"/>
+                                        <h:outputText value="AMBOS" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.tipoAcceso == 2}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Item">
+                                        <h:outputText value="#{detalles.idSstMatEqui.nombre}" />
+                                    </p:column>
+
+                                    <p:column headerText="Tipo"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{detalles.idSstMatEqui.idSstMatEquiTipo.tipo}"/>
+                                    </p:column>
+                                    <p:column headerText="Marca"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{detalles.idSstMatEqui.idSstMatEquiMarca.marca}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Serial"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{detalles.serial}" rendered="#{detalles.serial !=null}" />
+                                        <h:outputText value="N/A" rendered="#{empty(detalles.serial)}" />
+                                    </p:column>
+
+                                    <p:column headerText="Cantidad"
+                                              style="text-align: center;"
+                                              width="10%">
+                                        <h:outputText value="#{detalles.cantidad}" />
+                                    </p:column>
+
+                                    <p:column style="text-align: center;"
+                                              width="10%"
+                                              styleClass="#{autorizacion.idSstEsMatEqui.estado == 0 ? 'cssGreen texto-blanco' : autorizacion.idSstEsMatEqui.estado == 1 ? 'cssRed texto-blanco' : autorizacion.idSstEsMatEqui.estado == null ? 'cssPendiente texto-blanco': null}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Estado"/>
+                                        </f:facet>
+                                        <h:outputText value="ENTRÓ" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.estado == 0}"/>
+                                        <h:outputText value="SALIÓ" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.estado == 1}"/>
+                                        <h:outputText value="PENDIENTE" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.estado == null}"/>
+                                    </p:column>
+
+                                    <p:column style="text-align: center;"
+                                              width="10%"
+                                              styleClass="#{autorizacion.idSstEsMatEqui.entradaAprobada == 1 ? 'cssGreen texto-blanco' : autorizacion.idSstEsMatEqui.entradaAprobada == 0 ? 'cssRed texto-blanco' : null}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Entrada Aprobada"/>
+                                        </f:facet>
+                                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.entradaAprobada == 1}"/>
+                                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.entradaAprobada == 0}"/>
+                                    </p:column>
+
+                                    <p:column style="text-align: center;"
+                                              width="10%"
+                                              styleClass="#{autorizacion.idSstEsMatEqui.salidaAprobada == 1 ? 'cssGreen texto-blanco' : autorizacion.idSstEsMatEqui.salidaAprobada == 0 ? 'cssRed texto-blanco' : null}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Salida Aprobada"/>
+                                        </f:facet>
+                                        <h:outputText value="Sí" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.salidaAprobada == 1}"/>
+                                        <h:outputText value="No" style="color: white; font-weight: bolder" rendered="#{autorizacion.idSstEsMatEqui.salidaAprobada == 0}"/>
+                                    </p:column>
+
+                                    <p:column headerText="User Aprueba Entrada"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{autorizacion.idSstEsMatEqui.userApruebaEntrada}" rendered="#{autorizacion.idSstEsMatEqui.userApruebaEntrada != null}" />
+                                        <h:outputText value="N/A" rendered="#{autorizacion.idSstEsMatEqui.userApruebaEntrada eq null}" />
+                                    </p:column>
+
+                                    <p:column headerText="User Aprueba Salida"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{autorizacion.idSstEsMatEqui.userApruebaSalida}" rendered="#{autorizacion.idSstEsMatEqui.userApruebaSalida != null}"/>
+                                        <h:outputText value="N/A" rendered="#{autorizacion.idSstEsMatEqui.userApruebaSalida eq null}" />
+                                    </p:column>
+                                </p:dataTable>
+
+                            </div>
+                        </div>
+                    </p:rowExpansion>
+
+                    <f:facet name="footer">
+                        En total existen #{sstAutorizacionPublicoJSF.lstAutorizaciones.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtAutorizacion" 
+                                                fileName="Autorizaciones"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="create.xhtml"/>
+        <ui:include src="modal/ListaVisitante.xhtml"/>
+        <ui:include src="modal/ListaMateriales.xhtml"/>
+        <ui:include src="modal/crear_material.xhtml"/>
+    </ui:define>
+
+</ui:composition>

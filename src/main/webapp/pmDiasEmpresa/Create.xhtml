@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmDiasEmpresaCreateDlg" 
+              widgetVar="PmDiasEmpresaCreateDialog" 
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_30 mr500_90"
+              resizable="false"
+              appendTo="@(body)" 
+              closable="false"
+              position="center,top">
+        <p:ajax event="close" listener="#{pmDiasEmpresaController.reset()}" update=":PmDiasEmpresaListForm:datalist" />
+        
+         <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Registrar Pm días Empresa" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('PmDiasEmpresaCreateDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="PmDiasEmpresaCreateForm">
+            <div class="ui-fluid" jsf:rendered="#{pmDiasEmpresaController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desde" for="desde" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="desde" 
+                                        pattern="yyyy-MM-dd" 
+                                        value="#{pmDiasEmpresaController.selected.desde}" 
+                                        title="#{bundle.EditPmDiasEmpresaTitle_desde}"
+                                        mask="9999-99-99"
+                                        mindate="today+1"
+                                        required="true" 
+                                        requiredMessage="Debe ingresar DESDE" showOn="button">
+                                <p:ajax event="dateSelect" update="hasta" />
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Hasta" for="hasta" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hasta" 
+                                        pattern="yyyy-MM-dd"  
+                                        mask="9999-99-99"
+                                        value="#{pmDiasEmpresaController.selected.hasta}" 
+                                        title="#{bundle.EditPmDiasEmpresaTitle_hasta}"
+                                        required="true" requiredMessage="Debe ingresar HASTA" showOn="button">
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Número de días" for="NroDias"  />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber maxlength="3" 
+                                           maxValue="100" 
+                                           decimalPlaces="0"    
+                                           minValue="0"  
+                                           id="NroDias" 
+                                           value="#{pmDiasEmpresaController.selected.nroDias}" 
+                                           required="true" 
+                                           requiredMessage="Debe ingresar el NUMERO DE DIAS "  >
+                            </p:inputNumber>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand action="#{pmDiasEmpresaController.registar()}" 
+                             name="rc_de"
+                             update="@form,:PmDiasEmpresaListForm:datalist,msgs" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_de()"
+                             value="Guardar" 
+                             icon="fa fa-save"
+                             class="cssWhite"/>
+        </f:facet>
+    </p:dialog>
+
+</ui:composition>
+

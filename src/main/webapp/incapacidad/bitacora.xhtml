@@ -1,0 +1,448 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            input.readonly,
+            input.readonly.ui-state-focus {
+                background: none;
+                box-shadow: none;
+                border: none;
+            }
+            .calendarFilter .ui-inputfield
+            {
+                width:90px !important;
+                margin: 0 0.2em !important;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .oneLine {
+                display: inline-block;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Bitácora de ausentismos
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="frmSelect">
+                                <p:selectOneMenu 
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                    rendered="#{uniFuncSessionBean.filtradoUF}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="Seleccione unidad funcional" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update=":frmPrincipal:dtTipo" 
+                                            listener="#{ausentismosBean.getByDateRange()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+
+                <p:remoteCommand name="actualizarIncapacidades"
+                                 action="#{ausentismosBean.getByDateRange()}"
+                                 update="dtTipo"/>
+
+                <p:dataTable var="novedad" value="#{ausentismosBean.lista}"
+                             id="dtTipo"
+                             scrollable="true"
+                             scrollHeight="600"
+                             widgetVar="dtNovedades"
+                             disabledTextSelection="false"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1500"
+                             paginator="true"
+                             styleClass="fixed-size"
+                             sortBy="#{novedad.creado}"
+                             sortOrder="descending"
+                             selection="#{ausentismosBean.selected}"
+                             rowKey="#{novedad.idNovedad}"
+                             selectionMode="single"
+                             style="table-layout: fixed;"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen novedades registradas">
+                    <p:cache disabled="true"/>
+
+                    <f:facet name="header">
+                        <div align="center" jsf:id="botones">
+                            <h:outputText value="Seleccione rango de fechas: " title="Rango de fechas"
+                                          style="right: 300px"/>&nbsp;&nbsp;
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{ausentismosBean.fechaInicio}"
+                                        placeholder="Fecha Inicio"
+                                        maxdate="today"
+                                        required="true"
+                                        readonlyInput="true"
+                                        autocomplete="off"
+                                        requiredMessage="Debe seleccionar fecha de inicio"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="lastDate" 
+                                        process="@this"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter"
+                                        mindate="#{ausentismosBean.fechaInicio}"
+                                        value="#{ausentismosBean.fechaFin}"
+                                        required="true"
+                                        autocomplete="off"
+                                        readonlyInput="true"
+                                        requiredMessage="Debe seleccionar fecha fin"
+                                        placeholder="Fecha Fin"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                            </p:calendar>
+                            <p:spacer width="10"/>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Buscar"
+                                actionListener="#{ausentismosBean.getByDateRange()}"
+                                class="cssWhite"
+                                update="dtTipo,:msgs"
+                                >
+                            </p:commandButton>
+                            <p:spacer width="20"/>
+                            <p:commandButton id="btnSeguimientoIncapacidad"
+                                             icon="fa fa-chain-broken"
+                                             value="Seguimiento incapacidad"
+                                             class="cssWhite" style="color: white"
+                                             rendered="#{ausentismosBean.verificarIncapacidad()}"
+                                             update="dtTipo,:frmNovedadIncapacidadList:dtNovedadSeguimientoIncapacidad"
+                                             oncomplete="PF('NovedadIncapacidadListDialog').show();"
+                                             >
+                            </p:commandButton>
+                            <p:spacer width="10"/>
+                            <p:commandButton id="btnDocumentos"
+                                             icon="fa fa-file-text-o" style="color: white"
+                                             value="Documentos de novedad"
+                                             class="OrangeButton cssWhite"
+                                             rendered="#{not(ausentismosBean.selected == null)}"
+                                             update="dtTipo,:frmNovedadDocumentosList"
+                                             oncomplete="PF('NovedadDocumentosListDialog').show();"
+                                             />
+
+                            <p:spacer width="10"/>
+                            <p:commandButton value="Cambiar Puntos"
+                                             id="cambio-puntos"
+                                             update="formaplPM"
+                                             class="GreenButton cssWhite"
+                                             disabled="#{empty ausentismosBean.selected.idNovedad}"
+                                             rendered="#{ausentismosBean.flagGestor}"
+                                             action="#{ausentismosBean.cambiarPuntos()}"
+                                             />
+
+                            <p:spacer width="10"/>
+
+                            <p:commandButton value="Nueva novedad" 
+                                             id="btnNuevaNovedadPM"
+                                             title="Nueva novedad"
+                                             class="cssWhite"
+                                             icon="fa fa-sticky-note"
+                                             action="#{novedadIncapacidadBean.nuevo(null)}"
+                                             actionListener="#{novTipoAndDetBean.prepareModuloAusentismo()}"
+                                             update="frmNovedadesPm,modalnovedadesPM,:msgs">
+                            </p:commandButton>
+
+                            <p:spacer width="10"/>
+
+                            <p:commandButton value="Editar novedad" 
+                                             id="btnEditNovedadPM"
+                                             title="Editar novedad programa máster"
+                                             class="cssWhite"
+                                             icon="fa fa-pencil"
+                                             rendered="#{ausentismosBean.selected != null and (ausentismosBean.flagGestor or ausentismosBean.b_OwnerCreate)}"
+                                             action="#{novedadIncapacidadBean.editar()}"
+                                             update="frmNovedadesPm,modalnovedadesPM">
+                                <f:setPropertyActionListener value="#{ausentismosBean.selected}"
+                                                             target="#{novedadIncapacidadBean.selected}"/>
+                            </p:commandButton>
+
+                            <p:spacer width="10"/>
+
+                            <p:commandButton value="Generar reporte Ausentismos" icon="fa fa-download"
+                                             class="cssWhite GreenButton"
+                                             update=":msgs"
+                                             ajax="false"
+                                             actionListener="#{ausentismosBean.generarReporte()}">
+                                <p:fileDownload value="#{ausentismosBean.archivo}" />
+                            </p:commandButton>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:ajax event="rowSelect" listener="#{ausentismosBean.onRowSelect}" update="botones" />
+                    <p:ajax event="rowUnselect" update="botones"/>
+
+                    <p:column headerText="#" style="width: 30px" toggleable="false">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column filterBy="#{novedad.fecha}" 
+                              filterMatchMode="startsWith"
+                              style="width: 7%"
+                              >
+                        <f:facet name="header">
+                            Fecha
+                        </f:facet>
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('dtNovedades').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dtNovedades').filter()" update="dtTipo"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{novedad.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{novedad.idNovedadTipo.nombreTipoNovedad}">
+                        <f:facet name="header">
+                            Tipo Novedad
+                        </f:facet>
+                        <h:outputText value="#{novedad.idNovedadTipo.nombreTipoNovedad}" />
+                    </p:column>
+                    <p:column id="detTipoNovedad" filterBy="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+                        <f:facet name="header">
+                            Detalle Novedad
+                        </f:facet>
+                        <h:outputText value="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novedad.idNovedadDano eq null and novedad.idMulta eq null}" />
+                        <h:outputText value="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novedad.idNovedadTipoDetalle.idNovedadTipoDetalle gt 0 and novedad.idMulta.idMulta gt 0}" />
+                        <h:outputText value="#{novedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}" rendered="#{novedad.idNovedadDano.idNovedadDano gt 0}"/>
+                        <h:outputText value="#{novedad.idMulta.idMultaTipo.tipo}" 
+                                      rendered="#{novedad.idMulta.idMulta gt 0 and novedad.idNovedadTipoDetalle eq null}"/>
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{novedad.idEmpleado.codigoTm} #{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Operador">
+                        <h:outputText value="#{novedad.idEmpleado.codigoTm} - " class="cssBlack"/>
+                        <h:outputText value="#{novedad.idEmpleado.nombres.concat(' ').concat(novedad.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            Desde
+                        </f:facet>
+                        <h:outputText value="#{novedad.desde}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            Hasta
+                        </f:facet>
+                        <h:outputText value="#{novedad.hasta}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column styleClass="text-center">
+                        <f:facet name="header">
+                            Días
+                        </f:facet>
+                        <h:outputText value="#{ausentismosBean.calcularDias(novedad.desde, novedad.hasta)}"/>
+                    </p:column>
+                    <p:column visible="false">
+                        <f:facet name="header">
+                            Código Operador
+                        </f:facet>
+                        <h:outputText value="#{novedad.idEmpleado.codigoTm}"/>
+                    </p:column>
+                     <p:column visible="false">
+                        <f:facet name="header">
+                            Identificación
+                        </f:facet>
+                         <h:outputText value="#{novedad.idEmpleado.identificacion}"/>
+                    </p:column>
+                    <p:column visible="false">
+                        <f:facet name="header">
+                            Nombre Operador
+                        </f:facet>
+                        <h:outputText value=" #{novedad.idEmpleado.nombres.concat(' ').concat(novedad.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column class="cortar">
+                        <f:facet name="header">
+                            Observación
+                        </f:facet>
+                        <h:outputText value="#{novedad.observaciones}"/>
+                    </p:column>
+                    <p:column id="documento"
+                              styleClass="#{novedad.novedadDocumentosList.size() gt 0 ? 'cssGreen': 'cssRed'}">
+                        <f:facet name="header">
+                            Documento
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.novedadDocumentosList.size() gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.novedadDocumentosList.size() eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+
+                    <p:column id="seguimiento"
+                              styleClass="#{novedad.novedadSeguimientoList.size() gt 0 ? 'cssGreen': novedad.novedadSeguimientoList.size() eq 0 ? 'cssRed':' '}">
+                        <f:facet name="header">
+                            Seguimiento
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.novedadSeguimientoList.size() gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.novedadSeguimientoList.size() eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column id="soporte"
+                              styleClass="#{novedad.soporteAusentismo gt 0 ? 'cssGreen': novedad.soporteAusentismo eq 0 ? 'cssRed':' '}">
+                        <f:facet name="header">
+                            Soporte
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.soporteAusentismo gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.soporteAusentismo eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column styleClass="#{novedad.laboro gt 0 ? 'cssGreen': novedad.laboro eq 0 ? 'cssRed':' '}">
+                        <f:facet name="header">
+                            Laboró
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.laboro gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.laboro eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column styleClass="#{novedad.laboroParcial gt 0 ? 'cssGreen': novedad.laboroParcial eq 0 ? 'cssRed':' '}">
+                        <f:facet name="header">
+                            Laboró Parcial
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.laboroParcial gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.laboroParcial eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column styleClass="#{novedad.noLaboro gt 0 ? 'cssGreen': novedad.noLaboro eq 0 ? 'cssRed':' '}">
+                        <f:facet name="header">
+                            NO Laboró
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.noLaboro gt 0}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.noLaboro eq 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column id="puntosPm" 
+                              rendered="#{ausentismosBean.flagGestor}"
+                              styleClass="text-center">
+                        <f:facet name="header">
+                            <h:outputText value="Puntos PM" title="Puntos programa Máster"/>
+                        </f:facet>
+                        <h:outputText value="#{ausentismosBean.puntoView(novedad)}"  />
+                    </p:column>
+                    <p:column rendered="#{ausentismosBean.flagGestor}" 
+                              styleClass="text-center"
+                              headerText="Puntos PM Conciliados">
+                        <h:outputText value="#{novedad.puntosPmConciliados}"  />
+                    </p:column>
+                    <p:column rendered="#{ausentismosBean.flagGestor}" 
+                              styleClass="text-center"
+                              headerText="Número semana">
+                        <h:outputText value="#{novedad.numeroSemana}"  />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            Usuario
+                        </f:facet>
+                        <h:outputText value="#{novedad.username}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            Creado
+                        </f:facet>
+                        <h:outputText value="#{novedad.creado}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Acción" exportable="false" 
+                              rendered="#{ausentismosBean.flagGestor}"
+                              class="text-center">
+                        <p:commandButton action="#{ausentismosBean.procedeCociliacion(novedad)}"
+                                         icon="fa fa-thumbs-up"
+                                         class="cssWhite GreenButton"
+                                         title="Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea proceder la novedad?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                        <p:spacer width="3"/>
+                        <p:commandButton action="#{ausentismosBean.noProcedeConciliacion(novedad)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite RedButton"
+                                         title="No Procede">
+                            <p:confirm header="Confirmación" message="Está seguro que desea NO proceder con la novedad?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{ausentismosBean.lista.size()} novedad(es) registradas.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtTipo" 
+                                                fileName="bitacora #{now}"
+                                                postProcessor="#{ausentismosBean.postProcessXLS}"
+                                                />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="dtTipo" fileName="bitacora #{now}"  />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                     alt="csv" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="csv" target="dtTipo" fileName="bitacora #{now}"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modals/Create.xhtml"/>
+        <ui:include src="modals/aplica.xhtml"/>
+        <ui:include src="modals/seguimiento/ListaNovedadSeguimiento.xhtml"/>
+        <ui:include src="modals/documentos/ListaNovedadDocumentos.xhtml"/>
+    </ui:define>
+</ui:composition>

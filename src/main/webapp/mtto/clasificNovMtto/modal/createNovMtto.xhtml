@@ -1,0 +1,404 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="nov_mtto_wv" 
+              id="nov_mtto_dlg" 
+              modal="true" 
+              closeOnEscape="true"
+              closable="false"
+              responsive="true"
+              class="mr1024_60 mr500_90"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Novedad Mantenimiento." class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('nov_mtto_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="nov_mtto_form">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-4 Padding5">
+                        <p:outputLabel for="fecha" value="Fecha:" />
+                        <p:calendar id="fecha" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{clasificNovBean.fechaNov}"
+                                    locale="es"
+                                    readonly="true"
+                                    mindate="today"
+                                    maxdate="today"
+                                    disabled="true"
+                                    readonlyInput="true"
+                                    navigator="true">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="vehiculo_grp">
+                            <p:outputLabel value="Vehículo"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Placa Vehículo"
+                                             id="vehiculo"
+                                             required="#{novTipoAndDetBean.novedadTipoDet.reqVehiculo eq 1}"
+                                             requiredMessage="Debe asignar un vehículo a la novedad"
+                                             value="#{clasificNovBean.c_vehiculo}">
+                                    <p:ajax update="nov_mtto_form:cod_vehiculo,nov_mtto_form:vehiculo,btnGuardarNovedadPM,msgs" 
+                                            listener="#{clasificNovBean.cargarVehiculo()}"/>
+                                </p:inputText>
+                                <div class="botonFloat" >
+                                    <p:commandButton process="vehiculo,@this" 
+                                                     style="margin: 0px"
+                                                     update="nov_mtto_form:cod_vehiculo,nov_mtto_form:vehiculo,btnGuardarNovedadPM,msgs"
+                                                     action="#{clasificNovBean.cargarVehiculo()}"
+                                                     icon="fa fa-search"
+                                                     class="cssWhite"/>
+                                    <p:remoteCommand process="vehiculo,@this" 
+                                                     name="cargarVehiculo"
+                                                     update="nov_mtto_form:cod_vehiculo,nov_mtto_form:vehiculo,btnGuardarNovedadPM,msgs"
+                                                     action="#{clasificNovBean.cargarVehiculo()}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="vehiculo_N_grp">
+                            <p:outputLabel value="Vehículo"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="código Vehículo"
+                                             id="cod_vehiculo"
+                                             required="#{novTipoAndDetBean.novedadTipoDet.reqVehiculo eq 1}"
+                                             requiredMessage="Debe asignar un vehículo a la novedad"
+                                             value="#{clasificNovBean.cod_vehiculo}">
+                                    <p:ajax update="nov_mtto_form:cod_vehiculo,nov_mtto_form:vehiculo,btnGuardarNovedadPM,msgs" 
+                                            listener="#{clasificNovBean.cargarVehiculoCodigo()}"/>
+                                </p:inputText>
+                                <div class="botonFloat" >
+                                    <p:commandButton process="cod_vehiculo,@this" 
+                                                     style="margin: 0px"
+                                                     update="nov_mtto_form:cod_vehiculo,nov_mtto_form:vehiculo,btnGuardarNovedadPM,msgs"
+                                                     action="#{clasificNovBean.cargarVehiculoCodigo()}"
+                                                     icon="fa fa-search"
+                                                     class="cssWhite"/>
+                                    <p:remoteCommand process="cod_vehiculo,@this" 
+                                                     name="cargarVehiculoCodigo"
+                                                     update="nov_mtto_form:cod_vehiculo,nov_mtto_form:vehiculo,btnGuardarNovedadPM,msgs"
+                                                     action="#{clasificNovBean.cargarVehiculoCodigo()}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="novedad_tipo" value="Tipo de novedad: *"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione tipo de novedad"
+                                             id="novedad_tipo"
+                                             value="#{novTipoAndDetBean.novedadTipo.nombreTipoNovedad}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar tipo de novedad"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     disabled="true"
+                                                     update="dialog_nov_tipo"
+                                                     process="@this"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipo()}"
+                                                     oncomplete="PF('dialog_nov_tipo_wv').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="novedad_tipo_detalle" value="Detalle de tipo novedad:*"/> 
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione detalle tipo de novedad"
+                                             id="novedad_tipo_detalle"
+                                             value="#{novTipoAndDetBean.novedadTipoDet != null? novTipoAndDetBean.novedadTipoDet.tituloTipoNovedad : ''}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }">
+                                </p:inputText>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar detalle tipo de novedad"
+                                                     id="novedad_tipo_detalleBtn"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipoDetalle()}"
+                                                     disabled="#{not(novTipoAndDetBean.novedadTipo.idNovedadTipo gt 0) or novTipoAndDetBean.novedadTipo.nombreTipoNovedad eq 'Daño' }"
+                                                     oncomplete="PF('dialog_nov_tipo_det_wv').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5 " >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Sistema" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="id_sistema" 
+                                             value="#{clasificNovBean.id_dis_sistema}" 
+                                             filter="true"
+                                             required="true"
+                                             requiredMessage="Se debe seleccionar un sistema."
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno"  itemValue="#{null}" />
+                                <f:selectItems value="#{clasificNovBean.listDistSistema}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}}"
+                                               itemValue="#{item.idDispSistema}"/>
+                                <p:ajax listener="#{clasificNovBean.consultarCausas()}" 
+                                        process="@this"
+                                        update="msgs,nov_mtto_form:id_causa_entrada_lbl"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5 " jsf:id="id_causa_entrada_lbl"
+                         jsf:rendered="#{clasificNovBean.b_input_causa_estrada}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Causa Entrada" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="id_causa_entrada" 
+                                             value="#{clasificNovBean.id_dis_causa_entrada}" 
+                                             filter="true"
+                                             required="#{clasificNovBean.req_causa_entrada}"
+                                             requiredMessage="Se debe seleccionar una causa de entrada."
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno"  itemValue="#{null}" />
+                                <f:selectItems value="#{clasificNovBean.listDistCausaEntrada}" 
+                                               var="causa"
+                                               itemLabel="#{causa.nombre}"
+                                               itemDescription="#{causa.descripcion}}"
+                                               itemValue="#{causa.idDispCausaEntrada}"/>
+                                <p:ajax process="@this" global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5 " >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Estado Pendiente Actual" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="id_estado_pend" 
+                                             value="#{clasificNovBean.id_dis_estado_pendiente}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno"  itemValue="#{null}" />
+                                <f:selectItems value="#{clasificNovBean.listDistEstadoPend}" 
+                                               var="causa"
+                                               itemLabel="#{causa.nombre}"
+                                               itemDescription="#{causa.descripcion}"
+                                               itemValue="#{causa.idDispEstadoPendActual}"/>
+                                <p:ajax process="@this" global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="@next" value="Fecha Hora Posible Habilitación" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:calendar id="fecha_habilita" 
+                                        value="#{clasificNovBean.fechaHoraHabilitacion}" 
+                                        locale="es"
+                                        navigator="true"
+                                        showOn="button"
+                                        timeControlType="select"
+                                        timeInput="true"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        mask="true">
+                                <p:ajax event="dateSelect" process="@this" global="false"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" 
+                         jsf:rendered="#{clasificNovBean.b_input_operador}" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Operador:" for="operador"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Nombre completo de operador"
+                                             id="operador"
+                                             value="#{emplListJSFMB.empl.nombres} #{emplListJSFMB.empl.apellidos}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar lista de operadores"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     update="dialog_empl_form:dialog_empl_dt"
+                                                     action="#{emplListJSFMB.openModalEmpleadoList('nov_mtto_form:operador')}"                                     
+                                                     oncomplete="PF('dialog_empl_wv').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding3">
+                            <p:selectBooleanButton id="to_maximo" value="#{clasificNovBean.toMaximo}" 
+                                                   class="cssWhite"
+                                                   onLabel="Si" offLabel="No" onIcon="fa fa-check" offIcon="fa fa-close">
+                                <p:ajax global="false" process="@this" />
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-9 ui-lg-9 Padding3">
+                            <p:outputLabel for="@next" value="¿Enviar a Maximo?" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding3">
+                            <p:selectBooleanButton id="inmovilizado" value="#{clasificNovBean.inmovilizado}" 
+                                                   class="cssWhite"
+                                                   onLabel="Si" offLabel="No" onIcon="fa fa-check" offIcon="fa fa-close">
+                                <p:ajax global="false" process="@this" />
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-9 ui-lg-9 Padding3">
+                            <p:outputLabel for="@next" value="¿Inmovilizado?" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="atv_lbl">
+                            <p:outputLabel for="atv" 
+                                           rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1}"
+                                           value="¿Requiere atención en vía?"/>
+
+                            <p:selectBooleanButton id="atv"
+                                                   value="#{atvBean.b_atv}"
+                                                   onLabel="Sí"
+                                                   offLabel="No" 
+                                                   rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1}"
+                                                   title="Atención en vía"
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   class="cssWhite">
+                                <p:ajax process="@this" 
+                                        global="false"
+                                        update="nov_mtto_form:SOMAtv_lbl,
+                                        nov_mtto_form:SOMAtv_lbl_ii"/>
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="SOMAtv_lbl">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="SOMAtv" 
+                                           rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1 and
+                                                       atvBean.b_atv}"
+                                           value="Tipo Atención: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectOneMenu  id="SOMAtv" filterMatchMode="contains" filter="true"
+                                              style="width: 99.9999%"
+                                              required="true"
+                                              rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1 and
+                                                          atvBean.b_atv}"
+                                              value="#{atvBean.i_tipoAtención}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                <f:selectItems  value="#{atvBean.lstAtvTipoAtencion}" var="tipoAtv" 
+                                                itemValue="#{tipoAtv.idAtvTipoAtencion}"
+                                                itemLabel="#{tipoAtv.nombre}" />
+                                <p:ajax listener="#{atvBean.findById}" 
+                                        process="@this"
+                                        update="nov_mtto_form:SOMAtv_lbl_ii"
+                                        global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="SOMAtv_lbl_ii">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="op_patio" 
+                                           rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1 and
+                                                       atvBean.b_atv}"
+                                           value="Destino" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:selectOneMenu  id="op_patio" filterMatchMode="contains" filter="true"
+                                              style="width: 99.9999%"
+                                              required="#{atvBean.requeridoDestino}"
+                                              title="Indica lugar en el cual debe llegar el vehículo afectado."
+                                              rendered="#{novTipoAndDetBean.novedadTipoDet.atv==1 and
+                                                          atvBean.b_atv}"
+                                              value="#{atvBean.i_operacionPatio}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                <f:selectItems  value="#{atvBean.lstOperacionPatios}" var="nov" 
+                                                itemValue="#{nov.idOperacionPatios}" itemLabel="#{nov.nombrePatio}" />
+                                <p:ajax listener="#{atvBean.findPatioById()}" 
+                                        process="@this"
+                                        global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="observaciones" value="Observaciones:" />
+                        <p:inputTextarea id="observaciones" 
+                                         value="#{clasificNovBean.observacion}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una observación" />
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_nov"
+                             process="nov_mtto_form"
+                             update="msgs,nov_mtto_form,form_clasific_nov:dt_clasific_nov"
+                             action="#{clasificNovBean.guardarNovMtto()}"/>
+            <p:remoteCommand name="validarNovedadDuplicada"
+                             process="@this"
+                             update="msgs"
+                             action="#{clasificNovBean.validarNovedadDuplicada()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             id="btnGuardarNovedadPM"
+                             onclick="rc_nov()"
+                             oncomplete="actualizarResumenFlota();"
+                             icon="fa fa-check"
+                             class="cssWhite">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro de asignar la novedad al vehículo #{clasificNovBean.vehiculo.codigo}?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="../../../zComponent/dialogListNovedadTipo.xhtml" />
+    <ui:include src="../../../zComponent/dialogListNovedadTipoDet.xhtml" />
+    <ui:include src="../../../zComponent/dialogListEmpleado.xhtml" rendered="#{clasificNovBean.b_input_operador}"/>
+</ui:composition>

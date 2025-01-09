@@ -1,0 +1,136 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="Armamento"
+              widgetVar="wvArmamento" 
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{registroArmamentoBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{registroArmamentoBean.selected != null}">
+            <f:facet name="header">
+                EDITAR DATOS : #{registroArmamentoBean.selected.serial.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <h:form id="frmArmamento">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Marca" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            required="true" 
+                            value="#{registroArmamentoBean.registroArmamento.marca}"
+                            requiredMessage="Debe ingresar una marca"
+                            />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                             <p:outputLabel value="Calibre" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            required="true" 
+                            value="#{registroArmamentoBean.registroArmamento.calibre}"
+                            requiredMessage="Debe ingresar calibre"
+                            />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Serial" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            required="true" 
+                            value="#{registroArmamentoBean.serial}"
+                            requiredMessage="Debe ingresar un serial"
+                            />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Munición" for="@next"/>
+                        </div>
+                        <p:inputNumber 
+                            maxValue="100"
+                            decimalPlaces="0"
+                            required="true"
+                            requiredMessage="Debe ingresar la cantidad de munición"
+                            value="#{registroArmamentoBean.registroArmamento.municion}">
+                            <p:keyFilter regEx="/[\d]/"/>  
+                        </p:inputNumber>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding10">
+                        <div class="ui-g-3 ui-md-3 ui-lg-3">
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6">
+                            <p:commandButton value="Cargar Foto(s)"
+                                             update=":frmAddFiles"
+                                             oncomplete="PF('AddFilesListDialog').show()"
+                                             icon="fa fa-upload"
+                                             styleClass="OrangeButton cssWhite"/>
+                        </div>
+                        <div class="ui-g-3 ui-md-3 ui-lg-3">
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{registroArmamentoBean.flag_rremove_photo}">
+                        <p:staticMessage severity="warn" summary="Información!" detail="Para Eliminar un archivo, hacer clic sobre él" />
+                        <p:dataGrid var="url_foto" id="id_tabla_fotos" 
+                                    value="#{registroArmamentoBean.listFotosActividad}"
+                                    columns="6" layout="grid"
+                                    rowIndexVar="indexgd">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="frmArmamento:id_tabla_fotos"
+                                           action="#{registroArmamentoBean.delete(url_foto)}">
+                                <p:panel>
+                                    <div class="TexAlCenter">
+                                        <div>
+                                            <p:graphicImage cache="false"
+                                                            style="border:1px solid #106ebc; border-radius: 0px;"
+                                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                            width="80%">
+                                                <f:param name="path_foto" value="#{url_foto}" />
+                                            </p:graphicImage>
+                                        </div>
+                                    </div>
+                                </p:panel> 
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{registroArmamentoBean.listFotosActividad.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update=":msgs,pGridDatos,:frmPrincipal:dtArmamento" 
+                             action="#{registroArmamentoBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmPrincipal:dtArmamento"
+                             action="#{registroArmamentoBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{registroArmamentoBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{registroArmamentoBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

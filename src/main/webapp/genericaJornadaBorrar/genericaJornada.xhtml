@@ -1,0 +1,181 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .ui-datatable table tbody tr td {
+                color: #165785;
+                border: solid 1px #E5EBF0;
+                -webkit-transition: all 0.2s ease;
+                -moz-transition: all 0.2s ease;
+                -ms-transition: all 0.2s ease;
+                -o-transition: all 0.2s ease;
+                transition: all 0.2s ease;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="formBorrJornada">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Eliminar Jornada">
+                <p:dataTable id="serconlistLiq" 
+                             value="#{genericaJornadaGestionJSF.listGenericaJornada}" 
+                             var="item"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             reflow="true"
+                             scrollHeight="600"
+                             rowIndexVar="index"
+                             filterDelay="1000"
+                             rowKey="#{index + 1}"
+                             rows="20"
+                             widgetVar="dtserconlist"
+                             rowsPerPageTemplate="20,100,200,500">
+
+                    <f:facet name="footer">
+                        #{genericaJornadaGestionJSF.listGenericaJornada.size()} Registros Encontrados
+                        <h:commandLink rendered="false">
+                            <img src="../../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="serconlistLiq" fileName="Liquidación Jornada"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="open"
+                                             type="button" 
+                                             value="Buscar"
+                                             onclick="PF('jornadaWV').show()"
+                                             icon="fa fa-search" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:spacer width="3"/>
+                            <p:commandButton id="eliminar"
+                                             value="Eliminar Jornadas"
+                                             class="cssWhite RedButton"
+                                             icon="fa fa-trash"
+                                             rendered="#{not empty genericaJornadaGestionJSF.listGenericaJornada}"
+                                             actionListener="#{genericaJornadaGestionJSF.onEliminarJornadaSeleccionada()}"
+                                             update="formBorrJornada, form-jornada"
+                                             process="@this" >
+                                <p:confirm header="Confirmación"
+                                           escape="false"
+                                           message="Las novedades aplicadas para el rango de fechas solicitadas se perderán,&lt;br&gt; ¿Está seguro de proceder al BORRADO DE LAS JORNADAS? Esta acción NO SE PUEDE DESHACER!"
+                                           icon="fa fa-exclamation-triangle" />
+                            </p:commandButton>
+                            <p:spacer width="3"/>
+                            <p:commandButton id="toggler_id" type="button" 
+                                             title="Columnas"
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="serconlistLiq" trigger="toggler_id" />
+
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText  value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Fecha"  style="width: 150px;">
+                        <h:outputText  value="#{item.fecha}">
+                            <f:convertDateTime pattern="yyyy-MMMM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{item.idEmpleado.identificacion} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Empleado">
+                        <h:outputText value="#{item.idEmpleado.identificacion}" class="cssBlack"/>
+                        <h:outputText value=" #{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Nombre">
+                        <h:outputText value="#{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.idEmpleado.identificacion}"
+                              visible="false"
+                              filterMatchMode="contains"
+                              headerText="Documento de identidad">
+                        <h:outputText value="#{item.idEmpleado.identificacion}"/>
+                    </p:column>
+                    <p:column  headerText="Tiempo de producción" style="width: 70px;">
+                        <h:outputText value="#{item.productionTime}"/>
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{item.timeOrigin}" style="width: 70px;"
+                              sortBy="#{item.timeOrigin}"
+                              filterMatchMode="contains"
+                              headerText="Hora Inicio Programada">
+                        <h:outputText value="#{item.timeOrigin}"/>
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{item.timeDestiny}" style="width: 70px;"
+                              filterMatchMode="contains"
+                              sortBy="#{item.timeDestiny}"
+                              headerText="Hora Fin Programada">
+                        <h:outputText value="#{item.timeDestiny}"/>
+                    </p:column>
+                    <p:column exportable="false" style="background-color: green; color: white;width: 70px;"
+                              filterBy="#{item.realTimeOrigin}"
+                              sortBy="#{item.realTimeOrigin}"
+                              filterMatchMode="contains"
+                              headerText="Hora Inicio Real">
+                        <h:outputText value="#{item.nominaBorrada ==0 ? item.realTimeOrigin : '00:00:00'}"/>
+                    </p:column>
+                    <p:column exportable="false" style="background-color: green; color: white;width: 70px;"
+                              filterBy="#{item.realTimeDestiny}"
+                              filterMatchMode="contains"
+                              sortBy="#{item.realTimeDestiny}"
+                              headerText="Hora Fin Real">
+                        <h:outputText value="#{item.nominaBorrada ==0 ? item.realTimeDestiny : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.autorizado}"  style="width: 70px;" 
+                              headerText="Autorizado" 
+                              exportable="false"
+                              styleClass="#{(item.prgModificada==0 or item.autorizado==-1) ? 'cssGray' : item.autorizado eq 1 ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="equals">
+                        <f:facet name="filter">
+                            <p:selectOneButton onchange="PF('dtserconlist').filter()" styleClass="custom-filter">
+                                <f:converter converterId="javax.faces.Integer" />
+                                <f:selectItem itemLabel="Sí" itemValue="1"/>
+                                <f:selectItem itemLabel="No" itemValue="0" />
+                            </p:selectOneButton>
+                        </f:facet>
+                        <h:outputText class="cssWhite" 
+                                      value="#{item.prgModificada==0 ? 'N/A' : item.autorizado==1 ? 'Sí': item.autorizado==-1 ? 'Por Autorizar': 'No'}" />
+                    </p:column>
+                    <p:column  styleClass="#{item.liquidado == 1 ? 'cssGreen' : item.liquidado == 0 ? 'cssRed' : 'cssRed'}"
+                               headerText="Liq"  style="width: 70px;"
+                               exportable="false">
+                        <h:outputText value="#{item.liquidado ==1 ? 'Si' : 'No'}"  styleClass="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Orden Trabajo" visible="false">
+                        <h:outputText  value="#{item.ordenTrabajo}"/>
+                    </p:column>
+                    <p:column  headerText="Motivo" visible="false" exportable="true">
+                        <h:outputText value="#{item.idGenericaJornadaMotivo.descripcion}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.cargada}" 
+                              visible="false"
+                              headerText="Cargada" 
+                              exportable="false"
+                              filterMatchMode="equals">
+                        <f:facet name="filter">
+                            <p:selectOneButton onchange="PF('dtserconlist').filter()" styleClass="custom-filter">
+                                <f:converter converterId="javax.faces.Integer" />
+                                <f:selectItem itemLabel="No" itemValue="0" />
+                            </p:selectOneButton>
+                        </f:facet>
+                        <h:outputText value="#{item.cargada==0 ? 'No' : 'Sí'}" />
+                    </p:column>
+                    <p:column  headerText="Área" exportable="true">
+                        <h:outputText value="#{item.idParamArea.area}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/administrar.xhtml" />
+        <ui:include src="modal/listaEmpleados.xhtml" />
+    </ui:define>
+</ui:composition>

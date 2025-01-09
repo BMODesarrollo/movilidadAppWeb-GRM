@@ -1,0 +1,889 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="content">
+        <h:form id="form-semana-param">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <div class="Padding5"> 
+                <p:tabView id="tabView">
+
+                    <p:tab title="Grupos Vacaciones">
+                        <p:panel header="Grupos Vacaciones">
+                            <p:dataTable id="grupoVacacionesList" 
+                                         value="#{plaRecuGrupoVacacionesBean.listPlaRecuGrupoVacaciones}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuGrupoVacaciones}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuGrupoVacacionesBean.plaRecuGrupoVacaciones}"
+                                         widgetVar="w_grupoVacacionesList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuGrupoVacacionesBean.prepareGuardar()}" 
+                                                         update="dlgPlaRecuGrupoVacaciones" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         process="@this"
+                                                         oncomplete="PF('wvPlaRecuGrupoVacaciones').show()">
+                                            <p:resetInput target="form-registrar-grupoVacaciones"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.grupo}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Grupo"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.grupo}"/>
+                                </p:column>
+                                <p:column headerText="Fecha Inicio" filterBy="#{item.fechaInicio}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.fechaInicio}">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Fecha Fin" filterBy="#{item.fechaFin}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.fechaFin}">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Cupos" filterBy="#{item.cupo}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.cupo}"/>
+                                </p:column>
+                                <p:column headerText="Unidad Funcional" filterBy="#{item.idGopUnidadFuncional.codigo}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.idGopUnidadFuncional.codigo}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuGrupoVacacionesBean.editar(item)}"
+                                                     update="dlgPlaRecuGrupoVacaciones"
+                                                     oncomplete="PF('wvPlaRecuGrupoVacaciones').show()"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion GrupoVacaciones #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    
+                    <p:tab title="Categoría">
+                        <p:panel header="Categoria">
+                            <p:dataTable id="categoriaList" 
+                                         value="#{plaRecuCategoriaBean.listPlaRecuCategoria}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuCategoria}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuCategoriaBean.plaRecuCategoria}"
+                                         widgetVar="w_categoriaList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuCategoriaBean.prepareGuardar()}" 
+                                                         update="form-registrar-categoria" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuCategoria').show()">
+                                            <p:resetInput target="form-registrar-categoria"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.name}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Categoria"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.name}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuCategoriaBean.editar(item)}"
+                                                     update="form-registrar-categoria"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Categoria #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+
+                    <p:tab title="Conducción">
+                        <p:panel header="Conduccion">
+                            <p:dataTable id="conduccionList" 
+                                         value="#{plaRecuConduccionBean.listPlaRecuConduccion}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuConduccion}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuConduccionBean.plaRecuConduccion}"
+                                         widgetVar="w_conduccionList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuConduccionBean.prepareGuardar()}" 
+                                                         update="form-registrar-conduccion" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuConduccion').show()">
+                                            <p:resetInput target="form-registrar-conduccion"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuConduccionBean.editar(item)}"
+                                                     update="form-registrar-conduccion"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Conduccion #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+
+                    <p:tab title="Estado">
+                        <p:panel header="Estado">
+                            <p:dataTable id="estadoList" 
+                                         value="#{plaRecuEstadoBean.listPlaRecuEstado}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuEstado}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuEstadoBean.plaRecuEstado}"
+                                         widgetVar="w_estadoList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuEstadoBean.prepareGuardar()}" 
+                                                         update="form-registrar-estado" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         process="@this"
+                                                         oncomplete="PF('wvPlaRecuEstado').show()">
+                                            <p:resetInput target="form-registrar-estado"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.estado}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Estado"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.estado}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuEstadoBean.editar(item)}"
+                                                     update="form-registrar-estado"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Estado #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    
+                    <p:tab title="Lugar">
+                        <p:panel header="Lugar">
+                            <p:dataTable id="lugarList" 
+                                         value="#{plaRecuLugarBean.listPlaRecuLugar}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuLugar}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuLugarBean.plaRecuLugar}"
+                                         widgetVar="w_lugarList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuLugarBean.prepareGuardar()}" 
+                                                         update="form-registrar-lugar" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         process="@this"
+                                                         oncomplete="PF('wvPlaRecuLugar').show()">
+                                            <p:resetInput target="form-registrar-lugar"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.lugar}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Lugar"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.lugar}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuLugarBean.editar(item)}"
+                                                     update="form-registrar-lugar"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Lugar #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    
+                    <p:tab title="Modalidad">
+                        <p:panel header="Modalidad">
+                            <p:dataTable id="modalidadList" 
+                                         value="#{plaRecuModalidadBean.listPlaRecuModalidad}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuModalidad}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuModalidadBean.plaRecuModalidad}"
+                                         widgetVar="w_modalidadList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuModalidadBean.prepareGuardar()}" 
+                                                         update="form-registrar-modalidad" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuModalidad').show()">
+                                            <p:resetInput target="form-registrar-modalidad"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.modalidad}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Modalidad"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.modalidad}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuModalidadBean.editar(item)}"
+                                                     update="form-registrar-modalidad"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Modalidad #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    
+                    <p:tab title="Motivo">
+                        <p:panel header="Motivo">
+                            <p:dataTable id="motivoList" 
+                                         value="#{plaRecuMotivoBean.listPlaRecuMotivo}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuMotivo}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuMotivoBean.plaRecuMotivo}"
+                                         widgetVar="w_motivoList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuMotivoBean.prepareGuardar()}" 
+                                                         update="form-registrar-motivo" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuMotivo').show()">
+                                            <p:resetInput target="form-registrar-motivo"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.motivo}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Motivo"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.motivo}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuMotivoBean.editar(item)}"
+                                                     update="form-registrar-motivo"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Motivo #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    
+                    <p:tab title="Novedad">
+                        <p:panel header="Novedad">
+                            <p:dataTable id="novedadList" 
+                                         value="#{plaRecuNovedadBean.listPlaRecuNovedad}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuNovedad}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuNovedadBean.plaRecuNovedad}"
+                                         widgetVar="w_novedadList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuNovedadBean.prepareGuardar()}" 
+                                                         update="form-registrar-novedad" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuNovedad').show()">
+                                            <p:resetInput target="form-registrar-novedad"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.nombre}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Novedad"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.nombre}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuNovedadBean.editar(item)}"
+                                                     update="form-registrar-novedad"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Novedad #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    
+                    <p:tab title="Proceso">
+                        <p:panel header="Proceso">
+                            <p:dataTable id="procesoList" 
+                                         value="#{plaRecuProcesoBean.listPlaRecuProceso}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuProceso}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuProcesoBean.plaRecuProceso}"
+                                         widgetVar="w_procesoList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuProcesoBean.prepareGuardar()}" 
+                                                         update="form-registrar-proceso" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuProceso').show()">
+                                            <p:resetInput target="form-registrar-proceso"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.proceso}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Proceso"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.proceso}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuProcesoBean.editar(item)}"
+                                                     update="form-registrar-proceso"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Proceso #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    <p:tab title="Ruta">
+                        <p:panel header="Ruta">
+                            <p:dataTable id="rutaList" 
+                                         value="#{plaRecuRutaBean.listPlaRecuRuta}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuRuta}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rowIndexVar="rIndex"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuRutaBean.plaRecuRuta}"
+                                         widgetVar="w_turnoList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuRutaBean.prepareGuardar()}" 
+                                                         update="form-registrar-ruta" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuRuta').show()">
+                                            <p:resetInput target="form-registrar-ruta"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rIndex+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.ruta}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Ruta"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.ruta}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuRutaBean.editar(item)}"
+                                                     update="form-registrar-ruta"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Ruta #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    
+                    <p:tab title="Turno">
+                        <p:panel header="Turno">
+                            <p:dataTable id="turnoList" 
+                                         value="#{plaRecuTurnoBean.listPlaRecuTurno}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuTurno}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         rows="25"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuTurnoBean.plaRecuTurno}"
+                                         widgetVar="w_turnoList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuTurnoBean.prepareGuardar()}" 
+                                                         update="form-registrar-turno" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuTurno').show()">
+                                            <p:resetInput target="form-registrar-turno"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+                                <p:column filterBy="#{item.turno}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Turno"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.turno}"/>
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuTurnoBean.editar(item)}"
+                                                     update="form-registrar-turno"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Turno #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    <p:tab title="Etapa">
+                        <p:panel header="Etapa">
+                            <p:dataTable id="etapaList" 
+                                         value="#{plaRecuEtapaBean.listPlaRecuEtapa}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuProcesoPro}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuEtapaBean.plaRecuEtapa}"
+                                         widgetVar="w_etapaList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuEtapaBean.prepareGuardar()}" 
+                                                         update="form-registrar-etapa" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuEtapa').show()">
+                                            <p:resetInput target="form-registrar-etapa"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    
+                                </p:column>
+                                <p:column headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuEtapaBean.editar(item)}"
+                                                     update="form-registrar-etapa"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Etapa #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                    <p:tab title="Etapa Detalle">
+                        <p:panel header="Etapa Detalle">
+                            <p:dataTable id="etapaDetList" 
+                                         value="#{plaRecuEtapaBean.listPlaRecuEtapaDet}"
+                                         var="item"
+                                         rowKey="#{item.idPlaRecuProcesoProDet}"
+                                         emptyMessage="No existen registros"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         tableStyle="table-layout:fixed"
+                                         reflow="true"
+                                         filterDelay="1000"
+                                         selectionMode="single" 
+                                         selection="#{plaRecuEtapaBean.plaRecuEtapaDet}"
+                                         widgetVar="w_etapaDetList"
+                                         rowsPerPageTemplate="20,50,100">
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:commandButton id="createButton"
+                                                         icon="fa fa-plus"
+                                                         value="Nuevo" 
+                                                         actionListener="#{plaRecuEtapaBean.prepareGuardarDet()}" 
+                                                         update="form-registrar-etapa-det" 
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         class="cssWhite"
+                                                         oncomplete="PF('wvPlaRecuEtapaDet').show()">
+                                            <p:resetInput target="form-registrar-etapa-det"/>
+                                        </p:commandButton>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="#" style="width: 30px">
+                                    
+                                </p:column>
+                                <p:column headerText="Etapa" filterBy="#{item.idPlaRecuProcesoPro.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.idPlaRecuProcesoPro.descripcion}"/>
+                                </p:column>
+                                <p:column style="width: 30%;" headerText="Descripción" filterBy="#{item.descripcion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </p:column>
+                                <p:column style="width: 80px;" headerText="Duración" filterBy="#{item.duracion}" filterMatchMode="contains">
+                                    <h:outputText value="#{item.duracion}"/>
+                                </p:column>
+                                <p:column headerText="Creado Por" >
+                                    <h:outputText value="#{item.usernameCreate}"/>
+                                </p:column>
+                                <p:column headerText="Opción">
+                                    <p:commandButton icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuEtapaBean.editarDet(item)}"
+                                                     update="form-registrar-etapa-det"> 
+                                    </p:commandButton>          
+                                </p:column>
+                                <f:facet name="footer">
+                                    <h:commandLink>
+                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                             alt="excel" style="width: 24px;height: 24px"/>
+                                        <p:dataExporter type="xlsx" target="datalist" fileName="Planeacion Etapa Detalle #{now}" />
+                                    </h:commandLink>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </h:form>
+        <ui:include src="modal/createCategoria.xhtml"/>
+        <ui:include src="modal/createConduccion.xhtml"/>
+        <ui:include src="modal/createEstado.xhtml"/>
+        <ui:include src="modal/createGrupoVacaciones.xhtml"/>
+        <ui:include src="modal/createLugar.xhtml"/>
+        <ui:include src="modal/createModalidad.xhtml"/>
+        <ui:include src="modal/createMotivo.xhtml"/>
+        <ui:include src="modal/createNovedad.xhtml"/>
+        <ui:include src="modal/createProceso.xhtml"/>
+        <ui:include src="modal/createRuta.xhtml"/>
+        <ui:include src="modal/createTurno.xhtml"/>
+        <ui:include src="modal/createEtapa.xhtml"/>
+        <ui:include src="modal/createEtapaDet.xhtml"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <p:dialog id="idStopPointListDlg" widgetVar="wvStopPointListDialog" modal="true"
+              closeOnEscape="true"
+              position="center top"
+              resizable="false" appendTo="@(body)" class="mr1024_50 mr500_90">
+        <h:form id="frmPrincipalStopPointList">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Un click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="StopPoint" id="tablaStopPoint" value="#{prgTcResumenBean.listPrgStopPoint}"  
+                         selectionMode="single"                
+                         rowIndexVar="nroFila"
+                         widgetVar="tablaStopPointWV"
+                         rows="10"
+                         reflow="true"
+                         paginator="true"
+                         filterDelay="1000"
+                         rowKey="#{StopPoint.idPrgStoppoint}"
+                         emptyMessage="No existen Paradas registradas"       >
+                <p:ajax event="rowSelect" 
+                        listener="#{prgTcResumenBean.onRowDblClckSelectStopPoint}"
+                        process="@this" global="false"/>
+                <p:column headerText="#" style="width: 10%">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column  headerText="Nombre"
+                           filterMatchMode="contains"
+                           filterBy="#{StopPoint.name}">
+                    <h:outputText  value="#{StopPoint.name}" />
+                    <p:tooltip  value="Hacer doble click para seleccionar" trackMouse="true"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

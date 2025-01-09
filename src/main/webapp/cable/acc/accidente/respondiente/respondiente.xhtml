@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    #{cableAccInformeRespondienteJSF.init()}
+    <h:form id="formInformeRespondiente">
+        <div jsf:id="dInformeRespondiente" class="ui-g">
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                 jsf:id="dContainerData"
+                 jsf:rendered="#{cableAccInformeRespondienteJSF.cableAccInformeRespondiente != null}">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" jsf:rendered="#{not empty cableAccInformeRespondienteJSF.cableAccInformeRespondiente.idCableAccInformeRespondiente}">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Primer Respondiente" for="supervisor" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputText id="supervisor" 
+                                     value="#{cableAccInformeRespondienteJSF.cableAccInformeRespondiente.idEmpleadoSupervisor.nombres} #{cableAccInformeRespondienteJSF.cableAccInformeRespondiente.idEmpleadoSupervisor.apellidos}" 
+                                     placeholder="Operador"
+                                     readonly="true"
+                                     required="true"
+                                     requiredMessage="Supervisor es requerido"
+                                     onkeypress="if (event.keyCode === 13) {
+                                                 return false;
+                                             }">
+                        </p:inputText>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0"><span style="visibility: hidden">ss</span></div>
+                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0">
+                    <p:commandButton id="nuevo" 
+                                     value="Nuevo"
+                                     actionListener="#{cableAccInformeRespondienteJSF.prepareGuardar()}"
+                                     rendered="#{empty cableAccInformeRespondienteJSF.cableAccInformeRespondiente.idCableAccInformeRespondiente}"
+                                     class="cssWhite"
+                                     process="@this"
+                                     update="@form,:formRespuesta"
+                                     icon="fa fa-plus" />
+                </div>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12" jsf:id="dTbInformeRespondiente">
+                <p:dataTable id="tbInformeRespondiente"
+                             value="#{cableAccInformeRespondienteJSF.listCableAccInformeRespondienteDet}"
+                             rows="5"
+                             rendered="#{not empty cableAccInformeRespondienteJSF.cableAccInformeRespondiente.idCableAccInformeRespondiente}"
+                             var="item"
+                             rowIndexVar="numRow"
+                             rowsPerPageTemplate="5,10,20"
+                             paginator="true"
+                             reflow="true"
+                             scrollable="true"
+                             scrollHeight="500">
+                    <p:column headerText="#" style="width: 40px">
+                        <p:outputLabel value="#{numRow+1}" />
+                    </p:column>
+                    <p:column headerText="Pregunta">
+                        <div class="ui-g">
+                            <p:outputLabel value="#{item.idCableAccInformePregunta.pregunta}"
+                                           title="#{item.idCableAccInformePregunta.descripcion}"/>
+                        </div>
+                    </p:column>
+                    <p:column headerText="Respuesta">
+                        <p:outputLabel value="#{item.respuesta}" />
+                    </p:column>
+
+                    <p:column headerText="Acciones" style="width: 100px" styleClass="TexAlCenter">
+                        <p:commandButton id="btnOnEditar"
+                                         title="Editar"
+                                         class="cssWhite OrangeButton"
+                                         oncomplete="PF('wvRespuesta').show()"
+                                         update=":formRespuesta"
+                                         icon="fa fa-pencil" />
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+    </h:form>
+</ui:composition>  

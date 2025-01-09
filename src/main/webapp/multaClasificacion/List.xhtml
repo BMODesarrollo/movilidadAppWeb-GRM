@@ -1,0 +1,69 @@
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="../WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <h:form id="MultaClasificacionListForm">
+            <p:panel header="#{bundle.ListMultaClasificacionTitle}">
+                <p:dataTable id="datalist" value="#{multaClasificacionController.items}" var="item"
+                             selectionMode="single" selection="#{multaClasificacionController.selected}"
+                             paginator="true"
+                             filterDelay="1000"
+                             rowKey="#{item.idMultaClasificacion}"
+                             rows="10"
+                             rowsPerPageTemplate="10,20,30,40,50"
+                             >
+
+                    <p:ajax event="rowSelect"   update="createButton editButton "/>
+                    <p:ajax event="rowUnselect" update="createButton editButton "/>
+
+
+                    <p:column width="20%" filterBy="#{item.codigo}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListMultaClasificacionTitle_codigo}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.codigo}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListMultaClasificacionTitle_descripcion}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.descripcion}"/>
+                    </p:column>
+                    <p:column width="10%" sortBy="#{item.metros}">
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListMultaClasificacionTitle_metros}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.metros}" >
+                            <f:convertNumber pattern="#0,000"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column width="20%" filterBy="#{item.codigo}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle.ListMultaClasificacionTitle_idMultaTipo}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.idMultaTipo.tipo}"/>
+                    </p:column>
+
+                    <f:facet id="head" name="header" class="changecolor"  >
+                        <div align="right">
+                            <p:commandButton class="cssWhite" id="createButton" icon="fa fa-plus"   value="#{bundle.Create}" actionListener="#{multaClasificacionController.prepareCreate}" update=":MultaClasificacionCreateForm" oncomplete="PF('MultaClasificacionCreateDialog').show()">
+                                <p:resetInput target="MultaClasificacionCreateForm" ></p:resetInput>
+                            </p:commandButton>
+                            <p:commandButton id="editButton"   class="GreenButton cssWhite"  icon="fa fa-pencil" value="#{bundle.Edit}" update=":MultaClasificacionEditForm" oncomplete="PF('MultaClasificacionEditDialog').show()" disabled="#{empty multaClasificacionController.selected.idMultaClasificacion}"/>
+                        </div>
+
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+

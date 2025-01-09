@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    #{cableAccDocumentoJSF.init()}
+    <h:form id="fDocumento">
+        <div jsf:id="dDocumento" class="ui-g">
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                 jsf:id="dContainerData"
+                 jsf:rendered="#{cableAccDocumentoJSF.cableAccDocumento != null}">
+                <div class="ui-g-12 ui-md-12 ui-lg-6 Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="* Tipo de Documento:" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="test-profesion" 
+                                             value="#{cableAccDocumentoJSF.idAccTipoDocs}" 
+                                             style="width: 99.999%" 
+                                             required="true"
+                                             requiredMessage="Tipo de Documento es requerido">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                <f:selectItems value="#{accTipoDocsJSF.listAccTipoDocs}" 
+                                               var="tpDoc" 
+                                               itemLabel="#{tpDoc.tipoDocs}" 
+                                               itemDescription="#{tpDoc.descripcion}"
+                                               itemValue="#{tpDoc.idAccTipoDocs}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="EmptyBox5" />
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:fieldset legend="Cargar documento">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                <p:fileUpload fileUploadListener="#{cableAccDocumentoJSF.handleFileUpload}" 
+                                              mode="advanced" 
+                                              dragDropSupport="false"
+                                              update=":accidente-form:msg"
+                                              sizeLimit="30000000" 
+                                              fileLimit="50"
+                                              label="Seleccionar" 
+                                              uploadLabel="Cargar" 
+                                              cancelLabel="Cancelar"
+                                              invalidFileMessage="Archivo no válido"
+                                              invalidSizeMessage="El archivo no debe ser mayor a 30mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-6 Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <p:outputLabel value="* Descripción:" />
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <p:inputTextarea id="documento-obser"
+                                         value="#{cableAccDocumentoJSF.cableAccDocumento.descripcion}"
+                                         required="true"
+                                         requiredMessage="Descrpción es requerido"
+                                         maxlength="65000"
+                                         rows="7"
+                                         autoResize="false"/>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding0">
+                        <span style="visibility: hidden">ss</span>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding0">
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                            <p:commandButton id="documento-guardar"
+                                             value="Guardar"
+                                             process="@form,@this"
+                                             update=":accidente-form:msg,@form"
+                                             actionListener="#{cableAccDocumentoJSF.guardar()}"
+                                             rendered="#{empty cableAccDocumentoJSF.cableAccDocumento.idCableAccDocumento}"
+                                             icon="fa fa-check"
+                                             class="cssWhite GreenButton" />
+                            <p:commandButton id="documento-actualizar"
+                                             value="Actualizar"
+                                             process="@form,@this"
+                                             update=":accidente-form:msg,@form"
+                                             actionListener="#{cableAccDocumentoJSF.editar()}"
+                                             rendered="#{not empty cableAccDocumentoJSF.cableAccDocumento.idCableAccDocumento}"
+                                             icon="fa fa-check"
+                                             class="cssWhite GreenButton" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                            <p:commandButton id="documento-cancel"
+                                             value="Cancelar"
+                                             process="@this"
+                                             update="@form"
+                                             actionListener="#{cableAccDocumentoJSF.reset()}"
+                                             icon="fa fa-times"
+                                             class="cssWhite" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                <div class="ui-g-9 ui-md-9 ui-lg-9 Padding3"></div>
+                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding3">
+                    <p:commandButton id="nuevo-documento" 
+                                     value="Nuevo"
+                                     actionListener="#{cableAccDocumentoJSF.prepareGuardar()}"
+                                     rendered="#{empty cableAccDocumentoJSF.cableAccDocumento.idCableAccDocumento}"
+                                     class="cssWhite"
+                                     process="@this"
+                                     update="@form"
+                                     icon="fa fa-plus" />
+                </div>
+            </div>
+            <div class="ui-g-12 ui-md-12 ui-lg-12" jsf:id="panel-doc-tabla">
+                <p:dataTable id="documentos-tabla"
+                             value="#{cableAccDocumentoJSF.listCableAccDocumento}"
+                             var="item"
+                             rowIndexVar="rowIndex"
+                             rowKey="#{item.idCableAccDocumento}"
+                             rows="5"
+                             rowsPerPageTemplate="5,10,20"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             reflow="true"
+                             scrollable="true"
+                             scrollHeight="1000">
+
+                    <f:facet name="header">
+                        Documentos
+                    </f:facet>
+                    <p:column headerText="#" style="width: 40px">
+                        <h:outputText value="#{rowIndex + 1}" />
+                    </p:column>
+                    <p:column headerText="Tipo de Documento">
+                        <div class="ui-g">
+                            <h:outputText value="#{item.idAccTpDocs.tipoDocs}" title="#{item.descripcion}" />
+                        </div>
+                    </p:column>
+                    <p:column headerText="Descripción">
+                        <div class="ui-g">
+                            <h:outputText value="#{item.descripcion}" />
+                        </div>
+                    </p:column>
+                    <p:column headerText="Acciones">
+                        <div class="ui-g">
+                            <div class="ui-g-3 ui-md-3 ui-lg-3" style="text-align: center">
+                                <p:commandButton id="view-doc"
+                                                 icon="fa fa-eye"
+                                                 class="cssWhite"
+                                                 ajax="false"
+                                                 actionListener="#{cableAccDocumentoJSF.prepDownloadLocal(item.paths)}"
+                                                 title="Visualizar Documento"
+                                                 onclick="target = '_blank'"
+                                                 process="@this" >
+                                    <p:fileDownload value="#{cableAccDocumentoJSF.fileDown}" contentDisposition="inline" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3" style="text-align: center">
+                                <p:commandButton id="descargar-documento" 
+                                                 title="Descargar Documento" 
+                                                 ajax="false"
+                                                 actionListener="#{cableAccDocumentoJSF.prepDownloadLocal(item.paths)}"
+                                                 class="cssWhite GreenButton"
+                                                 icon="fa fa-arrow-circle-o-down">
+                                    <p:fileDownload value="#{cableAccDocumentoJSF.fileDown}" />
+                                </p:commandButton>  
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3" style="text-align: center">
+                                <p:commandButton id="documento-editar"
+                                                 title="Editar de la lista"
+                                                 process="@this"
+                                                 update="@form"
+                                                 actionListener="#{cableAccDocumentoJSF.prepareEditar(item)}"
+                                                 class="cssWhite OrangeButton"
+                                                 icon="fa fa-pencil" />
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3" style="text-align: center">
+                                <p:commandButton id="documento-eliminar"
+                                                 process="@this"
+                                                 update="@form,:accidente-form:msg"
+                                                 actionListener="#{cableAccDocumentoJSF.eliminarLista(item)}"
+                                                 title="Eliminar de la lista"
+                                                 class="cssWhite RedButton"
+                                                 icon="fa fa-trash" >
+                                    <p:confirm header="Confirmación" message="Seguro de eliminar este registro de documento?" 
+                                               icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+    </h:form>
+</ui:composition>

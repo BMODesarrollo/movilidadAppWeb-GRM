@@ -1,0 +1,231 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            input.readonly,
+            input.readonly.ui-state-focus {
+                background: none;
+                box-shadow: none;
+                border: none;
+            }
+            .calendarFilter .ui-inputfield
+            {
+                width:90px !important;
+                margin: 0 0.2em !important;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .oneLine {
+                display: inline-block;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="NOVEDADES CON SNC">
+            <h:form id="frmPrincipal">
+                <p:dataTable var="novedad" value="#{calidadBean.lista}"
+                             id="dtTipo"
+                             scrollable="true"
+                             scrollHeight="600"
+                             widgetVar="dtNovedades"
+                             disabledTextSelection="false"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1500"
+                             paginator="true"
+                             styleClass="fixed-size"
+                             sortBy="#{novedad.fecha}"
+                             sortOrder="descending"
+                             style="table-layout: fixed;"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen novedades registradas">
+                    <p:cache disabled="true"/>
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <h:outputText value="Fechas: " title="Fecha Inicio"
+                                          style="right: 300px"/>&nbsp;&nbsp;
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{calidadBean.fechaIni}"
+                                        placeholder="Fecha Ini"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dtTipo" 
+                                        listener="#{calidadBean.getByDateRange()}"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{calidadBean.fechaFin}"
+                                        placeholder="Fecha Fin"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dtTipo" 
+                                        listener="#{calidadBean.getByDateRange()}"/>
+                            </p:calendar>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px" toggleable="false">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Fecha"
+                              filterBy="#{novedad.fecha}" 
+                              filterMatchMode="startsWith"
+                              style="width: 7%"
+                              >
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('dtNovedades').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('dtNovedades').filter()" update="dtTipo"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{novedad.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo Novedad" filterBy="#{novedad.idNovedadTipo.nombreTipoNovedad}">
+                        <h:outputText value="#{novedad.idNovedadTipo.nombreTipoNovedad}" />
+                    </p:column>
+                    <p:column id="detTipoNovedad" filterBy="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+                        <f:facet name="header">
+                            <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novedad.idNovedadDano eq null and novedad.idMulta eq null}" />
+                        <h:outputText value="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{novedad.idNovedadTipoDetalle.idNovedadTipoDetalle gt 0 and novedad.idMulta.idMulta gt 0}" />
+                        <h:outputText value="#{novedad.idNovedadDano.idVehiculoDanoSeveridad.nombre}" rendered="#{novedad.idNovedadDano.idNovedadDano gt 0}"/>
+                        <h:outputText value="#{novedad.idMulta.idMultaTipo.tipo}" 
+                                      rendered="#{novedad.idMulta.idMulta gt 0 and novedad.idNovedadTipoDetalle eq null}"/>
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{novedad.idEmpleado.codigoTm} #{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Operador">
+                        <h:outputText value="#{novedad.idEmpleado.codigoTm} - " class="cssBlack"/>
+                        <h:outputText value=" #{novedad.idEmpleado.nombres.concat(' ').concat(novedad.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column exportable="false" filterBy="#{novedad.oldEmpleado.codigoTm} #{novedad.oldEmpleado.nombres} #{novedad.oldEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Operador Nuevo">
+                        <h:outputText value="#{novedad.oldEmpleado.codigoTm} - " rendered="#{!(novedad.oldEmpleado eq null)}" class="cssBlack" />
+                        <h:outputText value=" #{novedad.oldEmpleado.nombres.concat(' ').concat(novedad.oldEmpleado.apellidos)}" rendered="#{!(novedad.oldEmpleado eq null)}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.oldEmpleado eq null}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Código operador">
+                        <h:outputText value="#{novedad.idEmpleado.codigoTm}" rendered="#{novedad.idEmpleado != null}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.idEmpleado eq null}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Operador" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.idEmpleado.nombres} #{novedad.idEmpleado.apellidos}" rendered="#{novedad.idEmpleado != null}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.idEmpleado eq null}"/>
+                    </p:column>
+
+
+                    <p:column visible="false" headerText="Código Operador Nuevo">
+                        <h:outputText value="#{novedad.oldEmpleado.codigoTm}" rendered="#{novedad.oldEmpleado != null}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.oldEmpleado eq null}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Operador Nuevo" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.oldEmpleado.nombres} #{novedad.oldEmpleado.apellidos}" rendered="#{novedad.oldEmpleado != null}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.oldEmpleado eq null}"/>
+                    </p:column>
+
+                    <p:column headerText="Vehículo" filterBy="#{novedad.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.idVehiculo.codigo}" rendered="#{novedad.idVehiculo != null}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.idVehiculo eq null}"/>
+                    </p:column>
+                    <p:column headerText="Vehículo Nuevo" filterBy="#{novedad.oldVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{novedad.oldVehiculo.codigo}" rendered="#{novedad.oldVehiculo != null}"/>
+                        <h:outputText value="N/A" rendered="#{novedad.oldVehiculo eq null}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Observación" title="Observaciones"/>
+                        </f:facet>
+                        <h:outputText value="#{novedad.observaciones}"/>
+                    </p:column>
+                    <p:column id="procede"
+                              styleClass="#{novedad.procede gt 0 ? 'cssGreen': novedad.procede eq 0 ? 'cssRed' : ''}">
+                        <f:facet name="header">
+                            <h:outputText value="Procede"/>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.procede == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.procede == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column id="liquidada"
+                              rendered="false"
+                              styleClass="#{novedad.liquidada gt 0 ? 'cssGreen': novedad.liquidada eq 0 ? 'cssRed' : ''}">
+                        <f:facet name="header">
+                            <h:outputText value="Liquidada" title="¿Novedad liquidada?"/>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{novedad.liquidada == 1}"
+                                      style=" color: white;"/>
+                        <h:outputText value="No" rendered="#{novedad.liquidada == 0}"
+                                      style=" color: white;"/>
+                    </p:column>
+                    <p:column headerText="SNC" 
+                              filterMatchMode="contains"
+                              filterBy="#{novedad.idNovedadTipoDetalle.idSncDetalle.codigo}">
+                        <h:outputText value="#{novedad.idNovedadTipoDetalle.idSncDetalle.codigo}"
+                                      title="#{novedad.idNovedadTipoDetalle.idSncDetalle.nombre}"/>
+                    </p:column>
+                    <p:column headerText="Usuario" rendered="false">
+                        <h:outputText value="#{novedad.username}"/>
+                    </p:column>
+                    <p:column headerText="Creado">
+                        <h:outputText value="#{novedad.creado}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{calidadBean.lista.size()} novedad(es) registradas.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtTipo" 
+                                                fileName="Novedades_SNC"/>
+                            </h:commandLink>
+                            <h:commandLink>
+                                <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                     alt="pdf" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="pdf" target="dtTipo" fileName="Novedades_SNC"  />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

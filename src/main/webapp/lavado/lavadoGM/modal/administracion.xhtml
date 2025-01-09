@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{lavadoGMJSF.lavadoGm.idLavadoGm != null ? 'EDITAR LAVADO' : 'NUEVO LAVADO'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <p:messages id="msg" showSummary="false" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-fluid Padding0">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{lavadoGMJSF.lavadoGm.estado == 0}">
+                    <div class="ui-g Padding5">
+                        <p:outputLabel value="Vehículo:" />
+                        <p:selectOneMenu id="vehiculo"
+                                         style="width: 99.9999%"
+                                         required="true"
+                                         requiredMessage="Debe seleccionar Vehículo"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{lavadoGMJSF.i_Vehicle}">
+                            <f:selectItem itemLabel="Seleccione uno" noSelectionOption="true"/>
+                            <f:selectItems value="#{lavadoGMJSF.vehiculos}"
+                                           var="r" itemLabel="#{r.codigo}"
+                                           itemValue="#{r.idVehiculo}" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <h:outputText value="Tipo Servicio *"/> <br/>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="s-tp-servicio" value="#{lavadoGMJSF.idLavadoTipoServicio}"
+                                             style="width: 99.999%"
+                                             required="true" 
+                                             requiredMessage="Tipo Servicio es requerido">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                <f:selectItems value="#{lavadoTipoServicioBean.lstLavadoTipoServicios}" 
+                                               var="lts" 
+                                               itemLabel="#{lts.nombre} / Especial: #{lts.especial == 1 ? 'Sí' : 'No' }" 
+                                               itemDescription="#{lts.descripcion}"
+                                               itemValue="#{lts.idLavadoTipoServicio}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <h:outputLink id="motivo" value="#">
+                            <h:outputText value="Motivo" class="cssBlack" />
+                        </h:outputLink>
+                        <p:tooltip id="tool" for="motivo" value="Si el lavado es especial, debe seleccionar un motivo y observación" position="top"/>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="s-motivo" value="#{lavadoGMJSF.idLavadoMotivo}"
+                                             style="width: 99.999%" >
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{lavadoMotivoJSF.listLavadoMotivo}" 
+                                               var="lmt" 
+                                               itemLabel="#{lmt.motivo}" 
+                                               itemDescription="#{lmt.descripcion}"
+                                               itemValue="#{lmt.idLavadoMotivo}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <h:outputText value="Descripción"/> <br />
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="obs-motivo"
+                                             maxlength="60000"
+                                             value="#{lavadoGMJSF.lavadoGm.obsMotivo}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{(lavadoGMJSF.lavadoGm.estado == 1)}">
+                    <div class="ui-g Padding5">
+                        <h:outputText value="Calificación *"/> <br/>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="s-tp-calificacion" value="#{lavadoGMJSF.idLavadoCalificacion}"
+                                             style="width: 99.999%"
+                                             required="true" 
+                                             requiredMessage="Calificación es requerido">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                <f:selectItems value="#{lavadoCalificacionJSF.listLavadoCalificacion}" 
+                                               var="ltc" 
+                                               itemLabel="#{ltc.nombre}" 
+                                               itemDescription="#{ltc.descripcion}"
+                                               itemValue="#{ltc.idLavadoCalificacion}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             rendered="#{lavadoGMJSF.lavadoGm.estado == 0}"
+                             process="@form,@this"
+                             update=":form,@form"
+                             actionListener="#{lavadoGMJSF.procesarLavado()}"/>
+            <p:remoteCommand name="calificar"
+                             rendered="#{(lavadoGMJSF.lavadoGm.estado == 1 and lavadoGMJSF.lavadoGm.fechaCalifica == null)}"
+                             process="@form,@this"
+                             update=":form,@form"
+                             actionListener="#{lavadoGMJSF.calificarLavado()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="#{lavadoGMJSF.lavadoGm.idLavadoGm == null ? 'Guardar' : 'Actualizar'}" 
+                             icon="fa fa-save"
+                             class="cssWhite" 
+                             rendered="#{lavadoGMJSF.lavadoGm.estado == 0}"
+                             onclick="guardar()"/>
+            <p:commandButton value="Calificar" 
+                             icon="fa fa-check"
+                             class="cssWhite" 
+                             rendered="#{(lavadoGMJSF.lavadoGm.estado == 1 and lavadoGMJSF.lavadoGm.fechaCalifica == null)}"
+                             onclick="calificar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

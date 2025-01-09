@@ -1,0 +1,300 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="head">
+        <style>
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                padding: 2px 5px;
+            }
+            .btn-flex{
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Bitácora Novedades Diferidas MTTO.">
+            <h:form id="form_historico_nov_mtto">
+                <p:dataTable id="dt_historico_nov_mtto" 
+                             widgetVar="wv_historico_nov_mtto_dt"
+                             var="item"
+                             paginator="true"
+                             filterDelay="700"
+                             tableStyle="table-layout:auto"
+                             emptyMessage="No se han encontrado registros."
+                             rowStyleClass="text-center"
+                             value="#{repNovedadesDiferidasBean.listNovs}" 
+                             rowKey="#{item.idNovedad}"
+                             rowIndexVar="rVar"
+                             rows="20">
+                    <f:facet name="header">
+                        <div align="right">
+                            <h:outputText value="Fechas: " title="Fecha Inicio"
+                                          style="right: 300px"/>
+                            <p:calendar id="firstDate" styleClass="calendarFilter" 
+                                        value="#{repNovedadesDiferidasBean.desde}"
+                                        placeholder="Fecha Ini"
+                                        maxdate="today"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dt_historico_nov_mtto" 
+                                        listener="#{repNovedadesDiferidasBean.consultarNov()}"/>
+                            </p:calendar>
+                            -
+                            <p:calendar id="lastDate" styleClass="calendarFilter" 
+                                        value="#{repNovedadesDiferidasBean.hasta}"
+                                        placeholder="Fecha Fin"
+                                        maxdate="today+1"
+                                        pattern="dd-MM-yyyy" locale="es"
+                                        style="right: 300px">
+                                <p:ajax event="dateSelect" update="dt_historico_nov_mtto" 
+                                        listener="#{repNovedadesDiferidasBean.consultarNov()}"/>
+                            </p:calendar>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dt_historico_nov_mtto" 
+                                             trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        Total Registros #{repNovedadesDiferidasBean.listNovs.size()}
+                        <div align="right">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dt_historico_nov_mtto" fileName="BITÁCORA NOVEDADES DIFERIDAS MTTO." />
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                    <p:column width="2%" exportable="false">
+                        <p:rowToggler />
+                    </p:column>
+                    <p:column headerText="Creado">
+                        <h:outputText value="#{item.creado}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="U_F"
+                              filterBy="#{item.idVehiculo.idGopUnidadFuncional.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.idGopUnidadFuncional.codigo}" />
+                    </p:column>
+                    <p:column headerText="Vehículo"
+                              filterBy="#{item.idVehiculo.codigo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idVehiculo.codigo}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idVehiculo.placa}"
+                              exportable="false"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <div class="cortar_header">
+                                <h:outputText value="Placa Vehículo" />
+                            </div>
+                        </f:facet>
+                        <h:outputText value="#{item.idVehiculo.placa}" />
+                    </p:column>
+                    <p:column headerText="Placa Vehículo" visible="false    ">
+                        <h:outputText value="#{item.idVehiculo.placa}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idNovedadTipoDetalle.tituloTipoNovedad}"
+                              exportable="false"
+                              filterMatchMode="in">
+                        <f:facet name="header">
+                            <div class="cortar_header">
+                                <h:outputText value="Tipo Detalle" />
+                            </div>
+                        </f:facet>
+                        <f:facet name="filter">
+                            <p:selectCheckboxMenu label="Detalles"
+                                                  onchange="PF('wv_historico_nov_mtto_dt').filter()"
+                                                  styleClass="custom-filter">
+                                <f:selectItems value="#{repNovedadesDiferidasBean.listaTipoDetalle}" />
+                            </p:selectCheckboxMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                    </p:column>
+                    <p:column headerText="Tipo Detalle" visible="false">
+                        <h:outputText value="#{item.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idNovedadTipoDetalle.idVehiculoTipoEstadoDet.nombre}"
+                              exportable="false"
+                              filterMatchMode="in">
+                        <f:facet name="header">
+                            <div class="cortar_header">
+                                <h:outputText value="Causa Tipo Detalle" />
+                            </div>
+                        </f:facet>
+                        <f:facet name="filter">
+                            <p:selectCheckboxMenu label="Causas"
+                                                  onchange="PF('wv_historico_nov_mtto_dt').filter()"
+                                                  styleClass="custom-filter">
+                                <f:selectItems value="#{repNovedadesDiferidasBean.listaCausaTipoDetalle}" />
+                            </p:selectCheckboxMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idNovedadTipoDetalle.idVehiculoTipoEstadoDet.nombre}" />
+                    </p:column>
+                    <p:column headerText="Causa Tipo Detalle" visible="false">
+                        <h:outputText value="#{item.idNovedadTipoDetalle.idVehiculoTipoEstadoDet.nombre}" />
+                    </p:column>
+                    <p:column headerText="Sistema" 
+                              filterBy="#{item.idDispClasificacionNovedad.idDispSistema.nombre}"
+                              filterMatchMode="in">
+                        <f:facet name="filter">
+                            <p:selectCheckboxMenu label="Sistemas"
+                                                  onchange="PF('wv_historico_nov_mtto_dt').filter()"
+                                                  styleClass="custom-filter">
+                                <f:selectItems value="#{repNovedadesDiferidasBean.listaSistema}" />
+                            </p:selectCheckboxMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idDispClasificacionNovedad.idDispSistema.nombre}" />
+                    </p:column>
+                    <p:column headerText="Observación" class="cortar" style="max-width: 150px !important">
+                        <h:outputText value="#{item.idDispClasificacionNovedad.observacion}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idDispClasificacionNovedad.idDispEstadoPendActual.nombre}"
+                              exportable="false"
+                              filterMatchMode="in">
+                        <f:facet name="header">
+                            <div class="cortar_header">
+                                <h:outputText value="Estado Pendiente Actual" />
+                            </div>
+                        </f:facet>
+                        <f:facet name="filter">
+                            <p:selectCheckboxMenu label="Estados"
+                                                  onchange="PF('wv_historico_nov_mtto_dt').filter()"
+                                                  styleClass="custom-filter">
+                                <f:selectItems value="#{repNovedadesDiferidasBean.listaEstadoPendActual}" />
+                            </p:selectCheckboxMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idDispClasificacionNovedad.idDispEstadoPendActual.nombre}" />
+                    </p:column>
+                    <p:column headerText="Estado Pendiente Actual" visible="false">
+                        <h:outputText value="#{item.idDispClasificacionNovedad.idDispEstadoPendActual.nombre}" />
+                    </p:column>
+                    <p:column headerText="Posible Habilitación">
+                        <h:outputText value="#{item.idDispClasificacionNovedad.fechaHabilitacion}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tiempo Inoperativo (Hr.)">
+                        <h:outputText value="#{repNovedadesDiferidasBean.tiempoInoperativo(item)}" />
+                    </p:column>
+                    <p:column headerText="Reporta" 
+                              filterBy="#{item.username}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.username}" />
+                    </p:column>
+                    <p:column headerText="Usuario Cierre">
+                        <h:outputText value="#{item.usuarioCierre}" />
+                    </p:column>
+                    <p:column headerText="Fecha/Hora Cierre">
+                        <h:outputText value="#{item.fechaCierre}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="No_SR">
+                        <h:outputText value="#{item.idDispClasificacionNovedad.mxTicketId}" />
+                    </p:column>
+                    <p:column headerText="Tipo"
+                              filterBy="#{item.idNovedadTipo.nombreTipoNovedad}"
+                              filterMatchMode="in">
+                        <f:facet name="filter">
+                            <p:selectCheckboxMenu label="Tipos"
+                                                  onchange="PF('wv_historico_nov_mtto_dt').filter()"
+                                                  styleClass="custom-filter">
+                                <f:selectItems value="#{repNovedadesDiferidasBean.listaTipoNovedad}" />
+                            </p:selectCheckboxMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idNovedadTipo.nombreTipoNovedad}" />
+                    </p:column>
+                    <p:column filterBy="#{item.idVehiculo.idVehiculoTipoEstado.nombreTipoEstado}"
+                              exportable="false"
+                              filterMatchMode="contains">
+                        <f:facet name="header">
+                            <div class="cortar_header">
+                                <h:outputText value="Estado Vehículo" />
+                            </div>
+                        </f:facet>
+                        <h:outputText value="#{item.idVehiculo.idVehiculoTipoEstado.nombreTipoEstado}" />
+                    </p:column>
+                    <p:column headerText="Estado Vehículo" visible="false">
+                        <h:outputText value="#{item.idVehiculo.idVehiculoTipoEstado.nombreTipoEstado}" />
+                    </p:column>
+                    <p:column headerText="Inmovilizado">
+                        <h:outputText value="#{item.inmovilizado eq 0 ? 'No':'Si'}" />
+                    </p:column>
+                    <p:column headerText="Hora">
+                        <h:outputText value="#{item.hora}" />
+                    </p:column>
+                    <p:column headerText="Acciones" exportable="false">
+                        <p:commandButton icon="fa fa-photo" 
+                                         class="cssWhite OrangeButton"
+                                         style="background-color: #007746;color: white"
+                                         action="#{docsNovMttoBean.prepareNovedadDocs(item,false)}"
+                                         update="msgs,novedad_docs_dlg,novedad_docs_dlg_form:novedad_docs_dt"
+                                         title="Imágenes para la novedad del vehículo: #{item.idVehiculo.placa} - #{item.idVehiculo.codigo}">
+                        </p:commandButton>
+                    </p:column>
+                    <p:rowExpansion>
+                        <p:dataTable var="obj" 
+                                     tableStyle="table-layout:auto"
+                                     id="dt_actividades"
+                                     value="#{dispActivBean.getListActividades(item)}">
+                            <p:column headerText="Fecha" >
+                                <h:outputText value="#{obj.fechaHora}">
+                                    <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Detalle Estado de Vehículo" >
+                                <h:outputText value="#{obj.idVehiculoTipoEstadoDet.nombre}"/>
+                            </p:column>
+                            <p:column headerText="Estado Pendiente Actual" >
+                                <h:outputText value="#{obj.idDispEstadoPendActual.nombre}"/>
+                            </p:column>
+                            <p:column headerText="Observación" >
+                                <h:outputText value="#{obj.observacion}"/>
+                            </p:column>
+                            <p:column headerText="Diferida" >
+                                <h:outputText value="#{obj.diferir==1 ?'Si':'No'}"/>
+                            </p:column>
+                            <p:column headerText="Reporta" >
+                                <h:outputText value="#{obj.username}"/>
+                            </p:column>
+
+                            <p:column headerText="Acciones" 
+                                      width="10%">
+                                <p:commandButton icon="fa fa-wrench" 
+                                                 class="OrangeButton cssWhite"
+                                                 value="Ver"
+                                                 rendered="#{obj.dispFaltanteRepuestoList.size() gt 0}"
+                                                 action="#{faltanteRepuestBean.viewRepuestoFaltantes(obj)}"
+                                                 oncomplete="PF('repuestos_view_dlg_wv').show()"
+                                                 update="repuestos_view_dlg_id,repuestos_view_dlg_form"
+                                                 title="Ver repuestos faltante Solicitados para la actividad">
+                                </p:commandButton>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/listaImagenes.xhtml"/>
+        <ui:include src="../../galeriaFotos.xhtml"/>
+        <ui:include src="actividad/viewRepuestos.xhtml"/>
+    </ui:define>
+</ui:composition>

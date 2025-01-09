@@ -1,0 +1,262 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Parametrización Telegram">
+
+            <h:form id="frmDatos">
+                <div class="ui-fluid">
+                    <p:messages id="messages" showDetail="true" closable="true"/>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="pGridDatos">
+                            <p:fieldset legend="Datos Bot">
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Token" for="@next"/>
+                                    </div>
+                                    <p:inputText
+                                        id="token"
+                                        required="true"
+                                        maxlength="255"
+                                        autocomplete="off"
+                                        requiredMessage="Token es requerido"
+                                        value="#{notificacionTelegramBean.token}"/>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Nombre BOT" for="@next"/>
+                                    </div>
+                                    <p:inputText 
+                                        id="nombreBot"
+                                        required="true"
+                                        autocomplete="off"
+                                        requiredMessage="Nombre bot es requerido"
+                                        value="#{notificacionTelegramBean.nombreBot}"/>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="-" style="visibility: hidden"/>
+                                    </div>
+                                    <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                                     rendered="#{not(notificacionTelegramBean.notificacionTelegram.idNotificacionTelegram gt 0)}"
+                                                     class="cssWhite" onclick="guardar()">
+                                        <p:confirm header="Confirmación" message="Ésta seguro de guardar los datos?" icon="fa fa-exclamation-triangle" />
+                                    </p:commandButton>
+                                    <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                                     rendered="#{notificacionTelegramBean.notificacionTelegram.idNotificacionTelegram gt 0 }"
+                                                     class="cssWhite" onclick="actualizar()">
+                                        <p:confirm header="Confirmación" message="Ésta seguro de actualizar los datos?" icon="fa fa-exclamation-triangle" />
+                                    </p:commandButton>
+                                </div>
+
+                            </p:fieldset>
+                        </div>
+                    </div>
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="pnlDatos">
+                            <p:fieldset legend="Datos Detalle">
+                                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Nombre Grupo (Chat ID)" for="@next"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:inputText 
+                                            id="chatId"
+                                            autocomplete="off"
+                                            maxlength="255"
+                                            value="#{notificacionTelegramBean.chatId}"
+                                            />
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:outputLabel value="Notificación Proceso" for="notifProceso"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                        <p:inputText id="notifProceso" 
+                                                     value="#{notificaListComponentBean.proceso.nombreProceso}" 
+                                                     placeholder="Área Notifica" readonly="true"/>                          
+                                        <div class="botonFloat" >
+                                            <p:commandButton title="Seleccione un Proceso"
+                                                             icon="fa fa-list"
+                                                             class="cssWhite"
+                                                             process="@this"
+                                                             action="#{notificaListComponentBean.openModalEmpleadoList('frmDatos:notifProceso')}"
+                                                             style="margin:  0px"
+                                                             update="frmNotificaList:id_area_noti_dt">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Unidad Funcional:" for="uf"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:selectOneMenu 
+                                            id="uf"
+                                            styleClass="custom-filter" 
+                                            filter="true"
+                                            disabled="#{notificacionTelegramBean.isEditingDetalle}"
+                                            value="#{notificacionTelegramBean.idGopUnidadFuncional}"
+                                            filterMatchMode="contains" 
+                                            style="width: 99.999%" title="Seleccione Uno..">
+                                            <f:selectItem itemLabel="Seleccione Uno.." 
+                                                          itemValue="#{0}"
+                                                          itemDescription="Seleccione Uno.."/>
+                                            <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                           var="uf" itemLabel="#{uf.nombre}"
+                                                           itemValue="#{uf.idGopUnidadFuncional}"/>
+                                            <p:ajax global="false"
+                                                    process="@this"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5"
+                                     jsf:rendered="#{not(notificacionTelegramBean.isEditingDetalle)}">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="-" style="visibility: hidden"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:commandButton value="Agregar detalle"
+                                                         process="@this,chatId,uf,token,nombreBot"
+                                                         action="#{notificacionTelegramBean.agregarDetalle()}"
+                                                         update="frmDatos:dtTelegramParamDetCreate,pnlDatos,:msgs"
+                                                         icon="fa fa-plus"
+                                                         class="cssWhite">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" 
+                                     jsf:rendered="#{notificacionTelegramBean.isEditingDetalle and notificacionTelegramBean.notificacionTelegram.idNotificacionTelegram gt 0}">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="-" style="visibility: hidden"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:commandButton value="Actualizar detalle"
+                                                         process="@this,chatId,uf"
+                                                         action="#{notificacionTelegramBean.agregarDetalle()}"
+                                                         update="frmDatos:dtTelegramParamDetCreate,pnlDatos,:msgs"
+                                                         icon="fa fa-floppy-o"
+                                                         class="cssWhite">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                    <p:dataTable id="dtTelegramParamDetCreate" var="parametroDet" 
+                                                 scrollable="true"
+                                                 widgetVar="wlVdtTelegramParamDetCreate"
+                                                 scrollHeight="600"
+                                                 disabledTextSelection="false"
+                                                 reflow="true"
+                                                 rows="10"
+                                                 filterDelay="1700"
+                                                 rowIndexVar="index"
+                                                 paginator="true"
+                                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                 rowsPerPageTemplate="10,50,100"
+                                                 emptyMessage="No existen registros"
+                                                 value="#{notificacionTelegramBean.lstNotificacionTelegramDet}">
+
+                                        <p:column headerText="Notificación Proceso" 
+                                                  filterBy="#{parametroDet.idNotificacionProceso.nombreProceso}"
+                                                  filterMatchMode="contains"
+                                                  styleClass="text-center">
+                                            <h:outputText value="#{parametroDet.idNotificacionProceso.nombreProceso}" />
+                                        </p:column>
+
+                                        <p:column headerText="Unidad Funcional" 
+                                                  filterBy="#{parametroDet.idGopUnidadFuncional.nombre}"
+                                                  filterMatchMode="contains"
+                                                  styleClass="text-center">
+                                            <h:outputText value="#{parametroDet.idGopUnidadFuncional.nombre}" />
+                                        </p:column>
+
+                                        <p:column headerText="Nombre Grupo" styleClass="text-center">
+                                            <h:outputText value="#{parametroDet.chatId}" />
+                                        </p:column>
+
+                                        <p:column headerText="Acciones" styleClass="text-center"
+                                                  width="10%"
+                                                  exportable="false">
+                                            <div class="ui-g Padding0">
+                                                <div class="ui-g-12 ui-md-6 ui-lg-6" jsf:rendered="#{notificacionTelegramBean.isEditing}">
+                                                    <p:commandButton styleClass="cssWhite GreenButton"
+                                                                     title="Editar"
+                                                                     action="#{notificacionTelegramBean.editarDetalle()}"
+                                                                     process="@this"
+                                                                     update="frmDatos:pnlDatos,:msgs"
+                                                                     icon="fa fa-pencil">
+                                                        <f:setPropertyActionListener value="#{parametroDet}" target="#{notificacionTelegramBean.selectedDetalle}"/>
+                                                        <p:resetInput target=":frmDatos:pnlDatos"/>
+                                                    </p:commandButton>
+                                                </div>
+                                                <div class="ui-g-12 ui-md-6 ui-lg-6">
+                                                    <p:commandButton styleClass="cssWhite RedButton"
+                                                                     title="Eliminar Registro"
+                                                                     action="#{notificacionTelegramBean.eliminarRegistro()}"
+                                                                     process="@this"
+                                                                     update="frmDatos:dtTelegramParamDetCreate,:msgs"
+                                                                     icon="fa fa-times">
+                                                        <f:setPropertyActionListener value="#{parametroDet}" target="#{notificacionTelegramBean.selectedDetalle}"/>
+                                                        <p:confirm header="Confirmación" message="Está seguro de eliminar éste registro?" icon="fa fa-exclamation-triangle" />
+                                                    </p:commandButton>
+                                                </div>
+                                            </div>
+
+                                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                <p:commandButton value="SI" type="button" styleClass="cssWhite ui-confirmdialog-yes" icon="fa fa-check" />
+                                                <p:commandButton value="NO" type="button" styleClass="cssWhite ui-confirmdialog-no" icon="fa fa-times" />
+                                            </p:confirmDialog> 
+
+                                        </p:column>
+
+                                    </p:dataTable>
+                                </div>
+
+                            </p:fieldset>
+                        </div>
+                    </div>
+                </div>
+
+                <p:remoteCommand name="guardar"
+                                 process="token,nombreBot,dtTelegramParamDetCreate,@this"
+                                 update="messages,pGridDatos,pnlDatos,frmDatos:dtTelegramParamDetCreate" 
+                                 action="#{notificacionTelegramBean.guardar()}"/>
+                <p:remoteCommand name="actualizar"
+                                 process="token,nombreBot,dtTelegramParamDetCreate,@this"
+                                 update=":msgs,pGridDatos,pnlDatos,frmDatos:dtTelegramParamDetCreate"
+                                 action="#{notificacionTelegramBean.guardar()}"/>
+
+            </h:form>
+        </p:panel>
+        <ui:include src="../../zComponent/dialogListNotifica.xhtml"/>
+    </ui:define>
+
+</ui:composition>

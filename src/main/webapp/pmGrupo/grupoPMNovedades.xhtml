@@ -1,0 +1,515 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .alertBubbleRed {
+                background-color: red;
+                color: #ffffff;
+                font-weight: bold;
+                overflow: hidden;
+                padding: 3px 4px;
+                display: inline-block;
+                position: absolute;
+                margin-top: -5px;
+            }
+            .alertBubbleYellow {
+                background-color: yellow;
+                color: black;
+                font-weight: bold;
+                overflow: hidden;
+                padding: 3px 4px;
+                display: inline-block;
+                position: absolute;
+                margin-top: -5px;
+            }
+            .alertBubbleGreen {
+                background-color: green;
+                color: #ffffff;
+                font-weight: bold;
+                overflow: hidden;
+                padding: 3px 4px;
+                display: inline-block;
+                position: absolute;
+                margin-top: -5px;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel >
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Maestro Programa Senior"/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-5 ui-lg-4 Padding0">
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 autoWidth="true"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax process="@this"
+                                            event="change"
+                                            listener="#{gruposNovSFMB.resetByUnidadFuncional()}"
+                                            update="frmPrincipal"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <div class="ui-fluid" jsf:id="idBtnss">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-12 ui-md-2 ui-lg-2 Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding2">
+                                    <p:outputLabel for="fecha_desde" value="Desde:" />
+                                    <p:calendar id="fecha_desde" 
+                                                pattern="yyyy/MM/dd"
+                                                value="#{gruposNovSFMB.desde}"
+                                                locale="es"
+                                                required="true"
+                                                maxdate="today"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                navigator="true"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }">
+                                        <p:ajax event="dateSelect" process="@this"/>
+                                    </p:calendar>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding2">
+                                    <p:outputLabel for="fecha_hasta" value="Hasta:" />
+                                    <p:calendar id="fecha_hasta" 
+                                                pattern="yyyy/MM/dd"
+                                                value="#{gruposNovSFMB.hasta}"
+                                                locale="es"
+                                                required="true"
+                                                maxdate="today"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                navigator="true"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }">
+                                        <p:ajax event="dateSelect" process="@this"/>
+                                    </p:calendar>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding2">
+                                    <div class="ui-g-10 ui-md-9 ui-lg-10 Padding0">
+                                        <p:selectOneMenu  id="grupo_id" filterMatchMode="contains" 
+                                                          style="width: 99.9999%"
+                                                          filter="true"
+                                                          value="#{gruposNovSFMB.i_grupoPm}">
+                                            <f:selectItem itemLabel="--" itemValue="0" />
+                                            <f:selectItems  value="#{gruposNovSFMB.listPmGrup}" var="grupo" 
+                                                            itemValue="#{grupo.idPmGrupo}" itemLabel="#{grupo.nombreGrupo}" 
+                                                            itemDescription="#{grupo.descripcion}"/>
+                                            <p:ajax listener="#{gruposNovSFMB.masterGrupo}" update="master_id" />
+                                        </p:selectOneMenu>
+
+                                    </div>
+                                    <div class="ui-g-1 ui-md-2 ui-lg-1 Padding0">
+                                        <p:commandButton icon="fa fa-search" class="cssWhite"
+                                                         process="@this,grupo_id" 
+                                                         update="frmPrincipal:idTablaPmGrupoDialog,
+                                                         frmPrincipal:tbNovs,
+                                                         frmPrincipal:master_id,
+                                                         frmPrincipal:donut_chart,
+                                                         frmPrincipal:info_id"
+                                                         actionListener="#{gruposNovSFMB.findDetalle}"/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding2">
+
+                                    <p:panel id="master_id">
+                                        <p:commandLink update="frmPrincipal:tbNovs,
+                                                       frmPrincipal:master_id,
+                                                       frmPrincipal:donut_chart,
+                                                       frmPrincipal:info_id"
+                                                       title="Click para ver novedades"
+                                                       actionListener="#{gruposNovSFMB.novedadesView(gruposNovSFMB.pmGrup.idEmpleado.idEmpleado,true)}"
+                                                       process="@this">
+
+                                            <div class="TexAlCenter" style="display: table-cell;">
+                                                <span class="#{gruposNovSFMB.color(gruposNovSFMB.pmGrup.idEmpleado.idEmpleado,false)} BordRad10 Fs12" title="#Novedades - #Novedades con seguimiento - #Novedades con documento">
+                                                    #{gruposNovSFMB.numeroNovedades(gruposNovSFMB.pmGrup.idEmpleado.idEmpleado,false)} - 
+                                                    #{gruposNovSFMB.numeroNovedadesSeguim(gruposNovSFMB.pmGrup.idEmpleado.idEmpleado)}-
+                                                    #{gruposNovSFMB.numeroNovedadesDocu(gruposNovSFMB.pmGrup.idEmpleado.idEmpleado)} -
+                                                    #{gruposNovSFMB.numeroNovedades(gruposNovSFMB.pmGrup.idEmpleado.idEmpleado,true)}
+                                                </span>
+                                                <p:graphicImage cache="false"
+                                                                style="border-radius: 5px;"
+                                                                value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                                width="80%">
+                                                    <f:param name="path_foto" value="#{gruposNovSFMB.pmGrup.idEmpleado.pathFoto}" />
+                                                </p:graphicImage>
+                                                <br/>
+                                                <span class="Fs10" style="color: black;font-weight: bold">
+                                                    #{gruposNovSFMB.pmGrup.idEmpleado.codigoTm}&nbsp;-&nbsp;
+                                                    <span class="Fs10 softgray" style="font-weight: normal">
+                                                        #{gruposNovSFMB.pmGrup.idEmpleado.nombres} #{gruposNovSFMB.pmGrup.idEmpleado.apellidos}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </p:commandLink>
+                                    </p:panel>
+
+                                    <div jsf:id="info_id">
+
+                                        <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #fbfcfd;">
+                                            <p:outputLabel value="Operadores: "/>
+                                        </div>
+                                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #fbfcfd;">
+                                            <p:outputLabel value="#{gruposNovSFMB.listPmGrupDet.size()}"/>
+                                        </div>
+                                        <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #fbfcfd;">
+                                            <p:outputLabel value="Novedades: "/>
+                                        </div>
+                                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #fbfcfd;">
+                                            <p:outputLabel value="#{gruposNovSFMB.listNovs.size()}"/>
+                                        </div>
+                                        <div jsf:rendered="#{gruposNovSFMB.b_controlAplica}">
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="Con Seguimiento: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="#{gruposNovSFMB.conSeguimiento}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="Sin Seguimiento: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="#{gruposNovSFMB.sinSeguimiento}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #fbfcfd;">
+                                                <p:outputLabel value="Con Documento: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #fbfcfd;">
+                                                <p:outputLabel value="#{gruposNovSFMB.conDocumentos}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #fbfcfd;">
+                                                <p:outputLabel value="Sin Documento: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #fbfcfd;">
+                                                <p:outputLabel value="#{gruposNovSFMB.sinDocumentos}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="Aplicadas: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="#{gruposNovSFMB.aplicadas}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="No Aplicadas: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="#{gruposNovSFMB.noAplicadas}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" 
+                                                 style="background-color: red;color: black !important">
+                                                <p:outputLabel value="Pts. Aplicados Art: " style="color: black !important"/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0"
+                                                 style="background-color: red;">
+                                                <p:outputLabel value="#{gruposNovSFMB.totalPuntosAplicadosArt}" 
+                                                               style="color: black !important"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" 
+                                                 style="background-color: yellow;">
+                                                <p:outputLabel value="Pts. Aplicados BiArt " style="color: black !important"/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" 
+                                                 style="background-color: yellow;">
+                                                <p:outputLabel value="#{gruposNovSFMB.totalPuntosAplicadosBiArt}"
+                                                               style="color: black !important"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:donutChart rendered="#{gruposNovSFMB.b_controlAplica}" 
+                                                  id="donut_chart" 
+                                                  model="#{gruposNovSFMB.donutModel}" 
+                                                  style="width: 100%; height:350px;"/>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-10 ui-lg-10 Padding2">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:dataGrid var="operador" value="#{gruposNovSFMB.listPmGrupDet}"
+                                                paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                rowsPerPageTemplate="6,12,18,24,30,36"
+                                                rows="36"
+                                                paginatorPosition="top"
+                                                paginator="true"
+                                                columns="6" layout="grid"
+                                                id="idTablaPmGrupoDialog" >
+
+                                        <p:commandLink id="id"
+                                                       title="Click para ver novedades"
+                                                       update="frmPrincipal:tbNovs,
+                                                       frmPrincipal:idTablaPmGrupoDialog:#{gruposNovSFMB.listPmGrupDet.indexOf(operador)}:id,
+                                                       frmPrincipal:donut_chart,
+                                                       frmPrincipal:master_id,
+                                                       frmPrincipal:info_id"
+                                                       actionListener="#{gruposNovSFMB.novedadesView(operador.idEmpleado.idEmpleado,false)}"
+                                                       process="@this,frmPrincipal:tbNovs">
+                                            <div class="TexAlCenter" 
+                                                 style="display: table-cell;
+                                                 border: solid 1px #c0c5c7;
+                                                 border-radius: 5px;">
+                                                <span class="#{gruposNovSFMB.color(operador.idEmpleado.idEmpleado, false)} BordRad10 Fs13" title="#Novedades - #Novedades con seguimiento - #Novedades con documento">
+                                                    #{gruposNovSFMB.numeroNovedades(operador.idEmpleado.idEmpleado,false)} - 
+                                                    #{gruposNovSFMB.numeroNovedadesSeguim(operador.idEmpleado.idEmpleado)} - 
+                                                    #{gruposNovSFMB.numeroNovedadesDocu(operador.idEmpleado.idEmpleado)} -
+                                                    #{gruposNovSFMB.numeroNovedades(operador.idEmpleado.idEmpleado,true)}
+                                                </span>
+                                                <p:graphicImage cache="false"
+                                                                style="border-radius: 5px;"
+                                                                value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                                width="60%">
+                                                    <f:param name="path_foto" value="#{operador.idEmpleado.pathFoto}" />
+                                                </p:graphicImage>
+                                                <br/>
+                                                <span  style="color: black;font-weight: bold">
+                                                    #{operador.idEmpleado.codigoTm}&nbsp;-&nbsp;
+                                                    <span class="softgray" style="font-weight: normal">
+                                                        #{operador.idEmpleado.nombres} #{operador.idEmpleado.apellidos}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </p:commandLink>  
+                                    </p:dataGrid>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+
+                                    <p:dataTable id="tbNovs" 
+                                                 value="#{gruposNovSFMB.listNovs}" 
+                                                 var="item"
+                                                 emptyMessage="No existen registros"
+                                                 filterDelay="1000"
+                                                 scrollHeight="500"
+                                                 reflow="true"
+                                                 selection="#{gruposNovSFMB.selectedNovedad}"
+                                                 selectionMode="single"
+                                                 rowKey="#{item.idNovedad}"
+                                                 scrollable="true"
+                                                 widgetVar="tbNovsWV">
+                                        <p:ajax event="rowSelect" listener="#{gruposNovSFMB.onRowSelect}" update="msgs,id_botonera" />
+                                        <p:ajax event="rowUnselect" listener="#{gruposNovSFMB.onRowUnselect}" update="msgs,id_botonera" />
+                                        <f:facet name="header">
+                                            <div class="ui-fluid">
+                                                <div class="ui-g" jsf:id="id_botonera">
+                                                    <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3" >
+                                                        <p:commandButton icon="fa fa-binoculars" 
+                                                                         class="CyanButton cssWhite"
+                                                                         value="Seguimientos"
+                                                                         disabled="#{gruposNovSFMB.selectedNovedad==null}"
+                                                                         oncomplete="PF('seguiWV').show();"
+                                                                         action="#{gruposNovSFMB.seguimiento()}" 
+                                                                         title="Ver o registrar seguimientos para la novedad" 
+                                                                         update="frmNovedadSeguimientoLista:dtNovedadSeguimiento"/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                                        <p:commandButton icon="fa fa-book" 
+                                                                         class="cssWhite"
+                                                                         value="Documentos"
+                                                                         disabled="#{gruposNovSFMB.selectedNovedad==null}"
+                                                                         oncomplete="PF('NovedadDocumentosListDialog').show();"
+                                                                         action="#{gruposNovSFMB.documentos()}" 
+                                                                         title="Ver o registrar Documentos para la novedad" 
+                                                                         update="frmNovedadDocumentosList:dtNovedadDocumentos"/>
+                                                    </div>
+
+
+                                                    <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3" 
+                                                         jsf:rendered="#{gruposNovSFMB.b_controlAplica 
+                                                                         and (gruposNovSFMB.selectedNovedad.procede== null 
+                                                                         or gruposNovSFMB.selectedNovedad.procede == 0)}">
+                                                        <p:commandButton actionListener="#{gruposNovSFMB.aplicar(1)}"
+                                                                         icon="fa fa-thumbs-up"
+                                                                         value="Aplicar"
+                                                                         disabled="#{gruposNovSFMB.selectedNovedad==null}"
+                                                                         class="cssWhite GreenButton"
+                                                                         update="msgs,tbNovs"
+                                                                         title="Aplicar">
+                                                            <p:confirm header="Confirmación" 
+                                                                       message="Está seguro de APLICAR?"
+                                                                       icon="fa fa-exclamation-triangle"
+                                                                       class="cssWhite"/>
+                                                        </p:commandButton>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3" 
+                                                         jsf:rendered="#{gruposNovSFMB.b_controlAplica 
+                                                                         and (gruposNovSFMB.selectedNovedad.procede == 1 )}">
+                                                        <p:commandButton actionListener="#{gruposNovSFMB.aplicar(0)}"
+                                                                         icon="fa fa-thumbs-down"
+                                                                         class="cssWhite RedButton"
+                                                                         update="msgs,tbNovs"
+                                                                         disabled="#{gruposNovSFMB.selectedNovedad==null}"
+                                                                         value="No Aplicar"
+                                                                         title="No Aplicar">
+                                                            <p:confirm header="Confirmación" 
+                                                                       message="Está seguro de NO APLICAR?"
+                                                                       icon="fa fa-exclamation-triangle"
+                                                                       class="cssWhite"/>
+                                                        </p:commandButton>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3" 
+                                                         jsf:rendered="#{gruposNovSFMB.b_controlAplica}">
+                                                        <p:commandButton icon="fa fa-edit" 
+                                                                         value="Daños"
+                                                                         class="cssWhite OrangeButton"
+                                                                         disabled="#{gruposNovSFMB.flag_dano}"
+                                                                         action="#{gruposNovSFMB.editDano()}"
+                                                                         title="Modificar Daños" 
+                                                                         update="msgs,gestion_dano_form,gestion_dano_id"/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3" 
+                                                         jsf:rendered="#{gruposNovSFMB.b_controlAplica}">
+                                                        <p:commandButton icon="fa fa-edit" 
+                                                                         value="Novedad"
+                                                                         class="cssWhite GreenButton"
+                                                                         disabled="#{gruposNovSFMB.flag_nov}"
+                                                                         action="#{gruposNovSFMB.editNovedad()}"
+                                                                         title="Modificar Novedad" 
+                                                                         update="msgs,modalnovedadesPM,frmNovedadesPm"/>
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3" 
+                                                         jsf:rendered="#{gruposNovSFMB.b_controlAplica}">
+                                                        <p:commandButton icon="fa fa-edit" 
+                                                                         value="Puntos"
+                                                                         class="cssWhite PurpleButton"
+                                                                         disabled="#{gruposNovSFMB.selectedNovedad==null}"
+                                                                         title="Modificar Puntos" 
+                                                                         action="#{gruposNovSFMB.cambiarPuntos()}"
+                                                                         update="msgs"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </f:facet>
+                                        <p:column headerText="Fecha"
+                                                  filterBy="#{item.fecha}" 
+                                                  filterMatchMode="startsWith">
+                                            <f:facet name="filter">
+                                                <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                                            autocomplete="off"
+                                                            required="false"
+                                                            navigator="true" 
+                                                            showTodayButton="true"
+                                                            maxdate="today"
+                                                            inputStyle="width: 100%;"
+                                                            placeholder="Fecha"
+                                                            onkeyup="PF('tbNovsWV').filter()"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+                                                                    }">
+                                                    <p:ajax event="dateSelect" oncomplete="PF('tbNovsWV').filter()" update="tbNovs"/>
+                                                </p:calendar> 
+                                            </f:facet>
+                                            <h:outputText value="#{item.fecha}" >
+                                                <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Empleado"
+                                                  filterMatchMode="contains"
+                                                  filterBy="#{item.idEmpleado.codigoTm} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}">
+                                            <h:outputText  value="#{item.idEmpleado.codigoTm} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Tipología" 
+                                                  filterBy="#{gruposNovSFMB.tipologia(item.idEmpleado)}" 
+                                                  filterMatchMode="exact">
+                                            <f:facet name="filter">
+                                                <p:selectOneMenu onchange="PF('tbNovsWV').filter()" 
+                                                                 styleClass="custom-filter" 
+                                                                 filter="true" 
+                                                                 filterMatchMode="contains" 
+                                                                 style="width: auto" title="Seleccione Uno..">
+                                                    <f:selectItem itemLabel="Todo" itemDescription="Mostrar todo"/>
+                                                    <f:selectItems value="#{gruposNovSFMB.tipolofiaList()}"/>
+                                                </p:selectOneMenu>
+                                            </f:facet>
+                                            <h:outputText value="#{gruposNovSFMB.tipologia(item.idEmpleado)}" />
+                                        </p:column>
+
+                                        <p:column headerText="Tipo Novedad"
+                                                  filterBy="#{item.idNovedadTipo.nombreTipoNovedad}"
+                                                  filterMatchMode="contains">
+                                            <h:outputText  value="#{item.idNovedadTipo.nombreTipoNovedad}"/>
+                                        </p:column>
+
+                                        <p:column id="detTipoNovedad" filterBy="#{novedad.idNovedadTipoDetalle.tituloTipoNovedad}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                                            </f:facet>
+                                            <h:outputText value="#{item.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{item.idNovedadDano eq null and item.idMulta eq null}" />
+                                            <h:outputText value="#{item.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{item.idNovedadTipoDetalle.idNovedadTipoDetalle gt 0 and item.idMulta.idMulta gt 0}" />
+                                            <h:outputText value="#{item.idNovedadDano.idVehiculoDanoSeveridad.nombre}" rendered="#{item.idNovedadDano.idNovedadDano gt 0}"/>
+                                            <h:outputText value="#{item.idMulta.idMultaTipo.tipo}" rendered="#{item.idMulta.idMulta gt 0 and item.idNovedadTipoDetalle eq null}"/>
+                                        </p:column>
+                                        <p:column headerText="Vehículo" filterBy="#{item.idVehiculo.codigo}"
+                                                  filterMatchMode="contains" width="7%">
+                                            <h:outputText value="#{item.idVehiculo.codigo}" rendered="#{item.idVehiculo != null}"/>
+                                            <h:outputText value="N/A" rendered="#{item.idVehiculo eq null}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Descripción" class="cortar">
+                                            <h:outputText  value="#{item.observaciones}"/>
+                                        </p:column>
+                                        <p:column styleClass="#{item.procede gt 0 ? 'cssGreen': item.procede eq 0 ? 'cssRed' : ''}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Procede"/>
+                                            </f:facet>
+                                            <h:outputText value="Sí" rendered="#{item.procede == 1}"
+                                                          style=" color: white;"/>
+                                            <h:outputText value="No" rendered="#{item.procede == 0}"
+                                                          style=" color: white;"/>
+                                        </p:column>
+                                        <p:column  headerText="Puntos PM" exportable="false"> 
+                                            <h:outputText  value="#{item.puntosPm}"/>
+                                        </p:column>
+                                        <p:column  headerText="Puntos Conciliados" exportable="true">
+                                            <h:outputText  value="#{item.puntosPmConciliados}"/>
+                                        </p:column>
+                                        <p:column headerText="Seguimientos" class="cortar">
+                                            <h:outputText value="#{gruposNovSFMB.viewSeguimientos(item)}"/>
+                                        </p:column>
+                                        <f:facet name="footer">
+                                            <h:commandLink>
+                                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                     alt="excel" style="width: 24px;height: 24px"/>
+                                                <p:dataExporter type="xlsx" target="tbNovs" fileName="Novedades #{now}"/>
+                                            </h:commandLink>
+                                        </f:facet>
+                                    </p:dataTable>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/seguimientoNovedad.xhtml"/>
+        <ui:include src="modal/documentos/documentosNovedadesPM.xhtml"/>
+        <ui:include src="modal/dano/gestionDano.xhtml"/>
+        <ui:include src="modal/novedad/gestionNovedad.xhtml"/>
+        <ui:include src="modal/novedad/cambiarPuntos.xhtml"/>
+    </ui:define>
+</ui:composition>

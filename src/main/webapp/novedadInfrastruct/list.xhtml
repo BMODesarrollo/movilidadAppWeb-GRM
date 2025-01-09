@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <p:panel header="Novedades de Infraestructura">
+            <h:form id="form_novedad_infra">
+                <div class="ui-g">
+                    <p:dataTable id="dt_novedad_infra_id" var="item" 
+                                 scrollable="true"
+                                 widgetVar="wlVdt_novedad_infra_id"
+                                 scrollHeight="600"
+                                 reflow="true"
+                                 rowKey="#{item.idNovedadInfrastruc}"
+                                 selection="#{novInfrastructBean.novedadInfrastruc}" 
+                                 selectionMode="single"
+                                 rows="10"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,50,100"
+                                 emptyMessage="No existen registros"
+                                 value="#{novInfrastructBean.list}">
+
+                        <f:facet name="header">
+                            <div align="right" jsf:id="botones">
+                                <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                                <p:calendar id="fecha_desde" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{novInfrastructBean.desde}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{novInfrastructBean.consultar()}"
+                                            update="dt_novedad_infra_id"/>
+                                </p:calendar>
+                                <p:calendar id="fecha_hasta" 
+                                            pattern="yyyy/MM/dd"
+                                            value="#{novInfrastructBean.hasta}"
+                                            locale="es"
+                                            inputStyle="width: 90px"
+                                            maxdate="today"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }">
+                                    <p:ajax event="dateSelect"
+                                            process="@this" 
+                                            listener="#{novInfrastructBean.consultar()}"
+                                            update="dt_novedad_infra_id"/>
+                                </p:calendar>
+                                <p:commandButton
+                                    icon="fa fa-plus"
+                                    value="Nuevo"
+                                    actionListener="#{novInfrastructBean.nuevo()}"
+                                    class="cssWhite"
+                                    update="msgs,nov_novedad_infra_form"/>   
+                                <p:commandButton id="toggle" type="button" 
+                                                 title="Columnas" style="float:right" 
+                                                 icon="fa fa-align-justify"  
+                                                 class="OrangeButton cssWhite"/>
+                                <p:columnToggler datasource="dt_novedad_infra_id" trigger="toggle" />
+                            </div>
+                        </f:facet>
+
+                        <p:column headerText="Fecha Reg."  >
+                            <h:outputText value="#{item.fechaHoraReg}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Fecha Novedad"  >
+                            <h:outputText value="#{item.fechaHoraNov}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Pilona" 
+                                  filterBy="#{item.idSegPilona.nombre}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.idSegPilona.nombre}" />
+                        </p:column>
+                        <p:column headerText="Área" filterBy="#{item.idAseoParamArea.nombre}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.idAseoParamArea.nombre}" />
+                        </p:column>
+                        <p:column headerText="Tipo Novedad" 
+                                  filterBy="#{item.novedadTipoInfrastruc.nombre}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.novedadTipoInfrastruc.nombre}" />
+                        </p:column>
+                        <p:column headerText="Det. Tipo Novedad" 
+                                  filterBy="#{item.novedadTipoDetallesInfrastruc.nombre}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{item.novedadTipoDetallesInfrastruc.nombre}" />
+                        </p:column>
+                        <p:column headerText="Descripción" >
+                            <h:outputText value="#{item.descripcion}" />
+                        </p:column>
+                        <p:column filterBy="#{item.estado}" 
+                                  exportable="false"
+                                  headerText="Estado"
+                                  filterMatchMode="exact">
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('wlVdt_novedad_infra_id').filter()" 
+                                                 styleClass="custom-filter" style="width: 99.9999%">
+                                    <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItem itemValue="#{1}" itemLabel="Abierta"/>
+                                    <f:selectItem itemValue="#{2}" itemLabel="En Ejecucion"/>
+                                    <f:selectItem itemValue="#{3}" itemLabel="Reprogramada"/>
+                                    <f:selectItem itemValue="#{4}" itemLabel="Cerrada"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.estado==1 ? 'ABIERTA': item.estado==2 ? 'EN EJECUCION': item.estado==3 ? 'REPROGRAMADA':'CERRADA'}" />
+                        </p:column>
+                        <p:column headerText="Observación Seguimiento" >
+                            <h:outputText value="#{item.obsSeguimiento}" />
+                        </p:column>
+                        <p:column headerText="Usuario seguimiento"  
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.usrSeguimiento}">
+                            <h:outputText value="#{item.usrSeguimiento}" />
+                        </p:column>
+                        <p:column headerText="Observación Cierre" >
+                            <h:outputText value="#{item.obsCierre}" />
+                        </p:column>
+                        <p:column headerText="Usuario Cierre" 
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.usrCierre}">
+                            <h:outputText value="#{item.usrCierre}" />
+                        </p:column>
+                        <p:column headerText="Usuario Reporta" 
+                                  filterMatchMode="contains"
+                                  filterBy="#{item.userReporta}">
+                            <h:outputText value="#{item.userReporta}" />
+                        </p:column>
+                        <p:column headerText="Creado" >
+                            <h:outputText value="#{item.creado}" >
+                                <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Fotos" >
+                            <h:outputText value="#{empty(item.pathFotos)? 'NO':item.pathFotos==null ? 'NO':item.pathFotos=='/' ? 'NO':'SI'}" />
+                        </p:column>
+
+                        <f:facet name="footer">
+                            En total existen #{novInfrastructBean.list.size()} registros.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target="dt_novedad_infra_id" 
+                                                    fileName="Aseos"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                    <p:contextMenu for="dt_novedad_infra_id">
+                        <p:menuitem value="Abierta" action="#{novInfrastructBean.changeEstatus(1)}" style="background-color: blue;color: white" class="cssMenuItem" update="msgs,dt_novedad_infra_id"  />
+                        <p:menuitem value="En Ejecucion" action="#{novInfrastructBean.changeEstatus(2)}" style="background-color: orange;color: white" class="cssMenuItem" update="msgs,dt_novedad_infra_id"  />
+                        <p:menuitem value="Reprogramada" action="#{novInfrastructBean.changeEstatus(3)}" style="background-color: purple;color: white" class="cssMenuItem" update="msgs,dt_novedad_infra_id" />
+                        <p:menuitem value="Cerrada" oncomplete="PF('cierre_wv').show()" action="#{novInfrastructBean.onCerrar()}"  style="background-color: black;color: white" class="cssMenuItem" update="msgs,cierre_form" />
+                        <p:menuitem value="Editar" 
+                                    icon="fa fa-pencil" 
+                                    class="cssMenuItem"
+                                    style="background-color: green;color: white"
+                                    update="nov_novedad_infra_form,msgs"  
+                                    action="#{novInfrastructBean.editar()}"/>
+                        <p:menuitem value="Seguimiento" 
+                                    icon="fa fa-list" 
+                                    class="cssMenuItem"
+                                    style="background-color: #083359;color: white"
+                                    update="seguimiento_form"  
+                                    oncomplete="PF('seguimiento_wv').show()" />
+                        <p:menuitem value="Ver Fotos" 
+                                    icon="fa fa-photo" 
+                                    class="cssMenuItem"
+                                    style="background-color: orangered;color: white"
+                                    update="galeria_fotos_form,msgs"  
+                                    action="#{novInfrastructBean.obtenerFotos(true)}"/>
+                        <p:menuitem value="Ver Fotos Cierre" 
+                                    icon="fa fa-photo" 
+                                    class="cssMenuItem"
+                                    style="background-color: #0a0e27;color: white"
+                                    update="galeria_fotos_form,msgs"  
+                                    action="#{novInfrastructBean.obtenerFotos(false)}"/>
+                    </p:contextMenu>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+        <ui:include src="modal/cierre.xhtml"/>
+        <ui:include src="modal/seguimiento.xhtml"/>
+        <ui:include src="../galeriaFotos.xhtml"/>
+    </ui:define>
+</ui:composition>

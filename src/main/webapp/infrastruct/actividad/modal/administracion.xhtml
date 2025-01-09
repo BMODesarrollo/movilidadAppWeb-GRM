@@ -1,0 +1,313 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{actividadInfraDiariaJSF.actividadInfraDiaria.idActividadInfraDiaria != null ? 'editar actividad de componente' : 'nueva activida de componente'}"
+              resizable="false"
+              fitViewport="true"
+              class="mr1024_60 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <p:messages id="msgs_adm" showDetail="true" closable="true" />
+            <p:messages id="msgs_photo" showDetail="true" closable="false" />
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Fecha Hora *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fech-hora" 
+                                        value="#{actividadInfraDiariaJSF.actividadInfraDiaria.fechaHora}" 
+                                        locale="es"
+                                        navigator="true"
+                                        timeControlType="select"
+                                        showOn="button"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        mask="true"
+                                        required="true"
+                                        requiredMessage="Fecha es requerido"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Hora inicio *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hora-ini" 
+                                        value="#{actividadInfraDiariaJSF.actividadInfraDiaria.horaInicio}" 
+                                        locale="es"
+                                        showOn="button"
+                                        pattern="HH:mm" 
+                                        timeControlType="select"
+                                        timeOnly="true"
+                                        mask="true"
+                                        required="true"
+                                        requiredMessage="Hora inicio es requerido"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Hora fin *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hora-fin" 
+                                        value="#{actividadInfraDiariaJSF.actividadInfraDiaria.horaFin}" 
+                                        locale="es"
+                                        showOn="button"
+                                        timeOnly="true"
+                                        timeControlType="select"
+                                        pattern="HH:mm" 
+                                        mask="true"
+                                        required="true"
+                                        requiredMessage="Hora fin es requerido"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Estación"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="estacion"
+                                         readonly="true"
+                                         value="#{actividadInfraDiariaJSF.actividadInfraDiaria.idEstacion.nombre}" />
+                            <div class="botonFloat">
+                                <p:commandButton id="btn-estacion"
+                                                 oncomplete="PF('estacionDlg').show();"
+                                                 actionListener="#{actividadInfraDiariaJSF.cargarListaEstacion()}"
+                                                 process="@this"
+                                                 style="margin: 0px"
+                                                 update="estacionMd"
+                                                 class="cssWhite"
+                                                 icon="fa fa-list" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Pilona"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="pilona"
+                                         readonly="true"
+                                         value="#{actividadInfraDiariaJSF.actividadInfraDiaria.idPilona.nombre}" />
+                            <div class="botonFloat">
+                                <p:commandButton id="btn-pilona"
+                                                 oncomplete="PF('pilonaDlg').show();"
+                                                 actionListener="#{actividadInfraDiariaJSF.cargarListaPilona()}"
+                                                 process="@this"
+                                                 style="margin: 0px"
+                                                 update="pilonaMd"
+                                                 class="cssWhite"
+                                                 icon="fa fa-list" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Actividad *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="tpAct" 
+                                             value="#{actividadInfraDiariaJSF.idActividadInfraTipo}"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             required="true"
+                                             requiredMessage="Tipo actividad es requerido"
+                                             style="width: 99.999%">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{actividadInfraTipoBean.lstActividadInfraTipos}" 
+                                               var="actTp" 
+                                               itemLabel="#{actTp.nombre}" 
+                                               itemDescription="#{actTp.descripcion}"
+                                               itemValue="#{actTp.idActividadInfraTipo}" />
+                                <p:ajax listener="#{actividadInfraDiariaJSF.cargarListaActividadInfraTipoDet()}"
+                                        process="@this,tpAct"
+                                        global="false"
+                                        update="tpActDet"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Actividad Detalle *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="tpActDet" 
+                                             value="#{actividadInfraDiariaJSF.idActividadInfraTipoDet}"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             required="true"
+                                             requiredMessage="Tipo actividad es requerido"
+                                             style="width: 99.999%">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                <f:selectItems value="#{actividadInfraDiariaJSF.listActividadInfraTipoDet}" 
+                                               var="actDet" 
+                                               itemLabel="#{actDet.nombre}" 
+                                               itemDescription="#{actDet.descripcion}"
+                                               itemValue="#{actDet.idActividadInfraTipoDet}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Nombres Empleados"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:chips id="nombre-emp"
+                                     value="#{actividadInfraDiariaJSF.listNombreEmp}"
+                                     max="10"/>
+                            <div style="margin-top: -44.5px;
+                                 float: right;">
+                                <p:commandButton id="btn-empleado"
+                                                 oncomplete="PF('listEmpDlg').show();"
+                                                 actionListener="#{actividadInfraDiariaJSF.cargarListaEmpleado()}"
+                                                 process="@this"
+                                                 style="margin: 0px;zoom: 1.18;"
+                                                 title="Buscar empleado"
+                                                 update="dial-emple"
+                                                 class="cssWhite"
+                                                 icon="fa fa-list" />
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Fotos actividad">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{actividadInfraDiariaJSF.handleFileUpload}" 
+                                              mode="advanced" 
+                                              dragDropSupport="false"
+                                              multiple="true" 
+                                              cancelLabel="Cancelar"
+                                              label="Seleccionar"
+                                              uploadLabel="Cargar"
+                                              update="msgs,msgs_photo"
+                                              sizeLimit="10000000" 
+                                              fileLimit="50"
+                                              allowTypes="/(\.|\/)(PNG|jpe?g|png|JPE?G)$/" />
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             maxlength="255"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             value="#{actividadInfraDiariaJSF.actividadInfraDiaria.descripcion}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{actividadInfraDiariaJSF.flag_rremove_photo}">
+                        <p:staticMessage severity="warn" summary="Informacion!" detail="Para Eliminar un archivo, hacer clic sobre el" />
+                        <p:dataGrid var="url_foto" id="id_tabla_fotos" 
+                                    value="#{actividadInfraDiariaJSF.listFotos}"
+                                    columns="6" layout="grid"
+                                    rowIndexVar="indexgd">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="form-modal:id_tabla_fotos"
+                                           action="#{actividadInfraDiariaJSF.delete(url_foto)}">
+                                <div class="TexAlCenter">
+                                    <p:graphicImage cache="false"
+                                                    value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                    width="100%">
+                                        <f:param name="path_foto" value="#{url_foto}" />
+                                    </p:graphicImage>
+                                </div>
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{actividadInfraDiariaJSF.listFotos.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                </div>
+            </div>
+
+            <p:dataTable id="dt_id_nov" 
+                         value="#{actividadInfraDiariaJSF.listNovedadesInfra}" 
+                         var="novInfra"
+                         emptyMessage="No existen registros"
+                         paginator="true"
+                         paginatorPosition="top"
+                         rowIndexVar="index"
+                         rows="5"
+                         widgetVar="dt_wv"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton id="btnAgregarNov" 
+                                         icon="fa fa-plus" 
+                                         action="#{actividadInfraDiariaJSF.preAgregarNov()}" 
+                                         value="Agregar Novedad" 
+                                         process="@this"
+                                         update="nov_dialog_form"
+                                         class="cssWhite RedButton" />
+                    </div>
+                </f:facet>
+                <p:column headerText="#" width="10%">
+                    <h:outputText  value="#{index+1}"/>
+                </p:column>
+                <p:column headerText="Tipo">
+                    <h:outputText value="#{novInfra.novedadInfrastruc.novedadTipoInfrastruc.nombre}"/>
+                </p:column>
+                <p:column headerText="Detalle">
+                    <h:outputText value="#{novInfra.novedadInfrastruc.novedadTipoDetallesInfrastruc.nombre}"/>
+                </p:column>
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{novInfra.novedadInfrastruc.descripcion}"/>
+                </p:column>
+                <p:column headerText="Acción" width="10%">
+                    <p:commandButton id="bnt_eliminar_nov" 
+                                     update="msgs,dt_id_nov"
+                                     rendered="#{empty novInfra.novedadInfrastruc.idNovedadInfrastruc}"
+                                     icon="fa fa-close" title="Eliminar novedad de la lista"
+                                     action="#{actividadInfraDiariaJSF.eliminarNovedad(novInfra)}"
+                                     class="cssWhite RedButton" />
+                </p:column>
+            </p:dataTable>
+
+            <p:remoteCommand name="rc_save" 
+                             class="cssWhite"
+                             rendered="#{empty actividadInfraDiariaJSF.actividadInfraDiaria.idActividadInfraDiaria}"
+                             actionListener="#{actividadInfraDiariaJSF.guardar()}"
+                             update=":form,@form"
+                             process="@form" />
+            <p:remoteCommand name="rc_edit" 
+                             class="cssWhite"
+                             rendered="#{not empty actividadInfraDiariaJSF.actividadInfraDiaria.idActividadInfraDiaria}"
+                             actionListener="#{actividadInfraDiariaJSF.actualizar()}"
+                             update=":form,@form"
+                             process="@form" />
+
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnSaveNov" icon="fa fa-save" value="Guardar" 
+                             rendered="#{empty actividadInfraDiariaJSF.actividadInfraDiaria.idActividadInfraDiaria}"
+                             class="cssWhite" onclick="rc_save()"/>
+
+            <p:commandButton id="btnEditNov" icon="fa fa-save" value="Actualizar" 
+                             rendered="#{not empty actividadInfraDiariaJSF.actividadInfraDiaria.idActividadInfraDiaria}"
+                             class="cssWhite" onclick="rc_edit()"/>
+        </f:facet>
+        <ui:include src="createNovedadInfra.xhtml"/>
+    </p:dialog>
+</ui:composition>

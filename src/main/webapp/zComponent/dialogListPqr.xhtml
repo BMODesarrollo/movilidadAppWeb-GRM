@@ -1,0 +1,94 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dialog_pqr" 
+              widgetVar="dialog_pqr_wv"
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)" 
+              class="mr1024_50 mr500_100" 
+              closeOnEscape="true" 
+              responsive="true"
+              closable="false"
+              position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Listado de PQR abiertos" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('dialog_pqr_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="dialog_pqr_form">
+            <p:staticMessage severity="warn"  summary="IMPORTANTE" detail="Hacer click sobre la fila para seleccionar" />
+            <p:separator/>
+            <p:dataTable var="pqr" value="#{novedadBean.lstpqrMaestro}" 
+                         id="dialog_pqr_dt"
+                         widgetVar="dialog_pqr_dt_wv"
+                         selectionMode="single" selection="#{novedadBean.pqrmaestro}"
+                         paginator="true"
+                         paginatorPosition="bottom"
+                         rows="10"
+                         filterDelay="1000"
+                         rowIndexVar="nroFila"
+                         rowKey="#{pqr.idPqrMaestro}"
+                         emptyMessage="No existen PQR abiertos">
+                <p:ajax event="rowSelect" 
+                        listener="#{novedadBean.onRowPqrClckSelect}"
+                        update="frmNovedadesPm:pqrlist,btnGuardarNovedadPM,msgs"
+                        oncomplete="PF('dialog_pqr_wv').hide()"
+                        global="false" />
+                <p:column headerText="ID" 
+                          filterBy="#{pqr.idPqrMaestro}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{pqr.idPqrMaestro}"  />
+                </p:column>
+                <p:column headerText="FECHA PQR" 
+                          filterBy="#{pqr_maestro.fecha}" 
+                          filterMatchMode="startsWith" >
+                    <f:facet name="filter">
+                        <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                    autocomplete="off"
+                                    required="false"
+                                    navigator="true" showTodayButton="true"
+                                    maxdate="today"
+                                    inputStyle="width: 100%;"
+                                    placeholder="Fecha"
+                                    onkeyup="PF('dialog_pqr_dt').filter()"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                            <p:ajax event="dateSelect" oncomplete="PF('dialog_pqr_dt').filter()" update="dialog_pqr_dt"/>
+                        </p:calendar> 
+                    </f:facet>
+                    <h:outputText value="#{pqr.fecha}" >
+                        <f:convertDateTime type="date" pattern="dd-MMM-yyyy" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Descripci�n" 
+                          filterBy="#{pqr.reporte}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{pqr.reporte}"  />
+                </p:column>
+                <p:column headerText="Descripci�n" 
+                          filterBy="#{pqr.idPqrTipo.idPqrClasificacion.nombre}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{pqr.idPqrTipo.idPqrClasificacion.nombre}" />
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

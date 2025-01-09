@@ -1,0 +1,321 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .mapClass {
+                width: 100%;
+                height: 600px;
+            }
+        </style>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDX8EfDI5P5RUJkl3G1F1sBKwQCaYVfV4"></script>
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-fluid" >
+            <p:panel > 
+                <f:facet name="header">
+                    <div class="ui-g Padding0">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            <span>Reporte Cercanía a Patio</span>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="formUF" rendered="#{uniFuncSessionBean.filtradoUF}">
+                                <ui:include src="../zComponent/selectUnidadFuncional.xhtml"/>
+                            </h:form>
+                        </div>
+                    </div>
+                </f:facet>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <p:tabView dynamic="true"
+                               cache="true"
+                               effect="fold"
+                               id="tabView-empleados-ubicacion">
+                        <p:tab title="Empleados" id="empleados-ubicacion">
+                            <h:form id="formEmpleado">
+                                <p:dataTable id="tblED" 
+                                             var="emple"
+                                             value="#{reporteCercaniaJSF.listEmpleado}" 
+                                             rows="20"
+                                             paginator="true"
+                                             filterDelay="1000"
+                                             scrollable="true"
+                                             filteredValue="#{reporteCercaniaJSF.listEmpleadoFilter}"
+                                             scrollHeight="600"
+                                             rowIndexVar="nroFila"
+                                             widgetVar="dtEmpleado"
+                                             reflow="true"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} "
+                                             rowsPerPageTemplate="20,50,100">
+                                    <f:facet name="header">
+                                        <div class="ui-g">
+                                            <div class="ui-g-12 ui-md-12 ui-lg-8 Padding0"></div>
+                                            <div class="ui-g-12 ui-md-12 ui-lg-4 Padding0" style="display: flex">
+                                                <p:selectOneMenu title="Seleccione un Patio" 
+                                                                 id="patio"
+                                                                 style="width: 99.9999%;margin-right: 3px"
+                                                                 filter="true"
+                                                                 filterMatchMode="contains"
+                                                                 value="#{reporteCercaniaJSF.idOperacionPatio}" >
+                                                    <f:selectItem itemLabel="Seleccione un Patio" itemValue="#{null}" />
+                                                    <f:selectItems value="#{operPatJSFMB.listOperacionPatios}"
+                                                                   var="patio"
+                                                                   itemLabel="#{patio.nombrePatio}"
+                                                                   itemDescription="#{patio.codigoPatio}"
+                                                                   itemValue="#{patio.idOperacionPatios}"/>
+                                                </p:selectOneMenu>
+                                                <p:commandButton id="consultar"
+                                                                 title="Burcar"
+                                                                 process="patio,@this"
+                                                                 update="tblED,msgs"
+                                                                 icon="fa fa-search"
+                                                                 class="cssWhite"
+                                                                 actionListener="#{reporteCercaniaJSF.consultar()}">
+                                                </p:commandButton>
+                                                <p:spacer width="2"/>
+                                                <p:commandButton id="toggler"
+                                                                 type="button" 
+                                                                 title="Columnas"
+                                                                 style="float:right" 
+                                                                 icon="fa fa-align-justify" 
+                                                                 class="OrangeButton cssWhite"/>
+                                                <p:columnToggler datasource="tblED" trigger="toggler" />
+                                            </div>
+                                        </div>
+                                    </f:facet>
+
+                                    <f:facet name="paginatorTopRight">
+                                        <p:commandButton id="todosDir" 
+                                                         global="false"
+                                                         update="gmapDialog"
+                                                         value="Coordenadas Empleados" 
+                                                         disabled="#{empty reporteCercaniaJSF.listEmpleado and empty reporteCercaniaJSF.idOperacionPatio}"
+                                                         actionListener="#{reporteCercaniaJSF.mostrarTodos()}"
+                                                         icon="fa fa-location-arrow"
+                                                         class="cssWhite OrangeButton"/>
+                                    </f:facet>
+                                    <p:column headerText="#" style="width: 5%">
+                                        <h:outputText value="#{nroFila+1}" />
+                                    </p:column>
+                                    <p:column headerText="Cédula"
+                                              filterBy="#{emple.identificacion}"
+                                              filterMatchMode="contains">
+                                        <h:outputText value="#{emple.identificacion}" />
+                                    </p:column>
+
+                                    <p:column filterBy="#{emple.nombres}"
+                                              filterMatchMode="contains"
+                                              headerText="Nombres">
+                                        <h:outputText value="#{emple.nombres}"/>
+                                    </p:column>
+                                    <p:column filterBy="#{emple.apellidos}"
+                                              filterMatchMode="contains"
+                                              headerText="Apellidos">
+                                        <h:outputText value="#{emple.apellidos}"/>
+                                    </p:column>
+                                    <p:column filterBy="#{emple.telefonoMovil}"
+                                              filterMatchMode="contains"
+                                              headerText="Teléfono">
+                                        <h:outputText value="#{emple.telefonoMovil}"/>
+                                    </p:column>
+                                    <p:column filterBy="#{emple.idEmpleadoCargo.nombreCargo}"
+                                              filterMatchMode="contains"
+                                              headerText="Cargo">
+                                        <h:outputText value="#{emple.idEmpleadoCargo.nombreCargo}"/>
+                                    </p:column>
+                                    <p:column filterBy="#{emple.localidad}"
+                                              filterMatchMode="contains"
+                                              headerText="Localidad">
+                                        <h:outputText value="#{emple.localidad}"/>
+                                    </p:column>
+                                    <p:column headerText="Cercania (Km)" class="TexAlCenter">
+                                        <h:outputText value="#{emple.getKmDistanciaPaitos(reporteCercaniaJSF.operacionPatios.latitud, reporteCercaniaJSF.operacionPatios.longitud)}">
+                                            <f:convertNumber type="number"
+                                                             groupingUsed="true" 
+                                                             minFractionDigits="2"
+                                                             pattern="#0.00"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column rendered="#{not empty reporteCercaniaJSF.listEmpleado}"
+                                              headerText="Acciones"
+                                              style="width: 70px"
+                                              class="TexAlCenter">
+                                        <p:commandButton id="direccion" 
+                                                         global="false"
+                                                         update="gmapDialog"
+                                                         title="Coordenadas" 
+                                                         rendered="#{not empty emple.latitud and not empty emple.longitud}"
+                                                         actionListener="#{reporteCercaniaJSF.ubicacionEmpleado(emple)}"
+                                                         icon="fa fa-location-arrow"
+                                                         class="cssWhite OrangeButton"/>
+                                    </p:column>
+                                    <f:facet name="footer">
+                                        <div align="right">
+                                            <h:commandLink>
+                                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                     alt="excel" style="width: 24px;height: 24px"/>
+                                                <p:dataExporter type="xlsx" target="tblED" fileName="empleados distancia a patio #{now}"/>
+                                            </h:commandLink>
+                                        </div>
+                                    </f:facet>
+                                </p:dataTable>
+                            </h:form>
+                        </p:tab>
+                        <p:tab title="Informe Localidades" id="tap-informe" >
+                            #{reporteCercaniaJSF.crearInformeLocalidad()}
+                            <h:form id="form-tbs">
+                                <div align="right" class="Wid100">
+                                    <p:selectOneMenu id="cargos" 
+                                                     value="#{reporteCercaniaJSF.idEmpleadoCargo}"
+                                                     filter="true"
+                                                     filterMatchMode="contains"
+                                                     styleClass="mr1024_30 mr500_70">
+                                        <f:selectItem itemLabel="Seleccione Un Cargo"
+                                                      itemDescription="No seleccionar ninguno permite consultar todos"
+                                                      itemValue="#{null}" />
+                                        <f:selectItems value="#{emplTipoCargoCtrl.listEmpleadoTipoCargos}" 
+                                                       var="empC" 
+                                                       itemLabel="#{empC.nombreCargo}" 
+                                                       itemDescription="#{empC.nombreCargo}"
+                                                       itemValue="#{empC.idEmpleadoTipoCargo}" />
+                                        <p:ajax event="change" 
+                                                process="@this"
+                                                update="form-tbs,msgs"
+                                                listener="#{reporteCercaniaJSF.crearInformeLocalidad()}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="flex-grid">
+                                    <div class="col col-6">
+                                        <p:dataTable id="empleado-localidad"
+                                                     var="empLocl"
+                                                     value="#{reporteCercaniaJSF.infLoclEmpList}"
+                                                     rowIndexVar="idxEmpLocl"
+                                                     filterDelay="2000"
+                                                     rowKey="#{idxEmpLocl + 1}" 
+                                                     reflow="true"
+                                                     style="margin-bottom:0"
+                                                     scrollable="true"
+                                                     scrollHeight="150">
+                                            <f:facet name="header">
+                                                Empleados por localidades
+                                                <div align="right">
+                                                    <h:commandLink>
+                                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                                             alt="excel" style="width: 24px;height: 24px"/>
+                                                        <p:dataExporter type="xlsx"
+                                                                        target="empleado-localidad,tabView-empleados-ubicacion:form-tbs:empleado-porcentaje"
+                                                                        fileName="Empleado por localidad #{now}" />
+                                                    </h:commandLink>
+                                                </div>
+                                            </f:facet>
+                                            <p:column headerText="Localidad"
+                                                      filterBy="#{empLocl.localidad}"
+                                                      filterMatchMode="contains">
+                                                <h:outputText value="#{empLocl.localidad}" />
+                                            </p:column>
+                                            <p:column headerText="Empleados">
+                                                <h:outputText value="#{empLocl.total}" />
+                                            </p:column>
+                                            <f:facet name="footer">
+                                                Total: <span class="cssBlack">#{reporteCercaniaJSF.total}</span> 
+                                            </f:facet>
+                                        </p:dataTable>
+                                    </div>
+                                    <div class="col col-6">
+                                        <p:dataTable id="empleado-porcentaje"
+                                                     var="empLoclPorcj"
+                                                     value="#{reporteCercaniaJSF.infLoclPorcentaje}"
+                                                     rowIndexVar="idxEmpLoclPorcj"
+                                                     filterDelay="2000"
+                                                     rowKey="#{idxEmpLoclPorcj + 1}" 
+                                                     reflow="true"
+                                                     style="margin-bottom:0"
+                                                     scrollable="true"
+                                                     scrollHeight="150">
+                                            <f:facet name="header">
+                                                Porcentaje de empleados por localidades
+                                                <div align="right">
+                                                    <h:commandLink>
+                                                        <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                                             alt="excel" style="width: 24px;height: 24px"/>
+                                                        <p:dataExporter type="xlsx"
+                                                                        target="empleado-porcentaje,tabView-empleados-ubicacion:form-tbs:empleado-localidad"
+                                                                        fileName="Porcentaje empleado por localidad #{now}" />
+                                                    </h:commandLink>
+                                                </div>
+                                            </f:facet>
+                                            <p:column headerText="Localidad"
+                                                      filterBy="#{empLoclPorcj.localidad}"
+                                                      filterMatchMode="contains">
+                                                <h:outputText value="#{empLoclPorcj.localidad}" />
+                                            </p:column>
+                                            <p:column headerText="%">
+                                                <h:outputText value="#{empLoclPorcj.total}" >
+                                                    <f:convertNumber groupingUsed="true" minFractionDigits="1" />
+                                                </h:outputText>
+                                            </p:column>
+                                            <f:facet name="footer">
+                                                Total: <span class="cssBlack">100%</span> 
+                                            </f:facet>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </h:form>
+                        </p:tab>
+                    </p:tabView>
+                </div>
+            </p:panel>
+
+        </div>
+        <p:dialog id="gmapDialog" 
+                  widgetVar="dlgMap" 
+                  modal="true" 
+                  class="mr1024_80 mr500_90"
+                  closable="true" 
+                  position="center top"
+                  appendTo="@(body)"
+                  responsive="true">
+            <p:gmap id="gmap" 
+                    rendered="#{reporteCercaniaJSF.operacionPatios != null}"
+                    center="#{reporteCercaniaJSF.operacionPatios.latitud}, #{reporteCercaniaJSF.operacionPatios.longitud}" 
+                    zoom="18" 
+                    type="TERRAIN" 
+                    styleClass="mapClass"
+                    model="#{reporteCercaniaJSF.simpleModel}" >
+                <p:ajax event="overlaySelect" update="msgs" listener="#{reporteCercaniaJSF.onMarkerSelect}" global="false" />
+                <p:gmapInfoWindow id="infoWindow">
+                    <p:outputPanel style="text-align: center; display: block; margin: auto">
+                        <h:outputText value="#{reporteCercaniaJSF.marker.title}" rendered="#{reporteCercaniaJSF.marker.data == null}" />
+                        <p:panelGrid columns="2" rendered="#{reporteCercaniaJSF.marker.data != null}">
+                            <h:outputText value="Nombres:" class="cssBlack"/>
+                            <h:outputText value="#{reporteCercaniaJSF.marker.data.nombres}" />
+                            <h:outputText value="Dirección:" class="cssBlack"/>
+                            <h:outputText value="#{reporteCercaniaJSF.marker.data.direccion}" />
+                            <h:outputText value="Teléfono:" class="cssBlack"/>
+                            <h:outputText value="#{reporteCercaniaJSF.marker.data.telefono}" />
+                            <h:outputText value="Tipología:" class="cssBlack"/>
+                            <h:outputText value="#{reporteCercaniaJSF.marker.data.tipologia}" />
+                            <h:outputText value="Distancia (Km):" class="cssBlack"/>
+                            <h:outputText value="#{reporteCercaniaJSF.marker.data.distancia}" >
+                                <f:convertNumber type="number"
+                                                 groupingUsed="true" 
+                                                 minFractionDigits="2"
+                                                 pattern="#0.00"/>
+                            </h:outputText>
+                            <h:outputText value="Unidad Funcional:" class="cssBlack"/>
+                            <h:outputText value="#{reporteCercaniaJSF.marker.data.unidadFuncional}" />
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:gmapInfoWindow>
+            </p:gmap>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+
+
+

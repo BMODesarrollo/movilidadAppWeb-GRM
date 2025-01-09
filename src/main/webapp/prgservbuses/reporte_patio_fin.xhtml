@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="head">
+        <style>
+            .text-center{
+                text-align: center;
+            }
+            .sin-servbus{
+                background: red !important;
+                text-align: center;
+                text-transform: uppercase;
+                color: white !important;
+                font-weight: bold;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="REPORTE PRGSERBUSES PATIO FIN">
+            <h:form id="frmIncapacidadTipo">
+                <p:dataTable id="dtReporte" var="reporte"
+                             paginator="true"
+                             emptyMessage="No se han encontrado registos."
+                             rowStyleClass="text-center"
+                             sortBy="#{reporte.codigo}"
+                             value="#{reporteServbusesPatioFinBean.lstReporteServbusesPatioFin}" 
+                             rowIndexVar="idx" rows="20">
+                    <f:facet name="header">
+                        <div align="center">
+                            <p:commandButton value="Consultar" icon="fa fa-search"
+                                             class="cssWhite"
+                                             actionListener="#{reporteServbusesPatioFinBean.obtenerReporte()}"
+                                             update="dtReporte"
+                                             />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha">
+                        <h:outputText value="#{reporte.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Bus" filterBy="#{reporte.codigo}" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{reporte.codigo}" />
+                    </p:column>
+                    <p:column headerText="Servbus">
+                        <h:outputText value="#{reporte.servbus}" rendered="#{not(reporte.servbus eq null)}" />
+                        <h:outputText value="No asignado" 
+                                      rendered="#{reporte.servbus eq null}" 
+                                      styleClass="sin-servbus"/>
+                    </p:column>
+                    <p:column headerText="Patio Fin">
+                        <h:outputText value="#{reporte.todepot}" />
+                    </p:column>
+                    <p:column headerText="Hora entrada">
+                        <h:outputText value="#{reporte.hora_entrada}" >
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{reporteServbusesPatioFinBean.lstReporteServbusesPatioFin.size()} registrados.
+                        <div style="float: right;padding-bottom: 5px" align="center">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtReporte" fileName="Prg_Servbuses #{now}"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

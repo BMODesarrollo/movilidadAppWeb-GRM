@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <p:panel header="Informe Operación">
+            <h:form id="form_info_op">
+                <p:dataTable  id="tb_info_op" var="item"
+                              value="#{informeOpBean.list}"
+                              rows="20"
+                              widgetVar="tb_info_opWV"
+                              paginatorPosition="bottom"
+                              rowIndexVar="index"
+                              scrollable="true"
+                              filterDelay="1500"
+                              scrollHeight="600"
+                              paginator="true" 
+                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                              {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                              rowsPerPageTemplate="10,20,50,100,200,500">
+
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="tb_info_op" fileName="Informe Operación"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <p:column headerText="Día"
+                              filterBy="#{item.dia_operacion}" 
+                              filterMatchMode="startsWith" >
+                        <f:facet name="filter">
+                            <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        maxdate="today"
+                                        onkeyup="PF('tb_info_opWV').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('tb_info_opWV').filter()" update="tb_info_op"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.dia_operacion}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Bus" 
+                              filterMatchMode="contains" filterBy="#{item.bus}">
+                        <h:outputText value="#{item.bus}" />
+                    </p:column>
+                    
+                    <p:column headerText="Servbus"
+                              filterBy="#{item.servbus}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.servbus}" />
+                    </p:column>
+
+                    <p:column headerText="Servicio"
+                              filterBy="#{item.servicio}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.servicio}"/>
+                    </p:column>
+                    <p:column headerText="Operador"
+                              filterBy="#{item.operador}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.operador}"/>
+                    </p:column>
+                    <p:column headerText="Código Operador"
+                              filterBy="#{item.codigo_operador}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.codigo_operador}"/>
+                    </p:column>
+                    
+                    <f:facet name="footer">
+                        En total existen #{informeOpBean.list.size()} registros.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+

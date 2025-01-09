@@ -1,0 +1,379 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .aTexAlRight{
+                text-align: right;
+            }
+
+            @media only screen and (max-width: 600px) {
+                .texto-blanco {
+                    color: white !important;
+                    font-weight: bolder !important;
+                }
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Autorización Novedades Ausentismo
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 filter="true" 
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax update="frmPrincipal:dtAutorizacionNovedad" 
+                                            oncomplete="PF('wlVdt_autorizacion_novedad').getPaginator().setPage(0);"
+                                            listener="#{autorizacionNovedadAusentismosBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtAutorizacionNovedad" var="item" 
+                             scrollable="true"
+                             widgetVar="wlVdt_autorizacion_novedad"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             tableStyle="table-layout:auto"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{autorizacionNovedadAusentismosBean.lista}">
+
+                    <f:facet name="header">
+                        <div jsf:id="botones">
+                            <div class="ui-fluid">
+                                <div align="right">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                                        </div>
+                                        <div class="ui-g-12 ui-md-10 ui-lg-10 Padding5">
+                                            <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Desde: " for="fecha_desde" class="cssWhite"/>
+                                                <p:calendar id="fecha_desde" 
+                                                            maxdate="today"
+                                                            readonlyInput="true"
+                                                            locale="es" navigator="true"
+                                                            value="#{autorizacionNovedadAusentismosBean.fecha_inicio}" placeholder="Fecha">
+                                                    <p:ajax event="dateSelect" process="@this"/>
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5" style="text-align: left">
+                                                <p:outputLabel value="Hasta: " for="fecha_fin" class="cssWhite"/>
+                                                <p:calendar id="fecha_fin"
+                                                            maxdate="today"
+                                                            readonlyInput="true"
+                                                            locale="es" navigator="true"
+                                                            value="#{autorizacionNovedadAusentismosBean.fecha_fin}" placeholder="Fecha">
+                                                    <p:ajax event="dateSelect" process="@this"/>
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-search"
+                                                    value="Buscar"
+                                                    process="@this"
+                                                    action="#{autorizacionNovedadAusentismosBean.consultar()}"
+                                                    class="cssWhite"
+                                                    update="dtAutorizacionNovedad,:msgs,botones"
+                                                    >
+                                                </p:commandButton>       
+                                            </div>
+                                            <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5" jsf:rendered="#{autorizacionNovedadAusentismosBean.flagNoExisteAutorizacion}">
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-refresh"
+                                                    value="Obtener datos"
+                                                    action="#{autorizacionNovedadAusentismosBean.generarAutorizacion()}"
+                                                    class="OrangeButton cssWhite"
+                                                    update="dtAutorizacionNovedad,:msgs"
+                                                    >
+                                                </p:commandButton>       
+                                            </div>
+                                            <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5" jsf:rendered="#{autorizacionNovedadAusentismosBean.lista.size() gt 0}">
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-thumbs-up"
+                                                    value="Aprobar Todos"
+                                                    rendered="#{autorizacionNovedadAusentismosBean.flagGestor or autorizacionNovedadAusentismosBean.flagProfOp or autorizacionNovedadAusentismosBean.flagDirOp or item.enviadoNomina eq 0}"
+                                                    action="#{autorizacionNovedadAusentismosBean.aprobarTodos()}"
+                                                    class="cssWhite"
+                                                    update="dtAutorizacionNovedad,:msgs"
+                                                    >
+                                                    <p:confirm header="Confirmación" message="Está seguro de aprobar todas las autorizaciones?" icon="fa fa-exclamation-triangle" />
+                                                </p:commandButton>       
+                                            </div>
+                                            <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+
+                                                <p:outputLabel value="- " style="visibility: hidden"/>
+                                                <p:commandButton
+                                                    icon="fa fa-paper-plane"
+                                                    value="Enviar Novedades"
+                                                    title="Enviar todas las novedades a kactus"
+                                                    rendered="#{autorizacionNovedadAusentismosBean.flagGhNomina and autorizacionNovedadAusentismosBean.lista.size() gt 0}"
+                                                    action="#{autorizacionNovedadAusentismosBean.enviarNominaTodos()}"
+                                                    class="cssWhite"
+                                                    update="dtAutorizacionNovedad,:msgs"
+                                                    >
+                                                    <p:confirm header="Confirmación" message="Está seguro de enviar todas las autorizaciones?" icon="fa fa-exclamation-triangle" />
+                                                </p:commandButton>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="Fecha Novedad"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idNovedad.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Desde"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idNovedad.desde}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Hasta"
+                              styleClass="text-center">
+                        <h:outputText value="#{item.idNovedad.hasta}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Código TM"
+                              class="text-center"
+                              filterBy="#{item.idNovedad.idEmpleado.codigoTm}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idNovedad.idEmpleado.codigoTm}" rendered="#{item.idNovedad.idEmpleado != null}"/>
+                    </p:column>
+
+                    <p:column exportable="false" filterBy="#{item.idNovedad.idEmpleado.identificacion} #{item.idNovedad.idEmpleado.codigoTm} #{item.idNovedad.idEmpleado.nombres} #{item.idNovedad.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Operador">
+                        <h:outputText value="#{item.idNovedad.idEmpleado.identificacion} - " class="cssBlack"/>
+                        <h:outputText value=" #{item.idNovedad.idEmpleado.nombres.concat(' ').concat(item.idNovedad.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Identificación operador">
+                        <h:outputText value="#{item.idNovedad.idEmpleado.identificacion}" rendered="#{item.idNovedad.idEmpleado != null}"/>
+                    </p:column>
+                    <p:column visible="false" headerText="Operador" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idNovedad.idEmpleado.nombres} #{item.idNovedad.idEmpleado.apellidos}" rendered="#{item.idNovedad.idEmpleado != null}"/>
+                    </p:column>
+
+                    <p:column exportable="false" filterBy="#{item.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"
+                              filterMatchMode="contains"
+                              headerText="Detalle Novedad">
+                        <h:outputText value="#{item.idNovedad.idNovedadTipoDetalle.tituloTipoNovedad}"/>
+                    </p:column>
+
+                    <p:column  style="text-align: center;"
+                               filterBy="#{item.aprobacionGestor}" 
+                               filterMatchMode="exact"
+                               styleClass="#{item.aprobacionGestor == 1 ? 'cssGreen texto-blanco' : item.aprobacionGestor == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Aprobación Gestor"/>
+                        </f:facet>
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('wlVdt_autorizacion_novedad').filter()" 
+                                             styleClass="custom-filter" style="width: 99.9999%">
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="SI"/>
+                                <f:selectItem itemValue="#{2}" itemLabel="NO"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.aprobacionGestor == 1? 'Si':'No'}" style="color: white;"/>
+                    </p:column>
+                    <p:column  style="text-align: center;"
+                               filterBy="#{item.aprobacionProfOp}" 
+                               filterMatchMode="exact"
+                               styleClass="#{item.aprobacionProfOp == 1 ? 'cssGreen texto-blanco' : item.aprobacionProfOp == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Aprobación Prof Op"/>
+                        </f:facet>
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('wlVdt_autorizacion_novedad').filter()" 
+                                             styleClass="custom-filter" style="width: 99.9999%">
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="SI"/>
+                                <f:selectItem itemValue="#{2}" itemLabel="NO"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.aprobacionProfOp == 1? 'Si':'No'}" style="color: white;"/>
+                    </p:column>
+                    <p:column  style="text-align: center;"
+                               filterBy="#{item.aprobacionDirOp}" 
+                               filterMatchMode="exact"
+                               styleClass="#{item.aprobacionDirOp == 1 ? 'cssGreen texto-blanco' : item.aprobacionDirOp == 0 ? 'cssRed texto-blanco' : null}">
+                        <f:facet name="header">
+                            <h:outputText value="Aprobación Dir Op"/>
+                        </f:facet>
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('wlVdt_autorizacion_novedad').filter()" 
+                                             styleClass="custom-filter" style="width: 99.9999%">
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="SI"/>
+                                <f:selectItem itemValue="#{2}" itemLabel="NO"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.aprobacionDirOp == 1? 'Si':'No'}" style="color: white;"/>
+                    </p:column>
+                    <p:column styleClass="text-center" rendered="false">
+                        <f:facet name="header">
+                            <h:outputText value="Usuario"/>
+                        </f:facet>
+                        <h:outputText value="#{item.username}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Acciones" style="text-align: center;"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+
+                            <!-- Botones aprobación/rechazo Gestor -->
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNovedadAusentismosBean.flagGestor}">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Aprobar Autorización"
+                                                 action="#{autorizacionNovedadAusentismosBean.aprobarAutorizacion()}"
+                                                 disabled="#{item.aprobacionGestor eq 1}"
+                                                 update="dtAutorizacionNovedad,:msgs"
+                                                 icon="fa fa-thumbs-up">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNovedadAusentismosBean.autorizacionNovedad}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNovedadAusentismosBean.flagGestor}">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Rechazar Autorización"
+                                                 disabled="#{item.aprobacionGestor eq 1}"
+                                                 action="#{autorizacionNovedadAusentismosBean.reprobarAutorizacion()}"
+                                                 update="dtAutorizacionNovedad,:msgs"
+                                                 icon="fa fa-thumbs-down">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNovedadAusentismosBean.autorizacionNovedad}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de rechazar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+
+                            <!-- Botones aprobación/rechazo Prof Op -->
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNovedadAusentismosBean.flagProfOp}">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Aprobar Autorización"
+                                                 action="#{autorizacionNovedadAusentismosBean.aprobarAutorizacion()}"
+                                                 disabled="#{item.aprobacionProfOp eq 1}"
+                                                 update="dtAutorizacionNovedad,:msgs"
+                                                 icon="fa fa-thumbs-up">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNovedadAusentismosBean.autorizacionNovedad}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNovedadAusentismosBean.flagProfOp}">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Rechazar Autorización"
+                                                 disabled="#{item.aprobacionProfOp eq 1}"
+                                                 action="#{autorizacionNovedadAusentismosBean.reprobarAutorizacion()}"
+                                                 update="dtAutorizacionNovedad,:msgs"
+                                                 icon="fa fa-thumbs-down">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNovedadAusentismosBean.autorizacionNovedad}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de rechazar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+
+                            <!-- Botones aprobación/rechazo Dir Op -->
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNovedadAusentismosBean.flagDirOp}">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Aprobar Autorización"
+                                                 action="#{autorizacionNovedadAusentismosBean.aprobarAutorizacion()}"
+                                                 disabled="#{item.aprobacionDirOp eq 1}"
+                                                 update="dtAutorizacionNovedad,:msgs"
+                                                 icon="fa fa-thumbs-up">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNovedadAusentismosBean.autorizacionNovedad}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de aprobar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{autorizacionNovedadAusentismosBean.flagDirOp}">
+                                <p:commandButton styleClass="cssWhite RedButton"
+                                                 title="Rechazar Autorización"
+                                                 disabled="#{item.aprobacionDirOp eq 1}"
+                                                 action="#{autorizacionNovedadAusentismosBean.reprobarAutorizacion()}"
+                                                 update="dtAutorizacionNovedad,:msgs"
+                                                 icon="fa fa-thumbs-down">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNovedadAusentismosBean.autorizacionNovedad}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de rechazar la autorización?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4" jsf:rendered="#{item.aprobacionGestor eq 1 and item.aprobacionProfOp eq 1 and item.aprobacionDirOp eq 1 and autorizacionNovedadAusentismosBean.flagGhNomina}">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Enviar Kactus"
+                                                 disabled="#{item.enviadoNomina gt 0}"
+                                                 action="#{autorizacionNovedadAusentismosBean.enviarNomina()}"
+                                                 update="dtAutorizacionNovedad,:msgs"
+                                                 icon="fa fa-paper-plane">
+                                    <f:setPropertyActionListener value="#{item}" target="#{autorizacionNovedadAusentismosBean.autorizacionNovedad}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de enviar las novedades a pago?. Ésta acción NO se puede deshacer" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{autorizacionNovedadAusentismosBean.lista.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtAutorizacionNovedad" 
+                                                fileName="Listado Autorizaciones"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

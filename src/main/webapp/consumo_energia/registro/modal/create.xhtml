@@ -1,0 +1,134 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="consumoEnergia"
+              widgetVar="wlvConsumoEnergia" 
+              modal="true" 
+              class="mr1024_40 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{consumoEnergiaBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{consumoEnergiaBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmConsumoEnergia">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Fecha
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fecha" 
+                                        pattern="yyyy/MM/dd HH:mm" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Fecha/Hora es requerida"
+                                        title="año/mes/día hora:minutos"
+                                        showOn="button"
+                                        timeInput="true"
+                                        readonlyInput="true"
+                                        timeControlType="select"
+                                        navigator="true"
+                                        mask="true"
+                                        maxdate="#{consumoEnergiaBean.validarFormatoFecha()}"
+                                        value="#{consumoEnergiaBean.consumoEnergia.fechaHora}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Lectura 1 (KWH)
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+
+                            <p:inputNumber value="#{consumoEnergiaBean.consumoEnergia.lecturaUno}" 
+                                           maxValue="9999999.999" >
+                            </p:inputNumber>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Lectura 2 (KVA RH)
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber value="#{consumoEnergiaBean.consumoEnergia.lecturaDos}" 
+                                           maxValue="9999999.999" />
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Velocidad
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber value="#{consumoEnergiaBean.consumoEnergia.velocidad}" 
+                                           maxValue="9999999.999" />
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            Estado
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  
+                                style="width: 99.9999%"
+                                filter="true"
+                                filterMatchMode="contains"
+                                required="true"
+                                requiredMessage="Debe seleccionar un estado"
+                                value="#{consumoEnergiaBean.idEstado}">
+                                <f:selectItem itemLabel="Seleccione uno" 
+                                              itemDisabled="true"
+                                              itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="estado"
+                                    value="#{consumoEnergiaBean.lstConsumoEnergiaEstados}"
+                                    itemLabel="#{estado.nombre}"
+                                    itemValue="#{estado.idConsumoEnergiaEstado}"
+                                    />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             update="messages,pGridDatos,:frmPrincipal:dtConsumoEnergia" 
+                             action="#{consumoEnergiaBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmPrincipal:dtConsumoEnergia"
+                             action="#{consumoEnergiaBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="right">
+                <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                                 rendered="#{consumoEnergiaBean.selected == null}"
+                                 class="cssWhite" onclick="guardar()"/>
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{consumoEnergiaBean.selected != null }"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

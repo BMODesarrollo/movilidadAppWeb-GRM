@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="componenteMtto" id="modalComponenteMtto" modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)" position="center top"
+              class="mr1024_30 mr500_90" >
+        <c:if test="#{mttoComponenteBean.selected == null }">
+            <f:facet name="header">
+                Nuevo componente
+            </f:facet>
+        </c:if>
+        <c:if test="#{mttoComponenteBean.selected != null }">
+            <f:facet name="header">
+                Editar componente
+            </f:facet>
+        </c:if>
+        <h:form id="frmIncapacidad">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid" >
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Nombre: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText value="#{mttoComponenteBean.mttoComponente.nombre}"
+                                         id="nombre"
+                                         required="true"
+                                         requiredMessage="Debe ingresar un nombre"
+                                         />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Descripción: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 Wid100">
+                            <p:inputTextarea value="#{mttoComponenteBean.mttoComponente.descripcion}"
+                                             id="descripcion"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"
+                                             />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_update_comp"
+                             action="#{mttoComponenteBean.guardar()}"
+                             update=":frmMttoComponente:dtMttoComponente,messages"
+                             rendered="#{mttoComponenteBean.selected == null }"/>
+            <p:remoteCommand name="rc_update_comp" 
+                             action="#{mttoComponenteBean.actualizar()}"
+                             update=":frmMttoComponente:dtMttoComponente,:msgs"
+                             rendered="#{mttoComponenteBean.selected != null }"
+                             />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_comp();"
+                rendered="#{mttoComponenteBean.selected == null }"
+                class="cssWhite"
+                value="Guardar"/>
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_update_comp();"
+                rendered="#{mttoComponenteBean.selected != null }"
+                class="cssWhite"
+                value="Actualizar"/>
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

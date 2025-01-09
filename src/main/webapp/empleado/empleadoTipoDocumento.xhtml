@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel header="Tipos de Documentos" style="alignment-adjust: central">
+            <h:form id="formTablaTipoDocu">
+                <p:dataTable id="tblETD" var="emplTipDoc"  editable="true" 
+                             value="#{emplTipDocCtrl.listEmplTipDocs}" rows="10"
+                             paginator="true"
+                             filterDelay="1000"
+                             rowIndexVar="nroFila"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                             {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="btnAdd" value="Nuevo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             process="@this"
+                                             action="#{emplTipDocCtrl.openDialog()}"
+                                             update="formEmplTipoDoc:dlgid" 
+                                             onclick="$('#formEmplTipoDoc').trigger(':reset')"
+                                             oncomplete="PF('dlg2').show();">
+                                <p:resetInput target="dlgid" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="formTablaTipoDocu:tblETD" trigger="toggler" />
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Código" filterBy="#{emplTipDoc.codigo}">
+                        <h:outputText value="#{emplTipDoc.codigo}" />
+                    </p:column>
+                    <p:column filterBy="#{emplTipDoc.nombreTipoDocumento}"
+                              filterMatchMode="contains" 
+                              headerText="Nombre" >
+                        <h:outputText value="#{emplTipDoc.nombreTipoDocumento}"/>
+                    </p:column>
+                    <p:column filterBy="#{emplTipDoc.descripcionTipoDocumento}"
+                              filterMatchMode="contains"  headerText="Descripión">
+                        <h:outputText value="#{emplTipDoc.descripcionTipoDocumento}"/>
+                    </p:column>
+
+                    <p:column 
+                        headerText="Obligatorio" 
+                        styleClass="#{emplTipDoc.obligatorio == 1 ? 'cssGreen' : emplTipDoc.obligatorio == 0 ? 'cssRed' : null}" >
+                        <h:outputText value="Sí" styleClass="cssWhite" rendered="#{emplTipDoc.obligatorio == 1}"/>
+                        <h:outputText value="No" styleClass="cssWhite" rendered="#{emplTipDoc.obligatorio == 0}"/>
+                    </p:column>
+
+                    <p:column 
+                        headerText="Radicado" 
+                        styleClass="#{emplTipDoc.radicado == 1 ? 'cssGreen' : emplTipDoc.radicado == 0 ? 'cssRed' : null}" >
+                        <h:outputText value="Sí" styleClass="cssWhite" rendered="#{emplTipDoc.radicado == 1}"/>
+                        <h:outputText value="No" styleClass="cssWhite" rendered="#{emplTipDoc.radicado == 0}"/>
+                    </p:column>
+                    <p:column 
+                        headerText="Vencimiento" 
+                        styleClass="#{emplTipDoc.vencimiento == 1 ? 'cssGreen' : emplTipDoc.vencimiento == 0 ? 'cssRed' : null}" >
+                        <h:outputText value="Sí" styleClass="cssWhite" rendered="#{emplTipDoc.vencimiento == 1}"/>
+                        <h:outputText value="No" styleClass="cssWhite" rendered="#{emplTipDoc.vencimiento == 0}"/>
+                    </p:column>
+
+                    <p:column headerText="Opciones" style="width:15%; text-align: center">
+                        <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite"
+                                         update=":formEmplTipoDoc:dlgid"
+                                         oncomplete="PF('dlg2').show();"
+                                         action="#{emplTipDocCtrl.editar(emplTipDoc)}" 
+                                         title="Modificar" 
+                                         disabled="#{emplTipDoc.estadoReg==1}"/>
+
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <h:form id="formEmplTipoDoc">
+            <p:dialog header="Tipo de Documento" 
+                      position="center top"
+                      closeOnEscape="true"
+                      id="dlgid"
+                      class="mr1024_40 mr500_90"
+                      responsive="true"
+                      widgetVar="dlg2" 
+                      modal="true">
+                <div class="ui-fluid ">
+                    <div class="ui-g ">
+                        <div class="ui-g Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Código"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputText id="code"
+                                             required="true" requiredMessage="Código es obligatorio"
+                                             value="#{emplTipDocCtrl.emplTipDoc.codigo}" 
+                                             maxlength="60"
+                                             />
+                            </div>
+                    </div>
+                        <div class="ui-g-12 ui-gl-12 ui-md-12 Padding5">
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:outputLabel for="txtnombre"  value="Nombre:"/>
+                            </div>
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:inputText id="txtnombre" required="true" maxlength="45"  requiredMessage="Debe ingresar 
+                                             el nombre del Tipo Documento" 
+                                             value="#{emplTipDocCtrl.emplTipDoc.nombreTipoDocumento}">
+                                    <p:messages id="txtNombreMssg" showDetail="true"/>
+                                </p:inputText>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-gl-4 ui-md-4 Padding5">
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:outputLabel for="ISObligatorio"  value="Obligatorio:"/>
+                            </div>
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:selectBooleanButton id="ISObligatorio" 
+                                                       value="#{emplTipDocCtrl.obligatorio}"
+                                                       onLabel="Sí"
+                                                       offLabel="No" 
+                                                       class="cssWhite"
+                                                       offIcon="fa fa-close"
+                                                       onIcon="fa fa-check"/>
+                                <p:tooltip id="toolTipFadeISObligatorio" 
+                                           for="ISObligatorio" 
+                                           value="Haga click para cambiar el valor" 
+                                           position="top"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-gl-4 ui-md-4 Padding5">
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:outputLabel for="ISRadicado" value="Radicado:"/>
+                            </div>
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:selectBooleanButton id="ISRadicado" 
+                                                       value="#{emplTipDocCtrl.radicado}" 
+                                                       onLabel="Sí" 
+                                                       offLabel="No" 
+                                                       offIcon="fa fa-close"
+                                                       class="cssWhite"
+                                                       onIcon="fa fa-check"/>
+                                <p:tooltip id="toolTipISRadicado" for="ISRadicado" 
+                                           value="Haga click para cambiar el valor" position="top"/>
+
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-gl-4 ui-md-4 Padding5">
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:outputLabel for="ISVencimiento" value="Vencimiento:"/>
+                            </div>
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:selectBooleanButton id="ISVencimiento" 
+                                                       value="#{emplTipDocCtrl.vencimiento}" 
+                                                       onLabel="Sí" 
+                                                       offLabel="No" 
+                                                       class="cssWhite"
+                                                       offIcon="fa fa-close"
+                                                       onIcon="fa fa-check"/>
+                                <p:tooltip id="toolTipISVencimiento" for="ISVencimiento" 
+                                           value="Haga click para cambiar el valor" position="top"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-gl-12 ui-md-12 Padding5">
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:outputLabel for="ITDescripcion"  
+                                               value="Descripción:"/>
+                            </div>
+                            <div class="ui-g-12 ui-gl-12 ui-md-12 Padding0">
+                                <p:inputTextarea id="ITDescripcion" 
+                                                 required="true" 
+                                                 counter="display" 
+                                                 value="#{emplTipDocCtrl.emplTipDoc.descripcionTipoDocumento}" 
+                                                 maxlength="100"
+                                                 counterTemplate="{0} caracteres restantes." 
+                                                 autoResize="false" />
+                                <p:outputLabel id="display" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <f:facet name="footer">
+                    <p:commandButton id="btnGuardar" 
+                                     rendered="#{emplTipDocCtrl.emplTipDoc.idEmpleadoTipoDocumento==null}"
+                                     icon="fa fa-save" value="Guardar" 
+                                     class="cssWhite"
+                                     actionListener="#{emplTipDocCtrl.guargar()}"
+                                     update="formTablaTipoDocu:tblETD,msgs"/>
+                    <p:commandButton id="btnEditar" 
+                                     rendered="#{emplTipDocCtrl.emplTipDoc.idEmpleadoTipoDocumento!=null}"
+                                     icon="fa fa-pencil" value="Actualizar"
+                                     class="cssWhite"
+                                     actionListener="#{emplTipDocCtrl.guardarEdit()}"
+                                     update="formTablaTipoDocu:tblETD,msgs"/>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
+
+

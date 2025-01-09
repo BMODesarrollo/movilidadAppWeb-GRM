@@ -1,0 +1,299 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="incapacidadDlg" id="modalIncapacidad" modal="true" closeOnEscape="true"
+              responsive="true" closable="false"
+              class="mr1024_50 mr500_90"
+              fitViewport="true"
+              resizable="false" appendTo="@(body)" position="center,top">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{ausentismosBean.selectedIncapacidad == null }">
+                                <p:outputLabel value="Nuevo seguimiento de incapacidad" class="cssWhite"/>
+                            </c:if>
+                            <c:if test="#{ausentismosBean.selectedIncapacidad != null }">
+                                <p:outputLabel value="Editar seguimiento incapacidad" class="cssWhite"/>
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('incapacidadDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmIncapacidad">
+            <p:focus context="fecha"/>
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <p:fieldset legend="Datos novedad" >
+                <div class="ui-fluid" >
+                    <div class="ui-g ">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Código operador: "/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputText value="#{ausentismosBean.selected.idEmpleado.codigoTm}" class="cssBlack"
+                                             readonly="true"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Nombre operador: "/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputText value="#{ausentismosBean.selected.idEmpleado.nombres} #{ausentismosBean.selected.idEmpleado.apellidos}" 
+                                             class="cssBlack" readonly="true"/>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="tipo_novedad" value="Tipo novedad: " />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputText value="#{ausentismosBean.selected.idNovedadTipo.nombreTipoNovedad}"
+                                             id="tipo_novedad"
+                                             readonly="true"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Detalle novedad: " />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputText value="#{ausentismosBean.selected.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{ausentismosBean.selected.idNovedadDano eq null and ausentismosBean.selected.idMulta eq null}" readonly="true"/>
+                                <p:inputText value="#{ausentismosBean.selected.idNovedadTipoDetalle.tituloTipoNovedad}" rendered="#{ausentismosBean.selected.idNovedadTipoDetalle.idNovedadTipoDetalle gt 0 and ausentismosBean.selected.idMulta.idMulta gt 0}" readonly="true"/>
+                                <p:inputText value="#{ausentismosBean.selected.idNovedadDano.idVehiculoDanoSeveridad.nombre}" rendered="#{ausentismosBean.selected.idNovedadDano.idNovedadDano gt 0}" readonly="true"/>
+                                <p:inputText value="#{ausentismosBean.selected.idMulta.idMultaTipo.tipo}" 
+                                             readonly="true"
+                                             rendered="#{ausentismosBean.selected.idMulta.idMulta gt 0 and ausentismosBean.selected.idNovedadTipoDetalle eq null}"/>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="desde" value="Desde:" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:calendar id="desde" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{ausentismosBean.selected.desde}"
+                                            showOn="button" 
+                                            locale="es"
+                                            styleClass="oneLine"
+                                            showTodayButton="true"
+                                            readonlyInput="true"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }"
+                                            >
+                                    <p:ajax event="dateSelect" update="hasta"/>
+                                </p:calendar>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel for="hasta" value="Hasta:" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:calendar id="hasta" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{ausentismosBean.selected.hasta}"
+                                            mindate="#{ausentismosBean.selected.desde}"
+                                            showOn="button" 
+                                            locale="es"
+                                            readonlyInput="true"
+                                            showTodayButton="true"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }"
+                                            >
+                                </p:calendar>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+
+                                <p:outputLabel for="observacion" value="Observación:" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputTextarea value="#{ausentismosBean.selected.observaciones}"
+                                                 id="observacion"
+                                                 cols="5"
+                                                 rows="4"
+                                                 readonly="true"
+                                                 />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p:fieldset>
+
+            <div class="ui-fluid" jsf:id="pGrid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="fecha" value="Soporte:" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fecha" 
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        value="#{ausentismosBean.novedadIncapacidad.fecha}" 
+                                        showOn="button" 
+                                        locale="es"
+                                        placeholder="Seleccione fecha"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha"
+                                        readonlyInput="true"
+                                        navigator="true"
+                                        />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Incapacita: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="incapacita" value="#{ausentismosBean.i_Incapacita}" 
+                                             style="width:99.9999%"
+                                             required="true" requiredMessage="Debe seleccionar una opción"
+                                             filter="true">
+                                <f:selectItem itemLabel="Seleccione opción" itemValue="" />
+                                <f:selectItems value="#{ausentismosBean.lstIncapacidadOrdenas}" 
+                                               var="ordena" itemLabel="#{ordena.ordena}"
+                                               itemValue="#{ordena.idIncapacidadOrdena}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Diagnostico: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="diagnostico" value="#{ausentismosBean.i_Diagnostico}"
+                                             style="width:99.9999%"
+                                             required="true" requiredMessage="Debe seleccionar diagnóstico"
+                                             filter="true" filterMatchMode="contains">
+                                <p:ajax event="change" update="observaciones"
+                                        listener="#{ausentismosBean.addObservacion()}" />
+                                <f:selectItem itemLabel="Seleccione opción" itemValue="" />
+                                <f:selectItems value="#{ausentismosBean.lstIncapacidadDxs}"
+                                               var="dx" itemLabel="#{dx.codigo.concat(' - ').concat(dx.descripcion)}"
+                                               itemValue="#{dx.idIncapacidadDx}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Tipo incapacidad: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="tipo_incapacidad" 
+                                             value="#{ausentismosBean.i_TipoIncapacidad}" style="width: 99.9999%"
+                                             required="true" 
+                                             requiredMessage="Debe seleccionar tipo de incapacidad"
+                                             filter="true">
+                                <f:selectItem itemLabel="Seleccione opción" itemValue="" />
+                                <f:selectItems value="#{ausentismosBean.lstIncapacidadTipos}"
+                                               var="tipo" itemLabel="#{tipo.descripcion}"
+                                               itemValue="#{tipo.idIncapacidadTipo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Número incapacidad: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber value="#{ausentismosBean.novedadIncapacidad.numeroIncapacidad}"
+                                           id="numero_incapacidad"
+                                           required="true"
+                                           decimalPlaces="0"
+                                           requiredMessage="DEBE ingresar un número de incapcidad"
+                                           >
+                                <f:convertNumber integerOnly="true" 
+                                                 groupingUsed="false"/>
+                            </p:inputNumber>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="ui-fluid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" />
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <p:commandButton title="Cargar archivo incapacidad"
+                                         icon="fa fa-upload"
+                                         value="Cargar archivo incapacidad"
+                                         class="cssWhite OrangeButton"
+                                         update=":frmAddFileIncapacidad:content"
+                                         oncomplete="PF('AddFileIncapacidadDialog').show()"
+                                         >
+                        </p:commandButton>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" />
+                </div>
+            </div>
+            <div class="ui-fluid" jsf:id="pGridObservaciones">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="observaciones" value="Observaciones: "/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="observaciones"
+                                             autoResize="true"
+                                             addLine="true"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"
+                                             value="#{ausentismosBean.novedadIncapacidad.observaciones}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_segui"
+                             action="#{ausentismosBean.guardarSeguimientoIncapacidad()}"
+                             update=":frmNovedadIncapacidadList:dtNovedadSeguimientoIncapacidad,pGrid,pGridObservaciones,messages,
+                             :frmPrincipal:dtTipo"
+                             rendered="#{ausentismosBean.selectedIncapacidad == null }"/>
+            <p:remoteCommand name="rc_update_segui" 
+                             action="#{ausentismosBean.actualizarSeguimientoIncapacidad()}"
+                             update=":frmNovedadIncapacidadList:dtNovedadSeguimientoIncapacidad,messages"
+                             rendered="#{ausentismosBean.selectedIncapacidad != null }"
+                             />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_segui();"
+                rendered="#{ausentismosBean.selectedIncapacidad == null }"
+                class="cssWhite"
+                value="Guardar"/>
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_update_segui();"
+                rendered="#{ausentismosBean.selectedIncapacidad != null }"
+                class="cssWhite"
+                value="Actualizar"/>
+        </f:facet>
+        <ui:include src="modals/AddFiles.xhtml"/>
+    </p:dialog> 
+</ui:composition>

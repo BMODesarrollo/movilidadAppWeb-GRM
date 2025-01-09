@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="PrgTcListDlg" widgetVar="PrgTcListDialog" modal="true"
+              class="mr1024_60 mr500_90"
+              resizable="false" appendTo="@(body)" header="Lista PrgTc"
+              responsive="true" position="center top" 
+              closeOnEscape="true" >
+        <h:form id="frmPrgTcList">
+            <p:dataTable var="prgtc" value="#{multaController.lstPrgTcs}"
+                         id="dtNovedadTipo" widgetVar="wVPrgTcListDialog"
+                         selectionMode="single" selection="#{multaController.prgTc}"                       
+                         rowIndexVar="nroFila"
+                         reflow="true"
+                         filterDelay="1500"
+                         scrollable="true"
+                         scrollHeight="650"
+                         paginator="true"
+                         rows="8"
+                         rowKey="#{prgtc.idPrgTc}"
+                         emptyMessage="No existen prgtc registrados para esa fecha">
+                <p:ajax event="rowSelect" 
+                        listener="#{multaController.onRowPrgTcClckSelect}"
+                        update=":MultaCreateForm:idServicio,:MultaCreateForm:idLinea,
+                        :MultaCreateForm:tabla,:MultaCreateForm:idVehiculo,:MultaCreateForm:grid"
+                        oncomplete="PF('PrgTcListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Fecha">
+                    <h:outputText value="#{prgtc.fecha}">
+                        <f:convertDateTime pattern="yyyy-MM-dd"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="ServBus">
+                    <h:outputText value="#{prgtc.servbus}" />
+                </p:column>
+                <p:column headerText="Bus" 
+                          filterBy="#{prgtc.idVehiculo.codigo}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{prgtc.idVehiculo.codigo}" />
+                </p:column>
+                <p:column headerText="Operador" 
+                          filterBy="#{prgtc.idEmpleado.nombres} #{prgtc.idEmpleado.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{prgtc.idEmpleado.nombres} #{prgtc.idEmpleado.apellidos}" />
+                </p:column>
+                <p:column headerText="H.ini">
+                    <h:outputText value="#{prgtc.timeOrigin}" />
+                </p:column>
+                <p:column headerText="H.fin">
+                    <h:outputText value="#{prgtc.timeDestiny}" />
+                </p:column>
+                <p:column headerText="Servicio" 
+                          filterBy="#{prgtc.idRuta.name}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{prgtc.idRuta.name}" rendered="#{prgtc.idRuta.name != null}" />
+                    <h:outputText value="No tiene" rendered="#{prgtc.idRuta.name == null}" />
+                </p:column>
+                <p:column headerText="Tabla"
+                          filterBy="#{prgtc.tabla}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{prgtc.tabla}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

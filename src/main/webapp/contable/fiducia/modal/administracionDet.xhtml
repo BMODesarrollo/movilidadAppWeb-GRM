@@ -1,0 +1,96 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal-det" 
+              closeOnEscape="true" 
+              widgetVar="modalDetDlg"
+              modal="true"
+              header="#{contableRptFiduciaJSF.isbEditDet() ? 'EDITAR REPORTE FIDUCIA CUENTA' : 'NUEVA REPORTE FIDUCIA CUENTA'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal-det">
+            <div class="ui-fluid">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Tipo Cuenta *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  id="tipoCuenta"
+                                              filter="true"
+                                              filterMatchMode="contains"
+                                              required="true"
+                                              requiredMessage="Tipo Cuenta es requierido"
+                                              value="#{contableRptFiduciaJSF.idContableCta}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems var="cta"
+                                               value="#{contableCtaJSF.listContableCta}"
+                                               itemLabel="Multa? #{cta.esMulta == 1 ? 'Sí' : 'No'} - #{cta.nroCuenta}"
+                                               itemDescription="#{cta.concepto} - #{cta.idContableCtaTipo.tipoCuenta}"
+                                               itemValue="#{cta.idContableCta}"
+                                               />
+                                <p:ajax global="false" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Valor *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="valor" 
+                                         value="#{contableRptFiduciaJSF.contableRptFiduciaDet.valor}"
+                                         maxlength="10"
+                                         placeholder="$"
+                                         required="true" 
+                                         requiredMessage="Valor es requerido" >
+                                <p:keyFilter regEx="/[.0-9]/i"/>  
+                            </p:inputText>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             maxlength="255"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             value="#{contableRptFiduciaJSF.contableRptFiduciaDet.observacion}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardarFd" 
+                             rendered="#{!contableRptFiduciaJSF.isbEditDet()}"
+                             actionListener="#{contableRptFiduciaJSF.agregarContRptFidDet()}"
+                             update=":form-modal:detalles:tbl-det,@form,:form:msg"
+                             process="@form" />
+            <p:remoteCommand name="editarFd" 
+                             rendered="#{contableRptFiduciaJSF.isbEditDet()}"
+                             actionListener="#{contableRptFiduciaJSF.editarContRptFidDet()}"
+                             update=":form-modal:detalles:tbl-det,@form,:form:msg" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-guardar-det"
+                             value="Guardar"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{!contableRptFiduciaJSF.isbEditDet()}"
+                             onclick="guardarFd()"/>
+            <p:commandButton id="btn-editar-det"
+                             value="Actualizar"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             onclick="editarFd()"
+                             rendered="#{contableRptFiduciaJSF.isbEditDet()}"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,195 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="nov_novedad_mtto_wv" id="nov_novedad_mtto_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top"
+              class="mr1024_60 mr500_90" 
+              height="auto" header="Gestión Novedad Componente">
+        <h:form id="nov_novedad_mtto_form" enctype="multipart/form-data">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <p:messages id="msgs_photo" showSummary="false" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:staticMessage severity="warn" 
+                                         summary="AVISO" 
+                                         rendered="#{novMttoBean.tamanoNovedadDocumento eq null}"
+                                         detail="Si desea agregar archivos a la novedad, DEBE crear una llave con el nombre novMtoTamano y como valor colocar limite ( en BYTES ) por archivo... En el módulo Configuración Empresa ( Configuración / Empresa ) ===> Avisar a tecnología"/>
+                    </div>
+                </div>
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha_ini" value="Fecha:" />
+
+                        <p:calendar id="fecha_ini" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Fecha es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{novMttoBean.selected.fechaHoraNov}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipomttoStruct" value="Tipo de novedad:"/>
+                        <p:selectOneMenu id="SOMNovedadTipomttoStruct"
+                                         style="width: 99.9999%"
+                                         required="true"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novMttoBean.i_idNovedadTipoInfraStruct}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{novMttoBean.listNovMttoTipo}"
+                                           var="genTipo" itemLabel="#{genTipo.nombre}"
+                                           itemDescription="#{genTipo.descripcion}"
+                                           itemValue="#{genTipo.idNovedadMttoTipo}" />
+                            <p:ajax listener="#{novMttoBean.prepareTipoDetalles(true)}" update="SOMNovedadTipoDetallesmttoStruct"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipoDetallesmttoStruct" value="Detalle tipo novedad:"/>
+                        <p:selectOneMenu id="SOMNovedadTipoDetallesmttoStruct"
+                                         style="width: 99.9999%"
+                                         required="true"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novMttoBean.i_idNovedaTipoDetallesInfraStruct}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{novMttoBean.listNovTipoDetMtto}"
+                                           var="tipoDet" itemLabel="#{tipoDet.nombre}"
+                                           itemDescription="#{tipoDet.descripcion}"
+                                           itemValue="#{tipoDet.idNovedadMttoTipoDet}" />
+                            <p:ajax listener="#{novMttoBean.prepareTipoDetalles(false)}"/>
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMPilona" value="Pilona:"/>
+                        <p:selectOneMenu id="SOMPilona"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novMttoBean.i_idSegPilona}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{novMttoBean.listPilonas}"
+                                           var="pilona" itemLabel="#{pilona.codigo} #{pilona.nombre}"
+                                           itemDescription="#{pilona.descripcion}"
+                                           itemValue="#{pilona.idSegPilona}" />
+                            <p:ajax listener="#{novMttoBean.selectPilona()}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="id_estacion" value="Estación:"/>
+                        <p:selectOneMenu id="id_estacion"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novMttoBean.i_estacion}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{novMttoBean.listEstacion}"
+                                           var="estacion" itemLabel="#{estacion.nombre}"
+                                           itemDescription="#{estacion.descripcion}"
+                                           itemValue="#{estacion.idCableEstacion}" />
+                            <p:ajax listener="#{novMttoBean.selectEstacion()}"/>
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMCabina" value="Cabina"/>
+                        <p:selectOneMenu id="SOMCabina"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novMttoBean.i_cabina}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{novMttoBean.listCableCabina}"
+                                           var="cab" itemLabel="#{cab.nombre}"
+                                           itemDescription="#{cab.descripcion}"
+                                           itemValue="#{cab.idCableCabina}" />
+                            <p:ajax listener="#{novMttoBean.selectCabina()}"/>
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Fotos Novedad">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{novMttoBean.handleFileUpload}"
+                                              id="foto"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="#{novMttoBean.tamanoNovedadDocumento}"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG|mp4|MP4)$/"
+                                              update="msgs_photo"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG, .mp4, .MP4"
+                                              process="@this"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen ó video válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de #{novMttoBean.tamanoNovedadDocumento.split('0')[0]}MB"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{novMttoBean.flag_rremove_photo}">
+                        <p:staticMessage severity="warn" summary="Informacion!" detail="Para Eliminar un archivo, hacer clic sobre el" />
+                        <p:dataGrid var="url_foto" id="id_tabla_fotos" 
+                                    value="#{novMttoBean.listFotos}"
+                                    columns="6" layout="grid"
+                                    rowIndexVar="indexgd">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="nov_novedad_mtto_form:id_tabla_fotos"
+                                           action="#{novMttoBean.delete(url_foto)}">
+                                <p:panel>
+                                    <div class="TexAlCenter">
+                                        <div>
+                                            <p:graphicImage cache="false"
+                                                            style="border:1px solid #106ebc; border-radius: 0px;"
+                                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                            width="80%">
+                                                <f:param name="path_foto" value="#{url_foto}" />
+                                            </p:graphicImage>
+                                        </div>
+                                    </div>
+                                </p:panel> 
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{novMttoBean.listFotos.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="descripcion" value="Descripcion:" />
+                        <p:inputTextarea id="descripcion" 
+                                         value="#{novMttoBean.selected.descripcion}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una descripcion"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_save_mtto" 
+                             class="cssWhite"
+                             actionListener="#{novMttoBean.guardar()}"  
+                             value="Guardar" 
+                             process="@form"
+                             update="msgs,form_novedad_mtto:dt_novedad_mtto_id"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnEditNov" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc_save_mtto()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

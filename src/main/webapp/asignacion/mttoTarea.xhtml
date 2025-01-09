@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="content">
+        <p:panel header="Mtto Tarea"> 
+            <h:form id="formTablaMttoTarea">
+                <p:dataTable id="tblMttoTarea" var="tarea"  editable="true"
+                             value="#{mttoTareaJSFMB.listaMttoTareas}" 
+                             rows="10"
+                             paginator="true"
+                             filterDelay="1000"
+                             rowIndexVar="nroFila"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton id="btn_create"
+                                             icon="fa fa-plus"
+                                             value="Nuevo"
+                                             class="cssWhite"
+                                             process="@this"
+                                             update="form_mtto_tarea"
+                                             actionListener="#{mttoTareaJSFMB.prepareCreate()}"
+                                             oncomplete="PF('wv_tarea').show();">
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 10%">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre"
+                              filterBy="#{tarea.nombreMttoTarea}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tarea.nombreMttoTarea}"/>
+                    </p:column>
+                    <p:column headerText="Descripción"
+                              filterBy="#{tarea.descripcionMttoTarea}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{tarea.descripcionMttoTarea}"/>
+                    </p:column>
+
+                    <p:column style="width:15%; text-align: center">
+                        <p:commandButton icon="fa fa-pencil"
+                                         update="form_mtto_tarea"
+                                         class="GreenButton cssWhite"
+                                         oncomplete="PF('wv_tarea').show();"
+                                         action="#{mttoTareaJSFMB.prepareaEditar(tarea)}"
+                                         disabled="#{emplTipIdent.estadoReg==1}"
+                                         title="Modificar" />
+
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+
+
+

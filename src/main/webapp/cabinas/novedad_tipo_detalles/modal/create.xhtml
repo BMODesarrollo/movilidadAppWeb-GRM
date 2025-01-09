@@ -1,0 +1,137 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="novedadTipoDetalleCab"
+              widgetVar="wlvNovedadTipoDetalleCab" 
+              modal="true" 
+              class="mr1024_50 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{novedadTipoDetalleCabBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{novedadTipoDetalleCabBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmNovedadTipoDetalleCab">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding0">
+                            <p:outputLabel value="Novedad tipo" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="novedad_tipo"
+                                         readonly="true"
+                                         value="#{novedadTipoDetalleCabBean.novedadTipo.nombre}"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-list"
+                                                 update=":msgs,frmNovedadTipoCab:dtNovedadTipoCab"
+                                                 action="#{novedadTipoDetalleCabBean.prepareListNovedadTipo()}"
+                                                 oncomplete="PF('NovedadTipoCabDialog').show();"
+                                                 process="@this"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Nombre" for="@next"/>
+                            </div>
+                            <p:inputText 
+                                required="true" 
+                                value="#{novedadTipoDetalleCabBean.nombre}"
+                                requiredMessage="Debe ingresar un nombre"
+                                />
+                        </div>
+                    </div>
+
+                    <div class="EmptyBox10"></div>
+
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 Padding0">
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Notifica" for="@next"/>
+                            </div>
+                            <p:selectBooleanButton value="#{novedadTipoDetalleCabBean.b_notifica}" 
+                                                   onLabel="Sí" offLabel="No" 
+                                                   onIcon="fa fa-check" 
+                                                   offIcon="fa fa-times"
+                                                   styleClass="cssWhite">
+                                <p:ajax update="emails" listener="#{novedadTipoDetalleCabBean.cargarEmails()}" />
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                    </div>
+
+                    <div class="EmptyBox10"></div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="emails">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                             jsf:rendered="#{novedadTipoDetalleCabBean.b_notifica}">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" 
+                                 jsf:rendered="#{novedadTipoDetalleCabBean.b_notifica}">
+                                <p:outputLabel value="Emails ( Si va a ingresar varios emails, separelos por cómas)" />
+                            </div>
+                            <p:inputTextarea autoResize="false"
+                                             value="#{novedadTipoDetalleCabBean.novedadTipoDetalle.emails}"
+                                             required="true"
+                                             placeholder="Ex: example1@example.com,example2@example.com"
+                                             requiredMessage="Debe ingresar al menos un email"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         value="#{novedadTipoDetalleCabBean.novedadTipoDetalle.descripcion}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmNovedadTipoDetalleCab,@this"
+                             update="messages,pGridDatos,:frmPrincipal:dtNovedadTipoDetallesCab" 
+                             action="#{novedadTipoDetalleCabBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmNovedadTipoDetalleCab,@this"
+                             update=":msgs,:frmPrincipal:dtNovedadTipoDetallesCab"
+                             action="#{novedadTipoDetalleCabBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{novedadTipoDetalleCabBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{novedadTipoDetalleCabBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListaNovedadTipo.xhtml"/>
+</ui:composition>     

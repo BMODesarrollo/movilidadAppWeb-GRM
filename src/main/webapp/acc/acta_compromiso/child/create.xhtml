@@ -1,0 +1,92 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:panel id="panel" header="GENERAR ACTA DE COMPROMISO (ACCIDENTALIDAD)">
+        <h:form id="banner-form">
+            <p:staticMessage severity="error" summary="INFO!" 
+                             detail="Debe seleccionar un accidente!"
+                             rendered="#{empty actaCompromisoBean.accidente.idAccidente}"/> 
+
+            <p:staticMessage id="banner" severity="info" 
+                             summary="#{actaCompromisoBean.accidente.idEmpleado.codigoTm}: #{actaCompromisoBean.accidente.idNovedadTipoDetalle.tituloTipoNovedad} / Clasificación de Acc. (#{actaCompromisoBean.accidente.idVehiculo.codigo} - #{actaCompromisoBean.accidente.idVehiculo.placa})" 
+                             rendered="#{not empty actaCompromisoBean.accidente.idAccidente}" />
+            <div class="ui-fluid ui-g" jsf:rendered="#{not empty actaCompromisoBean.accidente.idAccidente}">
+                <div class="ui-g-12 ui-md-4 ui-lg-3 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Código operador: "/>
+                    </div>
+                    <p:inputText readonly="true" value="#{actaCompromisoBean.accidente.idEmpleado.codigoTm}" 
+                                   class="cssBlack"/>
+                </div>
+                <div class="ui-g-12 ui-md-8 ui-lg-9 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Nombre operador: "/>
+                    </div>
+                    <p:inputText readonly="true" value="#{actaCompromisoBean.accidente.idEmpleado.nombres.concat(' ').concat(actaCompromisoBean.accidente.idEmpleado.apellidos)}"
+                                   class="cssBlack"/>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Causa retroalimentación: " for="@next"/>
+                    </div>
+                    <p:inputText value="#{actaCompromisoBean.causa}"
+                                 autocomplete="off"/>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Fecha retroalimentación: " for="@next"/>
+                    </div>
+                    <p:calendar id="fechaRetro" 
+                                autocomplete="off"
+                                readonlyInput="true"
+                                value="#{actaCompromisoBean.fechaRetro}" 
+                                pattern="yyyy-MM-dd" 
+                                title="Fecha de Inicio"
+                                mask="true"
+                                locale="es"
+                                navigator="true"
+                                showOn="button"
+                                maxdate="today"/>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+
+                        <p:outputLabel for="time" value="Hora:" />
+                    </div>
+                    <p:calendar id="time" value="#{actaCompromisoBean.hora}"
+                                locale="es" pattern="HH:mm" 
+                                autocomplete="off" readonlyInput="true"
+                                timeOnly="true"
+                                placeholder="HH:mm"/>
+
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:outputLabel value="Lugar: " for="@next"/>
+                    </div>
+                    <p:inputText value="#{actaCompromisoBean.lugar}"
+                                 autocomplete="off"/>
+                </div>
+            </div>
+            <div align="center">
+                <p:commandButton value="Generar" 
+                                 actionListener="#{actaCompromisoBean.generarActa()}"
+                                 rendered="#{not empty actaCompromisoBean.accidente.idAccidente}"
+                                 ajax="false"
+                                 icon="fa fa-cloud-download"
+                                 onclick="PrimeFaces.monitorDownload(start, stop)"
+                                 class="cssWhite">
+                    <p:fileDownload value="#{actaCompromisoBean.file}" />
+                </p:commandButton>
+            </div>
+            <p:remoteCommand name="start" onstart="PF('statusDialog').show()" />
+            <p:remoteCommand name="stop"
+                             onstart="PF('statusDialog').hide()"
+                             update="@form,:list-accidente:table-accidente"/>
+        </h:form>
+    </p:panel>
+</ui:composition>     

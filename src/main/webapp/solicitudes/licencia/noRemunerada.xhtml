@@ -1,0 +1,499 @@
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            @media print {
+                body{
+                    min-width: 1024px;
+                    font-size: 80px !important;
+                    font-family: sans-serif !important;
+                }
+                .no-print{
+                    display: none !important;
+                }
+                .noNone{
+                    display: initial !important;
+                }
+                .H100{
+                    margin-top: 0 !important;
+                }
+                .ui-gp{
+                    display: block !important;
+                }
+                img{
+                    max-height: 980px;
+                }
+                .borderLine {
+                    border: 1px solid #6EC8C8;
+                    border-radius: 15px;
+                    text-align: center;
+                }
+                .He100{
+                    height: 100%;
+                }
+                .M3{
+                    margin-top: 3% !important;
+                }
+                .FontSize{
+                    font-size: 30px !important;
+                }
+                .borderB{
+                    border-bottom: 1px solid #6EC8C8;
+                }
+                .borderR{
+                    border-right: 1px solid #6EC8C8;
+                }
+                .borderT{
+                    border-top: 1px solid #6EC8C8;
+                }
+                .borderL{
+                    border-left: 1px solid #6EC8C8;
+                }
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="formNoRemunerada">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Licencias No Remuneradas" styleClass="no-print">
+                <p:dataTable id="datalist" 
+                             value="#{solicitudLicenciNoRemuneradaJSF.listPrgSolicitudLicencia}" 
+                             var="item"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             paginatorPosition="top"
+                             scrollable="true"
+                             reflow="true"
+                             scrollHeight="600"
+                             rowIndexVar="index"
+                             filterDelay="1000"
+                             rowKey="#{index + 1}"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rows="20"
+                             widgetVar="datalistWV"
+                             rowsPerPageTemplate="20,50,100,200">
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:calendar id="desde" 
+                                        placeholder="Desde"
+                                        navigator="true"
+                                        title="Fecha Desde"
+                                        showOn="button"
+                                        locale="es"
+                                        value="#{solicitudLicenciNoRemuneradaJSF.dDesde}"
+                                        pattern="yyyy-MM-dd" />
+                            -
+                            <p:calendar id="hasta" 
+                                        placeholder="Hasta"
+                                        navigator="true"
+                                        title="Fecha Hasta"
+                                        showOn="button"
+                                        locale="es"
+                                        value="#{solicitudLicenciNoRemuneradaJSF.dHasta}"
+                                        pattern="yyyy-MM-dd" />
+                            <p:spacer width="5"/>
+                            <p:spacer width="5"/>
+                            <p:commandButton id="buscar"
+                                             value="Buscar"
+                                             class="cssWhite"
+                                             icon="fa fa-search"
+                                             actionListener="#{solicitudLicenciNoRemuneradaJSF.buscarRegistros()}"
+                                             update="@form"
+                                             process="desde,hasta,@this" />
+                            <p:spacer width="3"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas"
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="datalist" trigger="toggler" />
+
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText  value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Fecha de Solicitud">
+                        <h:outputText  value="#{item.idPrgToken.solicitado}">
+                            <f:convertDateTime pattern="yyyy-MMMM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Solicitante"
+                              filterBy="#{item.idPrgToken.idEmpleado.apellidos} #{item.idPrgToken.idEmpleado.nombres} #{item.idPrgToken.idEmpleado.codigoTm}"
+                              filterMatchMode="contains">
+                        <h:outputText class="cssBlack" value="#{item.idPrgToken.idEmpleado.codigoTm}" /><br/>
+                        <h:outputText value="#{item.idPrgToken.idEmpleado.apellidos} #{item.idPrgToken.idEmpleado.nombres}" />
+                    </p:column>
+                    <p:column headerText="Cargo" filterBy="#{item.idPrgToken.idEmpleado.idEmpleadoCargo.nombreCargo}" filterMatchMode="contains">
+                        <h:outputText  value="#{item.idPrgToken.idEmpleado.idEmpleadoCargo.nombreCargo}" />
+                    </p:column>
+                    <p:column headerText="Motivo" filterBy="#{item.idPrgSolicitudMotivo.motivo}" filterMatchMode="contains">
+                        <h:outputText  value="#{item.idPrgSolicitudMotivo.motivo}" title="#{item.idPrgSolicitudMotivo.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Descripción">
+                        <h:outputText  value="#{item.idPrgSolicitudMotivo.descripcion}" />
+                    </p:column>
+                    <p:column headerText="Solicitado Desde">
+                        <h:outputText  value="#{item.desde}">
+                            <f:convertDateTime pattern="yyyy-MMMM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Solicitado Hasta">
+                        <h:outputText  value="#{item.hasta}">
+                            <f:convertDateTime pattern="yyyy-MMMM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Estado"
+                              styleClass="#{item.idPrgToken.activo == 1 ? 'cssGray' : item.idPrgToken.activo == 2 ? 'cssGreen' : 'cssRed'}"
+                              filterBy="#{item.idPrgToken.activo}"
+                              filterMatchMode="exact"
+                              exportable="false">
+                        <f:facet name="filter">
+                            <p:selectOneMenu style="width: 50%"
+                                             onchange="PF('datalistWV').filter()"
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Pendiente" itemValue="#{1}"/>
+                                <f:selectItem itemLabel="Aprobado" itemValue="#{2}"/>
+                                <f:selectItem itemLabel="Rechazado" itemValue="#{3}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.idPrgToken.activo == 1 ? 'Pendiente' : item.idPrgToken.activo == 2 ? 'Aprobado' : 'Rechazado'}" styleClass="cssWhite"/>
+                    </p:column>
+                    <p:column headerText="Nota">
+                        <h:outputText  value="#{item.nota}" />
+                    </p:column>
+                    <p:column headerText="Aprobado Desde">
+                        <h:outputText  value="#{item.aprobadoDesde}">
+                            <f:convertDateTime pattern="yyyy-MMMM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Aprobado Hasta">
+                        <h:outputText  value="#{item.aprobadoHasta}">
+                            <f:convertDateTime pattern="yyyy-MMMM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Número de días Aprobados">
+                        <h:outputText  value="#{item.numeroDiasAprobado}" />
+                    </p:column>
+                    <p:column headerText="Aprobado/Rechazado Por" filterBy="#{item.userAprueba}" filterMatchMode="contains">
+                        <h:outputText  value="#{item.userAprueba}" />
+                    </p:column>
+                    <p:column headerText="Acciones" width="10%" exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding3" style="text-align: center">
+                                <p:commandButton id="aprobar"
+                                                 icon="fa fa-thumbs-up"
+                                                 class="cssWhite GreenButton"
+                                                 disabled="#{item.idPrgToken.activo == 2 or item.idPrgToken.activo == 0}"
+                                                 title="Aprobar"
+                                                 rendered="#{solicitudLicenciNoRemuneradaJSF.bPermiso}"
+                                                 process="@this"
+                                                 update="@form,:form-licencia,dlg-licencia"
+                                                 action="#{solicitudLicenciNoRemuneradaJSF.setiOp(2)}"
+                                                 actionListener="#{solicitudLicenciNoRemuneradaJSF.onSelectPrgSolicitudLicencia(item, 1)}">
+                                    <p:resetInput target=":form-licencia" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding3" style="text-align: center">
+                                <p:commandButton id="rechazar"
+                                                 icon="fa fa-thumbs-down"
+                                                 class="cssWhite RedButton"
+                                                 disabled="#{item.idPrgToken.activo == 0 or item.idPrgToken.activo == 2 or item.idPrgToken.activo == 3}"
+                                                 title="Rechazar"
+                                                 rendered="#{solicitudLicenciNoRemuneradaJSF.bPermiso}"
+                                                 process="@this"
+                                                 update="@form,:form-licencia,dlg-licencia"
+                                                 action="#{solicitudLicenciNoRemuneradaJSF.setiOp(3)}"
+                                                 actionListener="#{solicitudLicenciNoRemuneradaJSF.onSelectPrgSolicitudLicencia(item, 1)}">
+                                    <p:resetInput target=":form-licencia" />
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding3" style="text-align: center">
+                                <p:commandButton id="imprimir" 
+                                                 title="Imprimir" 
+                                                 actionListener="#{solicitudLicenciNoRemuneradaJSF.onSelectPrgSolicitudLicencia(item, 0)}"
+                                                 class="cssWhite"
+                                                 update="@form"
+                                                 disabled="#{item.idPrgToken.activo != 2}"
+                                                 process="@this"
+                                                 oncomplete="window.print()"
+                                                 icon="fa fa-print" />
+                            </div>
+                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding3" style="text-align: center">
+                                <p:commandButton id="no_firma" 
+                                                 title="Generar novedad NO firma" 
+                                                 class="cssWhite"
+                                                 action="#{solicitudLicenciNoRemuneradaJSF.generarNovedadNoFirma()}"
+                                                 update="datalist,:msgs"
+                                                 rendered="#{item.idPrgToken.activo eq 2}"
+                                                 process="@this"
+                                                 icon="fa fa-pencil-square-o" >
+                                    <f:setPropertyActionListener value="#{item.idPrgToken}" target="#{solicitudLicenciNoRemuneradaJSF.prgToken}"/>
+                                    <p:confirm header="Confirmación" message="Está seguro de generar la novedad a éste operador?" icon="fa fa-exclamation-triangle" />
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="datalist" fileName="Licencias no Remuneradas #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="datalist" fileName="Licencias no Remuneradas #{now}" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="datalist" fileName="Licencias no Remuneradas #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+            <div class="EmptyBox40" />
+            <div jsf:id="panel-imprimir" class="noNone DispNone" style="font-size: 14px">
+                <div class="ui-fluid">
+                    <div class="ui-g Padding0 BorderRadio borderLine cssBlue">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                            <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0 borderR">
+                                <div style="margin-top: 1% !important">
+                                    <img src="#{solicitudLicenciNoRemuneradaJSF.loadGif}" 
+                                         alt=""
+                                         width="104"
+                                         height="80">
+                                    </img>
+                                </div>
+                            </div>
+                            <div class="ui-g-8 ui-md-8 ui-lg-8 Padding0">
+                                <div class="M3 FontSize">
+                                    SOLICITUD DE LICENCIA NO REMUNERADA
+                                </div>
+                            </div>
+                            <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0 ui-g-nopad He100 borderL">
+                                <div class="ui-g Padding0 He100">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 borderB">
+                                        <div>FGO - 04</div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <div class="M3">V01 - 05-19</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR ">
+                                <div>NOMBRE DE QUIEN SOLICITA</div>
+                            </div>
+                            <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0 ">
+                                <div>CÓDIGO</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL ">
+                                <div>No. Licencia</div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 Padding0 borderR He100">
+                                <div class="M3">#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.idPrgToken.idEmpleado.apellidos} #{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.idPrgToken.idEmpleado.nombres}</div>
+                            </div>
+                            <div class="ui-g-2 ui-md-2 ui-lg-2 Padding0 He100">
+                                <div class="M3">#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.idPrgToken.idEmpleado.codigoTm}</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL">
+                                <div class="M3 FontSize">
+                                    No. L 
+                                    <span class="cssRedColor FontSize" jsf:rendered="#{solicitudLicenciNoRemuneradaJSF.consec_licencia != null}">
+                                        #{solicitudLicenciNoRemuneradaJSF.consec_licencia}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR ">
+                                <div>CARGO</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 ">
+                                <div>ÁREA</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL ">
+                                <div>FECHA DE SOLICITUD</div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR">
+                                <div>#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.idPrgToken.idEmpleado.idEmpleadoCargo.nombreCargo}</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0">
+                                <div>OPERACIONES</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL">
+                                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR">
+                                    <div>
+                                        <h:outputText value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.idPrgToken.solicitado}">
+                                            <f:convertDateTime pattern="dd" type="date"/>
+                                        </h:outputText>
+                                    </div>
+                                </div>
+                                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0">
+                                    <div>
+                                        <h:outputText value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.idPrgToken.solicitado}">
+                                            <f:convertDateTime pattern="MM" type="date"/>
+                                        </h:outputText>
+                                    </div>
+                                </div>
+                                <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL">
+                                    <div>
+                                        <h:outputText value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.idPrgToken.solicitado}">
+                                            <f:convertDateTime pattern="YYYY" type="date"/>
+                                        </h:outputText>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB ">
+                            <div>CARACTERÍSTICAS DE LA LICENCIA</div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" style="text-align: justify">
+                            <div class="Padding3">MOTIVO DE LA SOLICITUD: #{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.idPrgSolicitudMotivo.motivo}</div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR">
+                                <div><p:spacer/></div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR borderT">
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 ">
+                                    <div style="font-size: 12px">A PARTIR DE</div>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderR borderL">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.desde}">
+                                        <f:convertDateTime pattern="dd" type="date"/>
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.desde}">
+                                        <f:convertDateTime pattern="MM" type="date"/>
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderL">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.desde}">
+                                        <f:convertDateTime pattern="yyyy" type="date"/>
+                                    </h:outputText>
+                                </div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderT">
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderR">
+                                    <div>HASTA</div>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderR">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.hasta}">
+                                        <f:convertDateTime pattern="dd" type="date"/>
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.hasta}">
+                                        <f:convertDateTime pattern="MM" type="date"/>
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderL">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.hasta}">
+                                        <f:convertDateTime pattern="yyyy" type="date"/>
+                                    </h:outputText>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB borderT ">
+                            <div>APROBACIÓN</div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR">
+                                <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0 borderR ">
+                                    <div>NÚMERO DE DÍAS APROBADOS</div>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0">
+                                    <div>#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.numeroDiasAprobado}</div>
+                                </div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR">
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 ">
+                                    <div style="font-size: 12px">A PARTIR DE</div>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderR borderL">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.aprobadoDesde}">
+                                        <f:convertDateTime pattern="dd" type="date"/>
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.aprobadoDesde}">
+                                        <f:convertDateTime pattern="MM" type="date"/>
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderL">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.aprobadoDesde}">
+                                        <f:convertDateTime pattern="yyyy" type="date"/>
+                                    </h:outputText>
+                                </div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0">
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderR">
+                                    <div>HASTA</div>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderR">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.aprobadoHasta}">
+                                        <f:convertDateTime pattern="dd" type="date"/>
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.aprobadoHasta}">
+                                        <f:convertDateTime pattern="MM" type="date"/>
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0 borderL">
+                                    <h:outputText  value="#{solicitudLicenciNoRemuneradaJSF.prgSolicitudLicencia.aprobadoHasta}">
+                                        <f:convertDateTime pattern="yyyy" type="date"/>
+                                    </h:outputText>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 borderB" style="height: 150px">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderR He100">
+                                <div class="Padding3" style="text-align: justify">FIRMA SOLICITANTE</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 He100">
+                                <div class="Padding3" style="text-align: justify">FIRMA</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL He100">
+                                <div class="Padding3" style="text-align: justify">FIRMA</div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 borderR Padding0">
+                                <div>CÉDULA</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0">
+                                <div>DIRECTOR DEL DEPARTAMENTO</div>
+                            </div>
+                            <div class="ui-g-4 ui-md-4 ui-lg-4 Padding0 borderL">
+                                <div>Vo. Vo. GESTIÓN HUMANA</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes cssWhite" icon="fa fa-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no cssWhite" icon="fa fa-times" />
+            </p:confirmDialog>
+        </h:form>
+        <ui:include src="modal/administrar.xhtml" />
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <ui:define name="content">
+        <p:panel header="Parametrizador soluciones.">
+            <h:form id="frm_principal">
+                <p:dataTable var="item" value="#{danoFlotaSolucionValorJSF.listDanoFlotaSolucionValor}"
+                             id="dt_param_severidad"
+                             scrollable="true"
+                             scrollHeight="600"
+                             widgetVar="dt_param_severidad_WV"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="20"
+                             filterDelay="1700"
+                             paginator="true"
+                             rowKey="#{item.idSolucionValor}"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,50,100"
+                             emptyMessage="No existen datos registrados">
+                    <p:cache disabled="true"/>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton value="Nuevo" 
+                                             id="btnNueno_id"
+                                             title="Nuevo"
+                                             class="cssWhite"
+                                             icon="fa fa-plus"                                             
+                                             update="id_create_dlg,form_create_dlg_severidad"
+                                             oncomplete="PF('wv_create_dlg').show();">
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Tipología" class="cortar" filterBy="#{item.danoFlotaComponente.danoFlotaGrupo.vehiculoTipo.descripcionTipoVehiculo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.danoFlotaComponente.danoFlotaGrupo.vehiculoTipo.descripcionTipoVehiculo}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Grupo" class="cortar" filterBy="#{item.danoFlotaComponente.danoFlotaGrupo.grupo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.danoFlotaComponente.danoFlotaGrupo.grupo}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Nombre" class="cortar" filterBy="#{item.danoFlotaComponente.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.danoFlotaComponente.nombre}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Descripción" class="cortar" filterBy="#{item.danoFlotaComponente.descripcion}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.descripcion}">
+                        </h:outputText>
+                    </p:column>                  
+                    <p:column headerText="Fecha vigencia desde" filterBy="#{item.vigenciaDesde}" 
+                              filterMatchMode="startsWith" >
+                        <f:facet name="filter">
+                            <p:calendar id="searchDesde" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dt_param_severidad_WV').filter()" update="dt_param_severidad"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.vigenciaDesde}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha vigencia hasta" filterBy="#{item.vigenciaHasta}" 
+                              filterMatchMode="startsWith" >
+                        <f:facet name="filter">
+                            <p:calendar id="searchHasta" pattern="dd-MM-yyyy" locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dt_param_severidad_WV').filter()" update="dt_param_severidad"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.vigenciaHasta}" >
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Tipo" filterBy="#{item.tipo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.tipo}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Costo" filterBy="#{item.costo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.costo}">
+                            <f:convertNumber currencySymbol="$" type="currency" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Creado por" filterBy="#{item.username}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.username}"/>
+                    </p:column>
+                    <p:column headerText="Fecha creación">
+                        <h:outputText value="#{item.creado}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column width="10%" headerText="Acción" exportable="false">
+                        <p:commandButton actionListener="#{danoFlotaSolucionValorJSF.activarDesactivarSolucionValor(item,0)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite RedButton" 
+                                         update="frm_principal:dt_param_severidad,msgs"
+                                         rendered="false"
+                                         title="Desactivar">
+                            <p:confirm header="Confirmación" message="Está seguro que desea desactivar este registro?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+
+                        <p:commandButton actionListener="#{danoFlotaSolucionValorJSF.preEdit(item)}"
+                                         icon="fa fa-pencil"
+                                         class="cssWhite GreenButton" 
+                                         update="id_create_dlg,form_create_dlg_severidad"
+                                         oncomplete="PF('wv_create_dlg').show();"
+                                         title="Editar">
+                        </p:commandButton>
+                        <p:commandButton actionListener="#{danoFlotaSolucionValorJSF.activarDesactivarSolucionValor(item,1)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite RedButton" 
+                                         update="frm_principal:dt_param_severidad,msgs"
+                                         rendered="false"
+                                         title="Desactivar">
+                            <p:confirm header="Confirmación" message="Está seguro que desea desactivar este registro?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="dt_pd_responsable" fileName="bitacora #{now}"/>
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/pdf.png" title="Exportar en formato pdf"
+                                 alt="pdf" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="pdf" target="dt_pd_responsable" fileName="bitacora #{now}"  />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <img src="../../resources/img/csv.png" title="Exportar en formato csv" 
+                                 alt="csv" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="csv" target="dt_pd_responsable" fileName="bitacora #{now}"  />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create_param_solucion_valor.xhtml"/>
+    </ui:define>
+</ui:composition>

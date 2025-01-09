@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="mtipo" id="modal" modal="true" closeOnEscape="true"
+              class="mr1024_30 mr500_90"
+              resizable="false"
+              position="center top"
+              responsive="true">
+        <c:if test="#{vehiculoComponenteGrupoBean.selected == null }">
+            <f:facet name="header">
+                Nuevo grupo de componente
+            </f:facet>
+        </c:if>
+        <c:if test="#{vehiculoComponenteGrupoBean.selected != null }">
+            <f:facet name="header">
+                Editar grupo de componente: #{vehiculoComponenteGrupoBean.selected.nombre.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             onclick="rc_save_tca();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoComponenteGrupoBean.selected == null }"/>
+            <p:commandButton value="Actualizar" 
+                             onclick="rc_update_tca();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoComponenteGrupoBean.selected != null }"/>
+        </f:facet>
+
+        <h:form id="frmNuevoTipo">
+            <p:remoteCommand name="rc_save_tca" action="#{vehiculoComponenteGrupoBean.guardar()}"
+                             update=":frmPrincipalVhclCompGrupo:dtTipo,messages,msgs,frmNuevoTipo"
+                             rendered="#{vehiculoComponenteGrupoBean.selected == null }"/>
+            <p:remoteCommand name="rc_update_tca" action="#{vehiculoComponenteGrupoBean.actualizar()}"
+                             update=":frmPrincipalVhclCompGrupo:dtTipo,messages,msgs"
+                             rendered="#{vehiculoComponenteGrupoBean.selected != null }"/>
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Nombre:" for="nombre"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:inputText id="nombre" value="#{vehiculoComponenteGrupoBean.vehiculoComponenteGrupo.nombre}"
+                                         required="true" requiredMessage="Debe ingresar un nombre"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Taxonomía MxM:" for="taxonomia"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:inputText id="taxonomia" value="#{vehiculoComponenteGrupoBean.vehiculoComponenteGrupo.taxonomiaMxm}"
+                                         required="true" requiredMessage="Debe ingresar una taxonomía"/>         
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Descripción:" for="descripcion"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding0">
+                            <p:inputTextarea id="descripcion" value="#{vehiculoComponenteGrupoBean.vehiculoComponenteGrupo.descripcion}"
+                                             required="true" requiredMessage="Debe ingresar una descripción"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>  
+    </p:dialog>  
+</ui:composition>

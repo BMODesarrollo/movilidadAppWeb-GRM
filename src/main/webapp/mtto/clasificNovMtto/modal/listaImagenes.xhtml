@@ -1,0 +1,111 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="novedad_docs_dlg"
+              widgetVar="novedad_docs_wv"
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)"
+              closable="false"
+              fitViewport="true"
+              class="mr1024_60 mr500_90" closeOnEscape="true" 
+              responsive="true" position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Fotos Novedad: #{docsNovMttoBean.headerModal}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('novedad_docs_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="novedad_docs_dlg_form">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-fluid" jsf:rendered="#{docsNovMttoBean.flagGuardarImg}">
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Fotos Novedad">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{fileUploadBean.handleFileUpload}"
+                                              id="foto"
+                                              style="width: 99.9999%"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="@form"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5"/>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                    <p:commandButton action="#{docsNovMttoBean.guardar()}" 
+                                                     title="Editar Fotos" icon="fa fa-save"
+                                                     update="msgs,novedad_docs_dt"
+                                                     value="Guardar"
+                                                     class="cssWhite">
+                                    </p:commandButton>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                </div>
+            </div>
+            <p:dataTable id="novedad_docs_dt" widgetVar="novedad_docs_dt_wv" 
+                         var="novDoc" 
+                         value="#{docsNovMttoBean.lstNovedadDocs}"
+                         rowKey="#{novDoc.idNovedadDocsc}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         tableStyle="table-layout:auto"
+                         paginatorPosition="top"
+                         reflow="true"
+                         rowIndexVar="nroFil"
+                         emptyMessage="No existen documentos registrados">
+                <p:column headerText="#" width="5%">
+                    <h:outputText value="#{nroFil+1}" />
+                </p:column>
+                <p:column headerText="Creado">
+                    <h:outputText value="#{novDoc.creado}" >
+                        <f:convertDateTime type="both" pattern="dd-MM-yyyy HH:mm:ss" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Usuario">
+                    <h:outputText value="#{novDoc.username}"/>
+                </p:column>
+                <p:column headerText="Acciones">
+                    <div align="center">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton action="#{docsNovMttoBean.verFotos(novDoc)}" 
+                                                 title="Ver Fotos para la novedad" icon="fa fa-eye"
+                                                 update="galeria_fotos_form"
+                                                 value="Ver Fotos"
+                                                 process="@this"
+                                                 class="cssWhite OrangeButton">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmTamplitudVrbonoCreateDlg" 
+              widgetVar="PmTamplitudVrbonoCreateDialog" 
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)" 
+              closeOnEscape="true"
+              class="mr1024_30 mr500_90"
+              closable="false"
+              position="center top">
+        
+         <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Crear Nuevo Pm T Amplitud Valor Bono" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('PmTamplitudVrbonoCreateDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <p:ajax event="close" listener="#{pmTamplitudVrbonoController.reset()}" update=":PmTamplitudVrbonoListForm:datalist"/>
+        <h:form id="PmTamplitudVrbonoCreateForm">
+            <div class="ui-fluid" jsf:rendered="#{pmTamplitudVrbonoController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desde:" for="desde" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="desde" 
+                                        pattern="yyyy-MM-dd" 
+                                        value="#{pmTamplitudVrbonoController.selected.desde}"
+                                        required="true"  
+                                        locale="es"
+                                        requiredMessage="Desde es requerido"
+                                        readonly="#{facesContext.renderResponse}"
+                                        showOn="button"  
+                                        mindate="today"
+                                        >
+                                <p:ajax event="dateSelect" update="hasta"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Hasta:" for="hasta" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hasta" 
+                                        pattern="yyyy-MM-dd" 
+                                        value="#{pmTamplitudVrbonoController.selected.hasta}"
+                                        required="true" 
+                                        readonly="#{facesContext.renderResponse}"
+                                        showOn="button"
+                                        locale="es"
+                                        requiredMessage="Hasta es requerido"
+                                        mindate="#{pmTamplitudVrbonoController.selected.desde}"
+                                        >
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Valor Bono:" for="vrBono" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="vrBono" 
+                                           value="#{pmTamplitudVrbonoController.selected.vrBono}" 
+                                           required="true" 
+                                           requiredMessage="Valor de Bono es requerido"
+                                           decimalPlaces="0"
+                                           minValue="0"
+                                           maxValue="9999999"
+                                           symbol="$"
+                                           >
+                            </p:inputNumber>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand actionListener="#{pmTamplitudVrbonoController.create}"
+                             name="rc_pm_vb"
+                             update="@form,
+                             :PmTamplitudVrbonoListForm:datalist,
+                             :PmTamplitudVrbonoListForm:upPmTamVB"/>
+            <p:staticMessage severity="warn" 
+                             summary="Tenga en cuenta" 
+                             detail="Fecha Desde no debe ser mayor a Fecha Hasta" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton  value="Guardar"
+                              icon="fa fa-save"
+                              class="cssWhite"
+                              onclick="rc_pm_vb();"/>
+        </f:facet>
+    </p:dialog>
+
+</ui:composition>

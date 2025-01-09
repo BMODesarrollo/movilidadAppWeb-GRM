@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="Bateria" 
+              widgetVar="bateriaDlg" 
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_30 mr500_90" 
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top"
+              header="Nuevo Batería Crítica">
+        <h:form id="form-bateria">
+            <div class="ui-fluid">
+                <p:messages id="msgs" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Carga *"/>
+
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="carga"
+                                           value="#{mttoBateriaCriticaJSF.mttoBateriaCritica.carga}" 
+                                           required="true"
+                                           maxValue="100"
+                                           minValue="0"
+                                           requiredMessage="Carga es requerido"
+                                           />
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Vehículo Tipo *" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="vehiculo" value="#{mttoBateriaCriticaJSF.idVehiculoTipo}" 
+                                             required="true" 
+                                             requiredMessage="Vehículo Tipo es requrido" 
+                                             style="width: 99.99999%">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                <f:selectItems value="#{vehiculoTipoBean.lista}" 
+                                               var="vehT" 
+                                               itemLabel="#{vehT.nombreTipoVehiculo}" 
+                                               itemDescription="#{vehT.descripcionTipoVehiculo}"
+                                               itemValue="#{vehT.idVehiculoTipo}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Procesos: *" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="causa" value="#{mttoBateriaCriticaJSF.idNotificacionProcesos}" 
+                                             required="true" 
+                                             requiredMessage="Proceso es requrido" 
+                                             style="width: 99.99999%">
+                                <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                                <f:selectItems value="#{notificacionProcesosBean.lstNotificacionProcesos}" 
+                                               var="pro" 
+                                               itemLabel="#{pro.nombreProceso}" 
+                                               itemDescription="#{pro.mensaje}"
+                                               itemValue="#{pro.idNotificacionProceso}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción: *"/>
+
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea  id="descripcion" 
+                                              maxlength="65000" 
+                                              class="cssBlack"
+                                              value="#{mttoBateriaCriticaJSF.mttoBateriaCritica.descripcion}" 
+                                              required="true" 
+                                              requiredMessage="Descripción es requerido"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             actionListener="#{mttoBateriaCriticaJSF.guardar()}" 
+                             process="@this,@form"
+                             update=":BateriaListForm,@form"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btn-guardar"
+                             value="Guardar"
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             onclick="guardar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition> 

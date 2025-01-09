@@ -1,0 +1,74 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="editNoLavado"
+              widgetVar="editNoLavadoDlg" 
+              modal="true" 
+              closable="true"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+
+        <f:facet name="header">
+            EDITAR NO LAVADO
+        </f:facet>
+        <p:ajax event="close" update="frmNoLavado,:frmNoLavadoList:dtNoLavado" listener="#{lavadoBean.handleClose}" />
+
+        <h:form id="frmEditNoLavado" styleClass="full-width-form">
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <h:panelGrid columns="2" id="pGridDatos">
+
+                <h:panelGrid columns="1">
+                    <p:outputLabel for="@next" value="Motivo Lavado:" />
+                    <p:selectOneMenu id="motivo_lavado" value="#{lavadoBean.idLavadoMotivo}"
+                                     required="true" 
+                                     requiredMessage="Debe seleccionar tipo de lavado">
+                        <f:selectItem itemLabel="Seleccione tipo lavado" itemValue="" />
+                        <f:selectItems value="#{lavadoBean.lstLavadoTipos}" var="ab"
+                                       itemLabel="#{ab.tipoLavado.toUpperCase()}" 
+                                       itemValue="#{ab.idLavadoTipo}" />
+                    </p:selectOneMenu>
+                </h:panelGrid>
+                <h:panelGrid columns="1">
+                    <p:outputLabel for="@next" value="Vehículo:" />
+                    <h:panelGrid columns="2">
+                        <p:inputText id="vehiculo" value="#{lavadoBean.codigoVehiculo}" required="true" 
+                                     placeholder="Ingrese código del vehículo"
+                                     title="Ingrese código del vehículo y presione enter"
+                                     requiredMessage="Debe ingresar código del vehículo"
+                                     />
+                        <p:commandButton onclick="buscarVehiculo()" 
+                                         icon="fa fa-search" 
+                                         process="vehiculo"
+                                         class="cssWhite"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+
+            </h:panelGrid>
+            <h:panelGrid columns="1" style="width: 100%;">
+                <p:outputLabel for="@next" value="Observación:" />
+                <p:inputTextarea value="#{lavadoBean.lavadoNO.observacion}" style="width: 100%;"/>
+            </h:panelGrid>
+            <p:remoteCommand name="buscarVehiculo" 
+                             update="messages" 
+                             action="#{lavadoBean.buscarVehiculoNOLavado()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs"
+                             action="#{lavadoBean.actualizarNoLavado()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{lavadoBean.selectedNO != null}"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

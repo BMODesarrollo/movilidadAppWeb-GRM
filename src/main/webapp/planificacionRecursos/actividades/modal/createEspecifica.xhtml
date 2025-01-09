@@ -1,0 +1,162 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlActividadesEspecificas"
+              widgetVar="wvPlaRecuActividadesEspecificas"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Actividad" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvPlaRecuActividadesEspecificas').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-especifica">
+            <p:messages id="msgs_create_act" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{planificacionRecursosActividadBean.actividadEspecifica.empleado.idEmpleado !=null }">
+                        <p:outputLabel value="Colaborador" />
+                        <p:selectOneMenu id="idColaborador"
+                                         value="#{planificacionRecursosActividadBean.actividadEspecifica.empleado.idEmpleado}" 
+                                         filter="true"
+                                         filterMatchMode="contains">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                            <f:selectItems value="#{planificacionRecursosActividadBean.listEmpleados}" 
+                                           var="items"
+                                           itemLabel="#{items.nombresApellidosCodigo}"
+                                           itemValue="#{items.idEmpleado}"/>
+                        </p:selectOneMenu>
+                    </div>                    
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Inicio" for="fechaAct"/>
+                        <p:calendar id="fechaAct" required="true" 
+                                    requiredMessage="'Fecha' es requerido"
+                                    value="#{planificacionRecursosActividadBean.actividadEspecifica.fechaIni}"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd"
+                                    mindate="#{planificacionRecursosActividadBean.fechaActual}"
+                                    maxdate="#{planificacionRecursosActividadBean.fechaMaximo}"
+                                    showButtonPanel="true" 
+                                    navigator="true">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Fin" for="fechaFinAct"/>
+                        <p:calendar id="fechaFinAct" required="true" 
+                                    requiredMessage="'Fecha' es requerido"
+                                    value="#{planificacionRecursosActividadBean.actividadEspecifica.fechaFin}"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd"
+                                    mindate="#{planificacionRecursosActividadBean.fechaActual}"
+                                    maxdate="#{planificacionRecursosActividadBean.fechaMaximo}"
+                                    showButtonPanel="true" 
+                                    navigator="true">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Hora Inicio*" />
+                        <p:inputMask id="hora_id"
+                                     mask="99:99:99"
+                                     value="#{planificacionRecursosActividadBean.actividadEspecifica.horaIni}"
+                                     required="true"
+                                     requiredMessage="'Hora' es requerido">
+                        </p:inputMask>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Hora Fin *" />
+                        <p:inputMask id="horaFin_id"
+                                     mask="99:99:99"
+                                     value="#{planificacionRecursosActividadBean.actividadEspecifica.horaFin}"
+                                     required="true"
+                                     requiredMessage="'Hora' es requerido">
+                            <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                        </p:inputMask>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Cantidad " />
+                        <p:inputText id="cantidad_id"
+                                     value="#{planificacionRecursosActividadBean.actividadEspecifica.cantidad}">
+                        </p:inputText>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Descripción" />
+                        <p:inputText id="descripcion_id"  placeholder="Nombre de la actividad"
+                                     title="Nombre descriptivo de la actividad" requiredMessage="'Descripción' es requerido"
+                                     value="#{planificacionRecursosActividadBean.actividadEspecifica.descripcion}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Lugar"/>
+                        <p:selectOneMenu id="lugarItem" 
+                                         value="#{planificacionRecursosActividadBean.actividadEspecifica.plaRecuLugar.idPlaRecuLugar}" 
+                                         filter="true"
+                                         filterMatchMode="contains"
+                                         required="true"
+                                         requiredMessage="'Lugar' es requerido">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                            <f:selectItems value="#{planificacionRecursosActividadBean.listPlaRecuLugar}" 
+                                           var="items"
+                                           itemLabel="#{items.lugar}"
+                                           itemValue="#{items.idPlaRecuLugar}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" jsf:rendered="#{planificacionRecursosActividadBean.b_editar}">
+                        <p:outputLabel value="Estado" />
+                        <p:selectOneMenu id="idEstado"
+                                         value="#{planificacionRecursosActividadBean.actividadEspecifica.estado}" 
+                                         filter="true"
+                                         filterMatchMode="contains">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                            <f:selectItem itemLabel="Pendiente" itemValue="0" />
+                            <f:selectItem itemLabel="Aprobado" itemValue="1" />
+                            <f:selectItem itemLabel="Rechazado" itemValue="2" />
+                            <f:selectItem itemLabel="Gestión" itemValue="3" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{planificacionRecursosActividadBean.crearActividadEspecifica()}"
+                             process="@form"
+                             rendered="#{!planificacionRecursosActividadBean.b_editar}"
+                             update="form-registrar-especifica,@form,:msgs, :frmActividadesEspecificas:dtActividadesEspecificas"
+                             />
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{planificacionRecursosActividadBean.editarActividadEspecifica()}"
+                             process="@form"
+                             rendered="#{planificacionRecursosActividadBean.b_editar}"
+                             update="form-registrar-especifica,@form,:msgs, :frmActividadesEspecificas:dtActividadesEspecificas"
+                             />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardar" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

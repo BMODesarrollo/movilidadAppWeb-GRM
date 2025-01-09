@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="criticidadMtto" id="modalCriticidadMtto" modal="true" closeOnEscape="true"
+              responsive="true"
+              class="mr1024_30 mr500_90"
+              resizable="false" appendTo="@(body)" position="center top"
+              style="overflow:auto;">
+        <c:if test="#{mttoCriticidadBean.selected == null }">
+            <f:facet name="header">
+                Nuevo(a) criticidad
+            </f:facet>
+        </c:if>
+        <c:if test="#{mttoCriticidadBean.selected != null }">
+            <f:facet name="header">
+                Editar criticidad
+            </f:facet>
+        </c:if>
+        <h:form id="frmIncapacidad">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid" >
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Criticidad: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText value="#{mttoCriticidadBean.mttoCriticidad.criticidad}"
+                                         id="estado"
+                                         required="true"
+                                         requiredMessage="Debe ingresar criticidad"
+                                         />
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Descripción: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea value="#{mttoCriticidadBean.mttoCriticidad.descripcion}"
+                                             id="descripcion"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"
+                                             />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand 
+                name="rc_criti"
+                action="#{mttoCriticidadBean.guardar()}"
+                update=":frmMttoCriticidad:dtMttoCriticidad,messages,@form"
+                rendered="#{mttoCriticidadBean.selected == null }"/>
+            <p:remoteCommand 
+                action="#{mttoCriticidadBean.actualizar()}"
+                name="rc_update_criti"
+                update=":frmMttoCriticidad:dtMttoCriticidad,:msgs"
+                rendered="#{mttoCriticidadBean.selected != null }"
+                />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_criti();"
+                rendered="#{mttoCriticidadBean.selected == null }"
+                class="cssWhite"
+                value="Guardar"/>
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_update_criti();"
+                rendered="#{mttoCriticidadBean.selected != null }"
+                class="cssWhite"
+                value="Actualizar"/>
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

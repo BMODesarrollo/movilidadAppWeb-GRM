@@ -1,0 +1,202 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="crear_audi_tipo_pregunta_id_dialog"
+              widgetVar="crear_audi_tipo_pregunta_dialog_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_50 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+         <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Tipo de Respueta Auditoría"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('crear_audi_tipo_pregunta_dialog_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="create_edit_dialog_form">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="label_nombre" value="Nombre"/>
+                        <p:inputText id="label_nombre"  required="true"
+                                     maxlength="45"
+                                     requiredMessage="Digite Un nombre de tipo de pregunta para auditoría"
+                                     value="#{audiTipoRespuestaJSFMB.auditoriaTipoRespuesta.nombre}" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="label_seleccion_multiple" value="Selección Múltiple"/>
+                        <p:selectBooleanButton 
+                            id="label_seleccion_multiple" 
+                            value="#{audiTipoRespuestaJSFMB.b_seleccion_multiple}" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            onLabel="Sí" 
+                            offLabel="No">
+                            <p:ajax process="@this" update="alternativa_id"/>
+                        </p:selectBooleanButton>
+                        <p:tooltip id="toolTip_label_seleccion_multiple" 
+                                   for="label_seleccion_multiple" 
+                                   value="Ideal para respuesta de multiples opciones unica respuesta. Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="label_observacion" value="Observación"/>
+                        <p:selectBooleanButton 
+                            id="label_observacion" 
+                            value="#{audiTipoRespuestaJSFMB.b_observacion}" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            onLabel="Sí" 
+                            offLabel="No">
+                            <p:ajax process="@this" global="false"/>
+                        </p:selectBooleanButton>
+                        <p:tooltip id="toolTip_label_observacion" 
+                                   for="label_observacion" 
+                                   value="Ideal para respuestas de no mas de 200 caracteres. Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="label_abierta" value="Abierta"/>
+                        <p:selectBooleanButton 
+                            id="label_abierta" 
+                            value="#{audiTipoRespuestaJSFMB.b_abierta}" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            onLabel="Sí" 
+                            offLabel="No">
+                            <p:ajax process="@this" global="false"/>
+                        </p:selectBooleanButton>
+
+                        <p:tooltip id="toolTip_label_abierta" 
+                                   for="label_abierta" 
+                                   value="Ideal para respuestas de no mas de 60 caracteres. Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="label_docu" value="Documento"/>
+                        <p:selectBooleanButton 
+                            id="label_docu" 
+                            value="#{audiTipoRespuestaJSFMB.b_documento}" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            onLabel="Sí" 
+                            offLabel="No"/>
+                        <p:tooltip id="toolTip_label_docu" 
+                                   for="label_docu" 
+                                   value="Ideal para solicitar documentos. Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="alternativa_id">
+                        <p:dataTable id="datalist_alternativas" 
+                                     value="#{audiTipoRespuestaJSFMB.listAlternativas}"
+                                     var="obj"
+                                     paginator="true"
+                                     rowKey="#{index + 1}"
+                                     rowIndexVar="index"
+                                     rendered="#{audiTipoRespuestaJSFMB.b_seleccion_multiple}"
+                                     rows="5"
+                                     filterDelay="2000"
+                                     rowsPerPageTemplate="5,10,15"
+                                     emptyMessage="No existen registros"
+                                     scrollable="true"
+                                     scrollHeight="1000">
+                            <f:facet name="header">
+                                <p:commandButton id="agregarAletrnativa"   
+                                                 value="Agregar Alternativa de Respuesta" 
+                                                 actionListener="#{audiTipoRespuestaJSFMB.preAgregarAlternativa()}" 
+                                                 update="msgs" 
+                                                 icon="fa fa-plus" 
+                                                 class="cssWhite"
+                                                 oncomplete="PF('alternativa_dialog_wv').show()">
+                                    <p:resetInput target="alternativa_dialog_form"/>
+                                </p:commandButton>
+                            </f:facet>
+                            <p:column headerText="Número" width="10%">
+                                <h:outputText value="#{obj.numero}"/>
+                            </p:column>
+                            <p:column headerText="Enunciado">
+                                <h:outputText value="#{obj.enunciado}"/>
+                            </p:column>
+                            <p:column headerText="Descripción">
+                                <h:outputText value="#{obj.descripcion}"/>
+                            </p:column>
+                            <p:column headerText="Valor" width="10%">
+                                <h:outputText value="#{obj.valor}"/>
+                            </p:column>
+                            <p:column headerText="Genera Novedad"
+                                      styleClass="#{obj.generaNovedad ? 'cssGreen' : 'cssRed'}" 
+                                      filterMatchMode="exact">
+                                <h:outputText class="cssWhite" 
+                                              value="#{obj.generaNovedad ? 'Sí' : 'No'}" />
+                            </p:column>
+                            <p:column headerText="Acciones" width="10%" exportable="false">
+                                <div align="center">
+
+                                    <p:commandButton id="remove_button"   
+                                                     update="create_edit_dialog_form:datalist_alternativas" 
+                                                     icon="fa fa-close" 
+                                                     actionListener="#{audiTipoRespuestaJSFMB.eliminar(index)}"
+                                                     class="cssWhite RedButton">
+                                    </p:commandButton>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{audiTipoRespuestaJSFMB.guardar()}"
+                             rendered="#{audiTipoRespuestaJSFMB.auditoriaTipoRespuesta.idAuditoriaTipoRespuesta==null}"
+                             process="@this,label_nombre,label_docu"
+                             update="msgs,
+                             audi_tipo_respuesta:datalist,create_edit_dialog_form"/>
+            <p:remoteCommand name="rcc" 
+                             class="cssWhite"
+                             action="#{audiTipoRespuestaJSFMB.edit()}"
+                             rendered="#{audiTipoRespuestaJSFMB.auditoriaTipoRespuesta.idAuditoriaTipoRespuesta!=null}"
+                             process="@this,label_nombre,label_docu"
+                             update="msgs,create_edit_dialog_form,
+                             audi_tipo_respuesta:datalist"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarL" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             rendered="#{audiTipoRespuestaJSFMB.auditoriaTipoRespuesta.idAuditoriaTipoRespuesta==null}"
+                             onclick="rc()"/>
+            <p:commandButton id="btnGuardarLC" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{audiTipoRespuestaJSFMB.auditoriaTipoRespuesta.idAuditoriaTipoRespuesta!=null}"
+                             value="Actualizar" 
+                             onclick="rcc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,205 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .ui-filter-column .ui-column-customfilter .custom-filter {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Ingresos y egresos ( PM )">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtPmIngEgr" var="pmIngEgr" 
+                             scrollable="true"
+                             widgetVar="wlVdtPmIngEgr"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{pmIngEgrBean.lstPmIngEgresos}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+
+                            <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                            <p:calendar id="fecha_desde" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{pmIngEgrBean.desde}"
+                                        locale="es"
+                                        maxdate="today"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" 
+                                        listener="#{pmIngEgrBean.consultar()}"
+                                        update="dtPmIngEgr"/>
+                            </p:calendar>
+                            <p:calendar id="fecha_hasta" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{pmIngEgrBean.hasta}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        maxdate="today"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" 
+                                        listener="#{pmIngEgrBean.consultar()}"
+                                        update="dtPmIngEgr"/>
+                            </p:calendar>
+
+                            <p:spacer width="10"/>
+
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                actionListener="#{pmIngEgrBean.nuevo()}"
+                                oncomplete="PF('wlvPmIngEgr').show();"
+                                class="cssWhite"
+                                update="dtPmIngEgr,:pmIngEgr,:frmPmIngEgr"
+                                >
+                                <p:resetInput target=":frmPmIngEgr:pGridDatos"/>
+                            </p:commandButton>    
+
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtPmIngEgr" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha"
+                              filterBy="#{pmIngEgr.fecha}" 
+                              filterMatchMode="startsWith"
+                              styleClass="text-center">
+
+                        <h:outputText value="#{pmIngEgr.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column exportable="false" filterBy="#{pmIngEgr.idEmpleado.identificacion} #{pmIngEgr.idEmpleado.nombres} #{pmIngEgr.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              styleClass="#{pmIngEgr.idEmpleado != null ? null: 'text-center'}"
+                              headerText="Empleado">
+                        <h:outputText value="#{pmIngEgr.idEmpleado.identificacion} - "
+                                      rendered="#{pmIngEgr.idEmpleado != null}"
+                                      class="cssBlack"/>
+                        <h:outputText value="#{pmIngEgr.idEmpleado.nombres} #{pmIngEgr.idEmpleado.apellidos}"
+                                      rendered="#{pmIngEgr.idEmpleado != null}"/>
+                    </p:column>
+
+                    <p:column visible="false" headerText="Identificación">
+                        <h:outputText value="#{pmIngEgr.idEmpleado.identificacion}" rendered="#{pmIngEgr.idEmpleado != null}"/>
+                        <h:outputText value="N/A" rendered="#{pmIngEgr.idEmpleado eq null}"/>
+                    </p:column>
+                    <p:column visible="false" 
+                              headerText="Nombre Empleado" 
+                              filterMatchMode="contains">
+                        <h:outputText value="#{pmIngEgr.idEmpleado.nombres} #{pmIngEgr.idEmpleado.apellidos}" rendered="#{pmIngEgr.idEmpleado != null}"/>
+                    </p:column>
+
+                    <p:column headerText="Tipo Concepto"
+                              filterBy="#{pmIngEgr.idPmIeConceptos.idPmTipoConcepto.tipo}"
+                              filterMatchMode="exact"
+                              styleClass="text-center">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('wlVdtPmIngEgr').filter()" 
+                                             styleClass="custom-filter">
+                                <f:selectItem itemLabel="Todos" 
+                                              itemValue="#{null}" 
+                                              noSelectionOption="true" />
+                                <f:selectItem itemLabel="Ingreso" 
+                                              itemValue="#{'ingreso'}" />
+                                <f:selectItem itemLabel="Egreso" 
+                                              itemValue="#{'egreso'}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+
+                        <h:outputText value="#{pmIngEgr.idPmIeConceptos.idPmTipoConcepto.tipo}" />
+                    </p:column>
+
+                    <p:column headerText="Concepto"
+                              filterBy="#{pmIngEgr.idPmIeConceptos.concepto}"
+                              filterMatchMode="contains"
+                              styleClass="text-center">
+                        <h:outputText value="#{pmIngEgr.idPmIeConceptos.concepto}" />
+                    </p:column>
+
+                    <p:column headerText="Valor" 
+                              styleClass="text-center">
+                        <h:outputText value="#{pmIngEgr.valor}" />
+                    </p:column>
+
+                    <p:column headerText="Descripción" class="cortar">
+                        <h:outputText value="#{pmIngEgr.descripcion}" />
+                    </p:column>
+
+
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              width="10%"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{pmIngEgrBean.editar()}"
+                                                 process="@this"
+                                                 update=":pmIngEgr,:frmPmIngEgr"
+                                                 oncomplete="PF('wlvPmIngEgr').show();"
+                                                 icon="fa fa-pencil">
+                                    <f:setPropertyActionListener value="#{pmIngEgr}" target="#{pmIngEgrBean.selected}"/>
+                                    <p:resetInput target=":frmPmIngEgr:pGridDatos"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{pmIngEgrBean.lstPmIngEgresos.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtPmIngEgr" 
+                                                fileName="Ingresos y Egresos"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

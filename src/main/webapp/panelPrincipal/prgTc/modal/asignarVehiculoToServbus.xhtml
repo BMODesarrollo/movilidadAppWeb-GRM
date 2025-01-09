@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="idAsignarDialog" 
+              closeOnEscape="true" 
+              widgetVar="AsignarDialog" 
+              modal="true" 
+              closable="false"
+              resizable="false" 
+              appendTo="@(body)" 
+              height="100%" 
+              class="mr1024_30 mr500_90"
+              position="top" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Asignar Servbus" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('AsignarDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <p:ajax event="close" global="false" process="@this" 
+                update="tab_pp:frmSinBus:tblssb,frmVDispo:tbVDispo"
+                listener="#{prgTcJSFMB.onCerrarModalAsignarServbus()}"/>
+        <h:form id="formAsignar">
+            <p:messages showDetail="true" id="msgsAsignar1"/>
+            <p:messages showDetail="true" id="msgsAsignar2"/>
+            <div class="ui-fluid" >
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="txtVehiculoAsignar" value="Vehiculo" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:inputText id="txtVehiculoAsignar" placeholder="Vehiculo"
+                                         value="#{busToServbusBean.codigoV}"  maxlength="12" 
+                                         onkeypress="if (event.keyCode == 13) {
+                                                     findVehiculo_asig();
+                                                     return false;
+                                                 }">
+                            </p:inputText>
+                            <div class="botonFloat" >
+                                <p:commandButton title="Consultar Vehículo"
+                                                 icon="fa fa-search"
+                                                 class="cssWhite"
+                                                 style="margin: 0px"
+                                                 process="@this,txtVehiculoAsignar"
+                                                 action="#{busToServbusBean.findVehiculo()}"
+                                                 update="txtVehiculoAsignar,msgsAsignar1,btnAsignarV"/>
+                                <p:remoteCommand name="findVehiculo_asig"
+                                                 process="@this,txtVehiculoAsignar" 
+                                                 actionListener="#{busToServbusBean.findVehiculo()}"
+                                                 update="txtVehiculoAsignar,msgsAsignar1,btnAsignarV"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="txtServbusAsignar" value="Servbus: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:inputText id="txtServbusAsignar" placeholder="Servbus"
+                                         value="#{busToServbusBean.servbusForAsignar}"  maxlength="12" 
+                                         onkeypress="if (event.keyCode == 13) {
+                                                     buscarPrgTcSinVehiculo_asig();
+                                                     return false;
+                                                 }">
+                            </p:inputText>
+                            <div class="botonFloat" >
+                                <p:commandButton title="Consultar y agregar empleado"
+                                                 icon="fa fa-search"
+                                                 class="cssWhite"
+                                                 style="margin: 0px"
+                                                 process="@this,txtServbusAsignar"
+                                                 action="#{busToServbusBean.buscarPrgTcSinVehiculo()}"
+                                                 update="txtServbusAsignar,msgsAsignar2"/>
+
+                                <p:remoteCommand name="buscarPrgTcSinVehiculo_asig"
+                                                 process="@this,txtServbusAsignar" 
+                                                 actionListener="#{busToServbusBean.buscarPrgTcSinVehiculo()}"
+                                                 update="txtServbusAsignar,msgsAsignar2"/>
+                            </div>
+                        </div>
+                    </div>
+                    <p:remoteCommand name="guardarAsignacion"
+                                     process="@this,formAsignar"
+                                     class="cssWhite"
+                                     update="msgsAsignar1,msgs,formAsignar" 
+                                     action="#{busToServbusBean.guardarAsignacion()}" />
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnAsignarV" 
+                             icon="fa fa-save"
+                             class="#{busToServbusBean.flag_forzar_asignacion?'cssWhite OrangeButton':'cssWhite'}"
+                             value="#{busToServbusBean.flag_forzar_asignacion?'Forzar Asignación':'Guardar'}"
+                             onclick="guardarAsignacion()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+
+
+

@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+
+    <p:dialog header="Operación KM CheckList" id="opKmDialogId" widgetVar="opKmDialog"
+              responsive="true" 
+              closeOnEscape="true"
+              class="mr1024_50 mr500_90"
+              modal="true" height="auto"
+              position="center top">
+        <h:form id="frmOpKm" >
+            <p:messages id="msgsLocal" showDetail="true" closable="true"/>
+            <div class="ui-fluid" >
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="CFechaOpKm" value="Fecha: "/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="CFechaOpKm" required="true"
+                                        disabled="#{opKmCLJSFMB.flagOpkmCl}"
+                                        value="#{opKmCLJSFMB.opKmChecklist.fecha}"
+                                        navigator="true"
+                                        maxdate="#{opKmCLJSFMB.maxDate()}"
+                                        locale="es"
+                                        requiredMessage="Se debe seleccionar una fecha"
+                                        pattern="dd/MM/yyyy"
+                                        mask="99/99/9999"
+                                        placeholder="DD/MM/AAAA"
+                                        showOtherMonths="true" showOn="button" >
+                            </p:calendar>
+
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel for="numODOIni" value="Km Inicial" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="numODOIni" minValue="0" 
+                                           value="#{opKmCLJSFMB.opKmChecklist.kmInicial}"
+                                           required="true"
+                                           maxlength="10"/>  
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel for="numODOFin" value="Km Fin" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="numODOFin" 
+                                           value="#{opKmCLJSFMB.opKmChecklist.kmFinal}"
+                                           required="true"
+                                           maxlength="10"/>  
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="CodigoTDialog"  value="Operador"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="CodigoTDialog" placeholder="Codígo TM"
+                                         value="#{opKmCLJSFMB.codigoTransMi}"  maxlength="6">
+                            </p:inputText>
+                            <div class="botonFloat">
+                                <p:commandButton title="Consultar Empleado"
+                                                 icon="fa fa-search"
+                                                 style="margin: 0px"
+                                                 class="cssWhite"
+                                                 process="@this,CodigoTDialog"
+                                                 actionListener="#{opKmCLJSFMB.findEmpleadoByCodigoT}"
+                                                 update="msgs,CodigoTDialog">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="txtCodigoBusDialog"  value="Vehículo"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="txtCodigoBusDialog" placeholder="Codígo Bus"
+                                         value="#{opKmCLJSFMB.codigoV}"  maxlength="12" readonly="#{opKmCLJSFMB.flagOpkmCl}">
+                            </p:inputText>
+                            <div class="botonFloat">
+                                <p:commandButton title="Consultar Empleado"
+                                                 icon="fa fa-search"
+                                                 class="cssWhite"
+                                                 style="margin: 0px"
+                                                 rendered="#{!opKmCLJSFMB.flagOpkmCl}"
+                                                 process="@this,txtCodigoBusDialog"
+                                                 actionListener="#{opKmCLJSFMB.findVehiculoByCod}"
+                                                 update="msgs,txtCodigoBusDialog">
+                                </p:commandButton>
+                            </div>
+                            <p:outputLabel id="flagVhcl">
+                                <p:staticMessage severity="info"
+                                                 summary="Exito!" 
+                                                 rendered="#{opKmCLJSFMB.flagVhcl}" 
+                                                 detail="Vehiculo Cargado" />
+                            </p:outputLabel>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel  value="-" style="visibility: hidden"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="idFULOP">
+                            <p:commandButton id="btnFoto" 
+                                             icon="fa fa-file-pdf-o" value="Agregar" 
+                                             process="@this"
+                                             update="formPDF"
+                                             class="OrangeButton cssWhite"
+                                             actionListener="#{opKmCLJSFMB.openDialogFileUpLoad()}">
+                            </p:commandButton>
+                            <p:staticMessage severity="info"
+                                             summary="Exito!" 
+                                             rendered="#{uploadFotoJSFManagedBean.flag}" 
+                                             detail="Archivo Cargado" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:dataTable id="tblOPKmDialog" var="OPKmVar"
+                                     value="#{opKmCLJSFMB.opKmChecklist.operacionKmChecklistDetList}"
+                                     rows="5"
+                                     paginatorPosition="bottom"
+                                     rowIndexVar="index"
+                                     filterDelay="1000"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} 
+                                     {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10">
+
+                            <p:column headerText="ROW">
+                                <h:outputText value="#{index+1}" />
+                            </p:column>
+                            <p:column headerText="Empresa">
+                                <h:outputText value="#{OPKmVar.idEmpleado.codigoTm}" />
+                            </p:column>
+
+                            <p:column headerText="Nombre">
+                                <h:outputText value="#{OPKmVar.idEmpleado.nombres} #{OPKmVar.idEmpleado.apellidos}"/>
+                            </p:column>
+
+                            <p:column>
+
+                                <p:commandButton icon="fa fa-close"
+                                                 id="CEEliminarDialog"
+                                                 process="@this"
+                                                 action="#{opKmCLJSFMB.eliminarListaDialog(OPKmVar)}"
+                                                 class="RedButton cssWhite"
+                                                 update="tblOPKmDialog"
+                                                 title="Eliminar">
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+
+            <p:remoteCommand 
+                name="rc_opchk"
+                actionListener="#{opKmCLJSFMB.guardar()}"
+                update="formTablaOpKm:tblOPkM,msgsLocal,tblOPKmDialog"/>
+
+
+            <p:keyFilter for="CodigoTDialog" mask="num"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                onclick="rc_opchk()"
+                class="cssWhite"
+                icon="fa fa-save" 
+                value="Guardar" />
+        </f:facet>
+    </p:dialog>
+    <ui:include src="../../empleado/modal/uploadPDF.xhtml"/>
+</ui:composition>
+
+
+

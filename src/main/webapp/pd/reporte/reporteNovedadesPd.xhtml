@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel >
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="Reporte novedades PD"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Una unidad funcional" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax global="false"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frm_novedades_pd">
+                <p:dataTable id="dt_novedades_pd" var="value" 
+                             scrollable="true"
+                             styleClass="verticalHeader"
+                             widgetVar="wlVdt_novedades_pd"
+                             scrollHeight="600"
+                             rows="50"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="50,100,200"
+                             emptyMessage="No existen registros"
+                             value="#{pdMaestroBean.lstNovedadesPd}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+                            <p:outputLabel for="fecha_desde" style="color: white" value="Fecha: " />
+                            <p:calendar id="fecha_desde" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{pdMaestroBean.fechaDesde}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        maxdate="today"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:calendar id="fecha_hasta" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{pdMaestroBean.fechaHasta}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        maxdate="today"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Consultar"
+                                actionListener="#{pdMaestroBean.consultarNovedadesPd()}"
+                                class="cssWhite"
+                                update="msgs,frm_novedades_pd:dt_novedades_pd"/>   
+                        </div>
+                    </f:facet>
+                    <p:column headerText="ID"
+                              width="5%"
+                              filterBy="#{value.idPdMaestro}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{value.idPdMaestro}" />
+                    </p:column>
+                    <p:column headerText="Fecha nov" width="15%" styleClass="text-center"
+                              sortable="true"
+                              sortBy="#{value.fecha}">
+                        <h:outputText value="#{value.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tipo"
+                              filterMatchMode="contains"
+                              filterBy="#{value.tipo}">
+                        <h:outputText value="#{value.tipo}" />
+                    </p:column>
+                    <p:column headerText="Detalle"
+                              filterMatchMode="contains"
+                              filterBy="#{value.detalle}">
+                        <h:outputText value="#{value.detalle}" />
+                    </p:column>
+                    <p:column headerText="Identificación"
+                              filterMatchMode="contains"
+                              filterBy="#{value.identificacion}">
+                        <h:outputText value="#{value.identificacion}" />
+                    </p:column>
+                    <p:column headerText="Código TM"
+                              filterMatchMode="contains"
+                              filterBy="#{value.codigoTm}">
+                        <h:outputText value="#{value.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="Operador"
+                              filterMatchMode="contains"
+                              filterBy="#{value.nombre}">
+                        <h:outputText value="#{value.nombre}" />
+                    </p:column>
+                <p:column id="procede"
+                          styleClass="#{value.procede gt 0 ? 'cssGreen': value.procede eq 0 ? 'cssRed' : ''}">
+                    <f:facet name="header">
+                        <h:outputText value="Procede"/>
+                    </f:facet>
+                    <h:outputText value="Sí" rendered="#{value.procede == 1}"
+                                  style=" color: white;"/>
+                    <h:outputText value="No" rendered="#{value.procede == 0}"
+                                  style=" color: white;"/>
+                </p:column>
+                    <p:column headerText="Observación" class="cortar"
+                              filterMatchMode="contains"
+                              filterBy="#{value.observacion}">
+                        <h:outputText value="#{value.observacion}" />
+                    </p:column>
+                    <p:column headerText="Fecha PD" width="15%" styleClass="text-center"
+                              sortable="true"
+                              sortBy="#{value.fechaPd}">
+                        <h:outputText value="#{value.fechaPd}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{pdMaestroBean.lstNovedadesPd.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dt_novedades_pd" 
+                                                fileName="Pd novedades reporte"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

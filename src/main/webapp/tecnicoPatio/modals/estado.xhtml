@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="estadpv" 
+              id="modalestado"
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_60 mr500_90"
+              closable="false"
+              responsive="true"
+              position="center top"
+              resizable="false" appendTo="@(body)">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Contadores" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('estadpv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmEstado">
+            <p:messages id="messagesEstado" showDetail="true" closable="true">
+            </p:messages>
+            <p:dataTable id="dtEstado" var="estado" 
+                         scrollable="true"
+                         widgetVar="wlVdtEstado"
+                         scrollHeight="600"
+                         disabledTextSelection="false"
+                         reflow="true"
+                         rows="10"
+                         filterDelay="1700"
+                         paginator="true"
+                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,50,100"
+                         emptyMessage="No existen registros"
+                         value="#{tecnicoPatioController.lstTpConteoDTO}">
+                <p:column filterBy="#{estado.depotType}"
+                          filterMatchMode="contains"
+                          headerText="Tipo">
+                    <h:outputText rendered="#{estado.depotType == 0}" value="ENTRADAS"/>
+                    <h:outputText rendered="#{estado.depotType == 1}" value="SALIDAS"/>
+                    <h:outputText rendered="#{estado.depotType == 2}" value="PARTIDAS"/>
+                </p:column>
+                <p:column headerText="Total"
+                          filterBy="#{estado.total}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{estado.total}" />
+                </p:column>
+                <p:column filterBy="#{estado.confirmado}"
+                          filterMatchMode="contains"
+                          headerText="Confirmado">
+                    <h:outputText value="#{estado.confirmado}"/>
+                </p:column>
+            </p:dataTable>
+            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                <p:commandButton value="Actualización manual"
+                                 icon="fa fa-save"
+                                 onclick="rc_update()"
+                                 id="btnActualizarManual"
+                                 class="cssWhite"
+                                 update=":formTp,modalestado"
+                                 rendered="true">
+                </p:commandButton>
+                <p:remoteCommand name="rc_update"
+                                 process="@this,frmEntradaSalida"
+                                 update=":formTp,:msgs,frmEstado"
+                                 action="#{tecnicoPatioController.estadoActual()}"
+                                 rendered="true"/>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

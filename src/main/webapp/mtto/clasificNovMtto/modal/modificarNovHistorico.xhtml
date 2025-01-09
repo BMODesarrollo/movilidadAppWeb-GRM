@@ -1,0 +1,154 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="wv_modificar_nov_historico"
+              id="dlg_modificar_nov_historico"
+              modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              closable="false"
+              class="mr1024_30 mr500_90"
+              resizable="false"
+              appendTo="@(body)"
+              position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Modificar Novedad" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wv_modificar_nov_historico').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form_modificar_nov_historico_dlg">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="novedad_tipo" value="Tipo de novedad: *"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione tipo de novedad"
+                                             id="novedad_tipo"
+                                             value="#{novTipoAndDetBean.novedadTipo.nombreTipoNovedad}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar tipo de novedad"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     disabled="true"
+                                                     update="dialog_nov_tipo"
+                                                     process="@this"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipo()}"
+                                                     oncomplete="PF('dialog_nov_tipo_wv').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="novedad_tipo_detalle" value="Detalle de tipo novedad:*"/> 
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione detalle tipo de novedad"
+                                             id="novedad_tipo_detalle"
+                                             value="#{novTipoAndDetBean.novedadTipoDet != null? novTipoAndDetBean.novedadTipoDet.tituloTipoNovedad : ''}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }">
+                                </p:inputText>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Cargar detalle tipo de novedad"
+                                                     id="novedad_tipo_detalleBtn"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     action="#{novTipoAndDetBean.prepareListNovedadTipoDetalle()}"
+                                                     disabled="#{not(novTipoAndDetBean.novedadTipo.idNovedadTipo gt 0) or novTipoAndDetBean.novedadTipo.nombreTipoNovedad eq 'Daño' }"
+                                                     oncomplete="PF('dialog_nov_tipo_det_wv').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 " >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Sistema" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="id_sistema" 
+                                             value="#{clasificNovBean.id_dis_sistema}" 
+                                             filter="true"
+                                             required="true"
+                                             requiredMessage="Se debe seleccionar un sistema."
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno"  itemValue="#{null}" />
+                                <f:selectItems value="#{clasificNovBean.listDistSistema}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}}"
+                                               itemValue="#{item.idDispSistema}"/>
+                                <p:ajax listener="#{clasificNovBean.consultarCausas()}" 
+                                        process="@this"
+                                        update="msgs"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 " >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Estado Pendiente Actual" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="id_estado_pend" 
+                                             value="#{clasificNovBean.id_dis_estado_pendiente}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno"  itemValue="#{null}" />
+                                <f:selectItems value="#{clasificNovBean.listDistEstadoPend}" 
+                                               var="causa"
+                                               itemLabel="#{causa.nombre}"
+                                               itemDescription="#{causa.descripcion}"
+                                               itemValue="#{causa.idDispEstadoPendActual}"/>
+                                <p:ajax process="@this" global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand 
+                name="rc_update_nov_histc"
+                action="#{clasificNovBean.modificarNovHistorico()}"
+                process="form_modificar_nov_historico_dlg"
+                update="form_historico_nov_mtto:dt_historico_nov_mtto,msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_update_nov_histc();"
+                class="cssWhite"
+                value="Guardar"/>
+        </f:facet>
+    </p:dialog> 
+    <ui:include src="../../../zComponent/dialogListNovedadTipo.xhtml" />
+    <ui:include src="../../../zComponent/dialogListNovedadTipoDet.xhtml" />
+</ui:composition>

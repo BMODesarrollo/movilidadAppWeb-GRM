@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="componentesFallasDlg" position="top" widgetVar="componentesFallasWv" modal="true" 
+              resizable="false" appendTo="@(body)" header="#{novedadMttoMB.header}" 
+              focus="btnCerar3"
+              class="mr1024_90 mr500_90" closeOnEscape="true" closable="false" responsive="true">
+        <h:form id="componentesFallasForm">
+            <p:commandButton id="desmarcar_id" 
+                             update="comps"
+                             action="#{novedadMttoMB.marcar(3)}"
+                             icon="fa fa-close" value="Desmarcar Todo"
+                             class="cssWhite OrangeButton" />
+            <p:separator/>
+            <p:selectManyCheckbox id="comps"  
+                                  value="#{novedadMttoMB.listValueCompFalla}"
+                                  immediate="true"
+                                  layout="grid" columns="4">
+                <f:selectItems value="#{novedadMttoMB.listCompFalla}"
+                               var="comp" transient="" 
+                               itemDescription="#{comp.descripcion}"
+                               itemLabel="#{comp.falla}" 
+                               itemValue="#{novedadMttoMB.toString(comp.idMttoComponenteFalla)}" />
+
+            </p:selectManyCheckbox>
+            <h:panelGrid columns="1" class="Wid100" id="observacion">
+                <p:outputLabel for="observaciones" value="Observaciones:" />
+                <p:inputTextarea id="observaciones" 
+                                 value="#{novedadMttoMB.observacion}"
+                                 style="width: 98%"/>
+            </h:panelGrid>
+            <p:remoteCommand name="btnCerar3" 
+                             update="formCreateNovMtto:tblNovMtto"
+                             actionListener="#{novedadMttoMB.addNovedad(3)}"
+                             process="componentesFallasForm"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton id="btnCerar3" 
+                                 onclick="btnCerar3()"
+                                 icon="fa fa-plus" value="Agregar"
+                                 oncomplete="PF('componentesFallasWv').hide()"
+                                 class="cssWhite GreenButton" />
+                <p:commandButton id="btnCerar3cerrar" 
+                                 icon="fa fa-times" value="Cerrar"
+                                 oncomplete="PF('componentesFallasWv').hide()"
+                                 class="cssWhite RedButton" />
+            </div>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,143 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui">
+    <p:dialog id="tanqueoCreate"
+              widgetVar="tanqueoCreateDialog"
+              modal="true" 
+              closeOnEscape="true"
+              width="auto"
+              height="auto"
+              position="center top"
+              class="mr1024_30 mr500_90"
+              resizable="false" 
+              closable="true"
+              appendTo="@(body)" 
+              header="Registrar Tanqueo">
+        <p:ajax event="close" listener="#{tanqueoJsf.reset()}" update=":form-tanqueo:datalist"/>
+        <h:form id="tanqueoFormCreate">
+            <p:messages id="messages" showDetail="true" closable="true" />
+            <div class="ui-fluid" >
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha:" for="fecha" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fecha" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{tanqueoJsf.tanqueo.fecha}" 
+                                        required="true" 
+                                        locale="es"
+                                        requiredMessage="Fecha es requerido" 
+                                        showOn="button"
+                                        readonly="#{facesContext.renderResponse}"
+                                        maxdate="today"
+                                        >
+                                <p:ajax event="dateSelect" update="vehiculo,tanqueoFormCreate:panel-control" listener="#{tanqueoJsf.controlCambioFecha()}"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Vehículo:" for="vehiculo" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="vehiculo"
+                                         value="#{tanqueoJsf.c_coVehiculo}"
+                                         required="true"
+                                         requiredMessage="Vehículo es requerido"
+                                         maxlength="6">
+                            </p:inputText>
+                            <div class="botonFloat">
+                                <p:commandButton id="btn-veh"
+                                                 class="cssWhite"
+                                                 icon="fa fa-search"
+                                                 style="margin: 0px"
+                                                 title="Validar Vehículo"
+                                                 actionListener="#{tanqueoJsf.cargarVehiculo()}"
+                                                 process="@this,vehiculo"
+                                                 update="messages,vehiculo,tanqueoFormCreate:panel-control,msgs"
+                                                 />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui-fluid" jsf:id="panel-control" >
+                <div class="ui-g " jsf:rendered="#{!tanqueoJsf.b_control}">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Kilometraje Inicial:" for="kmInicial" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="kmInicial" value="#{tanqueoJsf.tanqueo.kmInicial}" 
+                                           required="true" 
+                                           maxValue="9999999"
+                                           minValue="0"
+                                           decimalPlaces="0"
+                                           symbol="Km"
+                                           disabled="#{tanqueoJsf.i_kmIniUT gt 0}"
+                                           symbolPosition="s"
+                                           requiredMessage="Kilometraje Inicial es requerido">
+                            </p:inputNumber>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Kilometraje Final:" for="kmFinal" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="kmFinal" value="#{tanqueoJsf.tanqueo.kmFinal}"
+                                           required="true" 
+                                           maxValue="9999999"
+                                           minValue="0"
+                                           symbol="Km"
+                                           symbolPosition="s"
+                                           decimalPlaces="0"
+                                           requiredMessage="Kilometraje Final es requerido">
+                            </p:inputNumber>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Volumen de Combustible" for="volumen" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="volumen" 
+                                           value="#{tanqueoJsf.tanqueo.volumen}"
+                                           required="true" 
+                                           maxValue="999"
+                                           minValue="0"
+                                           decimalPlaces="0"
+                                           requiredMessage="Volumen de Combustible es requerido">
+                            </p:inputNumber>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <p:remoteCommand actionListener="#{tanqueoJsf.guardar()}"
+                             name="rc_tanq"
+                             update="@form,:form-tanqueo:datalist"  >
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                class="cssWhite"
+                onclick="rc_tanq();"
+                value="Guardar" 
+                icon="fa fa-check">
+                <p:confirm header="ADVERTENCIA" 
+                           icon="fa fa-exclamation-triangle" escape="false"
+                           message="Verificar los datos. &lt;br/&gt;Una vez confirme el registro no podrá editar todos los campos!"
+                           class="cssWhite"/>
+            </p:commandButton>
+        </f:facet>
+
+
+    </p:dialog>
+
+</ui:composition>

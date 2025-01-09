@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="nov_edit_reporte_pilona_wv" id="nov_edit_dialog_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top"
+              class="mr1024_50 mr500_90"
+              height="auto" header="Editar Novedad">
+        <h:form id="nov_edit_dialog_form">
+            <div class="ui-fluid">
+                <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-3 ui-lg-3 Padding5" >
+                        <p:outputLabel for="fecha" value="Fecha:" />
+                        <p:calendar id="fecha" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Debe seleccionar una fecha"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{segReportePilonaJSFMB.novedad.fechaHoraNov}">
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipoinfraStruct" value="Tipo de novedad: *"/>
+                        <p:selectOneMenu id="SOMNovedadTipoinfraStruct"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{segReportePilonaJSFMB.i_idNovedadTipoInfraStruct}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{segReportePilonaJSFMB.listNovTipoInfrastruc}"
+                                           var="genTipo" itemLabel="#{genTipo.nombre}"
+                                           itemDescription="#{genTipo.descripcion}"
+                                           itemValue="#{genTipo.idNovedadTipoInfrastruc}" />
+                            <p:ajax listener="#{segReportePilonaJSFMB.prepareTipoDetalles(true)}" update="SOMNovedadTipoDetallesinfraStruct"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-5 ui-lg-5 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipoDetallesinfraStruct" value="Detalle de tipo novedad: *"/>
+                        <p:selectOneMenu id="SOMNovedadTipoDetallesinfraStruct"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{segReportePilonaJSFMB.i_idNovedaTipoDetallesInfraStruct}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{segReportePilonaJSFMB.listNovTipoDetInfrastruc}"
+                                           var="tipoDet" itemLabel="#{tipoDet.nombre}"
+                                           itemDescription="#{tipoDet.descripcion}"
+                                           itemValue="#{tipoDet.idNovedadTipoDetInfrastruc}" />
+                            <p:ajax listener="#{segReportePilonaJSFMB.prepareTipoDetalles(false)}"/>
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Fotos Novedad">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{segReportePilonaJSFMB.handleFileUploadFotosNovedad}"
+                                              id="foto"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="@form"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG"
+                                              process="@this"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{segReportePilonaJSFMB.flag_rremove_photo}">
+                        <p:staticMessage severity="warn" summary="Informacion!" detail="Para Eliminar un archivo, hacer clic sobre el" />
+                        <p:dataGrid var="url_foto" id="id_tabla_fotos" 
+                                    value="#{segReportePilonaJSFMB.listFotosActividad}"
+                                    columns="6" layout="grid"
+                                    rowIndexVar="indexgd">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="nov_edit_dialog_form:id_tabla_fotos"
+                                           action="#{segReportePilonaJSFMB.delete(url_foto)}">
+                                <p:panel>
+                                    <div class="TexAlCenter">
+                                        <div>
+                                            <p:graphicImage cache="false"
+                                                            style="border:1px solid #106ebc; border-radius: 0px;"
+                                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                            width="80%">
+                                                <f:param name="path_foto" value="#{url_foto}" />
+                                            </p:graphicImage>
+                                        </div>
+                                    </div>
+                                </p:panel> 
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{segReportePilonaJSFMB.listFotosActividad.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="descripcion" value="Descripción:" />
+                        <p:inputTextarea id="descripcion" 
+                                         value="#{segReportePilonaJSFMB.novedad.descripcion}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una descripcion"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_edit" 
+                             class="cssWhite"
+                             actionListener="#{segReportePilonaJSFMB.guardarNovedad()}"  
+                             value="Guardar" 
+                             process="nov_edit_dialog_form"
+                             update="msgs,form_reporte_pilona:dt_reporte_pilona_id"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnEditNov" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc_edit()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

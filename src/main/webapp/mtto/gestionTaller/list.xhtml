@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="head">
+        <style>
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                padding: 1px 5px;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Tablas por salir">
+            <h:form id="tablas_por_salir_form">
+                <p:inputText value="#{gestionTallerBean.fecha}" 
+                             id="fecha_id" 
+                             style="display: none">
+                    <f:convertDateTime 
+                        type="date"
+                        pattern="yyyy-MM-dd"/>
+                </p:inputText>
+                <p:dataTable id="tablas_por_salir_dt" 
+                             widgetVar="tablas_por_salir_dt_wv"
+                             var="item"
+                             reflow="true"
+                             filterDelay="700"
+                             tableStyle="table-layout:auto"
+                             emptyMessage="No se han encontrado registros."
+                             rowStyleClass="text-center"
+                             value="#{gestionTallerBean.list}" 
+                             rowIndexVar="rVar">
+                    <f:facet name="footer">
+                        Total Registros #{gestionTallerBean.list.size()}
+                    </f:facet>
+                    <p:column headerText="Vehículo"
+                              filterBy="#{item.codigoVehiculo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.codigoVehiculo}" style="font-size: xx-large;"/>
+                    </p:column>
+                    <p:column headerText="Placa Vehículo"
+                              filterBy="#{item.placaVehiculo}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.placaVehiculo}" style="font-size: xx-large;"/>
+                    </p:column>
+                    <p:column headerText="Servbus"
+                              filterBy="#{item.servbus}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.servbus}" style="font-size: x-large;"/>
+                    </p:column>
+                    <p:column headerText="Tarea"
+                              filterBy="#{item.tarea}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.tarea}" style="font-size: x-large;"/>
+                    </p:column>
+                    <p:column headerText="Hora Servicio"
+                              filterBy="#{item.timeOrigin}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.timeOrigin}" style="font-size: x-large;"/>
+                    </p:column>
+                    <p:column headerText="Tiempo Restante" class="TexAlCenter">
+                        <ui:fragment>
+                            <script type="text/javascript">$(document).ready(function () {
+                                    function calcularTiempoRestante() {
+                                        var horaActual = new Date();
+
+                                        fin = '#{item.timeOrigin}';
+
+                                        inicioMinutos = horaActual.getMinutes();
+                                        inicioHoras = horaActual.getHours();
+
+                                        finMinutos = parseInt(fin.substr(3, 2));
+                                        finHoras = parseInt(fin.substr(0, 2));
+
+                                        transcurridoMinutos = finMinutos - inicioMinutos;
+                                        transcurridoHoras = finHoras - inicioHoras;
+                                        // <![CDATA[
+                                        var transcurridoHorasFlag = false;
+                                        if (transcurridoMinutos < 0) {
+                                            transcurridoHoras--;
+                                            transcurridoMinutos = 60 + transcurridoMinutos;
+                                        }
+                                        if (transcurridoHoras < 0) {
+                                            transcurridoHorasFlag = true;
+                                        }
+
+                                        horas = transcurridoHoras.toString();
+                                        minutos = transcurridoMinutos.toString();
+
+                                        if (horas.length < 2) {
+                                            horas = "0" + horas;
+                                        }
+
+                                        if (minutos.length < 2) {
+                                            minutos = "0" + minutos;
+                                        }
+                                        var doc = document.getElementById("tablas_por_salir_form:tablas_por_salir_dt:#{rVar}:rest");
+                                        if (transcurridoHorasFlag ||
+                                                (transcurridoMinutos == 0 && transcurridoHoras == 0)) {
+                                            doc.className = "rowRedStyle";
+                                            doc.textContent = "00:00";
+                                        } else {
+                                            doc.textContent = horas + ":" + minutos;
+                                        }
+                                        // ]]>
+                                    }
+                                    setInterval(calcularTiempoRestante, 1000);
+                                });</script>
+                        </ui:fragment>
+                        <h:outputText id="rest" class="" style="font-size: xx-large;"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

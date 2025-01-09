@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="NovedadDocumentosListDlg" widgetVar="NovedadDocumentosListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" 
+              closable="false"
+              class="mr1024_60 mr500_90" closeOnEscape="true" 
+              responsive="true" position="center top">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Documentos para novedad
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('NovedadDocumentosListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        
+        <h:form id="frmNovedadDocumentosList">
+
+            <p:dataTable id="dtNovedadDocumentos" widgetVar="dtNovedadesDocumento" 
+                         var="novedadDocumento" value="#{gruposNovSFMB.lstDocumentos}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         reflow="true"
+                         rowIndexVar="nroFila"
+                         emptyMessage="No existen documentos anexados a la novedad">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton actionListener="#{gruposNovSFMB.nuevoDocu()}"
+                                         oncomplete="PF('novedadDocumentos').show();"
+                                         title="Agregar nuevo documento" 
+                                         icon="fa fa-plus"
+                                         update="frmNuevoDocumento,modalDocumentos"
+                                         style="color: white"
+                                         value="Nuevo documento">
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+                <p:column headerText="#" >
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Tipo_Documento" filterBy="#{novedadDocumento.idNovedadTipoDocumento.nombreTipoDocumento}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{novedadDocumento.idNovedadTipoDocumento.nombreTipoDocumento}" />
+                </p:column>
+                <p:column headerText="Usuario">
+                    <h:outputText value="#{novedadDocumento.usuario}"/>
+                </p:column>
+                <p:column headerText="Documento">
+                    <p:commandButton action="#{gruposNovSFMB.getDocumento(novedadDocumento)}"
+                                     oncomplete="PF('DocumentoListDialog').show()"
+                                     update="DocumentoListDlg,frmDocumento"
+                                     value="Abrir" >
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+    <ui:include src="create.xhtml"/>
+    <ui:include src="modalDocumento.xhtml"/>
+</ui:composition>

@@ -1,0 +1,376 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="../WEB-INF/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .alertBubbleRed {
+                background-color: red;
+                color: #ffffff;
+                font-weight: bold;
+                overflow: hidden;
+                padding: 3px 4px;
+                display: inline-block;
+                position: absolute;
+                margin-top: -5px;
+            }
+            .alertBubbleYellow {
+                background-color: yellow;
+                color: black;
+                font-weight: bold;
+                overflow: hidden;
+                padding: 3px 4px;
+                display: inline-block;
+                position: absolute;
+                margin-top: -5px;
+            }
+            .alertBubbleGreen {
+                background-color: green;
+                color: #ffffff;
+                font-weight: bold;
+                overflow: hidden;
+                padding: 3px 4px;
+                display: inline-block;
+                position: absolute;
+                margin-top: -5px;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <p:panel header="Grupos">
+            <h:form id="frmPrincipal">
+                <div class="ui-fluid" jsf:id="idBtnss">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;">
+                            <div class="ui-g-12 ui-md-2 ui-lg-2" style="padding: 2px;">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;">
+                                    <p:outputLabel for="fecha_desde" value="Desde:" />
+                                    <p:calendar id="fecha_desde" 
+                                                pattern="yyyy/MM/dd"
+                                                value="#{genGruposNovMB.desde}"
+                                                locale="es"
+                                                required="true"
+                                                maxdate="today"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                navigator="true"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }">
+                                        <p:ajax event="dateSelect" process="@this"/>
+                                    </p:calendar>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;">
+                                    <p:outputLabel for="fecha_hasta" value="Desde:" />
+                                    <p:calendar id="fecha_hasta" 
+                                                pattern="yyyy/MM/dd"
+                                                value="#{genGruposNovMB.hasta}"
+                                                locale="es"
+                                                required="true"
+                                                maxdate="today"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                navigator="true"
+                                                onkeypress="if (event.keyCode === 13) {
+                                                            return false;
+                                                        }">
+                                        <p:ajax event="dateSelect" process="@this"/>
+                                    </p:calendar>
+                                </div>
+
+                                <div class="ui-g-10 ui-md-10 ui-lg-10" style="padding: 2px;">
+                                    <p:selectOneMenu  id="grupo_id" filterMatchMode="contains" filter="true"
+                                                      value="#{genGruposNovMB.i_grupoPm}">
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="0" />
+                                        <f:selectItems  value="#{genGruposNovMB.listPmGrup}" var="grupo" 
+                                                        itemValue="#{grupo.idGenericaPmGrupo}" itemLabel="#{grupo.nombreGrupo}" 
+                                                        itemDescription="#{grupo.descripcion}"/>
+                                        <p:ajax listener="#{genGruposNovMB.masterGrupo}" update="master_id" />
+                                    </p:selectOneMenu>
+
+                                </div>
+                                <div class="ui-g-2 ui-md-1 ui-lg-1" style="padding: 2px;">
+                                    <p:commandButton icon="fa fa-search" class="cssWhite"
+                                                     process="@this,grupo_id" 
+                                                     update="frmPrincipal:idTablaPmGrupoDialog,
+                                                     frmPrincipal:tbNovs,
+                                                     frmPrincipal:master_id,
+                                                     frmPrincipal:donut_chart"
+                                                     actionListener="#{genGruposNovMB.findDetalle}"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;">
+
+                                    <p:panel id="master_id">
+                                        <p:commandLink update="frmPrincipal:tbNovs,
+                                                       frmPrincipal:master_id,
+                                                       frmPrincipal:donut_chart,
+                                                       frmPrincipal:info_id"
+                                                       title="Click para ver novedades"
+                                                       actionListener="#{genGruposNovMB.novedadesView(genGruposNovMB.pmGrup.idEmpleado.idEmpleado)}"
+                                                       process="@this">
+
+                                            <div class="TexAlCenter">
+                                                <div>
+                                                    <span class="#{genGruposNovMB.color(genGruposNovMB.pmGrup.idEmpleado.idEmpleado)} BordRad10 Fs12" title="#Novedades - #Novedades con seguimiento - #Novedades con documento">
+                                                        #{genGruposNovMB.numeroNovedades(genGruposNovMB.pmGrup.idEmpleado.idEmpleado)} - 
+                                                        #{genGruposNovMB.numeroNovedadesSeguim(genGruposNovMB.pmGrup.idEmpleado.idEmpleado)}-
+                                                        #{genGruposNovMB.numeroNovedadesDocu(genGruposNovMB.pmGrup.idEmpleado.idEmpleado)}
+                                                    </span>
+                                                    <p:graphicImage cache="false"
+                                                                    style="border:1px solid #106ebc; border-radius: 0px;"
+                                                                    value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                                    width="100">
+                                                        <f:param name="path_foto" value="#{genGruposNovMB.pmGrup.idEmpleado.pathFoto}" />
+                                                    </p:graphicImage>
+                                                    <br/>
+                                                    <span class="Fs10 hardblue">
+                                                        #{genGruposNovMB.pmGrup.idEmpleado.identificacion}&nbsp;-&nbsp;
+                                                        <span class="Fs10 softgray">
+                                                            #{genGruposNovMB.pmGrup.idEmpleado.nombres} #{genGruposNovMB.pmGrup.idEmpleado.apellidos}
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </p:commandLink>
+                                    </p:panel>
+                                    <div jsf:id="info_id">
+
+                                        <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #fbfcfd;">
+                                            <p:outputLabel value="Operadores: "/>
+                                        </div>
+                                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #fbfcfd;">
+                                            <p:outputLabel value="#{genGruposNovMB.listPmGrupDet.size()}"/>
+                                        </div>
+                                        <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #fbfcfd;">
+                                            <p:outputLabel value="Novedades: "/>
+                                        </div>
+                                        <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #fbfcfd;">
+                                            <p:outputLabel value="#{genGruposNovMB.listNovs.size()}"/>
+                                        </div>
+                                        <div jsf:rendered="#{genGruposNovMB.b_controlAplica}">
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="Con Seguimiento: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="#{genGruposNovMB.conSeguimiento}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="Sin Seguimiento: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="#{genGruposNovMB.sinSeguimiento}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #fbfcfd;">
+                                                <p:outputLabel value="Con Documento: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #fbfcfd;">
+                                                <p:outputLabel value="#{genGruposNovMB.conDocumentos}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #fbfcfd;">
+                                                <p:outputLabel value="Sin Documento: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #fbfcfd;">
+                                                <p:outputLabel value="#{genGruposNovMB.sinDocumentos}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="Aplicadas: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="#{genGruposNovMB.aplicadas}"/>
+                                            </div>
+                                            <div class="ui-g-9 ui-md-9 ui-lg-9 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="No Aplicadas: "/>
+                                            </div>
+                                            <div class="ui-g-3 ui-md-3 ui-lg-3 Padding0" style="background-color: #f3f5f7;">
+                                                <p:outputLabel value="#{genGruposNovMB.noAplicadas}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 0px;">
+                                    <p:donutChart rendered="#{genGruposNovMB.b_controlAplica}" 
+                                                  id="donut_chart" 
+                                                  model="#{genGruposNovMB.donutModel}" 
+                                                  style="width: 100%; height:350px;"/>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-10 ui-lg-10" style="padding: 2px;">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;">
+                                    <p:dataGrid var="operador" value="#{genGruposNovMB.listPmGrupDet}"
+                                                paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                rowsPerPageTemplate="6,12,18,24,30,36"
+                                                rows="36"
+                                                paginatorPosition="top"
+                                                paginator="true"
+                                                columns="6" layout="grid"
+                                                id="idTablaPmGrupoDialog" >
+
+                                        <p:commandLink id="id"
+                                                       title="Click para ver novedades"
+                                                       update="frmPrincipal:tbNovs,frmPrincipal:idTablaPmGrupoDialog:#{genGruposNovMB.listPmGrupDet.indexOf(operador)}:id,
+                                                       frmPrincipal:donut_chart,
+                                                       frmPrincipal:master_id,
+                                                       frmPrincipal:info_id"
+                                                       actionListener="#{genGruposNovMB.novedadesView(operador.idEmpleado.idEmpleado)}"
+                                                       process="@this,frmPrincipal:tbNovs">
+                                            <p:panel >
+                                                <div class="TexAlCenter">
+                                                    <div>
+                                                        <span class="#{genGruposNovMB.color(operador.idEmpleado.idEmpleado)} BordRad10 Fs13" title="#Novedades - #Novedades con seguimiento - #Novedades con documento">
+                                                            #{genGruposNovMB.numeroNovedades(operador.idEmpleado.idEmpleado)} - 
+                                                            #{genGruposNovMB.numeroNovedadesSeguim(operador.idEmpleado.idEmpleado)} - 
+                                                            #{genGruposNovMB.numeroNovedadesDocu(operador.idEmpleado.idEmpleado)}
+                                                        </span>
+                                                        <p:graphicImage cache="false"
+                                                                        style="border:1px solid #106ebc; border-radius: 0px;"
+                                                                        value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                                        width="70">
+                                                            <f:param name="path_foto" value="#{operador.idEmpleado.pathFoto}" />
+                                                        </p:graphicImage>
+                                                        <br/>
+                                                        <span class="Fs10 hardblue">
+                                                            #{operador.idEmpleado.identificacion}&nbsp;-&nbsp;
+                                                            <span class="Fs10 softgray">
+                                                                #{operador.idEmpleado.nombres} #{operador.idEmpleado.apellidos}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </p:panel>
+                                        </p:commandLink>  
+                                    </p:dataGrid>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;">
+
+                                    <p:dataTable id="tbNovs" 
+                                                 value="#{genGruposNovMB.listNovs}" 
+                                                 var="item"
+                                                 emptyMessage="No existen registros"
+                                                 filterDelay="1000"
+                                                 scrollHeight="500"
+                                                 reflow="true"
+                                                 scrollable="true"
+                                                 rowKey="#{item.idGenerica}"
+                                                 widgetVar="tbNovsWV">
+                                        <p:column headerText="Fecha"
+                                                  filterBy="#{item.fecha}" 
+                                                  filterMatchMode="startsWith">
+                                            <f:facet name="filter">
+                                                <p:calendar id="search" pattern="dd-MM-yyyy" locale="es"
+                                                            autocomplete="off"
+                                                            required="false"
+                                                            navigator="true" 
+                                                            showTodayButton="true"
+                                                            maxdate="today"
+                                                            inputStyle="width: 100%;"
+                                                            placeholder="Fecha"
+                                                            onkeyup="PF('tbNovsWV').filter()"
+                                                            onkeypress="if (event.keyCode === 13) {
+                                                                        return false;
+                                                                    }">
+                                                    <p:ajax event="dateSelect" oncomplete="PF('tbNovsWV').filter()" update="tbNovs"/>
+                                                </p:calendar> 
+                                            </f:facet>
+                                            <h:outputText value="#{item.fecha}" >
+                                                <f:convertDateTime type="date" pattern="dd-MMMM-yyyy" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Empleado"
+                                                  filterMatchMode="contains"
+                                                  filterBy="#{item.idEmpleado.identificacion} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}">
+                                            <h:outputText  value="#{item.idEmpleado.identificacion} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Tipo Novedad"
+                                                  filterBy="#{item.idGenericaTipo.nombreTipoNovedad}"
+                                                  filterMatchMode="contains">
+                                            <h:outputText  value="#{item.idGenericaTipo.nombreTipoNovedad}"/>
+                                        </p:column>
+
+                                        <p:column id="detTipoNovedad" filterBy="#{item.idGenericaTipoDetalle.tituloTipoGenerica}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                                            </f:facet>
+                                            <h:outputText value="#{item.idGenericaTipoDetalle.tituloTipoGenerica}" />
+                                            <h:outputText value="#{item.idGenericaTipoDetalle.tituloTipoGenerica}" />
+                                        </p:column>
+
+                                        <p:column headerText="Descripción">
+                                            <h:outputText  value="#{item.observaciones}"/>
+                                        </p:column>
+                                        <p:column styleClass="#{item.procede gt 0 ? 'cssGreen': item.procede eq 0 ? 'cssRed' : ''}">
+                                            <f:facet name="header">
+                                                <h:outputText value="Procede"/>
+                                            </f:facet>
+                                            <h:outputText value="Sí" rendered="#{item.procede == 1}"
+                                                          style=" color: white;"/>
+                                            <h:outputText value="No" rendered="#{item.procede == 0}"
+                                                          style=" color: white;"/>
+                                        </p:column>
+                                        <p:column  headerText="Puntos PM" exportable="false"> 
+                                            <h:outputText  value="#{item.puntosPm}"/>
+                                        </p:column>
+                                        <p:column  headerText="Puntos Conciliados" exportable="false">
+                                            <h:outputText  value="#{item.puntosPmConciliados}"/>
+                                        </p:column>
+                                        <p:column headerText="Seguimientos">
+                                            <h:outputText escape="false"  value="#{genGruposNovMB.viewSeguimientos(item)}"/>
+                                        </p:column>
+                                        <p:column headerText="Opciones" width="7%">
+                                            <p:commandButton icon="fa fa-binoculars" 
+                                                             class="GreenButton cssWhite"
+                                                             oncomplete="PF('seguiWV').show();"
+                                                             action="#{genGruposNovMB.seguimiento(item)}" 
+                                                             title="Ver o registrar seguimientos para la novedad" 
+                                                             update="frmNovedadSeguimientoLista:dtNovedadSeguimiento"
+                                                             disabled="#{item.estadoReg==1}"/>
+                                            <p:commandButton icon="fa fa-book" 
+                                                             class="cssWhite"
+                                                             oncomplete="PF('NovedadDocumentosListDialog').show();"
+                                                             action="#{genGruposNovMB.documentos(item)}" 
+                                                             title="Ver o registrar Documentos para la novedad" 
+                                                             update="frmNovedadDocumentosList:dtNovedadDocumentos"
+                                                             disabled="#{item.estadoReg==1}"/>
+
+                                        </p:column>
+                                        <p:column rendered="#{genGruposNovMB.b_controlAplica}" exportable="false" width="4%">
+                                            <p:commandButton actionListener="#{genGruposNovMB.aplicar(item, 1)}"
+                                                             icon="fa fa-thumbs-up"
+                                                             class="cssWhite GreenButton"
+                                                             update="msgs,tbNovs"
+                                                             rendered="#{item.procede== null or item.procede == 0}"
+                                                             title="Aplicar">
+                                                <p:confirm header="Confirmación" 
+                                                           message="Está seguro de APLICAR?"
+                                                           icon="fa fa-exclamation-triangle"
+                                                           class="cssWhite"/>
+                                            </p:commandButton>
+                                            <p:commandButton actionListener="#{genGruposNovMB.aplicar(item, 0)}"
+                                                             icon="fa fa-thumbs-down"
+                                                             class="cssWhite RedButton"
+                                                             update="msgs,tbNovs"
+                                                             rendered="#{item.procede == 1 }"
+                                                             title="No Aplicar">
+                                                <p:confirm header="Confirmación" 
+                                                           message="Está seguro de NO APLICAR?"
+                                                           icon="fa fa-exclamation-triangle"
+                                                           class="cssWhite"/>
+                                            </p:commandButton>
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/seguimientoNovedad.xhtml"/>
+        <ui:include src="modal/documentos/documentosNovedadesPM.xhtml"/>
+    </ui:define>
+</ui:composition>

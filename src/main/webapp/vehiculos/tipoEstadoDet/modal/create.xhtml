@@ -1,0 +1,140 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="vehiculoTipoEstadoDet"
+              widgetVar="wlvVehiculoTipoEstadoDet" 
+              modal="true" 
+              class="mr1024_50 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{vehiculoTipoEstadoDetBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{vehiculoTipoEstadoDetBean.selected != null}">
+            <f:facet name="header">
+                EDITAR REGISTRO
+            </f:facet>
+        </c:if>
+        <h:form id="frmVehiculoTipoEstadoDet">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre" for="@next"/>
+                        </div>
+                        <p:inputText 
+                            required="true"
+                            requiredMessage="Debe ingresar un nombre"
+                            value="#{vehiculoTipoEstadoDetBean.nombre}"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo estado (Vehículos)" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="tipoEstado"
+                                         readonly="true"
+                                         value="#{vehiculoTipoEstadoDetBean.vehiculoTipoEstado.nombreTipoEstado}"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-list"
+                                                 action="#{vehiculoTipoEstadoDetBean.prepareListTipoEstado()}"
+                                                 oncomplete="PF('wlvCableEventoTipo').show();"
+                                                 process="@this"
+                                                 style="margin: 0px"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción"  for="@next"/>
+                        </div>
+                        <p:inputTextarea autoResize="false"
+                                         rows="5"
+                                         value="#{vehiculoTipoEstadoDetBean.vehiculoTipoEstadoDet.descripcion}"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <p:dataTable id="checkbox_estado_pend_dt" 
+                                     var="item" 
+                                     rows="20"
+                                     rowIndexVar="varr"
+                                     paginatorPosition="bottom"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} Preguntas"
+                                     filterDelay="1000"
+                                     rowsPerPageTemplate="20,30,50,100"
+                                     value="#{vehiculoTipoEstadoDetBean.listaEstadoPendActual}" 
+                                     selection="#{vehiculoTipoEstadoDetBean.selectListaEstadoPendActual}" 
+                                     rowKey="#{item.idDispEstadoPendActual}" 
+                                     emptyMessage="No existen registros">
+                            <f:facet name="header">
+                                Seleccionar los estados Pendientes actuales para el registro.
+                            </f:facet>
+                            <p:column selectionMode="multiple" width="5%"/>
+                            <p:column headerText="Primer Estado" 
+                                      width="10%" 
+                                      filterMatchMode="contains" 
+                                      filterBy="#{item.primerEstado}">
+                                <h:outputText value="#{item.primerEstado gt 0 ? 'Si':'No'}"/>
+                            </p:column>
+                            <p:column headerText="Nombre" 
+                                      filterMatchMode="contains"
+                                      width="30%"
+                                      filterBy="#{item.nombre}">
+                                <h:outputText value="#{item.nombre}" />
+                            </p:column>
+                            <p:column headerText="Descripción" 
+                                      filterMatchMode="contains"
+                                      width="30%"
+                                      filterBy="#{item.descripcion}">
+                                <h:outputText value="#{item.descripcion}" />
+                            </p:column>
+                            <p:column headerText="Por defecto al diferir">
+                                <h:outputText value="#{item.porDefectoDiferir gt 0 ? 'Si':'No'}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmVehiculoTipoEstadoDet,@this"
+                             update=":msgs,messages,pGridDatos,:frmPrincipal:dtVehiculoTipoEstadoDet" 
+                             rendered="#{vehiculoTipoEstadoDetBean.selected == null }"
+                             action="#{vehiculoTipoEstadoDetBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmVehiculoTipoEstadoDet,@this"
+                             rendered="#{vehiculoTipoEstadoDetBean.selected != null }"
+                             update="msgs,messages,:frmPrincipal:dtVehiculoTipoEstadoDet"
+                             action="#{vehiculoTipoEstadoDetBean.editar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{vehiculoTipoEstadoDetBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{vehiculoTipoEstadoDetBean.selected != null }"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListaCableEventoTipo.xhtml"/>
+</ui:composition>     

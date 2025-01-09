@@ -1,0 +1,189 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="cableRevisionDiaRta"
+              widgetVar="wlvCableRevisionDiaRta" 
+              modal="true" 
+              closeOnEscape="true"
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{cableRevisionDiaRtaBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{cableRevisionDiaRtaBean.selected != null}">
+            <f:facet name="header">
+                EDITAR DATOS
+            </f:facet>
+        </c:if>
+        <h:form id="frmCableRevisionDiaRta">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar fecha"
+                                        pattern="yyyy-MM-dd"
+                                        maxdate="today"
+                                        navigator="true"
+                                        readonlyInput="true"
+                                        value="#{cableRevisionDiaRtaBean.fecha}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Horario" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  
+                                filter="true"
+                                style="width: 99.9999%"
+                                required="true"
+                                requiredMessage="Debe seleccionar una franja horaria"
+                                value="#{cableRevisionDiaRtaBean.i_CableRevisionDiaHorario}">
+                                <f:selectItem itemLabel="Seleccione uno" 
+                                              itemDisabled="true"
+                                              itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="diaHorario"
+                                    value="#{cableRevisionDiaRtaBean.lstCableRevisionDiaHorarios}"
+                                    itemLabel="#{diaHorario.hora}"
+                                    itemValue="#{diaHorario.idCableRevisionDiaHorario}"
+                                    />
+                                <p:ajax process="@this"
+                                        listener="#{cableRevisionDiaRtaBean.cargarPreguntasPorFranjaHoraria()}"
+                                        update="preguntas,msgs"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Estación" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu  
+                                filter="true"
+                                filterMatchMode="contains"
+                                style="width: 99.9999%"
+                                required="true"
+                                requiredMessage="Debe seleccionar una estación"
+                                disabled="#{cableRevisionDiaRtaBean.isEditing}"
+                                value="#{cableRevisionDiaRtaBean.i_CableEstacion}">
+                                <f:selectItem itemLabel="Seleccione uno" 
+                                              itemValue="#{null}"
+                                              itemDisabled="true"
+                                              />
+                                <f:selectItems 
+                                    var="estacion"
+                                    value="#{cableRevisionDiaRtaBean.lstCableEstaciones}"
+                                    itemLabel="#{estacion.nombre}"
+                                    itemValue="#{estacion.idCableEstacion}"
+                                    />
+                                <p:ajax process="@this"
+                                        listener="#{cableRevisionDiaRtaBean.cargarPreguntasEnVista()}"
+                                        update="preguntas,msgs"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="EmptyBox10"/>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:id="preguntas">
+                            <p:dataTable var="item"
+                                         id="dtPreguntas"
+                                         value="#{cableRevisionDiaRtaBean.lstPreguntas}"
+                                         rendered="#{not(empty(cableRevisionDiaRtaBean.lstPreguntas))}"
+                                         scrollable="true"
+                                         editMode="cell" 
+                                         editable="true"
+                                         scrollHeight="600"
+                                         disabledTextSelection="false"
+                                         rows="10"
+                                         filterDelay="1700"
+                                         paginator="true"
+                                         paginatorPosition="top"
+                                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="10,50,100"
+                                         emptyMessage="No existen registros">
+
+                                <p:ajax event="cellEdit" 
+                                        update="dtPreguntas" 
+                                        process="@this" />
+
+
+                                <f:facet name="header">
+                                    Actividades
+                                </f:facet>
+                                <p:column headerText="Revisión equipo"
+                                          styleClass="text-center"
+                                          filterBy="#{item.idCableRevisionEstacion.idCableRevisionEquipo.nombre}"
+                                          filterMatchMode="contains">
+                                    <h:outputText value="#{item.idCableRevisionEstacion.idCableRevisionEquipo.nombre}"/>
+                                </p:column>
+                                <p:column headerText="Revisión actividad"
+                                          styleClass="text-center"
+                                          filterBy="#{item.idCableRevisionEstacion.idCableRevisionActividad.nombre}"
+                                          filterMatchMode="contains">
+                                    <h:outputText value="#{item.idCableRevisionEstacion.idCableRevisionActividad.nombre}"/>
+                                </p:column>
+                                <p:column headerText="Respuesta" 
+                                          width="20%"
+                                          styleClass="text-center">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{item.respuesta}"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputNumber value="#{item.respuesta}"
+                                                           maxValue="999"
+                                                           decimalPlaces="0"
+                                                           placeholder="Respuesta"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="messages,pGridDatos,:tbPadre:frmPrincipal" 
+                             action="#{cableRevisionDiaRtaBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:tbPadre:frmPrincipal"
+                             action="#{cableRevisionDiaRtaBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{cableRevisionDiaRtaBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{cableRevisionDiaRtaBean.selected != null}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

@@ -1,0 +1,272 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="novedadesPM" id="modalnovedadesPM" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top"
+              class="mr1024_70 mr500_90"
+              height="auto">
+        <p:ajax event="close" listener="#{genericaBean.resetSelected()}"
+                update=":frmPrincipal:dtTipo,frmNovedadesPm"/>
+        <c:if test="#{genericaBean.selected == null }">
+            <f:facet name="header">
+                Nueva novedad genérica
+            </f:facet>
+        </c:if>
+        <c:if test="#{genericaBean.selected != null }">
+            <f:facet name="header">
+                Editar novedad genérica
+            </f:facet>
+        </c:if>
+        <h:form id="frmNovedadesPm">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                        <p:effect type="pulsate" event="load" delay="500" />
+                    </p:messages>
+                    <div class="ui-g" jsf:id="pGrid">
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="fecha" value="Fecha:" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:calendar id="fecha" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{genericaBean.novedad.fecha}"
+                                            showOn="button" 
+                                            locale="es"
+                                            required="true"
+                                            maxdate="today"
+                                            requiredMessage="Debe seleccionar una fecha"
+                                            showTodayButton="true"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }"
+                                            >
+                                </p:calendar>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="novedad_tipo" value="Tipo de novedad: *"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText id="novedad_tipo"
+                                             value="#{genericaBean.genericaTipo.nombreTipoNovedad}"
+                                             readonly="true"/>
+                                <div class="botonFloat">
+
+                                    <p:commandButton title="Cargar tipo de novedad"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     process="@this"
+                                                     onclick="PF('dtNovedadTipos').getPaginator().setPage(0);"
+                                                     action="#{genericaBean.prepareListGenericaTipo()}"
+                                                     oncomplete="PF('PmNovedadTipoListDialog').show()"
+                                                     >
+                                        <p:ajax event="dialogReturn" listener="#{genericaBean.onGenericaTipoChosen}" process="@this" update="novedad_tipo"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="novedad_tipo_detalle" value="Detalle de tipo novedad:*"/> 
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="novedad_tipo_detalle"
+                                             value="#{genericaBean.genericaTipoDetalles.tituloTipoGenerica != null? genericaBean.genericaTipoDetalles.tituloTipoGenerica : ''}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }">
+                                </p:inputText>
+                                <div class="botonFloat">
+                                    <p:commandButton title="Cargar detalle tipo de novedad"
+                                                     id="novedad_tipo_detalleBtn"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite Wid100"
+                                                     process="@this"
+                                                     style="margin: 0px"
+                                                     update=":frmPmNovedadTipoDetalleList"
+                                                     onclick="PF('dtNovedadTipoDetalle').getPaginator().setPage(0);"
+                                                     disabled="#{not(genericaBean.genericaTipo.idGenericaTipo gt 0)}"
+                                                     action="#{genericaBean.prepareListGenericaTipoDetalle()}"
+                                                     oncomplete="PF('PmNovedadTipoDetalleListDialog').show()">
+                                        <p:ajax event="dialogReturn" listener="#{genericaBean.onGenericaTipoDetalleChosen}" process="@this" update="novedad_tipo_detalle"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >    
+                                <p:outputLabel for="desde" value="Desde:" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:calendar id="desde" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{genericaBean.novedad.desde}"
+                                            showOn="button" 
+                                            locale="es"
+                                            showTodayButton="true"
+                                            readonlyInput="true"
+                                            disabled="#{not(genericaBean.genericaTipoDetalles.fechas == 1)}"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }"
+                                            >
+                                    <p:ajax event="dateSelect" update="hasta"/>
+                                </p:calendar>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel for="hasta" value="Hasta:" />
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:calendar id="hasta" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{genericaBean.novedad.hasta}"
+                                            mindate="#{genericaBean.novedad.desde}"
+                                            showOn="button" 
+                                            locale="es"
+                                            disabled="#{not(genericaBean.genericaTipoDetalles.fechas == 1)}"
+                                            readonlyInput="true"
+                                            showTodayButton="true"
+                                            navigator="true"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }"
+                                            >
+                                </p:calendar>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" jsf:id="pgrid4">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Hora" for="@next"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:calendar id="hora" value="#{genericaBean.novedad.hora}" 
+                                            autocomplete="off"
+                                            pattern="HH:mm" 
+                                            locale="es"
+                                            timeOnly="true" 
+                                            disabled="#{not(genericaBean.genericaTipoDetalles.hora == 1)}"
+                                            onkeypress="if (event.keyCode === 13) {
+                                                        return false;
+                                                    }"/>
+
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-4  Padding5" jsf:id="pgrid3">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:outputLabel value="Empleado: *" for="operador"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText id="operador"
+                                             value="#{genericaBean.empleado.nombres} #{genericaBean.empleado.apellidos}"
+                                             readonly="true"
+                                             onkeypress="if (event.keyCode === 13) {
+                                                         return false;
+                                                     }"/>
+                                <div class="botonFloat">
+                                    <p:commandButton title="Cargar lista de empleados"
+                                                     icon="fa fa-list"
+                                                     process="@this"
+                                                     style="margin: 0px"
+                                                     class="cssWhite Wid100"
+                                                     update=":frmPmEmpleadoList"
+                                                     onclick="PF('wVPmEmpleadosListDialog').getPaginator().setPage(0);"
+                                                     action="#{genericaBean.prepareListEmpleados()}"                                     
+                                                     oncomplete="PF('PmEmpleadosListDialog').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" 
+                             jsf:rendered="false">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="Unidad Funcional:" for="uf"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:selectOneMenu 
+                                    id="uf"
+                                    styleClass="custom-filter" 
+                                    filter="true" 
+                                    value="#{genericaBean.idGopUnidadFuncional}"
+                                    filterMatchMode="contains" 
+                                    style="width: 99.999%" title="Seleccione Uno..">
+                                    <f:selectItem itemLabel="-" 
+                                                  itemValue="#{0}"
+                                                  itemDescription="Seleccione Uno.."/>
+                                    <f:selectItems value="#{genericaBean.lstUnidadesFuncionales}"
+                                                   var="uf" itemLabel="#{uf.nombre}"
+                                                   itemValue="#{uf.idGopUnidadFuncional}"/>
+                                    <p:ajax update="uf" 
+                                            global="false"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="pgrid2">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="observaciones" value="Observaciones:" />
+
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="observaciones" 
+                                             value="#{genericaBean.novedad.observaciones}"
+                                             required="true" 
+                                             requiredMessage="Debe ingresar una observación"/>
+                            <p:outputLabel value="(*) Campos obligatorios"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_gen"
+                             process="@this,frmNovedadesPm"
+                             update="messages,frmNovedadesPm,
+                             frmPrincipal:dtTipo"
+                             action="#{genericaBean.guardarNovedadPM()}"
+                             rendered="#{genericaBean.selected == null }"/>
+            <p:remoteCommand name="rc_gen_upd"
+                             process="@this,frmNovedadesPm"
+                             update="msgs"
+                             action="#{genericaBean.actualizarNovedadPM()}"
+                             rendered="#{genericaBean.selected != null }"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             id="btnGuardarNovedadPM"
+                             onclick="rc_gen()"
+                             rendered="#{genericaBean.selected == null }"
+                             icon="fa fa-check"
+                             class="cssWhite">
+                <p:confirm header="Confirmación"
+                           message="Ésta seguro de asignar la novedad al empleado: #{genericaBean.empleado.nombres} #{genericaBean.empleado.apellidos}?" 
+                           icon="fa fa-exclamation-triangle"/>
+            </p:commandButton>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-check"
+                             onclick="rc_gen_upd()"
+                             rendered="#{genericaBean.selected != null }"
+                             id="btnActualizarNovedadPM"
+                             class="cssWhite"
+                             update="msgs"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListPmNovedadTipo.xhtml" />
+    <ui:include src="ListPmNovedadTipoDetalles.xhtml" />
+    <ui:include src="ListaEmpleados.xhtml" />
+    <ui:include src="verificarNovedadPM.xhtml" />
+</ui:composition>

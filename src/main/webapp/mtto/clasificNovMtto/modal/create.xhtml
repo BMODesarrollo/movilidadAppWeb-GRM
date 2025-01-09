@@ -1,0 +1,156 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="wv_clasific_nov"
+              id="dlg_clasific_nov"
+              modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              closable="false"
+              class="mr1024_30 mr500_90"
+              resizable="false"
+              appendTo="@(body)"
+              position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Clasificación" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wv_clasific_nov').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form_clasific_nov_dlg">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 " >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Sistema" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="id_sistema" 
+                                             value="#{clasificNovBean.id_dis_sistema}" 
+                                             filter="true"
+                                             required="true"
+                                             requiredMessage="Se debe seleccionar un sistema."
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno"  itemValue="#{null}" />
+                                <f:selectItems value="#{clasificNovBean.listDistSistema}" 
+                                               var="item"
+                                               itemLabel="#{item.nombre}"
+                                               itemDescription="#{item.descripcion}}"
+                                               itemValue="#{item.idDispSistema}"/>
+                                <p:ajax listener="#{clasificNovBean.consultarCausas()}" 
+                                        process="@this"
+                                        update="msgs,form_clasific_nov_dlg:id_causa_entrada_lbl,
+                                        "/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 " 
+                         jsf:id="id_causa_entrada_lbl" 
+                         jsf:rendered="#{clasificNovBean.b_input_causa_estrada}">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Causa Entrada" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="id_causa_entrada" 
+                                             value="#{clasificNovBean.id_dis_causa_entrada}" 
+                                             filter="true"
+                                             required="#{clasificNovBean.req_causa_entrada}"
+                                             requiredMessage="Se debe seleccionar una causa de entrada."
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno"  itemValue="#{null}" />
+                                <f:selectItems value="#{clasificNovBean.listDistCausaEntrada}" 
+                                               var="causa"
+                                               itemLabel="#{causa.nombre}"
+                                               itemDescription="#{causa.descripcion}}"
+                                               itemValue="#{causa.idDispCausaEntrada}"/>
+                                <p:ajax process="@this" global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 " >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Estado Pendiente Actual" for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="id_estado_pend" 
+                                             value="#{clasificNovBean.id_dis_estado_pendiente}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno"  itemValue="#{null}" />
+                                <f:selectItems value="#{clasificNovBean.listDistEstadoPend}" 
+                                               var="causa"
+                                               itemLabel="#{causa.nombre}"
+                                               itemDescription="#{causa.descripcion}"
+                                               itemValue="#{causa.idDispEstadoPendActual}"/>
+                                <p:ajax process="@this" global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="@next" value="Fecha Hora Posible Habilitación" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:calendar id="fecha_habilita" 
+                                        value="#{clasificNovBean.fechaHoraHabilitacion}" 
+                                        locale="es"
+                                        navigator="true"
+                                        showOn="button"
+                                        timeControlType="select"
+                                        timeInput="true"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        mask="true">
+                                <p:ajax event="dateSelect" process="@this" global="false"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Observación " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea value="#{clasificNovBean.observacion}"
+                                             id="id_observacion"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"
+                                             />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand 
+                name="rc_save_clasifi"
+                action="#{clasificNovBean.guardar()}"
+                process="form_clasific_nov_dlg"
+                update="#{clasificNovBean.updateClasificar}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_save_clasifi();"
+                class="cssWhite"
+                value="Guardar"/>
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

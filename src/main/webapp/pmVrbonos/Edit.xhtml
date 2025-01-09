@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="PmVrbonosEditDlg" 
+              widgetVar="PmVrbonosEditDialog" 
+              modal="true" 
+              closeOnEscape="true"
+              closable="false"
+              position="center top"
+              resizable="false" 
+              appendTo="@(body)" header="Editar Pm Valor Bono">
+        <p:ajax event="close" listener="#{pmVrbonosController.reset()}" update=":PmVrbonosListForm:datalist" />
+        <h:form id="PmVrbonosEditForm">
+            <h:panelGroup id="display">
+                <h:panelGrid columns="2" rendered="#{pmVrbonosController.selected != null}">
+                    <p:outputLabel value="Desde:" for="desde" />
+                    <p:calendar id="desde"
+                                pattern="yyyy-MM-dd"
+                                value="#{pmVrbonosController.selected.desde}"
+                                required="true"
+                                requiredMessage="Fecha Desde es requerido"
+                                readonly="#{facesContext.renderResponse}"
+                                showOn="button"
+                                locale="es" >
+                        <p:ajax event="dateSelect" update="hasta"/>
+                    </p:calendar>
+                    <p:outputLabel value="Hasta:" for="hasta" />
+                    <p:calendar id="hasta"
+                                pattern="yyyy-MM-dd" 
+                                value="#{pmVrbonosController.selected.hasta}" 
+                                required="true"
+                                locale="es"
+                                requiredMessage="Fecha Hasta es requerido"
+                                readonly="#{facesContext.renderResponse}"
+                                showOn="button"
+                                mindate="#{pmVrbonosController.selected.desde}"
+                                >
+                        <p:ajax event="dateSelect"/>
+                    </p:calendar>
+                    <p:outputLabel value="Valor bono salarial:" for="vrBonoSalarial" />
+                    <p:inputNumber id="vrBonoSalarial" 
+                                   value="#{pmVrbonosController.selected.vrBonoSalarial}" 
+                                   required="true" 
+                                   requiredMessage="Valor Bono Salarial es requerido"
+                                   minValue="0"
+                                   size="25"
+                                   maxValue="9999999"
+                                   decimalPlaces="0"
+                                   symbol="$"
+                                   >
+                    </p:inputNumber>
+                    <p:outputLabel value="Valor bono alimentos:" for="vrBonoAlimentos" />
+                    <p:inputNumber id="vrBonoAlimentos"
+                                   value="#{pmVrbonosController.selected.vrBonoAlimentos}"
+                                   required="true" 
+                                   requiredMessage="Valor Bono Alimentos es requerido"
+                                   minValue="0"
+                                   size="25"
+                                   maxValue="9999999"
+                                   decimalPlaces="0"
+                                   symbol="$"
+                                   >
+                    </p:inputNumber>                     
+                    <p:outputLabel value="Empleado:" for="idEmpleadoTipoCargo" />
+                    <p:selectOneMenu id="idEmpleadoTipoCargo" 
+                                     value="#{pmVrbonosController.i_idEmpelado}"
+                                     required="true" 
+                                     requiredMessage="Empleado es requerido"
+                                     filter="true"
+                                     style="width: 142px"
+                                     filterMatchMode="startsWith"
+                                     >
+                        <f:selectItem itemLabel="Seleccionar uno" itemValue=""/>
+                        <f:selectItems value="#{pmVrbonosController.listEmpleadoTC}"
+                                       var="Item"
+                                       itemLabel="#{Item.nombreCargo}"
+                                       itemValue="#{Item.idEmpleadoTipoCargo}"/>
+                        <p:ajax process="@this"/>
+                    </p:selectOneMenu>
+                </h:panelGrid>
+                <p:separator/>
+                <p:commandButton actionListener="#{pmVrbonosController.update}" 
+                                 value="Actualizar" 
+                                 icon="fa fa-check"
+                                 class="cssWhite"
+                                 update="display,:PmVrbonosListForm:datalist,:PmVrbonosListForm:upPmVrB" 
+                                 >
+                </p:commandButton>
+                <p:commandButton value="Cancelar"
+                                 process="@this"
+                                 icon="fa fa-times"
+                                 class="cssWhite"
+                                 update=":PmVrbonosListForm:datalist"
+                                 actionListener="#{pmVrbonosController.reset}"
+                                 oncomplete="PF('PmVrbonosEditDialog').hide();"/>
+            </h:panelGroup>
+            <p:separator/>
+            <p:staticMessage severity="warn" summary="Tenga en cuenta" detail="Fecha Desde no debe ser mayor a Fecha Hasta" />
+        </h:form>
+    </p:dialog>
+
+</ui:composition>

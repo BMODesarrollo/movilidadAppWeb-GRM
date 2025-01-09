@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{sstEpsJSF.sstEps.idSstEps != null ? 'EDITAR PARAMETRIZACIÓN SST EPS' : 'NUEVA PARAMETRIZACIÓN SST EPS'}"
+              resizable="false" 
+              class="mr1024_40 mr500_90"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Nombre *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nombre"
+                                         maxlength="45"
+                                         required="true"
+                                         requiredMessage="Nombre es requerido"
+                                         value="#{sstEpsJSF.sstEps.nombre}" />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descripcion"
+                                             maxlength="255"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             value="#{sstEpsJSF.sstEps.descripcion}"/>
+                        </div>
+                    </div>
+                </div>
+                <p:remoteCommand id="btn-guardar"
+                                 name="rc_eps"
+                                 rendered="#{empty sstEpsJSF.sstEps.idSstEps}"
+                                 action="#{sstEpsJSF.guardar()}"
+                                 update=":form,@form,msgs"
+                                 process="@form" />
+                <p:remoteCommand id="btn-editar"
+                                 name="rc_update_eps"
+                                 rendered="#{not empty sstEpsJSF.sstEps.idSstEps}"
+                                 action="#{sstEpsJSF.actualizar()}"
+                                 update=":form,msgs"/>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-save"
+                             rendered="#{empty sstEpsJSF.sstEps.idSstEps}"
+                             class="cssWhite" onclick="rc_eps()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-save"
+                             rendered="#{not empty sstEpsJSF.sstEps.idSstEps}"
+                             class="cssWhite" onclick="rc_update_eps()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

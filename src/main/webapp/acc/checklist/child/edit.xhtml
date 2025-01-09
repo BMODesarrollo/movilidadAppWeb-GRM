@@ -1,0 +1,106 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="checklistEdit"
+              widgetVar="checklistEditDlg" 
+              modal="true" 
+              width="70%"
+              closeOnEscape="true"
+              closable="false"
+              responsive="true"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+        
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            EDITAR ACC_CHECKLIST
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('checklistEditDlg').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmCheckListEdit">
+            <p:messages id="messages" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div align="center">
+                <h:panelGrid columns="2" id="pGridDatos" styleClass="ui-fluid">
+                    <h:panelGrid columns="1">
+                        <p:outputLabel for="@next" value="Tipo de evento: "/>
+                        <h:panelGrid columns="2">
+                            <p:inputText id="tipo_evento" 
+                                         required="true"
+                                         readonly="true"
+                                         placeholder="Seleccione tipo de evento"
+                                         requiredMessage="Debe seleccionar tipo de evento"
+                                         value="#{accChecklistBean.detalle.tituloTipoNovedad}">
+                            </p:inputText>
+                            <p:commandButton title="Cargar detalle tipo de novedad"
+                                             id="novedad_tipo_detalleBtn"
+                                             icon="fa fa-search"
+                                             class="cssWhite"
+                                             update=":frmPmNovedadTipoDetalleListEdit"
+                                             onclick="PF('dtNovedadTipoDetalleEdit').getPaginator().setPage(0);"
+                                             action="#{accChecklistBean.prepareListNovedadTipoDetalle}"
+                                             oncomplete="PF('PmNovedadTipoDetalleListDialogEdit').show()">
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1">
+                        <p:outputLabel value="Tipo Documento: "/>
+                        <h:panelGrid columns="2">
+                            <p:inputText id="tipo_documento" 
+                                         required="true"
+                                         readonly="true"
+                                         placeholder="Seleccione tipo de documento"
+                                         requiredMessage="Debe seleccionar tipo de documento"
+                                         style="width: 300px"
+                                         value="#{accChecklistBean.tipoDocs.tipoDocs}">
+                            </p:inputText>
+                            <p:commandButton title="Cargar tipo de documento"
+                                             id="tipo_Docs_Btn"
+                                             icon="fa fa-search"
+                                             styleClass="cssWhite"
+                                             update=":frmAccTipoDocsListEdit"
+                                             onclick="PF('dtAccTipoDocEdit').getPaginator().setPage(0);"
+                                             action="#{accChecklistBean.prepareListAccTipoDocs()}"
+                                             oncomplete="PF('AccTipoDocsListDialogEdit').show()">
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1">
+                        <p:outputLabel value="Requerido: " for="@next"/>
+                        <p:selectBooleanButton id="requerido" 
+                                               value="#{accChecklistBean.isRequired}" 
+                                               onLabel="Sí" offLabel="No" />
+                    </h:panelGrid>
+                </h:panelGrid>
+            </div>
+            <p:remoteCommand name="actualizar"
+                             update=":msgs,:frmCheckList:dtCheckLists"
+                             action="#{accChecklistBean.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <div align="center">
+                <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                                 rendered="#{accChecklistBean.selected != null}"
+                                 class="cssWhite" onclick="actualizar()"/>
+            </div>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListPmNovedadTipoDetalles_Edit.xhtml" />
+    <ui:include src="ListAccTipoDocs_Edit.xhtml" />
+</ui:composition>     

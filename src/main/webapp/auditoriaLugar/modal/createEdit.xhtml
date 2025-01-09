@@ -1,0 +1,189 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="crear_audi_lugar_id_dialog"
+              widgetVar="crear_audi_lugar_dialog_wv"
+              modal="true" 
+              resizable="false" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Lugar para Auditoría"
+                                           class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('crear_audi_lugar_dialog_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="create_edit_dialog_form">
+            <p:messages id="msgs_turno" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="input_nombre" value="Nombre"/>
+                        <p:inputText id="input_nombre" required="true"
+                                     maxlength="45"
+                                     value="#{audiLugarJSFMB.auditoriaLugar.nombre}" />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="label_bus" value="Bus?"/>
+                        <p:selectBooleanButton 
+                            id="label_bus" 
+                            value="#{audiLugarJSFMB.bus}" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            onLabel="Sí" 
+                            offLabel="No">
+                            <p:ajax update="label_estacion,
+                                    label_area_comun,label_empleado,create_edit_dialog_form:tipo_vehiculo" global="false"
+                                    listener="#{audiLugarJSFMB.updateComponent(1)}" />
+                        </p:selectBooleanButton>
+                        <p:tooltip id="toolTip_label_bus" 
+                                   for="label_bus" 
+                                   value="Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="label_estacion" value="Estación?"/>
+                        <p:selectBooleanButton 
+                            id="label_estacion" 
+                            value="#{audiLugarJSFMB.estacion}" 
+                            onLabel="Sí" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            offLabel="No">
+                            <p:ajax update="label_bus,
+                                    label_area_comun,label_empleado,create_edit_dialog_form:tipo_vehiculo" global="false" 
+                                    listener="#{audiLugarJSFMB.updateComponent(2)}" />
+                        </p:selectBooleanButton> 
+                        <p:tooltip id="toolTip_label_estacion" 
+                                   for="label_estacion" 
+                                   value="Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="label_area_comun" value="Área Común?"/>
+                        <p:selectBooleanButton 
+                            id="label_area_comun" 
+                            value="#{audiLugarJSFMB.areaComun}" 
+                            onLabel="Sí" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            offLabel="No">
+                            <p:ajax update="label_bus,
+                                    label_estacion,label_empleado,create_edit_dialog_form:tipo_vehiculo"  global="false"
+                                    listener="#{audiLugarJSFMB.updateComponent(3)}" />
+                        </p:selectBooleanButton>
+                        <p:tooltip id="toolTip_area_comun" 
+                                   for="label_area_comun" 
+                                   value="Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel for="label_empleado" value="Empleado?"/>
+                        <p:selectBooleanButton 
+                            id="label_empleado" 
+                            value="#{audiLugarJSFMB.empleado}" 
+                            onLabel="Sí" 
+                            onIcon="fa fa-check" 
+                            offIcon="fa fa-times"
+                            styleClass="cssWhite"
+                            offLabel="No">
+                            <p:ajax update="label_bus,
+                                    label_estacion,label_area_comun,create_edit_dialog_form:tipo_vehiculo"  global="false"
+                                    listener="#{audiLugarJSFMB.updateComponent(4)}" />
+                        </p:selectBooleanButton>
+                        <p:tooltip id="toolTip_empleado" 
+                                   for="label_empleado" 
+                                   value="Haga click para cambiar el valor" 
+                                   position="top"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 " jsf:id="tipo_vehiculo">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" jsf:rendered="#{audiLugarJSFMB.bus}">
+                            <p:outputLabel value="Tipo Vehículo" for="tipoVehiculo" />
+                        </div>
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0" jsf:rendered="#{audiLugarJSFMB.bus}">
+                            <p:selectOneMenu id="tipoVehiculo" 
+                                             value="#{audiLugarJSFMB.idVehiculoTipo}" 
+                                             filter="true"
+                                             style="width: 99.9999%"
+                                             filterMatchMode="contains">
+                                <p:ajax/>
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                <f:selectItems value="#{audiLugarJSFMB.lstVehiculoTipo}" 
+                                               var="item"
+                                               itemLabel="#{item.nombreTipoVehiculo}"
+                                               itemDescription="#{item.descripcionTipoVehiculo}"
+                                               itemValue="#{item.idVehiculoTipo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="ui-g-2 ui-md-1 ui-lg-1 Padding0"  jsf:rendered="#{audiLugarJSFMB.bus}">
+                            <p:commandButton title="Cargar Tipos de Vehiculos"
+                                             icon="fa fa-refresh"
+                                             class="cssWhite"
+                                             actionListener="#{audiLugarJSFMB.cargarVehiculoTipo(true)}"
+                                             update="tipoVehiculo"
+                                             process="@this">
+                            </p:commandButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Wid100 Padding5" >
+                        <p:outputLabel for="descripcion" value="Descripción"/>
+                        <p:inputTextarea id="descripcion" 
+                                         required="true" 
+                                         maxlength="100"
+                                         value="#{audiLugarJSFMB.auditoriaLugar.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{audiLugarJSFMB.guardar()}"
+                             rendered="#{audiLugarJSFMB.auditoriaLugar.idAuditoriaLugar==null}"
+                             process="@this,label_bus,label_estacion,label_area_comun,input_nombre,descripcion"
+                             update="msgs,
+                             audi_estacion_form:datalist,create_edit_dialog_form"/>
+            <p:remoteCommand name="rcc" 
+                             class="cssWhite"
+                             action="#{audiLugarJSFMB.edit()}"
+                             rendered="#{audiLugarJSFMB.auditoriaLugar.idAuditoriaLugar!=null}"
+                             process="@this,label_bus,label_estacion,label_area_comun,input_nombre,descripcion"
+                             update="msgs,create_edit_dialog_form,
+                             audi_estacion_form:datalist"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarL" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             rendered="#{audiLugarJSFMB.auditoriaLugar.idAuditoriaLugar==null}"
+                             onclick="rc()"/>
+            <p:commandButton id="btnGuardarLC" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             rendered="#{audiLugarJSFMB.auditoriaLugar.idAuditoriaLugar!=null}"
+                             value="Actualizar" 
+                             onclick="rcc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

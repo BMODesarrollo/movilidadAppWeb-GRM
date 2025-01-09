@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns = "http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="EmpledoCreateDlg"
+              header="Empleado Documento" 
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              closeOnEscape="true"
+              position="top"  
+              widgetVar="EmpleadoCreateDlg_wv"
+              modal="true"
+              resizable="false" appendTo="@(body)">
+
+        <h:form id="EmpleadoDocuCreateForm" enctype="multipart/form-data" >
+            <p:messages id="msgs_create" showDetail="true" closable="true"/>
+
+            <div class="ui-fluid">
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-ml-6 ui-lg-4  Padding5">
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="numero_id"  value="Número"/>
+                        </div>
+                        <div class="ui-g-12 ui-ml-12 ui-lg-12 Padding0">
+                            <p:inputText id="numero_id" value="#{emplDocJSFMB.selected.empleadoDocumentos.numero}"/>  
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-ml-6 ui-lg-4  Padding5" 
+                         jsf:rendered="#{emplDocJSFMB.selected.empleadoDocumentos.idEmpleadoTipoDocumento.vencimiento==1}">
+                        <p:outputLabel for="CFechaIni" value="Fecha Desde:"/>
+                        <p:calendar id="CFechaIni" required="true"
+                                    value="#{emplDocJSFMB.selected.empleadoDocumentos.vigenteDesde}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="yyyy/MM/dd"
+                                    mask="9999/99/99"
+                                    placeholder="AAAA/MM/DD"
+                                    showOtherMonths="true" showOn="button" >
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-ml-6 ui-lg-4  Padding5"
+                         jsf:rendered="#{emplDocJSFMB.selected.empleadoDocumentos.idEmpleadoTipoDocumento.vencimiento==1}">
+                        <p:outputLabel for="CFechaFin" value="Fecha Hasta:"/>
+                        <p:calendar id="CFechaFin" required="true"
+                                    value="#{emplDocJSFMB.selected.empleadoDocumentos.vigenteHasta}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="yyyy/MM/dd"
+                                    mask="9999/99/99"
+                                    placeholder="AAAA/MM/DD"
+                                    showOtherMonths="true" showOn="button" >
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-ml-6 ui-lg-4  Padding5" 
+                         rendered="#{emplDocJSFMB.selected.empleadoDocumentos.idEmpleadoTipoDocumento.radicado==1}">
+
+                        <p:outputLabel for="txtRadicado"  value="Radicado: "/>
+                        <p:inputText id="txtRadicado" required="true" maxlength="45" 
+                                     requiredMessage="Debe ingresar Radicado" 
+                                     value="#{emplDocJSFMB.selected.empleadoDocumentos.radicado}">
+                            <p:messages id="txtNombreMssg" showDetail="true"/>
+
+                        </p:inputText>
+                    </div>
+                    <div class="ui-g-12 ui-ml-6 ui-lg-4  Padding5" 
+                         rendered="#{emplDocJSFMB.selected.empleadoDocumentos.idEmpleadoTipoDocumento.radicado==1}">
+                        <p:outputLabel for="CFechaRadi" value="Fecha Radicado:"/>
+                        <p:calendar id="CFechaRadi" required="true"
+                                    value="#{emplDocJSFMB.selected.empleadoDocumentos.fechaRadicado}"
+                                    navigator="true"
+                                    locale="es"
+                                    pattern="dd/MM/yyyy"
+                                    mask="99/99/9999"
+                                    placeholder="DD/MM/AAAA"
+                                    showOtherMonths="true" showOn="button" >
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-ml-12 ui-lg-12  Padding5">
+                        <p:fieldset toggleable="true"  legend="Documento">
+                            <p:fileUpload fileUploadListener="#{emplDocJSFMB.handleFileUpload}"
+                                          allowTypes="/(\.|\/)(pdf)$/"
+                                          label="Seleccionar documento"
+                                          fileLimit="1"
+                                          id="upload_file"
+                                          update="msgs,msgs_create"
+                                          fileLimitMessage="Solo se permite un archivo"
+                                          uploadLabel="Cargar"
+                                          cancelLabel="Cancelar"
+                                          invalidFileMessage="Archivo no permitido para este campo"
+                                          invalidSizeMessage="Archivo muy pesado"
+                                          sizeLimit="2000000"/>
+                        </p:fieldset>
+                    </div>
+                    <p:remoteCommand name="rc"
+                                     update="EmpleadoDocuGestionForm:dt_docu_cargo,
+                                     msgs,EmpleadoDocuGestionForm:msgs_gestion,
+                                     msgs_create" 
+                                     action="#{emplDocJSFMB.agregar()}" />
+                    <p:remoteCommand name="rc_save"
+                                     update="formTablaDocu:tblED,
+                                     msgs,
+                                     EmpleadoDocuGestionForm:msgs_gestion,
+                                     msgs_create" 
+                                     action="#{emplDocJSFMB.guardarEdit()}" />
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnAdd" 
+                             icon="fa fa-plus" value="Agregar" 
+                             class="cssWhite GreenButton"
+                             rendered="#{!emplDocJSFMB.flag_edit}"
+                             onclick="rc()"/>
+            <p:commandButton id="btnEdit" 
+                             rendered="#{emplDocJSFMB.flag_edit}"
+                             icon="fa fa-save" value="Actualizar" 
+                             class="cssWhite"
+                             onclick="rc_save()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+

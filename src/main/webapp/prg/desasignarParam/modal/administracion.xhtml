@@ -1,0 +1,95 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="dial-modal" 
+              closeOnEscape="true" 
+              widgetVar="modalDlg"
+              modal="true"
+              header="#{prgDesasignarParamJSF.prgDesasignarParam.idPrgDesasignarParam != null ? 'EDITAR PARAMETRIZACIÓN DESASIGNACIÓN NOVEDAD' : 'NUEVA PARAMETRIZACIÓN DESASIGNACIÓN NOVEDAD'}"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top"
+              responsive="true">
+        <h:form id="form-modal">
+            <div class="ui-fluid Padding0">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                    <p:outputLabel value="* Novedad Detalle:" />
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                    <p:selectOneMenu id="novedadDet" 
+                                     value="#{prgDesasignarParamJSF.idNovedadTipoDetalles}" 
+                                     style="width: 99.999%" 
+                                     filter="true"
+                                     filterMatchMode="contains"
+                                     required="true"
+                                     requiredMessage="Novedad Detalle es requerido">
+                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                        <f:selectItems value="#{prgDesasignarParamJSF.listNovedadTipoDetalles}" 
+                                       var="novDet" 
+                                       itemLabel="#{novDet.tituloTipoNovedad}" 
+                                       itemDescription="#{novDet.descripcionTipoNovedad}"
+                                       itemValue="#{novDet.idNovedadTipoDetalle}" />
+                    </p:selectOneMenu>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                    <p:outputLabel value="* Motivo" />
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                    <p:selectOneMenu id="prgMot" 
+                                     value="#{prgDesasignarParamJSF.idPrgSerconMotivo}" 
+                                     style="width: 99.999%"
+                                     filter="true"
+                                     filterMatchMode="contains"
+                                     required="true"
+                                     requiredMessage="Motivo es requerido">
+                        <f:selectItem itemLabel="Seleccione Uno" itemValue="" />
+                        <f:selectItems value="#{prgDesasignarParamJSF.listPrgSerconMotivo}" 
+                                       var="prgSerMot" 
+                                       itemLabel="#{prgSerMot.descripcion}" 
+                                       itemDescription="#{prgSerMot.descripcion}"
+                                       itemValue="#{prgSerMot.idPrgSerconMotivo}" />
+                    </p:selectOneMenu>
+                </div>
+                <div class="ui-g Padding5">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <h:outputText value="Descripción *"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:inputTextarea id="descripcion"
+                                         maxlength="65500"
+                                         required="true"
+                                         requiredMessage="Descripción es requerido"
+                                         value="#{prgDesasignarParamJSF.prgDesasignarParam.descripcion}"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="@form" 
+                             rendered="#{empty prgDesasignarParamJSF.prgDesasignarParam.idPrgDesasignarParam}"
+                             update=":form,@form"
+                             actionListener="#{prgDesasignarParamJSF.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             rendered="#{not empty prgDesasignarParamJSF.prgDesasignarParam.idPrgDesasignarParam}"
+                             process="@form,@this"
+                             update=":form,@form"
+                             actionListener="#{prgDesasignarParamJSF.actualizar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" 
+                             icon="fa fa-save"
+                             rendered="#{empty prgDesasignarParamJSF.prgDesasignarParam.idPrgDesasignarParam}"
+                             class="cssWhite" 
+                             onclick="guardar()"/>
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-save"
+                             rendered="#{not empty prgDesasignarParamJSF.prgDesasignarParam.idPrgDesasignarParam}"
+                             class="cssWhite" 
+                             onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

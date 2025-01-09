@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <ui:define name="content">
+        <p:panel header="Interfaz de Carga Liquidación Jornadas * Freeway - Rigel">
+            <p:growl id="messages" showDetail="true" />     
+            <h:form id="frmPrincipal">
+                <div align="right">
+                    <p:commandButton title="Cargar Liquidación" 
+                                     icon="fa fa-plus"
+                                     class="cssWhite"
+                                     rendered="false"
+                                     action="#{prgCargaLiquidacionMB.consumeCargaLiquidacion()}" 
+                                     value="Cargar Liquidación">
+                    </p:commandButton>
+                </div>
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <p:panel header="Parámetros de Carga" class="ui-g-12 ui-md-3 ui-lg-3 Padding1" id="pGrid">
+                            <div class="ui-g-6 ui-md-12 ui-lg-12 Padding5" >
+                                <p:outputLabel for="fromDate" value="Fecha Desde"/>
+                                <p:calendar id="fromDate" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{prgCargaLiquidacionMB.fromDate}" 
+                                            showOn="button" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha"
+                                            showTodayButton="true"                                        
+                                            >
+                                    <p:ajax event="dateSelect" update="toDate"/>
+                                </p:calendar>
+                            </div>
+                            <div class="ui-g-6 ui-md-12 ui-lg-12 Padding5" >
+                                <p:outputLabel for="toDate" value="Fecha Hasta" />
+                                <p:calendar id="toDate" 
+                                            pattern="dd-MM-yyyy"
+                                            value="#{prgCargaLiquidacionMB.toDate}" 
+                                            showOn="button" 
+                                            locale="es"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar una fecha"
+                                            showTodayButton="true"                       
+                                            mindate="#{prgCargaLiquidacionMB.fromDate}">
+                                    <p:ajax event="dateSelect" process="@this"/>
+                                </p:calendar>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <ui:include src="../zComponent/selectConfigFreeway.xhtml"/>
+                            </div>
+                            <div jsf:id="pGridBtn">
+
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5"  >
+                                    <p:commandButton title="Obtener TablaControl" 
+                                                     icon="fa fa-plus"
+                                                     class="cssWhite"
+                                                     action="#{prgCargaLiquidacionMB.consumeCargaLiquidacion()}" 
+                                                     process="@this,frmPrincipal:fromDate,
+                                                     frmPrincipal:toDate,
+                                                     frmPrincipal:config_freeway_id"
+                                                     value="Obtener"
+                                                     disabled="#{!prgCargaLiquidacionMB.obtener}"
+                                                     update="frmPrincipal:validarTc,@this,messages,frmPrincipal:pGridBtn"
+                                                     id="getTC">
+                                    </p:commandButton>   
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5"  >
+                                    <p:commandButton title="Validar TablaControl" 
+                                                     icon="fa fa-check-square"
+                                                     class="cssWhite"
+                                                     action="#{prgCargaLiquidacionMB.validate()}" 
+                                                     process="@this"
+                                                     value="Validar"
+                                                     disabled="#{!prgCargaLiquidacionMB.validar}"
+                                                     update="getTC,@this,frmPrincipal:processTc,
+                                                     frmPrincipal:tabResumen:listErrores,messages,
+                                                     frmPrincipal:config_freeway_id"
+                                                     id="validarTc">
+                                    </p:commandButton>                          
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5"  >
+                                    <p:commandButton title="Procesar TablaControl" 
+                                                     icon="fa fa-spinner"
+                                                     class="cssWhite"
+                                                     action="#{prgCargaLiquidacionMB.load2Db(1)}" 
+                                                     process="@this"
+                                                     value="Procesar"
+                                                     disabled="#{!prgCargaLiquidacionMB.procesar}"
+                                                     update="messages,@this"
+                                                     id="processTc">
+                                    </p:commandButton>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5"  >
+                                    <p:commandButton title="Validar y Actualizar TablaControl" 
+                                                     icon="fa fa-refresh"
+                                                     class="cssWhite"
+                                                     action="#{prgCargaLiquidacionMB.validarActualizar()}" 
+                                                     process="@this"
+                                                     value="Validar y Actualizar"
+                                                     disabled="#{!prgCargaLiquidacionMB.update}"
+                                                     update="messages,@this,frmPrincipal:tabResumen:listErrores,
+                                                     frmPrincipal:config_freeway_id"
+                                                     id="updateTc">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </p:panel>
+                        <p:panel header="Resúmen de la Carga" class="ui-g-12 ui-md-9 ui-lg-9 Padding1">
+                            <p:tabView id="tabResumen" dynamic="true" cache="true"  >
+                                <p:tab title="Errores">
+                                    <p:dataTable var="error" value="#{prgCargaLiquidacionMB.listError}"
+                                                 id="listErrores"
+                                                 rowIndexVar="nroFila"
+                                                 reflow="true"
+                                                 rows="7"
+                                                 emptyMessage="No existen errores">
+                                        <p:column headerText="#" >
+                                            <h:outputText value="#{nroFila+1}" />
+                                        </p:column>
+                                        <p:column headerText="Fecha" >
+                                            <h:outputText value="#{error.fecha}" >
+                                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Código">
+                                            <h:outputText value="#{error.driver_code}"  style="font-size: 8px;"/>
+                                        </p:column>
+                                        <p:column headerText="Operador" >
+                                            <h:outputText value="#{error.driver_name}"  style="font-size: 8px;"/>
+                                        </p:column>
+                                        <p:column headerText="Production">
+                                            <h:outputText value="#{error.production_time}"  style="font-size: 8px;"/>
+                                        </p:column>
+                                        <p:column headerText="Error(es)" >
+                                            <h:outputText value="#{error.error}" style="font-size: 8px;" />
+                                        </p:column>
+
+                                        <f:facet name="footer">
+                                            En total existen #{prgCargaLiquidacionMB.listError.size()} registros.
+                                            <div align="right">
+                                                <h:commandLink>
+                                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                         alt="excel" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="xlsx" target="listErrores" fileName="empleados #{now}"/>
+                                                </h:commandLink>
+                                                <h:commandLink>
+                                                    <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                                         alt="pdf" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="pdf" target="listErrores" fileName="empleados #{now}" />
+                                                </h:commandLink>
+                                                <h:commandLink>
+                                                    <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                                         alt="csv" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="csv" target="listErrores" fileName="empleados #{now}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </f:facet>
+                                    </p:dataTable>
+                                </p:tab>
+                            </p:tabView>
+                        </p:panel>
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="ServiciosListDlg" widgetVar="ServiciosListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de tareas"
+              width="550px" closeOnEscape="true" responsive="true" position="center top">
+        <h:form id="frmServiciosList">
+            <p:dataTable var="serv" value="#{prgTcResumenBean.lstServicios}"  
+                         selectionMode="single" selection="#{prgTcResumenBean.servicio}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         reflow="true"
+                         rowIndexVar="nroFila"
+                         rowKey="#{serv.idPrgTarea}"
+                         emptyMessage="No existen servicios registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{prgTcResumenBean.onRowServicioClckSelect}"
+                        update=":frmAddServicio:servicio,:frmAddServicio:ruta,
+                        :frmAddServicio:btnRuta,:frmAddServicio:rutaComercial,
+                        :frmAddServicio:rutaNoComercial"
+                        oncomplete="PF('ServiciosListDialog').hide()"
+                        global="false" />
+                <p:column headerText="#" style="width: 30px">
+                    <h:outputText value="#{nroFila+1}" />
+                </p:column>
+                <p:column headerText="Tarea" filterBy="#{serv.tarea}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{serv.tarea}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

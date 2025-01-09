@@ -1,0 +1,180 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgPlaRecuReprogramacionPAA"
+              widgetVar="wvPlaRecuReprogramacionPAA"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{plaRecuReprogramacionPAABean.b_editar ? 'Editar Reprogramacion PAA':'Crear Reprogramacion PAA'}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvPlaRecuReprogramacionPAA').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-reprogramacionPAA">
+            <p:messages id="msgs_create_reprogramacionPAA" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Código TM *" />
+                        <p:inputText id="codigoTM_id" required="true" placeholder="Ingrese un valor numérico"
+                                     title="Código Transmilenio que identifica al colaborador (número de cédula para cargos administrativos)" 
+                                     requiredMessage="Debe ingresar 'Código TM'"
+                                     disabled="#{plaRecuReprogramacionPAABean.b_editar}"
+                                     value="#{plaRecuReprogramacionPAABean.codigo_TM}">
+                            <p:ajax update="form-registrar-reprogramacionPAA:cedula_id,form-registrar-reprogramacionPAA:nombre_id,form-registrar-reprogramacionPAA:cargo_id,btnGuardarReprogramacionPAA,msgs" 
+                                    listener="#{plaRecuReprogramacionPAABean.cargarEmpleado()}"/>
+                        </p:inputText>
+                        <div class="botonFloat" >
+                            <p:commandButton process="codigoTM_id,@this" 
+                                             style="margin: 0px"
+                                             update="form-registrar-reprogramacionPAA:cedula_id,form-registrar-reprogramacionPAA:nombre_id,form-registrar-reprogramacionPAA:cargo_id,btnGuardarReprogramacionPAA,msgs"
+                                             action="#{plaRecuReprogramacionPAABean.cargarEmpleado()}"
+                                             icon="fa fa-search"
+                                             rendered="#{!plaRecuReprogramacionPAABean.b_editar}"
+                                             class="cssWhite"/>
+                            <p:remoteCommand process="codigoTM_id,@this" 
+                                             name="cargarEmpleado"
+                                             update="form-registrar-reprogramacionPAA:cedula_id,form-registrar-reprogramacionPAA:nombre_id,form-registrar-reprogramacionPAA:cargo_id,btnGuardarReprogramacionPAA,msgs"
+                                             action="#{plaRecuReprogramacionPAABean.cargarEmpleado()}"/>
+                        </div>    
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cédula" />
+                        <p:inputText id="cedula_id" disabled="true"
+                                     title="Número del documento de identidad del colaborador" 
+                                     value="#{plaRecuReprogramacionPAABean.plaRecuReprogramacionPAA.empleado.identificacion}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Nombre" />
+                        <p:inputText id="nombre_id" disabled="true"
+                                     title="Nombre completo del colaborador" 
+                                     value="#{plaRecuReprogramacionPAABean.plaRecuReprogramacionPAA.empleado.nombresApellidos}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cargo" />
+                        <p:inputText id="cargo_id" disabled="true"
+                                     title="Nombre del cargo del colaborador" 
+                                     value="#{plaRecuReprogramacionPAABean.plaRecuReprogramacionPAA.empleado.idEmpleadoCargo.nombreCargo}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Observaciones" />
+                        <p:inputText id="observacion_id" placeholder="Texto descriptivo o informativo del plan actualización anual"
+                                     title="Text descriptivo del PAA"
+                                     value="#{plaRecuReprogramacionPAABean.plaRecuReprogramacionPAA.observaciones}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Modalidad" for="modalidadItem"/>
+                        <p:selectOneMenu  
+                            filter="true" id="modalidadItem"
+                            style="width: 99.9999%"
+                            value="#{plaRecuReprogramacionPAABean.modalidadSelectedId}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}" />
+                            <f:selectItems 
+                                var="user"
+                                value="#{plaRecuReprogramacionPAABean.listModalidad}" 
+                                itemLabel="#{user.modalidad}"
+                                itemValue="#{user.idPlaRecuModalidad}"
+                                />
+                        </p:selectOneMenu>
+                    </div>
+                     <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                            <p:outputLabel value="Días Reprogramación" rendered="#{!plaRecuReprogramacionPAABean.b_editar}"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <p:commandButton class="#{plaRecuReprogramacionPAABean.lunes == 0 ? 'cssWhite GreenButton' : 'cssWhite RedButton'}"
+                                             title="Lunes" id="lunes_id"
+                                             process="@this"
+                                             value="L"
+                                             rendered="#{!plaRecuReprogramacionPAABean.b_editar}"
+                                             actionListener="#{plaRecuReprogramacionPAABean.reprogramarDia('L')}"
+                                             update="form-registrar-reprogramacionPAA:lunes_id"> 
+                            </p:commandButton> 
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <p:commandButton class="#{plaRecuReprogramacionPAABean.martes == 0 ? 'cssWhite GreenButton' : 'cssWhite RedButton'}"
+                                             title="Martes" id="martes_id" 
+                                             process="@this"
+                                             value="M"       
+                                             rendered="#{!plaRecuReprogramacionPAABean.b_editar}"
+                                             actionListener="#{plaRecuReprogramacionPAABean.reprogramarDia('M')}"
+                                             update="form-registrar-reprogramacionPAA:martes_id"> 
+                            </p:commandButton> 
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <p:commandButton class="#{plaRecuReprogramacionPAABean.miercoles == 0 ? 'cssWhite GreenButton' : 'cssWhite RedButton'}"
+                                             title="Miércoles"  id="miercoles_id"
+                                             process="@this"
+                                             value="X"      
+                                             rendered="#{!plaRecuReprogramacionPAABean.b_editar}"
+                                             actionListener="#{plaRecuReprogramacionPAABean.reprogramarDia('X')}"
+                                             update="form-registrar-reprogramacionPAA:miercoles_id">  
+                            </p:commandButton> 
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <p:commandButton class="#{plaRecuReprogramacionPAABean.jueves == 0 ? 'cssWhite GreenButton' : 'cssWhite RedButton'}"
+                                             title="Jueves"  id="jueves_id" 
+                                             process="@this"
+                                             value="J"      
+                                             rendered="#{!plaRecuReprogramacionPAABean.b_editar}"
+                                             actionListener="#{plaRecuReprogramacionPAABean.reprogramarDia('J')}"
+                                             update="form-registrar-reprogramacionPAA:jueves_id">  
+                            </p:commandButton> 
+                        </div>
+                        <div class="ui-g-12 ui-md-2 ui-lg-2 Padding5">
+                            <p:commandButton class="#{plaRecuReprogramacionPAABean.viernes == 0 ? 'cssWhite GreenButton' : 'cssWhite RedButton'}"
+                                             title="Viernes"  id="viernes_id" 
+                                             process="@this"
+                                             value="V"
+                                             rendered="#{!plaRecuReprogramacionPAABean.b_editar}"
+                                             actionListener="#{plaRecuReprogramacionPAABean.reprogramarDia('V')}"
+                                             update="form-registrar-reprogramacionPAA:viernes_id"> 
+                            </p:commandButton> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuReprogramacionPAABean.crearReprogramacionPAA()}"
+                             process="@form"
+                             rendered="#{!plaRecuReprogramacionPAABean.b_editar}"
+                             update="formReprogramacionPAA,:formReprogramacionPAA:reprogramacion-paaList,:formReprogramacionPAA:cj-grow, @form,:msgs"/>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuReprogramacionPAABean.editarReprogramacionPAA()}"
+                             process="@form"
+                             rendered="#{plaRecuReprogramacionPAABean.b_editar}"
+                             update="formReprogramacionPAA,:formReprogramacionPAA:reprogramacion-paaList,:formReprogramacionPAA:cj-grow, @form,:msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarReprogramacionPAA" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

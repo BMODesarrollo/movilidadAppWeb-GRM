@@ -1,0 +1,255 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog widgetVar="wv_actividad"
+              id="dlg_actividad"
+              modal="true"
+              closable="false"
+              closeOnEscape="true"
+              responsive="true"
+              fitViewport="true"
+              class="mr1024_40 mr500_90"
+              resizable="false"
+              appendTo="@(body)"
+              position="center top">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="Gestión Actividad: #{dispActivBean.headerModal}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wv_actividad').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form_actividad_dlg">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g ">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="@next" value="Fecha:" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:calendar id="fecha_hora" 
+                                        value="#{dispActivBean.fechaHora}" 
+                                        locale="es"
+                                        navigator="true"
+                                        showOn="button"
+                                        timeControlType="select"
+                                        timeInput="true"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        mask="true"
+                                        required="true"
+                                        requiredMessage="Fecha es requerido">
+                                <p:ajax event="dateSelect" process="@this" global="false"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 " >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Estado Pendiente Actual"
+                                           for="@next" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="id_estado_pend" 
+                                             disabled="#{dispActivBean.diferir}"
+                                             value="#{dispActivBean.id_estado_pend_actual}" 
+                                             filter="true"
+                                             required="true"
+                                             requiredMessage="Se debe seleccionar un estado pendiente actual."
+                                             filterMatchMode="contains">
+                                <f:selectItem itemLabel="Seleccione uno"  itemValue="#{null}" />
+                                <f:selectItems value="#{dispActivBean.listDistEstadoPend}" 
+                                               var="estado"
+                                               itemLabel="#{estado.nombre}"
+                                               itemDescription="#{estado.descripcion}}"
+                                               itemValue="#{estado.idDispEstadoPendActual}"/>
+                                <p:ajax process="@this" global="false"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Diferir" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:selectBooleanButton id="diferir" 
+                                                   class="cssWhite"
+                                                   value="#{dispActivBean.diferir}" 
+                                                   onIcon="fa fa-check"
+                                                   offIcon="fa fa-close"
+                                                   onLabel="Sí" 
+                                                   offLabel="No">
+                                <p:ajax process="@this"
+                                        update="id_estado_pend,habilita_veh"
+                                        listener="#{dispActivBean.changeValue(true)}"
+                                        global="false"/>
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Habilitar Vehículo" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:selectBooleanButton id="habilita_veh" 
+                                                   class="cssWhite"
+                                                   value="#{dispActivBean.habilitaVehiculo}" 
+                                                   onIcon="fa fa-check"
+                                                   offIcon="fa fa-close"
+                                                   onLabel="Sí" 
+                                                   offLabel="No">
+                                <p:ajax process="@this"
+                                        update="diferir"
+                                        listener="#{dispActivBean.changeValue(false)}"
+                                        global="false"/>
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="@next" value="Observación " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea value="#{dispActivBean.observacion}"
+                                             id="id_observacion"
+                                             required="true"
+                                             requiredMessage="Debe ingresar una descripción"
+                                             />
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-3 ui-lg-2 Padding3">
+                            <p:selectBooleanButton id="s_repu_falt" value="#{dispActivBean.flagRepuestos}" 
+                                                   class="cssWhite"
+                                                   onLabel="Si" offLabel="No" onIcon="fa fa-check" offIcon="fa fa-close">
+                                <p:ajax update="msgs,respuestos_pnl" global="false"/>
+                            </p:selectBooleanButton>
+                        </div>
+                        <div class="ui-g-12 ui-md-9 ui-lg-9 Padding3">
+                            <p:outputLabel for="@next" value="¿Pendiente por Repuestos y/o Servicios?" />
+                        </div>
+                    </div>
+
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="respuestos_pnl">
+                        <p:panel header="Repuestos Faltantes" rendered="#{dispActivBean.flagRepuestos}">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="nombre" 
+                                                   value="Nombre" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText value="#{faltanteRepuestBean.nombre}"
+                                                 required="true"
+                                                 requiredMessage="Debe ingresar un nombre"
+                                                 id="nombre"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="cantidad" 
+                                                   value="Cantidad" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputNumber value="#{faltanteRepuestBean.cant}"
+                                                   maxlength="3"
+                                                   required="true"
+                                                   requiredMessage="Debe ingresar una cantidad"
+                                                   id="cantidad"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel for="id_observacion_respuestos" value="Observación " />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputTextarea value="#{faltanteRepuestBean.observacion}"
+                                                     id="id_observacion_respuestos"/>
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding5 "/>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5 " >
+                                <p:commandButton 
+                                    icon="fa fa-plus"
+                                    action="#{faltanteRepuestBean.agregar()}"
+                                    class="cssWhite GreenButton"
+                                    process="@this,nombre,cantidad,id_observacion_respuestos"
+                                    update="dt_repuestos_id,nombre,cantidad,id_observacion_respuestos"
+                                    value="Agregar"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:dataTable id="dt_repuestos_id" 
+                                             widgetVar="dt_repuestos_wv"
+                                             var="item"
+                                             reflow="true"
+                                             paginator="true"
+                                             filterDelay="700"
+                                             tableStyle="table-layout:auto"
+                                             emptyMessage="No se han encontrado registros."
+                                             rowStyleClass="text-center"
+                                             value="#{faltanteRepuestBean.list}" 
+                                             rowKey="#{item.idDispFaltanteRepuesto}"
+                                             rowIndexVar="rVar"
+                                             rows="10">
+                                    <p:column headerText="nombre"
+                                              filterBy="#{item.nombre}"
+                                              filterMatchMode="contains">
+                                        <h:outputText value="#{item.nombre}" />
+                                    </p:column>
+                                    <p:column headerText="Cantidad">
+                                        <h:outputText value="#{item.cantidad}" />
+                                    </p:column>
+                                    <p:column headerText="Observación">
+                                        <h:outputText value="#{item.observacion}" />
+                                    </p:column>
+                                    <p:column headerText="Opción">
+                                        <p:commandButton icon="fa fa-close" 
+                                                         process="@this"
+                                                         class="cssWhite RedButton"
+                                                         action="#{faltanteRepuestBean.delete(item)}"
+                                                         update="msgs,dt_repuestos_id"
+                                                         title="Eliminar registro de la lista.">
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </p:panel>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand 
+                name="rc_save"
+                action="#{dispActivBean.guardar()}"
+                process="form_actividad_dlg:fecha_hora,
+                form_actividad_dlg:id_estado_pend,form_actividad_dlg:diferir,
+                form_actividad_dlg:habilita_veh,form_actividad_dlg:id_observacion,@this"
+                update="form_actividad_dlg,
+                msgs"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton 
+                icon="fa fa-save"
+                onclick="rc_save();"
+                oncomplete="cargarTablaPrincipal();actualizarResumenFlota();"
+                class="cssWhite"
+                value="Guardar"/>
+        </f:facet>
+    </p:dialog> 
+</ui:composition>

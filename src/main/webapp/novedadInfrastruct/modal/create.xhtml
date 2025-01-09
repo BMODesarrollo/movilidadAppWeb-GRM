@@ -1,0 +1,183 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="nov_novedad_infra_wv" id="nov_novedad_infra_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top"
+              class="mr1024_60 mr500_90"
+              height="auto" header="Gestión Novedad Infraestructura">
+        <h:form id="nov_novedad_infra_form">
+            <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                <p:effect type="pulsate" event="load" delay="500" />
+            </p:messages>
+            <div class="ui-fluid">
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha_ini" value="Fecha:" />
+
+                        <p:calendar id="fecha_ini" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    timeControlType="select"
+                                    requiredMessage="Fecha es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    mask="true"
+                                    value="#{novInfrastructBean.novedadInfrastruc.fechaHoraNov}"  >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipoinfraStruct" value="Tipo de novedad:"/>
+                        <p:selectOneMenu id="SOMNovedadTipoinfraStruct"
+                                         style="width: 99.9999%"
+                                         required="true"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novInfrastructBean.i_idNovedadTipoInfraStruct}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{novInfrastructBean.listNovTipoInfrastruc}"
+                                           var="genTipo" itemLabel="#{genTipo.nombre}"
+                                           itemDescription="#{genTipo.descripcion}"
+                                           itemValue="#{genTipo.idNovedadTipoInfrastruc}" />
+                            <p:ajax listener="#{novInfrastructBean.prepareTipoDetalles(true)}" update="SOMNovedadTipoDetallesinfraStruct"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipoDetallesinfraStruct" value="Detalle de tipo novedad:"/>
+                        <p:selectOneMenu id="SOMNovedadTipoDetallesinfraStruct"
+                                         style="width: 99.9999%"
+                                         required="true"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novInfrastructBean.i_idNovedaTipoDetallesInfraStruct}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{novInfrastructBean.listNovTipoDetInfrastruc}"
+                                           var="tipoDet" itemLabel="#{tipoDet.nombre}"
+                                           itemDescription="#{tipoDet.descripcion}"
+                                           itemValue="#{tipoDet.idNovedadTipoDetInfrastruc}" />
+                            <p:ajax listener="#{novInfrastructBean.prepareTipoDetalles(false)}"/>
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMPilona" value="Pilona:"/>
+                        <p:selectOneMenu id="SOMPilona"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novInfrastructBean.i_idSegPilona}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{novInfrastructBean.listPilonas}"
+                                           var="pilona" itemLabel="#{pilona.codigo} #{pilona.nombre}"
+                                           itemDescription="#{pilona.descripcion}"
+                                           itemValue="#{pilona.idSegPilona}" />
+                            <p:ajax process="@this" listener="#{novInfrastructBean.selectPilona()}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="id_estacion" value="Estación:"/>
+                        <p:selectOneMenu id="id_estacion"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novInfrastructBean.i_idCableEstacion}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{novInfrastructBean.listEstacion}"
+                                           var="estacion" itemLabel="#{estacion.nombre}"
+                                           itemDescription="#{estacion.descripcion}"
+                                           itemValue="#{estacion.idCableEstacion}" />
+                            <p:ajax listener="#{novInfrastructBean.selectEstacion()}" update="SOMArea"/>
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                        <p:outputLabel for="SOMArea" value="Área"/>
+                        <p:selectOneMenu id="SOMArea"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{novInfrastructBean.i_idAseoParamArea}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{novInfrastructBean.listAseoParamArea}"
+                                           var="area" itemLabel="#{area.codigo} #{area.nombre}"
+                                           itemDescription="#{area.descripcion}"
+                                           itemValue="#{area.idAseoParamArea}" />
+                            <p:ajax process="@this" listener="#{novInfrastructBean.selectAseoParamArea()}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Fotos Novedad">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{novInfrastructBean.handleFileUpload}"
+                                              id="foto"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="@form"
+                                              sequential="true"
+                                              accept=".jpg, .jpeg, .png, .JPG, .JPEG, .PNG"
+                                              process="@this"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{novInfrastructBean.flag_rremove_photo}">
+                        <p:staticMessage severity="warn" summary="Informacion!" detail="Para Eliminar un archivo, hacer clic sobre el" />
+                        <p:dataGrid var="url_foto" id="id_tabla_fotos" 
+                                    value="#{novInfrastructBean.listFotos}"
+                                    columns="6" layout="grid"
+                                    rowIndexVar="indexgd">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="nov_novedad_infra_form:id_tabla_fotos"
+                                           action="#{novInfrastructBean.delete(url_foto)}">
+                                <p:panel>
+                                    <div class="TexAlCenter">
+                                        <div>
+                                            <p:graphicImage cache="false"
+                                                            style="border:1px solid #106ebc; border-radius: 0px;"
+                                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                            width="80%">
+                                                <f:param name="path_foto" value="#{url_foto}" />
+                                            </p:graphicImage>
+                                        </div>
+                                    </div>
+                                </p:panel> 
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{novInfrastructBean.listFotos.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="descripcion" value="Descripcion:" />
+                        <p:inputTextarea id="descripcion" 
+                                         value="#{novInfrastructBean.novedadInfrastruc.descripcion}"
+                                         required="true" 
+                                         requiredMessage="Debe ingresar una descripcion"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc_save" 
+                             class="cssWhite"
+                             actionListener="#{novInfrastructBean.guardar()}"  
+                             value="Guardar" 
+                             process="nov_novedad_infra_form"
+                             update="msgs,form_novedad_infra:dt_novedad_infra_id"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnEditNov" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc_save()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

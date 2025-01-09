@@ -1,0 +1,86 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <p:dialog id="MultaSeguimientoListDlg"
+              widgetVar="seguimientoMultaDig" modal="true"
+              resizable="false" appendTo="@(body)" header="Seguimiento de Multa" 
+              class="mr1024_50 mr500_90" height="auto" closeOnEscape="true" responsive="true">
+        <p:ajax event="close" listener="#{multaController.reset}" update=":MultaListForm:datalist"/>
+        <p:ajax event="close" listener="#{multaDocumentosController.reset}"/>
+        <h:form id="MultaSeguimientoListForm">
+            <p:growl id="upMultaS" showDetail="true" showSummary="true" life="4000"/>
+            <p:dataTable id="datalist" value="#{multaSeguimientoController.items}" var="item"
+                         selectionMode="single" selection="#{multaSeguimientoController.selected}"
+                         paginator="true"
+                         rowKey="#{item.idMultaSeguimiento}"
+                         rows="5"
+                         reflow="true" filterDelay="1000">
+
+                <p:ajax event="rowSelect"   update="createButton viewButton editButton deleteButton"/>
+                <p:ajax event="rowUnselect" update="createButton viewButton editButton deleteButton"/>
+
+                <p:column style="width: 60px;"
+                          filterBy="#{item.fecha}"
+                          filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Fecha"/>
+                    </f:facet>
+                    <h:outputText value="#{item.fecha}">
+                        <f:convertDateTime pattern="yyyy/MM/dd" />
+                    </h:outputText>
+                </p:column>
+                <p:column style="width: 200px;">
+                    <f:facet name="header">
+                        <h:outputText value="Seguimiento"/>
+                    </f:facet>
+                    <h:outputText value="#{item.seguimiento}"/>
+                </p:column>
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton id="createButton" 
+                                         icon="fa fa-plus" 
+                                         class="cssWhite"
+                                         value="Nuevo"
+                                         actionListener="#{multaSeguimientoController.prepareCreate}" 
+                                         update=":MultaSeguimientoCreateForm,:MultaSeguimientoListForm:datalist" 
+                                         disabled="#{multaSeguimientoController.i_idMulta == 0}"
+                                         oncomplete="PF('MultaSeguimientoCreateDialog').show()">
+                            <p:resetInput target=":MultaSeguimientoCreateForm"/>
+                        </p:commandButton>
+                        <p:commandButton id="viewButton"  
+                                         icon="fa fa-search"
+                                         title="Actualizar"
+                                         class="cssWhite OrangeButton"
+                                         update=":MultaSeguimientoViewForm" 
+                                         oncomplete="PF('MultaSeguimientoViewDialog').show()"
+                                         disabled="#{empty multaSeguimientoController.selected.idMultaSeguimiento}"/>
+                        <p:commandButton id="editButton"  
+                                         icon="fa fa-pencil"
+                                         title="Editar"
+                                         class="cssWhite GreenButton"
+                                         update=":MultaSeguimientoEditForm" 
+                                         oncomplete="PF('MultaSeguimientoEditDialog').show()" 
+                                         disabled="#{empty multaSeguimientoController.selected.idMultaSeguimiento}"/>
+                        <p:commandButton id="deleteButton" 
+                                         icon="fa fa-trash"  
+                                         title="Eliminar"
+                                         class="cssWhite RedButton"
+                                         actionListener="#{multaSeguimientoController.destroy}" 
+                                         update="datalist,:MultaSeguimientoListForm:upMultaS" 
+                                         disabled="#{empty multaSeguimientoController.selected.idMultaSeguimiento}"
+                                         >
+                            <p:confirm header="Confirmación"   class="cssWhite"
+                                       message="Seguro quiere eliminar?"
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+    <ui:include src="Create.xhtml"/>
+    <ui:include src="Edit.xhtml"/>
+    <ui:include src="View.xhtml"/>
+</ui:composition>

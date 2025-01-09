@@ -1,0 +1,225 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <div jsf:id="col-especificos" class="ui-g">
+        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" jsf:id="panel-tab">
+            <h:form id="carga-info-esp"  enctype="multipart/form-data">
+                <p:panel header="Carga Actividades"
+                         toggleable="true" 
+                         toggleSpeed="500" 
+                         closeSpeed="500"  
+                         collapsed="true"
+                         widgetVar="panel" 
+                         style="margin-bottom:20px">
+                    <p:messages id="messages" showDetail="true" closable="true">
+                    </p:messages>
+                    <h:panelGrid columns="2" style="text-align: center; margin: 0 auto">
+                        <p:fileUpload fileUploadListener="#{planificacionRecursosActividadBean.cargarActividadesEspecificas}" mode="advanced" dragDropSupport="false"
+                                      update="messages" sizeLimit="2000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/" 
+                                      label="Buscar archivo" uploadLabel="Cargar" cancelLabel="Cancelar carga"
+                                      invalidFileMessage="Debe cargar un archivo excel válido"
+                                      invalidSizeMessage="El archivo no debe ser mayor a 2mb"
+                                      oncomplete="PF('w_Actividades_especificas').clearFilters(); PF('w_Actividades_especificas').filter();"/>
+                    </h:panelGrid>
+                </p:panel>
+            </h:form>
+            <h:form id="frmActividadesEspecificas" prependId="false">
+                <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+                <p:panel>
+                    <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                UNIDAD FUNCIONAL
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                <p:selectOneMenu id="uni_func" 
+                                                 value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{0}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax process="@this"
+                                            event="change"
+                                            listener="#{planificacionRecursosActividadBean.cargarDatos()}"
+                                            update="@form"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                    </f:facet>
+                </p:panel>
+                <p:panel header="REGISTRO DE NOVEDADES" id="panelGrid">
+                    <p:dataTable id="dtActividadesEspecificas" var="item" 
+                                 scrollable="true"
+                                 widgetVar="w_Actividades_especificas"
+                                 disabledTextSelection="false"
+                                 rows="20"
+                                 rowKey="#{item.idActividadEspecifica}"
+                                 filterDelay="1700"
+                                 paginator="true"
+                                 currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="20,60,150"
+                                 emptyMessage="No existen registros"
+                                 value="#{planificacionRecursosActividadBean.listActividadesEspecificas}">
+
+                        <f:facet name="header">
+                            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                <p:outputLabel value="Semana a Programar " class="cssWhite Fs20" for="desde" />
+                                <p:calendar id="desde" 
+                                            label="Fecha de Consulta de Servicio: " 
+                                            value="#{planificacionRecursosActividadBean.desde}"
+                                            pattern="yyyy-MM-dd"
+                                            style="width: 100px;">
+                                    <p:ajax event="dateSelect" listener="#{planificacionRecursosActividadBean.consultar()}" 
+                                            update="dtActividadesEspecificas"></p:ajax>
+                                </p:calendar>
+                                -
+                                <p:calendar id="hasta" 
+                                            label="Fecha de Consulta de Servicio: " 
+                                            value="#{planificacionRecursosActividadBean.hasta}"
+                                            pattern="yyyy-MM-dd"
+                                            style="width: 100px;">
+                                    <p:ajax event="dateSelect" listener="#{planificacionRecursosActividadBean.consultar()}" 
+                                            update="dtActividadesEspecificas"></p:ajax>
+                                </p:calendar>
+
+                                <p:commandButton id="crear_actividad_especifica"
+                                                 icon="fa fa-plus"
+                                                 value="Actividad"
+                                                 title="Crear nueva Actividad"
+                                                 update="tabView:dlgPlaRecuActividadesEspecificas"
+                                                 actionListener="#{planificacionRecursosActividadBean.preGestionar()}"
+                                                 class="cssWhite"
+                                                 style="margin-left: 5px; width: 160px;"
+                                                 oncomplete="PF('wvPlaRecuActividadesEspecificas').show()" />
+                            </div>
+                        </f:facet>
+
+                        <p:column headerText="Fecha Inicio"
+                                  filterBy="#{item.fechaIni}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.fechaIni}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Fecha Fin"
+                                  filterBy="#{item.fechaFin}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.fechaFin}">
+                                <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Hora Inicio"
+                                  filterBy="#{item.horaIni}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.horaIni}" />
+                        </p:column>
+                        <p:column headerText="Hora Fin"
+                                  filterBy="#{item.horaFin}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.horaFin}" />
+                        </p:column>
+                        <!--<p:column headerText="Duración"
+                                  filterBy="#{item.duracion}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.duracion}" />
+                        </p:column>-->
+                        <p:column headerText="Cantidad"
+                                  filterBy="#{item.cantidad}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.cantidad}" />
+                        </p:column>
+                        <p:column headerText="Descripción"
+                                  filterBy="#{item.descripcion}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.descripcion}" />
+                        </p:column>
+
+                        <p:column headerText="Identificación"
+                                  filterBy="#{item.empleado.identificacion}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.empleado.identificacion}" />
+                        </p:column>
+                        
+                        <p:column headerText="Código TM"
+                                  filterBy="#{item.empleado.codigoTm}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.empleado.codigoTm}" />
+                        </p:column>
+                        
+                        <p:column headerText="Nombres"
+                                  filterBy="#{item.empleado.nombresApellidos}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.empleado.nombresApellidos}" />
+                        </p:column>
+                        
+                        <p:column headerText="Lugar"
+                                  filterBy="#{item.lugar.lugar}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.lugar.lugar}" />
+                        </p:column>
+
+                        <p:column headerText="Estado"
+                                  filterBy="#{item.estado}"
+                                  filterMatchMode="contains"
+                                  styleClass="text-center">
+                            <h:outputText value="#{item.estado == 0 ? 'PENDIENTE' : item.estado == 1 ? 'GESTIÓN' : item.estado == 2 ? 'APROBADO' : 'RECHAZADO'}" />
+                        </p:column>
+                        
+                        <p:column headerText="Opción">
+                                  <p:commandButton icon="fa fa-pencil"
+                                         class="GreenButton cssWhite" 
+                                         title="Modificar Registro" 
+                                         process="@this"
+                                         actionListener="#{planificacionRecursosActividadBean.editarEspecifica(item)}"
+                                         update="tabView:dlgPlaRecuActividadesEspecificas"
+                                         oncomplete="PF('wvPlaRecuActividadesEspecificas').show()"
+                                         disabled="#{emple.estadoReg==1}"> 
+                                  </p:commandButton>          
+                        </p:column>
+                        
+                        <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{planificacionRecursosActividadBean.crearActividad()}"
+                             process="@form"
+                             update="tabView:form-col-espec,@form,:msgs"
+                             oncomplete="PF('wvPlaRecuActividadesEspecificas').hide()"/>
+                        
+                        <f:facet name="footer">
+                            En total existen #{planificacionRecursosActividadBean.listActividadesEspecificas.size()} registros.
+                            <div style="float: right;padding-bottom: 5px">
+                                <h:commandLink>
+                                    <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                         alt="excel" style="width: 24px;height: 24px"/>
+                                    <p:dataExporter type="xlsx" target=":frmActividadesEspecificas:dtActividadesEspecificas" 
+                                                    fileName="Listado Actividades Especificas"/>
+                                </h:commandLink>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </div>
+    </div>
+</ui:composition>

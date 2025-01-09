@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <style>
+        .ui-galleria-caption  {
+            width: 973.98px;
+            height: 40px;
+            visibility: hidden  
+        }
+        .ui-galleria-filmstrip-wrapper {
+            overflow: hidden;
+            margin: 5px auto;
+            position: fixed;
+        }
+        .ui-galleria {
+            overflow: initial;
+            visibility: hidden;
+            position: relative;
+        }
+    </style>
+
+    <p:dialog id="DocumentoListDlg" widgetVar="DocumentoListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" closable="false"
+              closeOnEscape="true" responsive="true" position="center top"
+              class="mr1024_70 mr500_90">
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            #{archivosBean.modalHeader}
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('DocumentoListDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmDocumento">
+            <div align="center">
+                <p:galleria var="img_"
+                            value="#{gruposNovSFMB.fotosNovedades}"
+                            showCaption="true" autoPlay="false" rendered="#{!empty(gruposNovSFMB.fotosNovedades) and archivosBean.extension != 'pdf'}">
+                    <p:graphicImage cache="false" style="width: 100%" value="#{archivosBean.imagenDinamica}">
+                        <f:param name="nombre_imagen" value="#{img_}"/>
+                    </p:graphicImage>
+                </p:galleria>
+            </div>
+            <p:media value="#{archivosBean.documento}"
+                     cache="false" player="pdf" width="100%"
+                     style="height:  90vh"
+                     rendered="#{archivosBean.extension.contains('pdf')}"/>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="EmpleadosListDlg" widgetVar="EmpleadosListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de empleados"
+              closeOnEscape="true" responsive="true" class="mr1024_70 mr500_90"
+              position="center top">
+        <h:form id="frmPmEmpleadoList">
+            <p:dataTable var="vht" value="#{sstAutorizacionBean.lstEmpleados}" 
+                         id="dtEmpleados"
+                         widgetVar="wVPmEmpleadosListDialog"
+                         selectionMode="single"
+                         selection="#{sstAutorizacionBean.empleado}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1700"
+                         rowIndexVar="nroFila"
+                         rowKey="#{vht.idEmpleado}"
+                         emptyMessage="No existen empleados registrados">
+                <p:ajax event="rowSelect" 
+                        listener="#{sstAutorizacionBean.onRowEmpleadoClckSelect}"
+                        update=":frmAutorizacion:nomResponsable"
+                        oncomplete="PF('EmpleadosListDialog').hide()"
+                        global="false" />
+                <p:column headerText="Identificación" filterBy="#{vht.identificacion}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.identificacion}" />
+                </p:column>
+                <p:column headerText="Nombre completo" filterBy="#{vht.nombres} #{vht.apellidos}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{vht.nombres} #{vht.apellidos}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

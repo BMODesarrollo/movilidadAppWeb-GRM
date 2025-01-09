@@ -1,0 +1,155 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="nov_dialog_wv" id="nov_dialog_id" modal="true" closeOnEscape="true"
+              responsive="true" appendTo="@(body)" position="center top"
+              class="mr1024_70 mr500_90"
+              height="auto" header="Gestión Novedad">
+        <h:form id="nov_dialog_form">
+            <div class="ui-fluid">
+                <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-g" >
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5" >
+                        <p:outputLabel for="fecha" value="Fecha" />
+                        <p:calendar id="fecha" 
+                                    pattern="yyyy/MM/dd HH:mm" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Fecha Inicio es requerido"
+                                    title="año/mes/día hora:minutos"
+                                    showOn="button"
+                                    timeInput="true"
+                                    timeControlType="select"
+                                    mask="true"
+                                    value="#{aseoCabinaNovJSFMB.novedad.fechaHora}"
+                                    >
+                            <p:ajax event="dateSelect" process="@this"/>
+                        </p:calendar>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5" >
+                        <p:outputLabel for="SOMCab" value="Cabina"/>
+                        <p:selectOneMenu id="SOMCab"
+                                         required="true"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{aseoCabinaNovJSFMB.i_cabina}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{aseoCabinaNovJSFMB.listCableCabina}"
+                                           var="cab" itemLabel="#{cab.nombre}"
+                                           itemDescription="#{cab.descripcion}"
+                                           itemValue="#{cab.idCableCabina}" />
+                            <p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipoCab" value="Tipo de novedad"/>
+                        <p:selectOneMenu id="SOMNovedadTipoCab"
+                                         required="true"
+
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{aseoCabinaNovJSFMB.i_idNovedadTipoCab}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{aseoCabinaNovJSFMB.listNovedadTipoCab}"
+                                           var="genTipo" itemLabel="#{genTipo.nombre}"
+                                           itemDescription="#{genTipo.descripcion}"
+                                           itemValue="#{genTipo.idNovedadTipoCab}" />
+                            <p:ajax listener="#{aseoCabinaNovJSFMB.prepareTipoDetalles(true)}" update="SOMNovedadTipoDetallesCab"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-3 Padding5" >
+                        <p:outputLabel for="SOMNovedadTipoDetallesCab" value="Detalle de tipo novedad:"/>
+                        <p:selectOneMenu id="SOMNovedadTipoDetallesCab"
+                                         style="width: 99.9999%"
+                                         required="true"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{aseoCabinaNovJSFMB.i_idNovedaTipoDetallesCab}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{aseoCabinaNovJSFMB.listNovedadTipoDetallesCab}"
+                                           var="tipoDet" itemLabel="#{tipoDet.nombre}"
+                                           itemDescription="#{tipoDet.descripcion}"
+                                           itemValue="#{tipoDet.idNovedadTipoDetCab}" />
+                            <p:ajax listener="#{aseoCabinaNovJSFMB.prepareTipoDetalles(false)}"/>
+
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset  legend="Fotos Novedad">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{aseoCabinaNovJSFMB.handleFileUploadFotosNovedad}"
+                                              id="foto"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="@form"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:rendered="#{aseoCabinaNovJSFMB.novedad.idNovedadCab!=null}">
+                        <p:staticMessage severity="warn" summary="Informacion!" detail="Para Eliminar un archivo, hacer clic sobre el" />
+                        <p:dataGrid var="url_foto" id="id_tabla_fotos" 
+                                    value="#{aseoCabinaNovJSFMB.listFotospath_fotos}"
+                                    columns="4" layout="grid"
+                                    rowIndexVar="indexgd">
+                            <p:commandLink title="Click para eliminar" 
+                                           process="@this"  
+                                           global="false"
+                                           update="nov_dialog_form:id_tabla_fotos"
+                                           action="#{aseoCabinaNovJSFMB.delete(url_foto)}">
+                                <p:panel>
+                                    <div class="TexAlCenter">
+                                        <div>
+                                            <p:graphicImage cache="false"
+                                                            style="border:1px solid #106ebc; border-radius: 0px;"
+                                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                                            width="100%">
+                                                <f:param name="path_foto" value="#{url_foto}" />
+                                            </p:graphicImage>
+                                        </div>
+                                    </div>
+                                </p:panel> 
+                            </p:commandLink>  
+
+                            <f:facet name="footer">
+                                #{aseoCabinaNovJSFMB.listFotospath_fotos.size()} archivos.
+                            </f:facet>
+                        </p:dataGrid>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:outputLabel for="observaciones" value="Observaciones:" />
+                        <p:inputTextarea id="observaciones" 
+                                         value="#{aseoCabinaNovJSFMB.novedad.observacion}"
+                                         required="true" 
+                                         maxlength="200"
+                                         requiredMessage="Debe ingresar una observación"/>
+                        <p:outputLabel value="(*) Campos obligatorios"/>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             actionListener="#{aseoCabinaNovJSFMB.guardar()}"  
+                             process="nov_dialog_form"
+                             update="msgs,form_aseo_bano:dt_aseo_bano_id">
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnAgregarNov" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

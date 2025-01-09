@@ -1,0 +1,420 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="head">
+        <style>
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                padding: 2px 5px;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="form-reporte-liq"  enctype="multipart/form-data">
+            <p:panel header="Carga reporte de liquidación" 
+                     rendered="false" 
+                     toggleable="true" 
+                     toggleSpeed="500" 
+                     closeSpeed="500"  
+                     widgetVar="panel" 
+                     style="margin-bottom:20px">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <h:panelGrid columns="2" style="text-align: center; margin: 0 auto">
+                    <p:fileUpload fileUploadListener="#{controlJornada.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                                  update="messages" sizeLimit="2000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/" 
+                                  label="Buscar archivo" uploadLabel="Cargar" cancelLabel="Cancelar carga"
+                                  invalidFileMessage="Debe cargar un archivo excel válido"
+                                  invalidSizeMessage="El archivo no debe ser mayor a 2mb"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+        <h:form id="form-carga-novedades"  enctype="multipart/form-data"  rendered="#{controlJornada.b_controlSubirArchivo}">
+            <p:panel header="Carga Archivo Novedades" 
+                     toggleable="true" 
+                     toggleSpeed="300" 
+                     rendered="#{controlJornada.b_controlSubirArchivo}"
+                     collapsed="true"
+                     closeSpeed="300"  
+                     widgetVar="panelNovedades">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <h:panelGrid columns="1" style="text-align: left; margin: 0 auto">
+                    <p:fileUpload fileUploadListener="#{controlJornada.cargarNovedades}" 
+                                  mode="advanced" dragDropSupport="false"
+                                  update="messages,formcontroljornada:serconlist,form-reporte-liq,msgs,:formcontroljornada:cj-grow" sizeLimit="2000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/" 
+                                  label="Buscar archivo" uploadLabel="Cargar" cancelLabel="Cancelar carga"
+                                  invalidFileMessage="Debe cargar un archivo excel válido"
+                                  invalidSizeMessage="El archivo no debe ser mayor a 2mb"/>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+        <h:form id="formcontroljornada">
+            <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel>
+                <f:facet name="header">
+                    <div class="ui-fluid">
+                        <div class="ui-g" >
+                            <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                                <h:outputText value="Control Jornada"/>
+                            </div>
+                            <div class="ui-g-12 ui-ml-5 ui-lg-4 Padding0">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax process="@this"
+                                            event="change"
+                                            listener="#{controlJornada.consultar()}"
+                                            update="formcontroljornada:serconlist"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                </f:facet>
+                
+                <p:remoteCommand name="actualizarSercones"
+                                 action="#{controlJornada.consultar()}"
+                                 oncomplete="PF('dtserconlist').clearFilters()"
+                                 update="serconlist"/>
+                
+                <p:dataTable id="serconlist" 
+                             value="#{controlJornada.prglist}" 
+                             var="item"
+                             emptyMessage="No existen registros"
+                             paginator="true"
+                             tableStyle="table-layout:auto"
+                             paginatorPosition="top"
+                             style="height: 90vh !important;overflow-y: scroll"
+                             reflow="true"
+                             filterDelay="1000"
+                             rowKey="#{item.idPrgSercon}"
+                             selection="#{controlJornada.prglistSelected}"
+                             rows="31"
+                             widgetVar="dtserconlist"
+                             rowSelectMode="add"
+                             rowsPerPageTemplate="31,100,200,500">
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar a Excel" class="iconexporter" alt="Exportar a Excel"></img>
+                            <p:dataExporter type="xlsx" target="serconlist" fileName="Control Jornada"/>
+                        </h:commandLink>
+                    </f:facet>
+                    <f:facet name="header">
+                        <div align="right">
+
+                            <p:outputLabel value="Fecha " class="cssWhite Fs20" for="desde"></p:outputLabel>
+                            <p:calendar id="desde" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{controlJornada.fechaDesde}"
+                                        locale="es"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" 
+                                        oncomplete="PF('dtserconlist').clearFilters()"
+                                        listener="#{controlJornada.consultar()}" 
+                                        update="serconlist"></p:ajax>
+                            </p:calendar>
+                            -
+                            <p:calendar id="hasta" 
+                                        label="Fecha de Consulta de Servicio: " 
+                                        value="#{controlJornada.fechaHasta}"
+                                        locale="es"
+                                        pattern="yyyy-MM-dd">
+                                <p:ajax event="dateSelect" 
+                                        oncomplete="PF('dtserconlist').clearFilters()"
+                                        listener="#{controlJornada.consultar()}" 
+                                        update="serconlist"></p:ajax>
+                            </p:calendar>
+                            <p:commandButton id="question_id"
+                                             value="¿Como ajustar la jornada?"
+                                             icon="fa fa-question-circle"
+                                             ajax="false"
+                                             rendered="false"
+                                             class="cssWhite GreenButton"
+                                             actionListener="#{controlJornada.prepDownloadLocal()}">
+                                <p:fileDownload value="#{viewDocuJSFMB.download}" />
+                            </p:commandButton>
+                            <p:commandButton id="crear_turno"
+                                             icon="fa fa-plus"
+                                             value="Nueva Jornada"
+                                             actionListener="#{controlJornada.preCrearTurno()}"
+                                             class="cssWhite"
+                                             update="form_turno"
+                                             oncomplete="PF('crear_turno_wv_dialog').show();" >
+                            </p:commandButton>
+                            <p:commandButton id="crear"
+                                             icon="fa fa-plus"
+                                             value="Ajustar Jornada"
+                                             rendered="#{controlJornada.b_genera}"
+                                             actionListener="#{controlJornada.preAjustar()}"
+                                             class="cssWhite OrangeButton"
+                                             update="controljornada-idDlg,form-registrar,msgs"
+                                             disabled="#{empty controlJornada.prgSercon.idPrgSercon or
+                                                         controlJornada.prgSercon.nominaBorrada==1 or 
+                                                         controlJornada.prgSercon.liquidado==1}" />
+                            <p:commandButton id="autoriza_nov"
+                                             icon="fa fa-list"
+                                             value="Autorizar Novedades"
+                                             actionListener="#{controlJornada.autorizarNovedades()}"
+                                             class="cssWhite GreenButton"
+                                             update="serconlist,:formcontroljornada:cj-grow"
+                                             disabled="#{controlJornada.prglistSelected.size() > 1 ? false : true}" />
+                            <p:commandButton id="ajustar_por_fechas"
+                                             icon="fa fa-list"
+                                             value="Ajustar Jornada Masivo"
+                                             rendered="#{controlJornada.b_liquida}"
+                                             action="#{controlJornada.preAjustarPorFechas()}"
+                                             class="cssWhite PurpleButton"
+                                             update="form_ajuste_jornada_fecha"/>
+                            <p:commandButton id="cambio_operador_por_fechas"
+                                             icon="fa fa-handshake-o"
+                                             value="Cambio Operadores Masivo"
+                                             rendered="#{controlJornada.b_liquida}"
+                                             action="#{cambioMasivoOperadoresBean.cargarDatosParaAjustar()}"
+                                             class="cssWhite"
+                                             update="form_cambioEmpl"/>
+                            <p:commandButton id="borrar_id"
+                                             icon="fa fa-close"
+                                             value="Borrar Masivo"
+                                             rendered="#{controlJornada.b_generaDelete}"
+                                             actionListener="#{controlJornada.preBorrarMasivo()}"
+                                             class="cssWhite RedButton"
+                                             update="form_borrar_masivo"
+                                             oncomplete="PF('borrar_wv_dialog').show();" />
+                            <p:commandButton id="toggler_id" type="button" 
+                                             title="Columnas"
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="serconlist" trigger="toggler_id"/>
+                        </div>
+                    </f:facet>
+
+                    <p:ajax event="rowSelect" listener="#{controlJornada.onRowSelect}" update="crear, autoriza_nov" />
+                    <p:ajax event="rowUnselect" listener="#{controlJornada.onRowUnselect}" update="serconlist,crear, autoriza_nov" />
+                    <p:ajax event="toggleSelect" listener="#{controlJornada.onToggleSelect}" update="crear, autoriza_nov" />
+
+                    <p:column selectionMode="multiple" style="width:5rem; text-align: center" exportable="false" />
+                    
+                    <p:column headerText="Fecha">
+                        <h:outputText  value="#{item.fecha}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.idEmpleado.codigoTm} #{item.idEmpleado.nombres} #{item.idEmpleado.apellidos}"
+                              filterMatchMode="contains"
+                              headerText="Código TM">
+                        <h:outputText value="#{item.idEmpleado.codigoTm}" class="cssBlack"/>
+                        <h:outputText value=" - #{item.idEmpleado.nombres.concat(' ').concat(item.idEmpleado.apellidos)}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.workTime}"
+                              filterMatchMode="contains"
+                              visible="false"
+                              exportable="false"
+                              headerText="Work Time">
+                        <h:outputText value="#{item.workTime}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.sercon}"
+                              filterMatchMode="contains"
+                              headerText="Tarea">
+                        <h:outputText value="#{item.sercon}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.timeOrigin}"
+                              sortBy="#{item.timeOrigin}"
+                              filterMatchMode="contains"
+                              headerText="Hr. Inicio Programada">
+                        <h:outputText value="#{item.timeOrigin}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.timeDestiny}"
+                              filterMatchMode="contains"
+                              sortBy="#{item.timeDestiny}"
+                              headerText="Hr. Fin Programada">
+                        <h:outputText value="#{item.timeDestiny}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.realTimeOrigin}"
+                              sortBy="#{item.realTimeOrigin}"
+                              style="background-color: green; color: white;"
+                              filterMatchMode="contains"
+                              headerText="Hr. Inicio Real">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.realTimeOrigin != null ? item.realTimeOrigin : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.realTimeDestiny}"
+                              filterMatchMode="contains"
+                              style="background-color: green; color: white;"
+                              sortBy="#{item.realTimeDestiny}"
+                              headerText="Hr. Fin Real">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.realTimeDestiny != null ? item.realTimeDestiny : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.hiniTurno2}"
+                              filterMatchMode="contains"
+                              sortBy="#{item.hiniTurno2}"
+                              headerText="Hr. Inicio Turno 2">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.hiniTurno2 != null ? item.hiniTurno2 : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.hfinTurno2}"
+                              filterMatchMode="contains"
+                              sortBy="#{item.hfinTurno2}"
+                              headerText="Hr. Fin Turno 2">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.hfinTurno2 != null ? item.hfinTurno2 : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.realHiniTurno2}"
+                              visible="true"
+                              exportable="true"
+                              style="background-color: green; color: white;"
+                              filterMatchMode="contains"
+                              sortBy="#{item.realHiniTurno2}"
+                              headerText="Hr. Inicio Turno 2 Real">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.realHiniTurno2 != null ? item.realHiniTurno2 : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.realHfinTurno2}"
+                              visible="true"
+                              exportable="true"
+                              filterMatchMode="contains"
+                              sortBy="#{item.realHfinTurno2}"
+                              style="background-color: green; color: white;"
+                              headerText="Hr. Fin Turno 2 Real">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.realHfinTurno2 != null ? item.realHfinTurno2 : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.hiniTurno3}"
+                              filterMatchMode="contains"
+                              sortBy="#{item.hiniTurno3}"
+                              headerText="Hr. Inicio Turno 3">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.hiniTurno3 != null ? item.hiniTurno3 : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.hfinTurno3}"
+                              filterMatchMode="contains"
+                              sortBy="#{item.hfinTurno3}"
+                              headerText="Hr. Fin Turno 3">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.hfinTurno3 != null ? item.hfinTurno3 : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.realHiniTurno3}"
+                              visible="true"
+                              exportable="true"
+                              filterMatchMode="contains"
+                              sortBy="#{item.realHiniTurno3}"
+                              style="background-color: green; color: white;"
+                              headerText="Hr. Inicio Turno 3 Real">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.realHiniTurno3 != null ? item.realHiniTurno3 : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.realHfinTurno3}"
+                              visible="true"
+                              exportable="true"
+                              filterMatchMode="contains"
+                              sortBy="#{item.realHfinTurno3}"
+                              style="background-color: green; color: white;"
+                              headerText="Hr. Fin Turno 3 Real">
+                        <h:outputText value="#{item.nominaBorrada != 0 ? '00:00:00' : item.realHfinTurno3 != null ? item.realHfinTurno3 : '00:00:00'}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.prgModificada}" 
+                              exportable="false"
+                              headerText="Modificado"
+                              styleClass="#{item.prgModificada eq 1 ? 'cssGreen' : 'cssRed'}" 
+                              filterMatchMode="exact">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('dtserconlist').filter()" 
+                                             styleClass="custom-filter" >
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText class="cssWhite" value="#{item.prgModificada==1 ? 'Sí': item.prgModificada==null ? 'No': 'No'}" />
+                    </p:column>
+                    <p:column headerText="Motivo"
+                              filterBy="#{item.idPrgSerconMotivo.descripcion}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.idPrgSerconMotivo.descripcion}"/>
+                    </p:column>
+                    <p:column headerText="Observaciones" class="cortar" style="max-width: 150px !important">
+                        <h:outputText value="#{item.observaciones}"/>
+                    </p:column>
+                    <p:column headerText="Generado Por" filterBy="#{item.userGenera}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{item.userGenera}"/>
+                    </p:column>
+                    <p:column headerText="Generada el">
+                        <h:outputText  value="#{item.fechaGenera}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Autorizado" 
+                              filterMatchMode="exact"
+                              filterBy="#{item.autorizado}"
+                              styleClass="#{item.autorizado eq 1 ? 'cssGreen' : item.autorizado eq -1 ? 'cssGray' : item.autorizado eq 0 ? 'cssRed' : ''}" rendered="#{controlJornada.b_autoriza}">
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('dtserconlist').filter()" 
+                                             styleClass="custom-filter" style="width: 99.9999%">
+                                <f:selectItem itemLabel="Todo" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemValue="#{-1}" itemLabel="Por Autorizar" />
+                                <f:selectItem itemValue="#{1}" itemLabel="Si"/>
+                                <f:selectItem itemValue="#{0}" itemLabel="No"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="Sí" rendered="#{item.autorizado == 1}" class="cssWhite" />
+                        <h:outputText value="No" rendered="#{item.autorizado == 0}" class="cssWhite" />
+                        <h:outputText value="Por autorizar" rendered="#{item.autorizado == -1}" class="cssWhite" />
+                    </p:column>
+                    <p:column headerText="Autorizado Por" rendered="#{controlJornada.b_autoriza}">
+                        <h:outputText value="#{item.userAutorizado}"/>
+                    </p:column>
+                    <p:column headerText="Liquidado" styleClass="#{item.liquidado eq 1 ? 'cssGreen' : 'cssRed'}" rendered="#{controlJornada.b_liquida}">
+                        <h:outputText value="Sí" rendered="#{item.liquidado == 1}" class="cssWhite" />
+                        <h:outputText value="No" rendered="#{item.liquidado == 0}" class="cssWhite" />
+                    </p:column>
+                    <p:column headerText="Liquidado Por" rendered="#{controlJornada.b_liquida}">
+                        <h:outputText value="#{item.userLiquida}"/>
+                    </p:column>
+                    <p:column headerText="Fecha Autorizada" rendered="#{controlJornada.b_autoriza}">
+                        <h:outputText  value="#{item.fechaAutoriza}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fecha Liquidada" rendered="#{controlJornada.b_liquida}">
+                        <h:outputText  value="#{item.fechaLiquida}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column rendered="#{controlJornada.b_controlAutoriza}" exportable="false" headerText="Acción">
+                        <p:commandButton actionListener="#{controlJornada.autorizar(item, 1)}"
+                                         icon="fa fa-thumbs-up"
+                                         class="cssWhite GreenButton"
+                                         update="serconlist,:formcontroljornada:cj-grow,msgs"
+                                         rendered="#{item.autorizado== -1 or item.autorizado == 0}"
+                                         disabled="#{item.liquidado==1}"
+                                         title="Autorizar">
+                            <p:confirm header="Confirmación" 
+                                       message="Está seguro de autorizar?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                        <p:commandButton actionListener="#{controlJornada.autorizar(item, 0)}"
+                                         icon="fa fa-thumbs-down"
+                                         class="cssWhite RedButton"
+                                         update="serconlist,:formcontroljornada:cj-grow,msgs"
+                                         rendered="#{item.autorizado== -1 or item.autorizado == 1 }"
+                                         disabled="#{item.liquidado==1}"
+                                         title="No Autorizar">
+                            <p:confirm header="Confirmación" 
+                                       message="Está seguro de NO autorizar?"
+                                       icon="fa fa-exclamation-triangle"
+                                       class="cssWhite"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="modal/ajusteJornadaPorFechas.xhtml"/>
+        <ui:include src="modal/cambioEmpleadoMasivo.xhtml"/>
+        <ui:include src="modal/listaEmpleados.xhtml"/>
+        <ui:include src="modal/ajustarJornada.xhtml"/>
+        <ui:include src="modal/borrarMasivo.xhtml"/>
+        <ui:include src="modal/crearJornada.xhtml"/>
+    </ui:define>
+</ui:composition>

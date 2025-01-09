@@ -1,0 +1,170 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog id="dlgPlaRecuBienestar"
+              widgetVar="wvPlaRecuBienestar"
+              modal="true" 
+              resizable="false" 
+              closable="false"
+              closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              height="auto"
+              position="center top"
+              appendTo="@(body)" >
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <p:outputLabel value="#{plaRecuBienestarBean.b_editar ? 'Editar Bienestar':'Crear Bienestar'}" class="cssWhite"/>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('wvPlaRecuBienestar').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="form-registrar-bienestar">
+            <p:messages id="msgs_create_bienestar" showDetail="true" closable="true"/>
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Código TM *" />
+                        <p:inputText id="codigoTM_id" required="true" placeholder="Ingrese un valor numérico"
+                                     title="Código Transmilenio que identifica al colaborador (número de cédula para cargos administrativos)" 
+                                     requiredMessage="Debe ingresar 'Código TM'"
+                                     value="#{plaRecuBienestarBean.codigo_TM}">
+                            <p:ajax update="form-registrar-bienestar:cedula_id,form-registrar-bienestar:nombre_id,form-registrar-bienestar:cargo_id,btnGuardarBienestar,msgs" 
+                                    listener="#{plaRecuBienestarBean.cargarEmpleado()}"/>
+                        </p:inputText>
+                        <div class="botonFloat" >
+                            <p:commandButton process="codigoTM_id,@this" 
+                                             style="margin: 0px"
+                                             update="form-registrar-bienestar:cedula_id,form-registrar-bienestar:nombre_id,form-registrar-bienestar:cargo_id,btnGuardarBienestar,msgs"
+                                             action="#{plaRecuBienestarBean.cargarEmpleado()}"
+                                             icon="fa fa-search"
+                                             class="cssWhite"/>
+                            <p:remoteCommand process="codigoTM_id,@this" 
+                                             name="cargarEmpleado"
+                                             update="form-registrar-bienestar:cedula_id,form-registrar-bienestar:nombre_id,form-registrar-bienestar:cargo_id,btnGuardarBienestar,msgs"
+                                             action="#{plaRecuBienestarBean.cargarEmpleado()}"/>
+                        </div>    
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cédula" />
+                        <p:inputText id="cedula_id" disabled="true"
+                                     title="Número del documento de identidad del colaborador" 
+                                     value="#{plaRecuBienestarBean.plaRecuBienestar.empleado.identificacion}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Nombre" />
+                        <p:inputText id="nombre_id" disabled="true"
+                                     title="Nombre completo del colaborador" 
+                                     value="#{plaRecuBienestarBean.plaRecuBienestar.empleado.nombresApellidos}"  />
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Cargo" />
+                        <p:inputText id="cargo_id" disabled="true"
+                                     title="Nombre del cargo del colaborador" 
+                                     value="#{plaRecuBienestarBean.plaRecuBienestar.empleado.idEmpleadoCargo.nombreCargo}"  />
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Inicio" for="fecha_inicio_id"/>
+                        <p:calendar id="fecha_inicio_id" required="true" 
+                                    requiredMessage="'Fecha Inicio' es requerido"
+                                    value="#{plaRecuBienestarBean.plaRecuBienestar.fechaInicio}"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Fecha Fin" for="fecha_fin_id"/>
+                        <p:calendar id="fecha_fin_id" required="true" 
+                                    requiredMessage="'Fecha Fin' es requerido"
+                                    value="#{plaRecuBienestarBean.plaRecuBienestar.fechaFin}"
+                                    locale="es"
+                                    pattern="yyyy-MM-dd">
+                        </p:calendar>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Turno" for="turnoItem"/>
+                        <p:selectOneMenu  
+                            filter="true" id="turnoItem"
+                            style="width: 99.9999%"
+                            value="#{plaRecuBienestarBean.turnoSelectedId}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}" />
+                            <f:selectItems 
+                                var="user"
+                                value="#{plaRecuBienestarBean.listTurno}" 
+                                itemLabel="#{user.turno}"
+                                itemValue="#{user.idPlaRecuTurno}"/>
+                            <p:ajax event="change" listener="#{plaRecuBienestarBean.setFlag()}" 
+                                    update="form-registrar-bienestar:hora_ini_id,form-registrar-bienestar:hora_fin_id, msgs"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Hora Inicio *" />
+                        <p:inputMask id="hora_ini_id"
+                                     mask="99:99:99"
+                                     value="#{plaRecuBienestarBean.turnoSelected.horaInicio}" disabled="#{!plaRecuBienestarBean.b_otro_turno}">
+                            <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                        </p:inputMask>
+                    </div>
+                    <div class="ui-g-6 ui-md-6 ui-lg-6 Padding5 ">
+                        <p:outputLabel value="Hora Fin *" />
+                        <p:inputMask id="hora_fin_id"
+                                     mask="99:99:99"
+                                     value="#{plaRecuBienestarBean.turnoSelected.horaFin}" disabled="#{!plaRecuBienestarBean.b_otro_turno}">
+                            <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]"/>
+                        </p:inputMask>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <p:outputLabel value="Motivo" for="motivoItem"/>
+                        <p:selectOneMenu  
+                            filter="true" id="motivoItem"
+                            required="true"
+                            requiredMessage="Debe seleccionar un motivo"
+                            style="width: 99.9999%"
+                            value="#{plaRecuBienestarBean.motivoSelectedId}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="#{0}" />
+                            <f:selectItems 
+                                var="m"
+                                value="#{plaRecuBienestarBean.listMotivo}" 
+                                itemLabel="#{m.motivo}"
+                                itemValue="#{m.idPlaRecuMotivo}"
+                                />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuBienestarBean.crearBienestar()}"
+                             process="@form"
+                             rendered="#{!plaRecuBienestarBean.b_editar}"
+                             update="formBienestar,:formBienestar:bienestarList,:formBienestar:cj-grow, @form,:msgs"/>
+
+            <p:remoteCommand name="rc" 
+                             class="cssWhite"
+                             action="#{plaRecuBienestarBean.editarBienestar()}"
+                             process="@form"
+                             rendered="#{plaRecuBienestarBean.b_editar}"
+                             update="formBienestar,:formBienestar:bienestarList,:formBienestar:cj-grow, @form,:msgs" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton id="btnGuardarBienestar" 
+                             class="cssWhite"
+                             icon="fa fa-save"
+                             value="Guardar" 
+                             onclick="rc()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

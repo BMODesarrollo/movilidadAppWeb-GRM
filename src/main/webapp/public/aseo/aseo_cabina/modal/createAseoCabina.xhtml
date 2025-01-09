@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="create_aseo_cabina_dialog" 
+              widgetVar="create_aseo_cabina_wv" 
+              modal="true" 
+              resizable="false" 
+              appendTo="@(body)" 
+              header="Aseo para la Cabina #{aseoCabinaJSFMB.aseoCabina.cableCabina.nombre}"
+              class="mr1024_50 mr500_90" closeOnEscape="true" responsive="true" position="center,top">
+        <h:form id="form_create_aseo_cabina" enctype="multipart/form-data">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="fecha_hora" value="Fecha Hora Actividad: " />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="fecha_hora" 
+                                        pattern="yyyy/MM/dd HH:mm" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Fecha y Hora es requerido"
+                                        title="año/mes/día hora:minutos"
+                                        showOn="button"
+                                        timeInput="true"
+                                        mask="true"
+                                        value="#{aseoCabinaJSFMB.aseoCabina.fechaHora}"  >
+                                <p:ajax event="dateSelect" process="@this"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-8 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel for="aseoCabinaTipo_id" value="Tipo de Aseo *"/>
+                        </div>
+                        <p:selectOneMenu id="aseoCabinaTipo_id"
+                                         style="width: 99.9999%"
+                                         filterMatchMode="contains" filter="true"
+                                         value="#{aseoCabinaJSFMB.i_aseoCabinaTipo}">
+                            <f:selectItem itemLabel="Seleccione uno" itemValue="0"/>
+                            <f:selectItems value="#{aseoCabinaJSFMB.listAseoCabinaTipo}"
+                                           var="tipo" itemLabel="#{tipo.nombre}"
+                                           itemDescription="#{tipo.descripcion}"
+                                           itemValue="#{tipo.idAseoCabinaTipo}" />
+                            <p:ajax process="@this" listener="#{aseoCabinaJSFMB.selectAseoCabinaTipo()}"/>
+
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset legend="Fotos Reporte">
+                            <p:fileUpload fileUploadListener="#{aseoCabinaJSFMB.handleFileUpload}"
+                                          id="foto"
+                                          mode="advanced"
+                                          multiple="true" sizeLimit="2000000"
+                                          allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                          update="@form"
+                                          uploadLabel="Cargar"    
+                                          cancelLabel="Cancelar"
+                                          label="Selecionar" 
+                                          invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                          invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                        </p:fieldset>
+                    </div>
+                </div>
+            </div>
+            <p:dataTable id="dt_id_nov" 
+                         value="#{aseoCabinaJSFMB.listAseoCabinaNov}" 
+                         var="aseoCabinaNov"
+                         emptyMessage="No existen registros"
+                         paginator="true"
+                         paginatorPosition="top"
+                         rowIndexVar="index"
+                         rows="5"
+                         widgetVar="dt_wv"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <div align="right">
+                        <p:commandButton id="btnAgregarNov" 
+                                         icon="fa fa-plus" 
+                                         action="#{aseoCabinaJSFMB.preAgregarNov()}" 
+                                         value="Agregar Novedad" 
+                                         update="nov_dialog_form"
+                                         class="cssWhite RedButton" />
+                    </div>
+                </f:facet>
+                <p:column headerText="#" width="10%">
+                    <h:outputText  value="#{index+1}"/>
+                </p:column>
+                <p:column headerText="Tipo">
+                    <h:outputText value="#{aseoCabinaNov.aseoCabinaNovedad.novedadCab.idNovedadTipoCab.nombre}"/>
+                </p:column>
+                <p:column headerText="Detalle">
+                    <h:outputText value="#{aseoCabinaNov.aseoCabinaNovedad.novedadCab.idNovedadTipoDetCab.nombre}"/>
+                </p:column>
+                <p:column headerText="Observación">
+                    <h:outputText value="#{aseoCabinaNov.aseoCabinaNovedad.novedadCab.observacion}"/>
+                </p:column>
+                <p:column headerText="Acción" width="10%">
+                    <p:commandButton id="bnt_eliminar_nov" 
+                                     update="msgs,dt_id_nov"
+                                     icon="fa fa-close" title="Eliminar novedad de la lista"
+                                     action="#{aseoCabinaJSFMB.eliminarNovedad(aseoCabinaNov)}"
+                                     class="cssWhite RedButton" />
+                </p:column>
+            </p:dataTable>
+
+            <p:remoteCommand name="rc_a_cab" 
+                             class="cssWhite"
+                             actionListener="#{aseoCabinaJSFMB.guardarAseoCabina()}"  
+                             value="Guardar" 
+                             update="msgs,form_aseo_cabina:dg_cabina_id"  >
+
+            </p:remoteCommand>
+        </h:form>
+        <f:facet name="footer" >
+            <p:commandButton id="btnGuardar" icon="fa fa-save" value="Guardar" 
+                             class="cssWhite" onclick="rc_a_cab()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="createNovedad.xhtml"/>
+</ui:composition>

@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="MaterialesListDlg" widgetVar="MaterialesListDialog" modal="true" 
+              resizable="false" appendTo="@(body)" header="Listado de Materiales"
+              class="mr1024_70 mr500_90" closeOnEscape="true" responsive="true" position="center top">
+        <h:form id="frmMaterialesList">
+            <p:dataTable var="item" value="#{sstAutorizacionBean.lstMatEquipos}" 
+                         id="dtListaMateriales"
+                         widgetVar="wVMaterialesListDialog"
+                         selectionMode="single" 
+                         selection="#{sstAutorizacionBean.sstMatEqui}"
+                         paginator="true"
+                         rows="8"
+                         filterDelay="1000"
+                         rowIndexVar="nroFila"
+                         rowKey="#{item.idSstMatEqui}"
+                         emptyMessage="No existen items registrados">
+
+                <f:facet name="header">
+                    <div align="right" jsf:id="botones">
+                        <p:commandButton
+                            icon="fa fa-plus"
+                            value="Agregar Item"
+                            process="@this"
+                            actionListener="#{sstAutorizacionBean.nuevoDetalle()}"
+                            oncomplete="PF('wlvEsMatEquiDet').show();"
+                            class="cssWhite"
+                            update=":EsMatEquiDet,:frmMateriales"
+                            >
+                            <p:resetInput target=":frmMateriales:pGridDatos"/>
+                        </p:commandButton>    
+                    </div>
+                </f:facet>
+
+                <p:ajax event="rowSelect" 
+                        listener="#{sstAutorizacionBean.onRowMaterialClckSelect}"
+                        update=":frmAutorizacion:dtMateriales,:msgs"
+                        global="false" />
+                
+                <p:column headerText="Material"
+                          filterBy="#{item.nombre}"
+                          filterMatchMode="contains"
+                          style="text-align: center;">
+                    <h:outputText value="#{item.nombre}"/>
+                </p:column>
+                <p:column headerText="Tipo Material"
+                          filterBy="#{item.idSstMatEquiTipo.tipo}"
+                          filterMatchMode="contains"
+                          style="text-align: center;">
+                    <h:outputText value="#{item.idSstMatEquiTipo.tipo}"/>
+                </p:column>
+                <p:column headerText="Marca Material"
+                          filterBy="#{item.idSstMatEquiMarca.marca}"
+                          filterMatchMode="contains"
+                          style="text-align: center;">
+                    <h:outputText value="#{item.idSstMatEquiMarca.marca}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

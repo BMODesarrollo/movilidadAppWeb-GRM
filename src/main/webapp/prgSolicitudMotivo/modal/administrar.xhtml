@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="dlg-motivo" 
+              widgetVar="motivoWV"
+              modal="true" 
+              header="#{prgMotivoJSF.prgMotivo.idPrgSolicitudMotivo != null ? 'EDITAR MOTIVO' : 'NUEVO MOTIVO'}"
+              position="center top"
+              resizable="false"
+              class="mr1024_30 mr500_90"
+              draggable="false"
+              responsive="true">
+        <h:form id="form-motivo">
+            <p:messages id="msgs" closable="true" showSummary="true" showDetail="true"/>  
+            <div class="ui-fluid">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Motivo *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="motivo"
+                                         maxlength="60"
+                                         required="true"
+                                         requiredMessage="Motivo es requerido"
+                                         value="#{prgMotivoJSF.prgMotivo.motivo}" />
+                        </div>
+                    </div>
+                    <div class="ui-g Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Descripción *"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea id="descrpcion"
+                                             value="#{prgMotivoJSF.prgMotivo.descripcion}"
+                                             rows="5"
+                                             maxlength="255"
+                                             counter="cou"
+                                             required="true"
+                                             requiredMessage="Descripción es requerido"
+                                             counterTemplate="Quedan {0} carácteres" 
+                                             autoResize="false"
+                                             placeholder="Descripción" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" style="text-align: right; font-size: 12px">
+                            <h:outputText id="cou" />
+                        </div>
+                    </div>
+                    <p:remoteCommand id="btn-guardar"
+                                     rendered="#{empty prgMotivoJSF.prgMotivo.idPrgSolicitudMotivo}"
+                                     action="#{prgMotivoJSF.guardar()}"
+                                     update=":formMotivo,@form"
+                                     name="rc_prg_motivo"
+                                     process="@form" />
+                    <p:remoteCommand id="rechazar"
+                                     rendered="#{not empty prgMotivoJSF.prgMotivo.idPrgSolicitudMotivo}"
+                                     update=":formMotivo,@form"
+                                     name="rc_prg_motivo_update"
+                                     process="@form"
+                                     action="#{prgMotivoJSF.actualizar()}" />
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_prg_motivo();"
+                             rendered="#{empty prgMotivoJSF.prgMotivo.idPrgSolicitudMotivo}"
+                             class="cssWhite"
+                             value="Guardar"
+                             icon="fa fa-save"/>
+            <p:commandButton onclick="rc_prg_motivo_update();"
+                             rendered="#{not empty prgMotivoJSF.prgMotivo.idPrgSolicitudMotivo}"
+                             class="cssWhite"
+                             value="Actualizar"
+                             icon="fa fa-save"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition> 

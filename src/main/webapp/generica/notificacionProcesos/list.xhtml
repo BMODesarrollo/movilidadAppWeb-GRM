@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel header="Notificación de procesos ( Genérica )">
+            <h:form id="frmNotificacionProcesosList">
+                <p:dataTable id="dtNotificacionProcesos" 
+                             filterDelay="1000"
+                             widgetVar="wlvNotificacionProcesos"
+                             value="#{genericaNotifProcesosBean.lstGenericaNotifProcesos}"
+                             var="notificacionProceso" 
+                             reflow="true"
+                             rows="10"
+                             paginator="true"
+                             rowIndexVar="numFila"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,20"
+                             emptyMessage="No existen procesos de notificación registrados">
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton value="Nuevo" 
+                                             icon="fa fa-plus"
+                                             class="cssWhite"
+                                             actionListener="#{genericaNotifProcesosBean.nuevo()}"
+                                             update=":frmNuevaNotificacionProceso,:modalCreateNotificacionProceso"
+                                             oncomplete="PF('genericaNotifProcesos').show();">
+                                <p:resetInput target=":frmNuevaNotificacionProceso"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                    <p:column headerText="#" width="30">
+                        <h:outputText value="#{numFila+1}" />
+                    </p:column>
+
+                    <p:column headerText="Codigo_Proceso" 
+                              filterBy="#{notificacionProceso.codigoProceso}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{notificacionProceso.codigoProceso}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre_Proceso"
+                              filterBy="#{notificacionProceso.nombreProceso}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{notificacionProceso.nombreProceso}" />
+                    </p:column>
+
+                    <p:column headerText="Emails" width="500" style="word-break: break-word">
+                        <h:outputText value="#{notificacionProceso.emails}" />
+                    </p:column>
+                    <p:column headerText="Mensaje">
+                        <h:outputText value="#{notificacionProceso.mensaje}" />
+                    </p:column>
+                    <p:column headerText="Acción" width="50">
+                        <div align="center">
+                            <p:commandButton icon="fa fa-pencil" class="cssWhite GreenButton"
+                                             title="Editar proceso"
+                                             action="#{genericaNotifProcesosBean.editar()}"
+                                             update=":frmNuevaNotificacionProceso,:modalCreateNotificacionProceso"
+                                             oncomplete="PF('genericaNotifProcesos').show();">
+                                <f:setPropertyActionListener target="#{genericaNotifProcesosBean.selected}" value="#{notificacionProceso}"/>
+                                <p:resetInput target=":frmNuevaNotificacionProceso"/>
+                            </p:commandButton>
+                        </div>
+
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{genericaNotifProcesosBean.lstGenericaNotifProcesos.size()} proceso(s) de notificación registrados.
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modals/Create.xhtml"/>
+    </ui:define>
+
+</ui:composition>

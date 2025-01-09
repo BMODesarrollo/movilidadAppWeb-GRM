@@ -1,0 +1,165 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog id="PmVrbonosCreateDlg" 
+              widgetVar="PmVrbonosCreateDialog" 
+              modal="true" 
+              closable="false"
+              closeOnEscape="true"
+              fitViewport="true"
+              resizable="false" 
+              class="mr1024_30 mr500_90"
+              appendTo="@(body)"
+              position="center top"
+              responsive="true">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{pmVrbonosController.selected.idPmVrbonos == null }">
+                                Nuevo Pm Valor Bono
+                            </c:if>
+                            <c:if test="#{pmVrbonosController.selected.idPmVrbonos != null }">
+                                Editar Pm Valor Bono #{pmVrbonosController.selected.idEmpleadoTipoCargo.nombreCargo.toUpperCase()}
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('PmVrbonosCreateDialog').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <p:ajax event="close" listener="#{pmVrbonosController.reset()}" update=":PmVrbonosListForm:datalist" />
+        <h:form id="PmVrbonosCreateForm">
+            <div class="ui-fluid" jsf:rendered="#{pmVrbonosController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Desde:" for="desde" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="desde"
+                                        pattern="yyyy-MM-dd"
+                                        value="#{pmVrbonosController.selected.desde}" 
+                                        required="true" 
+                                        locale="es"
+                                        requiredMessage="Fecha Desde es requerido"
+                                        readonly="#{facesContext.renderResponse}"
+                                        showOn="button">
+                                <p:ajax event="dateSelect" update="hasta"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Hasta:" for="hasta" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="hasta" 
+                                        pattern="yyyy-MM-dd" 
+                                        value="#{pmVrbonosController.selected.hasta}"
+                                        required="true" 
+                                        locale="es"
+                                        requiredMessage="Fecha Hasta es requerido"
+                                        readonly="#{facesContext.renderResponse}"
+                                        showOn="button"
+                                        mindate="#{pmVrbonosController.selected.desde}"
+                                        >
+                                <p:ajax event="dateSelect"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Valor bono salarial:" for="vrBonoSalarial" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="vrBonoSalarial" 
+                                           value="#{pmVrbonosController.selected.vrBonoSalarial}" 
+                                           required="true" 
+                                           requiredMessage="Valor Bono Salarial es requerido"
+                                           minValue="0"
+                                           maxValue="9999999"
+                                           decimalPlaces="0"
+                                           symbol="$"
+                                           >
+                            </p:inputNumber>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Valor bono alimentos:" for="vrBonoAlimentos" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputNumber id="vrBonoAlimentos"
+                                           value="#{pmVrbonosController.selected.vrBonoAlimentos}"
+                                           required="true" 
+                                           requiredMessage="Valor Bono Alimentos es requerido"
+                                           minValue="0"
+                                           maxValue="9999999"
+                                           decimalPlaces="0"
+                                           symbol="$"
+                                           >
+                            </p:inputNumber>                        
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Cargo Empleado" for="idEmpleadoTipoCargo" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu id="idEmpleadoTipoCargo"
+                                             value="#{pmVrbonosController.i_idEmpelado}"
+                                             required="true" 
+                                             style="width: 99.9999%"
+                                             requiredMessage="Empleado es requerido"
+                                             filter="true"
+                                             filterMatchMode="startsWith"
+                                             >
+                                <f:selectItem itemLabel="Seleccionar uno" itemValue=""/>
+                                <f:selectItems value="#{pmVrbonosController.listEmpleadoTC}"
+                                               var="Item"
+                                               itemLabel="#{Item.nombreCargo}"
+                                               itemValue="#{Item.idEmpleadoTipoCargo}"/>
+                                <p:ajax process="@this"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <p:remoteCommand action="#{pmVrbonosController.create}" 
+                                     name="rc_pm_valor"
+                                     rendered="#{empty pmVrbonosController.selected.idPmVrbonos}"
+                                     update="@form,:PmVrbonosListForm:datalist,:PmVrbonosListForm:upPmVrB"/>
+                    <p:remoteCommand actionListener="#{pmVrbonosController.update}" 
+                                     name="rc_update_pm_valor"
+                                     rendered="#{!empty pmVrbonosController.selected.idPmVrbonos}"
+                                     update=":PmVrbonosListForm:datalist,:PmVrbonosListForm:upPmVrB"/>
+                    <p:staticMessage severity="warn" summary="Tenga en cuenta" detail="Fecha Desde no debe ser mayor a Fecha Hasta" />
+                </div>
+            </div>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_pm_valor()"
+                             value="Guardar"
+                             rendered="#{empty pmVrbonosController.selected.idPmVrbonos}"
+                             class="cssWhite"
+                             icon="fa fa-save"/>
+            <p:commandButton onclick="rc_update_pm_valor()"
+                             value="Actualizar"
+                             rendered="#{!empty pmVrbonosController.selected.idPmVrbonos}"
+                             class="cssWhite"
+                             icon="fa fa-save"/>
+        </f:facet>
+    </p:dialog>
+
+</ui:composition>

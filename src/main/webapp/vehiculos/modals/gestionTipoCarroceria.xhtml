@@ -1,0 +1,88 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="mtipo" id="modal" modal="true" closeOnEscape="true"
+              class="mr1024_40 mr500_90"
+              resizable="false"
+              position="center top"
+              responsive="true">
+        <c:if test="#{vehiculoTipoCarroceriaBean.selected == null }">
+            <f:facet name="header">
+                Nuevo tipo de carrocería
+            </f:facet>
+        </c:if>
+        <c:if test="#{vehiculoTipoCarroceriaBean.selected != null }">
+            <f:facet name="header">
+                Editar tipo de carrocería: #{vehiculoTipoCarroceriaBean.selected.nombreTipoCarroceria.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar"
+                             onclick="rc_save_tca();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoTipoCarroceriaBean.selected == null }"/>
+            <p:commandButton value="Actualizar" 
+                             onclick="rc_update_tca();"
+                             class="cssWhite"
+                             icon="fa fa-check"
+                             rendered="#{vehiculoTipoCarroceriaBean.selected != null }"/>
+        </f:facet>
+
+        <h:form id="frmNuevoTipo">
+            <p:remoteCommand name="rc_save_tca" action="#{vehiculoTipoCarroceriaBean.guardar()}"
+                             update=":frmPrincipalVhclTipCarroc:dtTipo,messages,msgs,frmNuevoTipo"
+                             rendered="#{vehiculoTipoCarroceriaBean.selected == null }"/>
+            <p:remoteCommand name="rc_update_tca" action="#{vehiculoTipoCarroceriaBean.actualizar()}"
+                             update=":frmPrincipalVhclTipCarroc:dtTipo,messages,msgs"
+                             rendered="#{vehiculoTipoCarroceriaBean.selected != null }"/>
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Nombre:" for="nombre"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:inputText id="nombre" value="#{vehiculoTipoCarroceriaBean.vehiculoTipoCarroceria.nombreTipoCarroceria}"
+                                         required="true" requiredMessage="El nombre del tipo es obligatorio"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <p:fieldset toggleable="true" legend="Layout">
+                            <div align="center">
+                                <p:fileUpload fileUploadListener="#{vehiculoTipoCarroceriaBean.handleFileUpload}"
+                                              id="foto"
+                                              style="width: 99.9999%"
+                                              mode="advanced"
+                                              multiple="true" sizeLimit="2000000"
+                                              allowTypes="/(\.|\/)(jpg|jpe?g|png|JPG|JPE?G|PNG)$/"
+                                              update="foto,msgs"
+                                              uploadLabel="Cargar"    
+                                              cancelLabel="Cancelar"
+                                              label="Selecionar" 
+                                              invalidFileMessage="Debe seleccionar un archivo de imágen válido"
+                                              invalidSizeMessage="El archivo debe ser máximo de 2mb"/>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12  Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:outputLabel value="Descripción:" for="descripcion"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12  Padding0">
+                            <p:inputTextarea id="descripcion" 
+                                             value="#{vehiculoTipoCarroceriaBean.vehiculoTipoCarroceria.descripcionTipoCarroceria}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>  
+    </p:dialog>  
+</ui:composition>

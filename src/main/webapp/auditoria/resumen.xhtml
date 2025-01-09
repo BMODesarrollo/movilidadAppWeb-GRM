@@ -1,0 +1,185 @@
+<ui:composition template="../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <h:form id="audi_resumen_form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000"/>
+            <p:panel header="Resumen Auditoría">
+                <p:dataTable id="respuesta" 
+                             var="respuesta" 
+                             reflow="true"
+                             scrollHeight="600"
+                             scrollable="true"
+                             value="#{audiResumenBean.respuestas}"
+                             widgetVar="productsTable">
+                    <p:column headerText="Fecha" >
+                        <p:outputLabel value="#{respuesta.idAuditoriaRealizadoPor.fecha}">
+                            <f:convertDateTime type="both" pattern="yyyy-MM-dd HH:mm:ss"/> 
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Código Auditoría" >
+                        <p:outputLabel value="#{respuesta.idAuditoriaRealizadoPor.idAuditoria.codigo}"/>
+                    </p:column>
+                    <p:column headerText="Titulo Auditoría" >
+                        <p:outputLabel value="#{respuesta.idAuditoriaRealizadoPor.idAuditoria.idAuditoriaEncabezado.titulo}"/>
+                    </p:column>
+                    <p:column headerText="Se Auditó" >
+                        <p:outputLabel value="#{audiResumenBean.seAudito(respuesta)}"/>
+                    </p:column>
+                    <p:column headerText="Realizado por" >
+                        <p:outputLabel value="#{respuesta.idAuditoriaRealizadoPor.idEmpleadoRealiza.codigoTm} - #{respuesta.idAuditoriaRealizadoPor.idEmpleadoRealiza.nombres} #{respuesta.idAuditoriaRealizadoPor.idEmpleadoRealiza.apellidos}"/>
+                    </p:column>
+                    <p:column headerText="Pregunta" >
+                        <p:outputLabel value="#{respuesta.idAuditoriaPregunta.enunciado}"/>
+                    </p:column>
+                    <p:column headerText="Respuesta Alternativa" >
+                        <p:outputLabel value="#{respuesta.idAuditoriaAlternativaRespuesta.enunciado}"/>
+                    </p:column>
+                    <p:column headerText="Respuesta Abierta" >
+                        <p:outputLabel value="#{respuesta.respuestaAbierta}"/>
+                    </p:column>
+                    <p:column headerText="Respuesta Observación" >
+                        <p:outputLabel value="#{respuesta.respuestaObservacion}"/>
+                    </p:column>
+                    <p:column headerText="Fotos" exportable="false">
+                        <p:graphicImage cache="false"
+                                        id="GIImagen"
+                                        value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                        rendered="#{respuesta.pathDocumento!=null}" 
+                                        width="150">
+                            <f:param name="path_foto" value="#{respuesta.pathDocumento}" />
+                        </p:graphicImage>
+
+                        <p:tooltip id="toolTipContent" for="GIImagen" trackMouse="true" >
+                            <p:graphicImage cache="false"
+                                            value="#{uploadFotoJSFManagedBean.imagenDinamica}"
+                                            rendered="#{respuesta.pathDocumento!=null}" 
+                                            width="100%">
+                                <f:param name="path_foto" value="#{respuesta.pathDocumento}" />
+                            </p:graphicImage>
+                        </p:tooltip>
+                    </p:column>
+                    <f:facet name="header">
+                        <div class="ui-fluid">
+                            <div class="ui-g">
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                    <p:outputLabel for="tipo_select" value="Tipo Auditoría"  class="cssWhite Fs20"/>
+                                    <p:selectOneMenu id="tipo_select" 
+                                                     value="#{audiResumenBean.i_tipo_audi}" 
+                                                     filter="true"
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains">
+                                        <p:ajax global="false" process="@this"/>
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                        <f:selectItems value="#{audiResumenBean.listTipoAuditoria}" 
+                                                       var="tipo"
+                                                       itemDescription="#{tipo.descripcion}"
+                                                       itemLabel="#{tipo.nombre}"
+                                                       itemValue="#{tipo.idAuditoriaTipo}"/>
+                                        <p:ajax process="@this" global="false" 
+                                                update="audi_select"
+                                                listener="#{audiResumenBean.cargarAuditorias()}"/>
+                                    </p:selectOneMenu>
+                                </div>       
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                    <p:outputLabel for="uni_func" value="Unidad Funcional"  class="cssWhite Fs20"/>
+                                    <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                     filter="true" 
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains">
+                                        <f:selectItem itemLabel="SELECCIONE UNA UNIDAD FUNCIONAL" itemValue="#{null}" />
+                                        <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                       var="uniFunc" 
+                                                       itemLabel="#{uniFunc.nombre}"
+                                                       itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                        <p:ajax process="@this" global="false" 
+                                                update="audi_select"
+                                                listener="#{audiResumenBean.cargarAuditorias()}"/>
+                                    </p:selectOneMenu>
+                                </div>       
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                    <p:outputLabel for="audi_select" value="Auditoría"  class="cssWhite Fs20"/>
+                                    <p:selectOneMenu id="audi_select" 
+                                                     value="#{audiResumenBean.i_audi}" 
+                                                     filter="true"
+                                                     style="width: 99.9999%"
+                                                     filterMatchMode="contains">
+                                        <p:ajax global="false" process="@this"/>
+                                        <f:selectItem itemLabel="Seleccione uno" itemValue="" />
+                                        <f:selectItems value="#{audiResumenBean.listAudi}" 
+                                                       var="audi"
+                                                       itemDescription="#{audi.idAuditoriaEncabezado.titulo}"
+                                                       itemLabel="#{audi.codigo}"
+                                                       itemValue="#{audi.idAuditoria}"/>
+                                        <p:ajax process="@this" global="false" />
+                                    </p:selectOneMenu>
+                                </div>                               
+                                <div class="ui-g-6 ui-md-4 ui-lg-1 Padding3">
+                                    <p:outputLabel value="Desde" class="cssWhite Fs20" for="desde"></p:outputLabel>
+                                    <p:calendar id="desde" 
+                                                label="Fecha de Consulta de Servicio: " 
+                                                value="#{audiResumenBean.desde}"
+                                                locale="es"
+                                                navigator="true"
+                                                pattern="yyyy-MM-dd">
+                                        <p:ajax process="@this" global="false"/>
+                                    </p:calendar>
+                                </div>
+                                <div class="ui-g-6 ui-md-4 ui-lg-1 Padding3">
+                                    <p:outputLabel value="Hasta" class="cssWhite Fs20" for="desde"></p:outputLabel>
+                                    <p:calendar id="hasta" 
+                                                label="Fecha de Consulta de Servicio: " 
+                                                value="#{audiResumenBean.hasta}"
+                                                navigator="true"
+                                                locale="es"
+                                                pattern="yyyy-MM-dd">
+                                        <p:ajax process="@this" global="false"/>
+                                    </p:calendar>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="-" style="visibility: hidden" class="cssWhite Fs20" for="desde"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:commandButton icon="fa fa-search" 
+                                                         value="buscar"
+                                                         actionListener="#{audiResumenBean.consultar()}" 
+                                                         class="cssWhite"
+                                                         update="respuesta" process="@this,desde,hasta,tipo_select"/>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding3">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="-" style="visibility: hidden" class="cssWhite Fs20" for="desde"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:commandButton value="Documento" icon="fa fa-download" 
+                                                         actionListener="#{audiResumenBean.proceso()}" 
+                                                         class="cssWhite OrangeButton"
+                                                         ajax="false"
+                                                         process="@this,desde,hasta,tipo_select">
+                                            <p:fileDownload value="#{audiResumenBean.file}" />
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:commandLink>
+                            <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="respuesta" fileName="Resumen" />
+                        </h:commandLink>
+                    </f:facet>
+                </p:dataTable>
+
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

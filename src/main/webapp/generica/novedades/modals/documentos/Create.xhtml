@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:dialog widgetVar="novedadDocumentos" id="modalDocumentos" modal="true" closeOnEscape="true"
+              responsive="true"
+              resizable="false" appendTo="@(body)" position="center,top"
+              width="550px">
+        <c:if test="#{genericaBean.selectedDocumento == null }">
+            <f:facet name="header">
+                Nuevo documento
+            </f:facet>
+        </c:if>
+        <c:if test="#{genericaBean.selectedDocumento != null }">
+            <f:facet name="header">
+                Editar documento : #{genericaBean.selectedDocumento.idGenericaTipoDocumento.nombreTipoDocumento}
+            </f:facet>
+        </c:if>
+        <h:form id="frmNuevoDocumento">
+            <p:panel id="panel">
+                <p:messages id="messages" showDetail="true" closable="true">
+                </p:messages>
+                <f:facet name="footer">
+                    <p:commandButton value="Registrar"
+                                     action="#{genericaBean.guardarNovedadDocumento()}"
+                                     update=":frmNovedadDocumentosList:dtNovedadDocumentos,
+                                     pGrid,messages,frmPrincipal:dtTipo"
+                                     rendered="#{genericaBean.selectedDocumento == null }"
+                                     >
+                    </p:commandButton>
+                    <p:commandButton value="Actualizar" 
+                                     action="#{genericaBean.actualizarNovedadDocumento()}"
+                                     update=":frmNovedadSeguimientoList:dtNovedadSeguimiento,:msgs"
+                                     rendered="#{genericaBean.selectedDocumento != null }"
+                                     />
+                </f:facet>
+                <p:panelGrid columns="3" id="pGrid"
+                             columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-4,ui-grid-col-4" 
+                             layout="grid" styleClass="ui-panelgrid-blank ui-fluid">
+                    <p:outputLabel value="Tipo de documento:" for="tipo_documento"/>
+                    <p:inputText placeholder="Tipo de documento"
+                                 id="tipo_documento"
+                                 value="#{genericaBean.genericaTipoDocumentos.nombreTipoDocumento}"
+                                 style="width: 220px"
+                                 required="true"
+                                 requiredMessage="Debe seleccionar un tipo de documento"
+                                 styleClass="readonly"
+                                 readonly="#{not facesContext.postback or facesContext.renderResponse}" 
+                                 onmouseover="return false;"/>
+                    <p:commandButton title="Seleccione tipo de documento"
+                                     icon="fa fa-search"
+                                     class="cssWhite"
+                                     onclick="PF('dtNovedadDocumento').getPaginator().setPage(0);"
+                                     update=":frmNovedadTipoDocumentosList"
+                                     actionListener="#{genericaBean.prepareListGenericaTipoDocumentos}"                                     
+                                     oncomplete="PF('NovedadTipoDocumentosListDialog').show()"
+                                     process="@this"
+                                     style="margin-left: 70px"
+                                     >
+                        <p:ajax event="dialogReturn" listener="#{genericaBean.onNovedadTipoDocumentosChosen}" process="@this" update="tipo_documento"/>
+                    </p:commandButton>
+                    
+
+                    <p:outputLabel value="Documento novedad:"/>
+                    <p:commandButton title="Cargar documento de la novedad"
+                                     icon="fa fa-upload"
+                                     style="color: white"
+                                     update="frmAddFiles"
+                                     oncomplete="PF('AddFilesListDialog').show()"
+                                     >
+                    </p:commandButton>
+                </p:panelGrid>
+            </p:panel>
+        </h:form>
+    </p:dialog> 
+    <ui:include src="ListaNovedadTipoDocumentos.xhtml"/>
+    <ui:include src="AddFiles.xhtml"/>
+</ui:composition>

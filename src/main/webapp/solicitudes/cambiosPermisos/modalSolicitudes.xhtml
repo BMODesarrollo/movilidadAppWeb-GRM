@@ -1,0 +1,351 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="modal"
+              widgetVar="modalDlg" 
+              modal="true" 
+              closeOnEscape="true"
+              responsive="true"
+              fitViewport="true"
+              class="mr1024_60 mr500_90"
+              resizable="false" 
+              appendTo="@(body)" 
+              position="center top">
+        <c:if test="#{prgSolicitudesMasterBean.tipo_solicitud eq 'cambio'}">
+            <f:facet name="header">
+                CAMBIOS
+            </f:facet>
+        </c:if>
+        <c:if test="#{prgSolicitudesMasterBean.tipo_solicitud eq 'permiso'}">
+            <f:facet name="header">
+                PERMISOS
+            </f:facet>
+        </c:if>
+        <h:form id="frmRegistroSolicitudes">
+            <div class="ui-fluid" jsf:id="panelSolicitudes">
+                
+                <p:messages id="messages" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+                
+                <div class="ui-g" jsf:id="pnlPermisos"
+                     jsf:rendered="#{prgSolicitudesMasterBean.tipo_solicitud eq 'permiso'}">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Fecha"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar id="calPermiso"
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar una fecha"
+                                        mindate="#{prgSolicitudesMasterBean.obtenerFecha()}"
+                                        value="#{prgSolicitudesMasterBean.prgSolicitudPermiso.fecha}"
+                                        pattern="yyyy-MM-dd" 
+                                        showOn="button">
+                                <p:ajax event="dateSelect" 
+                                        process="@this"
+                                        listener="#{prgSolicitudesMasterBean.obtenerSercon()}"
+                                        update="pnlPermisos,:msgs,messages"/>
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel value="Sercon"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText 
+                                styleClass="cssBlack"
+                                rendered="#{prgSolicitudesMasterBean.prgSerconSolicitante != null}"
+                                value="#{prgSolicitudesMasterBean.prgSerconSolicitante.sercon}"/>
+
+                            <h:outputText 
+                                styleClass="cssBlack"
+                                rendered="#{prgSolicitudesMasterBean.prgSerconSolicitante eq null}"
+                                value="N/A"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel for="p_HoraIni" value="Hora Inicio" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="p_HoraIni" validatorMessage="Hora inicio invalida"  
+                                         value="#{prgSolicitudesMasterBean.prgSolicitudPermiso.timeOrigin}" 
+                                         readonly="#{facesContext.currentPhaseId.ordinal eq 6}" requiredMessage="Hora invalida" mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="p_HoraIni"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputLabel for="p_HoraFin" value="Hora Fin" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputMask id="p_HoraFin" validatorMessage="Hora fin invalida"  
+                                         value="#{prgSolicitudesMasterBean.prgSolicitudPermiso.timeDestiny}" 
+                                         readonly="#{facesContext.currentPhaseId.ordinal eq 6}" requiredMessage="Hora invalida" mask="99:99:99" >
+                                <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="p_HoraFin"/>
+                            </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Lugar Inicio" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true"
+                                readonly="#{facesContext.currentPhaseId.ordinal eq 6}"
+                                requiredMessage="Debe ingresar lugar inicio"
+                                value="#{prgSolicitudesMasterBean.prgSolicitudPermiso.lugarInicio}" 
+                                autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <h:outputText value="Lugar Fin" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText 
+                                required="true"
+                                readonly="#{facesContext.currentPhaseId.ordinal eq 6}"
+                                requiredMessage="Debe ingresar lugar fin"
+                                value="#{prgSolicitudesMasterBean.prgSolicitudPermiso.lugarFin}" 
+                                autocomplete="off"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui-g Padding0" jsf:id="pnlCambios"
+                     jsf:rendered="#{prgSolicitudesMasterBean.tipo_solicitud eq 'cambio'}">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding1">
+                        <p:fieldset legend="Datos del Reemplazo">
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Fecha" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:calendar showOn="button" 
+                                                locale="es"
+                                                required="true"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                mindate="#{prgSolicitudesMasterBean.obtenerFecha()}"
+                                                pattern="yyyy-MM-dd"
+                                                value="#{prgSolicitudesMasterBean.prgSolicitudCambio.fecha}">
+                                        <p:ajax event="dateSelect"
+                                                listener="#{prgSolicitudesMasterBean.obtenerSercon()}"
+                                                update="pnlCambios,:msgs,messages"
+                                                process="@this"/>
+                                    </p:calendar>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Código Reemplazo"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 Padding0">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:inputText id="codRemplazo"
+                                                     required="true"
+                                                     requiredMessage="Debe ingresar código del operador de reemplazo"
+                                                     value="#{prgSolicitudesMasterBean.codigo_operador_reemplazo}"/>
+                                        <div class="botonFloat">
+                                            <p:commandButton icon="fa fa-search"
+                                                             actionListener="#{prgSolicitudesMasterBean.cargarSerconReemplazo()}"
+                                                             process="@this,codRemplazo"
+                                                             style="margin: 0px"
+                                                             update="pnlCambios,:msgs,messages"
+                                                             styleClass="cssWhite"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Nombre" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText 
+                                        styleClass="cssBlack"
+                                        rendered="#{prgSolicitudesMasterBean.prgSerconReemplazo != null}"
+                                        value="#{prgSolicitudesMasterBean.prgSerconReemplazo.idEmpleado.nombres.concat(' ').concat(prgSolicitudesMasterBean.prgSerconReemplazo.idEmpleado.apellidos)}"/>
+
+                                    <h:outputText 
+                                        styleClass="cssBlack"
+                                        rendered="#{prgSolicitudesMasterBean.prgSerconReemplazo eq null}"
+                                        value="N/A"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputLabel for="c_Rem_HoraIni" value="Hora Inicio" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputMask id="c_Rem_HoraIni" validatorMessage="Hora inicio invalida"  
+                                                 value="#{prgSolicitudesMasterBean.prgSolicitudCambio.timeOriginReemplazo}" 
+                                                 readonly="#{facesContext.currentPhaseId.ordinal eq 6}" requiredMessage="Hora invalida" mask="99:99:99" >
+                                        <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="c_Rem_HoraIni"/>
+                                    </p:inputMask>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputLabel for="c_Rem_HoraFin" value="Hora Fin" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputMask id="c_Rem_HoraFin" validatorMessage="Hora fin invalida"  
+                                                 value="#{prgSolicitudesMasterBean.prgSolicitudCambio.timeDestinyReemplazo}"
+                                                 readonly="#{facesContext.currentPhaseId.ordinal eq 6}" requiredMessage="Hora invalida" mask="99:99:99" >
+                                        <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="c_Rem_HoraFin"/>
+                                    </p:inputMask>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Lugar Inicio" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        readonly="#{facesContext.currentPhaseId.ordinal eq 6}"
+                                        requiredMessage="Debe ingresar lugar inicio (OPERADOR REEMPLAZO)"
+                                        value="#{prgSolicitudesMasterBean.prgSolicitudCambio.lugarInicioReemplazo}" 
+                                        autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Lugar Fin" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText 
+                                        required="true"
+                                        readonly="#{facesContext.currentPhaseId.ordinal eq 6}"
+                                        requiredMessage="Debe ingresar lugar fin (OPERADOR REEMPLAZO)"
+                                        value="#{prgSolicitudesMasterBean.prgSolicitudCambio.lugarFinReemplazo}" 
+                                        autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Sercon"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+
+                                    <h:outputText 
+                                        id="c_Sercon_Reemplazo"
+                                        styleClass="cssBlack"
+                                        rendered="#{prgSolicitudesMasterBean.prgSerconReemplazo != null}"
+                                        value="#{prgSolicitudesMasterBean.prgSerconReemplazo.sercon}"/>
+
+                                    <h:outputText 
+                                        styleClass="cssBlack"
+                                        rendered="#{prgSolicitudesMasterBean.prgSerconReemplazo eq null}"
+                                        value="N/A"/>
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding1">
+                        <p:fieldset legend="Datos del Solicitante">
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Fecha"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:calendar showOn="button" 
+                                                required="true"
+                                                requiredMessage="Debe seleccionar una fecha"
+                                                value="#{prgSolicitudesMasterBean.prgSolicitudCambio.fecha}"
+                                                id="c_Fecha_Solicitante"
+                                                pattern="yyyy-MM-dd"
+                                                disabled="true"
+                                                readonlyInput="true"
+                                                locale="es"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputLabel for="c_Sol_HoraIni" value="Hora Inicio" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputMask id="c_Sol_HoraIni" validatorMessage="Hora inicio invalida"  
+                                                 value="#{prgSolicitudesMasterBean.prgSolicitudCambio.timeOriginSolicitante}" 
+                                                 readonly="#{facesContext.currentPhaseId.ordinal eq 6}" requiredMessage="Hora invalida" mask="99:99:99" >
+                                        <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="c_Sol_HoraIni"/>
+                                    </p:inputMask>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputLabel for="c_Sol_HoraFin" value="Hora Fin" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputMask id="c_Sol_HoraFin" validatorMessage="Hora fin invalida"  
+                                                 value="#{prgSolicitudesMasterBean.prgSolicitudCambio.timeDestinySolicitante}" 
+                                                 readonly="#{facesContext.currentPhaseId.ordinal eq 6}" requiredMessage="Hora invalida" mask="99:99:99" >
+                                        <f:validateRegex pattern="([0-1]?[0-9]|[2-3]?[0-9]):[0-5][0-9]:[0-5][0-9]" for="c_Sol_HoraFin"/>
+                                    </p:inputMask>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Lugar Inicio" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText required="true"
+                                                 readonly="#{facesContext.currentPhaseId.ordinal eq 6}"
+                                                 requiredMessage="Debe ingresar lugar inicio (OPERADOR SOLICITANTE)"
+                                                 value="#{prgSolicitudesMasterBean.prgSolicitudCambio.lugarInicioSolicitante}" autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Lugar Fin" />
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText required="true"
+                                                 readonly="#{facesContext.currentPhaseId.ordinal eq 6}"
+                                                 requiredMessage="Debe ingresar lugar fin (OPERADOR SOLICITANTE)"
+                                                 value="#{prgSolicitudesMasterBean.prgSolicitudCambio.lugarFinSolicitante}" autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-6 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <h:outputText value="Sercon"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+
+                                    <h:outputText 
+                                        id="c_Sercon_Solicitante"
+                                        styleClass="cssBlack"
+                                        rendered="#{prgSolicitudesMasterBean.prgSerconSolicitante != null}"
+                                        value="#{prgSolicitudesMasterBean.prgSerconSolicitante.sercon}"/>
+
+                                    <h:outputText 
+                                        styleClass="cssBlack"
+                                        rendered="#{prgSolicitudesMasterBean.prgSerconSolicitante eq null}"
+                                        value="N/A"/>
+                                </div>
+                            </div>
+                        </p:fieldset>    
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar" 
+                             update="@form,:msgs,:frmSolicitudes:dtSolicitudes"
+                             action="#{prgSolicitudesMasterBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" 
+                             onclick="guardar()"
+                             icon="fa fa-save"
+                             class="cssWhite"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

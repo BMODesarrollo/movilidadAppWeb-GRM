@@ -1,0 +1,319 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="autorizacion"
+              widgetVar="wlVAutorizacion" 
+              modal="true" 
+              class="mr1024_60 mr500_90"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              position="center top">
+        <c:if test="#{sstAutorizacionBean.selected == null}">
+            <f:facet name="header">
+                NUEVO REGISTRO
+            </f:facet>
+        </c:if>
+        <c:if test="#{sstAutorizacionBean.selected != null}">
+            <f:facet name="header">
+                EDITAR AUTORIZACIÓN
+            </f:facet>
+        </c:if>
+        <h:form id="frmAutorizacion">
+            <div class="ui-fluid" jsf:id="pGridDatos">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <p:messages showDetail="true" 
+                                    closable="true">
+                            <p:effect type="pulsate" event="load" delay="500"/>
+                        </p:messages>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Visitante"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nomVisitante"
+                                         readonly="true"
+                                         value="#{sstAutorizacionBean.sstEmpresaVisitante.nombre} #{sstAutorizacionBean.sstEmpresaVisitante.apellidos}"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-list"
+                                                 action="#{sstAutorizacionBean.prepareListVisitantes()}"
+                                                 onclick="PF('wVVisitantesListDialog').clearFilters();"
+                                                 oncomplete="PF('VisitantesListDialog').show();"
+                                                 process="@this"
+                                                 style="margin: 0px"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Responsable del Visitante"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="nomResponsable"
+                                         readonly="true"
+                                         value="#{sstAutorizacionBean.empleado.nombres} #{sstAutorizacionBean.empleado.apellidos}"/>
+                            <div class="botonFloat">
+                                <p:commandButton icon="fa fa-list"
+                                                 action="#{sstAutorizacionBean.prepareListEmpleados()}"
+                                                 onclick="PF('wVPmEmpleadosListDialog').clearFilters();"
+                                                 oncomplete="PF('EmpleadosListDialog').show();"
+                                                 process="@this"
+                                                 style="margin: 0px"
+                                                 styleClass="cssWhite"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha y hora llegada" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar Fecha y hora llegada"
+                                        timeInput="true"
+                                        mask="true"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        value="#{sstAutorizacionBean.sstAutorizacion.fechaHoraLlegada}">
+                            </p:calendar>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Fecha y hora salida" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:calendar showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        requiredMessage="Debe seleccionar fecha y hora salida"
+                                        timeInput="true"
+                                        mask="true"
+                                        pattern="yyyy-MM-dd HH:mm"
+                                        value="#{sstAutorizacionBean.sstAutorizacion.fechaHoraSalida}">
+                            </p:calendar>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Tipo Labor" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu 
+                                style="width: 99.999%"
+                                filter="true"
+                                required="true"
+                                requiredMessage="Debe seleccionar un tipo de labor"
+                                value="#{sstAutorizacionBean.i_sstTipoLabor}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="labor"
+                                    value="#{sstAutorizacionBean.lstTipoLabor}"
+                                    itemLabel="#{labor.tipoLabor}"
+                                    itemValue="#{labor.idSstTipoLabor}"
+                                    />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Área de labor" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu 
+                                style="width: 99.999%"
+                                filter="true"
+                                required="true"
+                                requiredMessage="Debe seleccionar un área de labor"
+                                value="#{sstAutorizacionBean.i_sstAreaEmpresa}">
+                                <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                <f:selectItems 
+                                    var="area"
+                                    value="#{sstAutorizacionBean.lstAreaEmpresa}"
+                                    itemLabel="#{area.area}"
+                                    itemValue="#{area.idSstAreaEmpresa}"
+                                    />
+                            </p:selectOneMenu> 
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Motivo Visita" for="@next"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea autoResize="false"
+                                             value="#{sstAutorizacionBean.sstAutorizacion.motivoVisita}"
+                                             required="true"
+                                             requiredMessage="Debe ingresar un motivo"/>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-6 ui-lg-6 Padding1 TexAlRight" >
+                            <p:outputLabel value=" ¿Agregar Herramienta/Equipo?"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-3 ui-lg-3 Padding1">
+                            <p:selectBooleanButton 
+                                value="#{sstAutorizacionBean.flagMateriales}" 
+                                class="cssWhite"
+                                onLabel="Si" offLabel="No" 
+                                onIcon="fa fa-check" 
+                                offIcon="fa fa-times">
+                                <p:ajax update="materiales"
+                                        global="false" />
+                            </p:selectBooleanButton>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding1" jsf:id="materiales">
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0" jsf:rendered="#{sstAutorizacionBean.flagMateriales}">
+                            <p:fieldset legend="E/S Materiales y Equipos">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Tipo Acceso" for="@next"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:selectOneMenu
+                                            style="width: 99.999%"
+                                            filter="true"
+                                            required="true"
+                                            requiredMessage="Debe seleccionar un tipo de acceso"
+                                            value="#{sstAutorizacionBean.i_tipoAcceso}">
+                                            <f:selectItem itemLabel="Seleccione uno" itemValue="#{null}" />
+                                            <f:selectItem itemLabel="Entrada" itemValue="#{0}" />
+                                            <f:selectItem itemLabel="Salida" itemValue="#{1}" />
+                                            <f:selectItem itemLabel="Ambos" itemValue="#{2}" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+                            </p:fieldset>
+                        </div>
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0" jsf:rendered="#{sstAutorizacionBean.flagMateriales}">
+                            <p:fieldset legend="Listado de Materiales/herramientas">
+                                <p:dataTable id="dtMateriales" 
+                                             rowIndexVar="index"
+                                             var="material" 
+                                             scrollable="true"
+                                             widgetVar="wlVMateriales"
+                                             scrollHeight="200"
+                                             disabledTextSelection="false"
+                                             reflow="true"
+                                             rows="10"
+                                             editable="true"
+                                             editMode="cell" 
+                                             filterDelay="1700"
+                                             paginator="true"
+                                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             rowsPerPageTemplate="10,50,100"
+                                             emptyMessage="No existen registros"
+                                             value="#{sstAutorizacionBean.lstEsMatEquiDet}">
+
+
+                                    <f:facet name="header">
+                                        <div align="right" jsf:id="botones">
+                                            <p:commandButton
+                                                icon="fa fa-plus"
+                                                value="Agregar Item"
+                                                process="@this"
+                                                actionListener="#{sstAutorizacionBean.prepareListMateriales()}"
+                                                class="cssWhite"
+                                                update=":MaterialesListDlg,:frmMaterialesList:dtListaMateriales,:msgs"
+                                                >
+                                            </p:commandButton>    
+                                        </div>
+                                    </f:facet>
+
+                                    <p:column headerText="Material"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{material.idSstMatEqui.nombre}"/>
+                                    </p:column>
+                                    <p:column headerText="Tipo Material"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{material.idSstMatEqui.idSstMatEquiTipo.tipo}"/>
+                                    </p:column>
+                                    <p:column headerText="Marca Material"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{material.idSstMatEqui.idSstMatEquiMarca.marca}"/>
+                                    </p:column>
+                                    <p:column headerText="Serial"
+                                              style="text-align: center;">
+                                        <h:outputText value="#{material.serial}" rendered="#{material.serial != null}"/>
+                                        <h:outputText value="N/A" rendered="#{empty(material.serial)}"/>
+                                    </p:column>
+                                    <p:column headerText="Cantidad"
+                                              width="10%"
+                                              style="text-align: center;">
+                                        <p:cellEditor>
+                                            <f:facet name="output"><h:outputText value="#{material.cantidad}"/></f:facet>
+                                            <f:facet name="input"><p:spinner value="#{material.cantidad}" min="1" label="Cantidad"/></f:facet>
+                                        </p:cellEditor>
+                                    </p:column>
+
+                                    <p:column headerText="Acciones" style="text-align: center;"
+                                              exportable="false">
+                                        <div class="ui-g Padding0">
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                                 title="Editar"
+                                                                 process="@this"
+                                                                 actionListener="#{sstAutorizacionBean.editarDetalle(material)}"
+                                                                 update=":EsMatEquiDet ,:frmMateriales:pGridDatos"
+                                                                 oncomplete="PF('wlvEsMatEquiDet').show();"
+                                                                 icon="fa fa-pencil">
+                                                    <p:resetInput target=":frmMateriales:pGridDatos"/>
+                                                </p:commandButton>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6">
+                                                <p:commandButton styleClass="cssWhite RedButton"
+                                                                 title="Eliminar detalle"
+                                                                 process="@this"
+                                                                 actionListener="#{sstAutorizacionBean.eliminarDetalle(material)}"
+                                                                 update="dtMateriales,:msgs"
+                                                                 icon="fa fa-times">
+                                                    <p:confirm header="Confirmación" message="Está seguro de eliminar éste item?" icon="fa fa-exclamation-triangle" />
+                                                </p:commandButton>
+                                            </div>
+                                        </div>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand name="guardar"
+                             process="frmAutorizacion,@this"
+                             update=":msgs,pGridDatos,:frmAutorizacionList:dtAutorizacion" 
+                             action="#{sstAutorizacionBean.guardar()}"/>
+            <p:remoteCommand name="actualizar"
+                             process="frmAutorizacion,@this"
+                             update=":msgs,:frmAutorizacionList:dtAutorizacion"
+                             action="#{sstAutorizacionBean.guardar()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Guardar" icon="fa fa-floppy-o"
+                             rendered="#{sstAutorizacionBean.selected == null}"
+                             class="cssWhite" onclick="guardar()"/>
+            <p:commandButton value="Actualizar" icon="fa fa-floppy-o"
+                             rendered="#{sstAutorizacionBean.selected != null and not(sstAutorizacionBean.flagAprobacionAutorizacion)}"
+                             class="cssWhite" onclick="actualizar()"/>
+            <p:commandButton value="Actualizar y Aprobar" icon="fa fa-floppy-o"
+                             rendered="#{sstAutorizacionBean.flagAprobacionAutorizacion}"
+                             class="cssWhite" onclick="actualizar()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>     

@@ -1,0 +1,203 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .texto-blanco {
+                color: white !important;
+                font-weight: bolder !important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="MAESTRO PROCESOS DISCIPLINARIOS (GENÉRICO)">
+            <h:form id="frmPrincipal">
+                <p:dataTable id="dtPdMaestro" var="proceso" 
+                             scrollable="true"
+                             widgetVar="wlVdtPdMaestro"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             reflow="true"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{genericaPdMaestroBean.lstProcesos}">
+
+                    <f:facet name="header">
+                        <div align="right" jsf:id="botones">
+
+                            <p:commandButton
+                                icon="fa fa-plus"
+                                value="Nuevo"
+                                action="#{genericaPdMaestroBean.nuevo()}"
+                                disabled="#{not(genericaPdMaestroBean.flagBtnNuevo)}"
+                                oncomplete="PF('wlvGenericaPdMaestro').show();"
+                                class="cssWhite"
+                                update=":genericaPdMaestro,:frmGenericaPdMaestro"
+                                >
+                                <p:resetInput target=":frmGenericaPdMaestro:pGridDatos"/>
+                            </p:commandButton>   
+
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtPdMaestro" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="Fecha Apertura" 
+                              filterBy="#{proceso.fechaApertura}" 
+                              filterMatchMode="startsWith"
+                              styleClass="text-center">
+
+                        <f:facet name="filter">
+                            <p:calendar id="search1" pattern="yyyy-MM-dd HH:mm" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdtPdMaestro').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdtPdMaestro').filter()" update="dtPdMaestro"/>
+                            </p:calendar> 
+                        </f:facet>
+
+                        <h:outputText value="#{proceso.fechaApertura}">
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha Cierre" 
+                              filterBy="#{proceso.fechaCierre}" 
+                              filterMatchMode="startsWith"
+                              styleClass="text-center">
+
+                        <f:facet name="filter">
+                            <p:calendar id="search2" pattern="yyyy-MM-dd HH:mm" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" showTodayButton="true"
+                                        inputStyle="width: 100%;"
+                                        placeholder="Fecha"
+                                        onkeyup="PF('wlVdtPdMaestro').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect" oncomplete="PF('wlVdtPdMaestro').filter()" update="dtPdMaestro"/>
+                            </p:calendar> 
+                        </f:facet>
+
+                        <h:outputText value="#{proceso.fechaCierre}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Estado" 
+                              filterBy="#{proceso.idPdEstadoProceso.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{proceso.idPdEstadoProceso.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Tipo Sanción" 
+                              filterBy="#{proceso.idPdTipoSancion.nombre}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{proceso.idPdTipoSancion.nombre}" />
+                    </p:column>
+
+                    <p:column headerText="Comentarios" class="cortar">
+                        <h:outputText value="#{proceso.comentarios}" />
+                    </p:column>
+
+                    <p:column headerText="Usuario Apertura" 
+                              styleClass="text-center">
+                        <h:outputText value="#{proceso.usuarioApertura}"/>
+                    </p:column>
+                    <p:column headerText="Usuario Cierre"
+                              styleClass="text-center">
+                        <h:outputText value="#{proceso.usuarioCierre}" />
+                    </p:column>
+                    <p:column headerText="Acciones" styleClass="text-center"
+                              exportable="false">
+                        <div class="ui-g Padding0">
+                            <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite GreenButton"
+                                                 title="Editar"
+                                                 action="#{genericaPdMaestroBean.editar()}"
+                                                 process="@this"
+                                                 update=":genericaPdMaestro,:frmGenericaPdMaestro"
+                                                 oncomplete="PF('wlvGenericaPdMaestro').show();"
+                                                 icon="fa fa-pencil">
+                                    <p:resetInput target=":frmGenericaPdMaestro:pGridDatos"/>
+                                    <f:setPropertyActionListener value="#{proceso}" target="#{genericaPdMaestroBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+                            <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Ver Lista de detalles"
+                                                 process="@this"
+                                                 update=":pdListaDetalle,:frmPdListaDetalle"
+                                                 oncomplete="PF('wlvPdListaDetalle').show();"
+                                                 icon="fa fa-external-link">
+                                    <f:setPropertyActionListener value="#{proceso}" target="#{genericaPdMaestroBean.selected}"/>
+                                </p:commandButton>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4 ui-lg-4">
+                                <p:commandButton styleClass="cssWhite"
+                                                 title="Ver Lista de seguimientos"
+                                                 action="#{genericaPdMaestroSeguimientoBean.cargarSeguimientos()}"
+                                                 process="@this"
+                                                 update=":NovedadDocumentosListDlg,:frmNovedadDocumentosList"
+                                                 oncomplete="PF('NovedadDocumentosListDialog').show();"
+                                                 icon="fa fa-book">
+                                    <f:setPropertyActionListener value="#{proceso}" target="#{genericaPdMaestroSeguimientoBean.genericaPdMaestro}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{genericaPdMaestroBean.lstProcesos.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtPdMaestro" 
+                                                fileName="Procesos disciplinarios"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        <ui:include src="modal/create.xhtml"/>
+        <ui:include src="modal/listaDetalles.xhtml"/>
+        <ui:include src="seguimientos/ListaNovedadDocumentos.xhtml"/>
+    </ui:define>
+
+</ui:composition>

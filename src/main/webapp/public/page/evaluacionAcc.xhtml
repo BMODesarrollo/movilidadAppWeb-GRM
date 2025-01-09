@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:jsf="http://xmlns.jcp.org/jsf"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Evaluación Caso Accidentalidad </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <h:outputStylesheet name="css/font-icon-layout.css" library="sentinel-layout" />
+        <h:outputStylesheet name="css/sentinel-layout.css" library="sentinel-layout" />
+        <h:outputStylesheet name="css/core-layout.css" library="sentinel-layout" />
+        <link rel="shortcut icon" href="resources/sentinel-layout/images/logo_III.png" />
+    </h:head>
+    <h:body class="fontRegular login-back white-back">
+        <h:form id="form">
+            <p:growl id="msg" showDetail="true" showSummary="true" life="6000" />
+            <div class="ui-fluid">
+                <div class="ui-g Padding0" style="text-transform: uppercase">
+                    <div class="ui-g-12 ui-ml-6 ui-lg-4 Padding3 Container80 MaxWid500 white-back Fnone MarAuto">
+                        <div class="EmptyBox5" />
+                        <p:panel id="pnl-info" header="Información del Evento" widgetVar="pnlWv">
+                            <div class="ui-g Padding0">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                                    <h:outputText value="ID CASO: #{evaluacionAccDetalleJSF.accidente != null ? evaluacionAccDetalleJSF.accidente.idAccidente + 1000 : ''}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="Evento" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="#{evaluacionAccDetalleJSF.accidente.idNovedadTipoDetalle.tituloTipoNovedad}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="Fecha del Evento" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="#{evaluacionAccDetalleJSF.accidente.fechaAcc}" >
+                                        <f:convertDateTime pattern="yyyy-MMMM-dd" />
+                                    </h:outputText>
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="Vehículo" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="#{evaluacionAccDetalleJSF.accidente.idVehiculo.codigo} - #{evaluacionAccDetalleJSF.accidente.idVehiculo.placa}" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="Operador" />
+                                </div>
+                                <div class="ui-g-6 ui-md-6 ui-lg-6 Padding3">
+                                    <h:outputText value="#{evaluacionAccDetalleJSF.accidente.idEmpleado.apellidos} #{evaluacionAccDetalleJSF.accidente.idEmpleado.nombres} - #{evaluacionAccDetalleJSF.accidente.idEmpleado.codigoTm}" />
+                                </div>
+                            </div>
+                            <f:facet name="options">
+                                <p:menu>
+                                    <p:submenu>
+                                        <p:menuitem value="Finalizar" url="../page/loginAcc.jsf?faces-redirect=true&amp;pin=#{evaluacionAccDetalleJSF.getiPin()}" icon="fa fa-times" />
+                                    </p:submenu>
+                                </p:menu>
+                            </f:facet>
+                        </p:panel>
+                        <div class="EmptyBox5" />
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:dataTable id="datalist" 
+                                         value="#{evaluacionAccDetalleJSF.listAccidenteCalificacionDet}"
+                                         var="item"
+                                         rowIndexVar="rVar"
+                                         rows="20"
+                                         rowKey="#{rVar + 1}"
+                                         reflow="true"
+                                         editable="true" 
+                                         editMode="cell" 
+                                         widgetVar="valoracionWV"
+                                         emptyMessage="No existen registros">
+
+                                <f:facet name="header">
+                                    <div style="text-transform: uppercase">
+                                        Causalidades
+                                    </div>
+                                </f:facet>
+
+                                <p:ajax event="cellEdit" 
+                                        global="true" 
+                                        listener="#{evaluacionAccDetalleJSF.onCellEdit}"
+                                        update=":form:msg,:form:btn-sig,:form:acumulado"/>
+
+                                <p:column headerText="#" style="width: 30px">
+                                    <p:outputLabel value="#{rVar+1}"/>
+                                </p:column>
+
+                                <p:column headerText="Árbol" >
+                                    <div class="ui-g">
+                                        <h:outputText value="Árbol: #{item.idAccidenteAnalisis.idCausaSub.idCausa.idAccArbol.arbol}" 
+                                                      title="desc: #{item.idAccidenteAnalisis.idCausaSub.idCausa.idAccArbol.descripcion}" />
+                                    </div>
+                                    <div class="ui-g">
+                                        <h:outputText value="Causa: #{item.idAccidenteAnalisis.idCausaSub.idCausa.causa}" 
+                                                      title="desc: #{item.idAccidenteAnalisis.idCausaSub.idCausa.descripcion}" />
+                                    </div>
+                                    <div class="ui-g">
+                                        <h:outputText value="Sub Causa: #{item.idAccidenteAnalisis.idCausaSub.subcausa}" 
+                                                      title="desc: #{item.idAccidenteAnalisis.idCausaSub.descripcion}" />
+                                    </div>
+                                    <div class="ui-g">
+                                        <h:outputText value="Causa Raíz: #{item.idAccidenteAnalisis.idCausaRaiz.causaRaiz}"
+                                                      title="desc: #{item.idAccidenteAnalisis.idCausaRaiz.descripcion}"/>
+                                    </div>
+                                </p:column>
+                                <p:column headerText="Valoración" id="valoracion" ariaHeaderText="1" style="text-align: center">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <p:inputText value="#{item.calificacion}"
+                                                         readonly="true"
+                                                         style="text-align: center;"
+                                                         placeholder="Ingrese su calificación"
+                                                         class="cssBlack" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{evaluacionAccDetalleJSF.iValue}" 
+                                                         style="width:96%" 
+                                                         placeholder="#{item.calificacion}"
+                                                         maxlength="3" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                        <div class="ui-g-4 ui-lm-4 ui-lg-5 Padding3">
+                            <p:commandButton id="btn-sig"
+                                             action="#{evaluacionAccDetalleJSF.siguiente()}"
+                                             icon="fa fa-arrow-right" 
+                                             disabled="#{evaluacionAccDetalleJSF.iAcumulado != 100}"
+                                             process="@this"
+                                             rendered="#{evaluacionAccDetalleJSF.bFlag}"
+                                             update=":form" 
+                                             class="cssWhite GreenButton"  
+                                             value="Siguiente" >
+                                <p:confirm header="Confirmación" message="Seguro de su valoración? No son reversible estos datos" 
+                                           icon="fa fa-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+                        <div class="ui-g-4 ui-lm-4 ui-lg-7 Padding3" style="text-align: right">
+                            <h:outputText id="acumulado"
+                                          value="Total: #{evaluacionAccDetalleJSF.getiAcumulado()} %"
+                                          class="cssBlack" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:contextMenu for="datalist" widgetVar="cMenu">   
+                <p:menuitem value="Editar Valor" icon="fa fa-search" onclick="PF('valoracionWV').showCellEditor();return false;"/>  
+                <p:menuitem value="Cerrar Menú" icon="fa fa-times" onclick="PF('cMenu').hide()"/>  
+            </p:contextMenu> 
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes cssWhite" icon="fa fa-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no cssWhite" icon="fa fa-times" />
+            </p:confirmDialog>
+        </h:form>
+        <p:ajaxStatus  onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:graphicImage name="images/preloadbmo.gif" height="50" library="sentinel-layout"/>
+        </p:dialog>
+    </h:body>
+    <!--  -->
+</html>

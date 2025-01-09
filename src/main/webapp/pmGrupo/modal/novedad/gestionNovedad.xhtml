@@ -1,0 +1,230 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="novedadesPM" id="modalnovedadesPM" modal="true" closeOnEscape="true"
+              responsive="true" closable="false"
+              resizable="false" appendTo="@(body)"
+              class="mr1024_70 mr500_90" position="center top">
+        <p:ajax event="close" listener="#{gruposNovSFMB.updateInfo()}"
+                update="frmPrincipal:tbNovs,
+                frmPrincipal:master_id,
+                frmPrincipal:donut_chart,
+                frmPrincipal:info_id"/>
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Editar novedad programa máster: #{gestionDanoNovPuntBean.novedad.idEmpleado.nombres.toUpperCase()} #{gestionDanoNovPuntBean.novedad.idEmpleado.apellidos.toUpperCase()}
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('novedadesPM').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="frmNovedadesPm">
+            <div jsf:id="panel">
+                <p:messages id="messages" showSummary="false" showDetail="true" closable="true">
+                    <p:effect type="pulsate" event="load" delay="500" />
+                </p:messages>
+
+                <div class="ui-fluid" jsf:id="pGrid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <p:outputLabel for="fecha" value="Fecha:" />
+                            <p:calendar id="fecha" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{gestionDanoNovPuntBean.novedad.fecha}"
+                                        showOn="button" 
+                                        locale="es"
+                                        required="true"
+                                        maxdate="today"
+                                        requiredMessage="Debe seleccionar una fecha"
+                                        showTodayButton="true"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                                <p:outputLabel for="novedad_tipo" value="Tipo de novedad: *"/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+
+                                    <p:inputText placeholder="Seleccione tipo de novedad"
+                                                 id="novedad_tipo"
+                                                 value="#{gestionDanoNovPuntBean.novedadTipo.nombreTipoNovedad}"
+                                                 readonly="true"/>
+                                    <div class="botonFloat" >
+
+                                        <p:commandButton title="Cargar tipo de novedad"
+                                                         icon="fa fa-list"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         process="@this"
+                                                         onclick="PF('dtNovedadTipos').getPaginator().setPage(0);"
+                                                         action="#{gestionDanoNovPuntBean.prepareListNovedadTipo()}"
+                                                         oncomplete="PF('PmNovedadTipoListDialog').show()">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                                <p:outputLabel for="novedad_tipo_detalle" value="Detalle de tipo novedad:*"/> 
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                                    <p:inputText placeholder="Seleccione detalle tipo de novedad"
+                                                 id="novedad_tipo_detalle"
+                                                 value="#{gestionDanoNovPuntBean.novedadTipoDetalles.tituloTipoNovedad != null? gestionDanoNovPuntBean.novedadTipoDetalles.tituloTipoNovedad : ''}"
+                                                 readonly="true"
+                                                 onkeypress="if (event.keyCode === 13) {
+                                                             return false;
+                                                         }">
+                                    </p:inputText>
+                                    <div class="botonFloat" >
+                                        <p:commandButton title="Cargar detalle tipo de novedad"
+                                                         id="novedad_tipo_detalleBtn"
+                                                         icon="fa fa-list"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         process="@this"
+                                                         update="frmPmNovedadTipoDetalleList"
+                                                         action="#{gestionDanoNovPuntBean.prepareListNovedadTipoDetalle()}">
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+
+                            <p:outputLabel for="desde" value="Desde:" />
+                            <p:calendar id="desde" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{gestionDanoNovPuntBean.novedad.desde}"
+                                        showOn="button" 
+                                        locale="es"
+                                        showTodayButton="true"
+                                        readonlyInput="true"
+                                        disabled="#{not(gestionDanoNovPuntBean.novedadTipoDetalles.fechas == 1)}"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" update="hasta"/>
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" >
+                            <p:outputLabel for="hasta" value="Hasta:" />
+                            <p:calendar id="hasta" 
+                                        pattern="dd-MM-yyyy"
+                                        value="#{gestionDanoNovPuntBean.novedad.hasta}"
+                                        mindate="#{gestionDanoNovPuntBean.novedad.desde}"
+                                        showOn="button" 
+                                        locale="es"
+                                        disabled="#{not(gestionDanoNovPuntBean.novedadTipoDetalles.fechas == 1)}"
+                                        readonlyInput="true"
+                                        showTodayButton="true"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                            </p:calendar>
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="pgrid4">
+                            <div class="ui-g-6 ui-md-12 ui-lg-12 Padding0 " >
+                                <p:outputLabel value="Vehículo"/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+
+                                    <p:inputText placeholder="Vehículo"
+                                                 id="vehiculo"
+                                                 value="#{gestionDanoNovPuntBean.c_vehiculo}"
+                                                 onkeypress="if (event.keyCode === 13) {
+                                                             return false;
+                                                         }">
+                                    </p:inputText>
+                                    <div class="botonFloat" >
+
+                                        <p:commandButton process="vehiculo,@this" 
+                                                         actionListener="#{gestionDanoNovPuntBean.cargarVehiculo()}"
+                                                         icon="fa fa-search"
+                                                         style="margin: 0px"
+                                                         class="cssWhite"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="pgrid3">
+                            <div class="ui-g-6 ui-md-12 ui-lg-12 Padding0 " >
+                                <p:outputLabel value="Operador: *" for="operador"/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0 " >
+                                    <p:inputText placeholder="Nombre completo de operador"
+                                                 id="operador"
+                                                 value="#{gestionDanoNovPuntBean.empleado.nombres} #{gestionDanoNovPuntBean.empleado.apellidos}"
+                                                 readonly="true"
+                                                 onkeypress="if (event.keyCode === 13) {
+                                                             return false;
+                                                         }"/>
+                                    <div class="botonFloat" >
+                                        <p:commandButton title="Cargar lista de operadores"
+                                                         icon="fa fa-list"
+                                                         process="@this"
+                                                         class="cssWhite"
+                                                         style="margin: 0px"
+                                                         update="frmPmEmpleadoList"
+                                                         oncomplete="PF('PmEmpleadosListDialog').show()"
+                                                         action="#{gestionDanoNovPuntBean.prepareListEmpleados}" >
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p:separator />
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5 Wid100" jsf:id="pgrid2">
+                            <p:outputLabel for="observaciones" value="Observaciones:" />
+                            <p:inputTextarea id="observaciones" 
+                                             value="#{gestionDanoNovPuntBean.novedad.observaciones}"
+                                             required="true" 
+                                             requiredMessage="Debe ingresar una observación"/>
+                            <p:outputLabel value="(*) Campos obligatorios"/>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <p:remoteCommand name="rc_nov_upd"
+                             update="msgs,frmPrincipal:idTablaPmGrupoDialog,
+                             frmPrincipal:tbNovs,
+                             frmPrincipal:master_id,
+                             frmPrincipal:donut_chart,
+                             frmPrincipal:info_id"
+                             action="#{gruposNovSFMB.updateInfo()}"
+                             actionListener="#{gestionDanoNovPuntBean.actualizarNovedadPM()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Actualizar" 
+                             icon="fa fa-check"
+                             id="btnActualizarNovedadPM"
+                             class="cssWhite"
+                             onclick="rc_nov_upd()"/>
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListPmNovedadTipo.xhtml" />
+    <ui:include src="ListPmNovedadTipoDetalles.xhtml" />
+    <ui:include src="ListaEmpleados.xhtml" />
+</ui:composition>

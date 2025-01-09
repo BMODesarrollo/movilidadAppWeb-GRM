@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <p:dialog id="dlgNuevoDetalle" 
+              widgetVar="dlgNuevoDetalle" 
+              header="Nuevo Detalle" 
+              modal="true" 
+              closable="true" 
+              resizable="false" 
+              draggable="false" 
+              styleClass="modal-center" 
+              width="500">
+
+        <h:form id="formNuevoDetalle">
+            <p:messages id="messagesNuevoDetalle" />
+
+            <p:panelGrid columns="2">
+                <p:outputLabel value="Etapa:" for="etapaSelect" />
+                <p:selectOneMenu id="etapaSelect" 
+                                 value="#{planRecuProcesoProBean.nuevaEtapa.idPlaRecuProcesoPro}" 
+                                 style="width: 100%;" 
+                                 required="true">
+                    <f:selectItem itemLabel="Seleccione una etapa" itemValue="" />
+                    <f:selectItems value="#{planRecuProcesoProBean.listProcesoPro}" 
+                                   var="etapa" 
+                                   itemLabel="#{etapa.descripcion}" 
+                                   itemValue="#{etapa.idPlaRecuProcesoPro}" />
+                </p:selectOneMenu>
+
+                <p:outputLabel value="Detalle:" for="detalleInput" />
+                <p:inputText id="detalleInput" 
+                             value="#{planRecuProcesoProBean.nuevoDetalle}" 
+                             style="width: 100%;" 
+                             required="true" />
+
+                <p:outputLabel value="Duración:" for="duracionInput" />
+                <p:inputNumber id="duracionInput" 
+                               value="#{planRecuProcesoProBean.nuevaDuracion}" 
+                               style="width: 100%;" 
+                               required="true" />
+
+                <p:remoteCommand action="#{planRecuProcesoProBean.guardarNuevoDetalle()}" 
+                                 name="rc_u"
+                                 update="msgs,@form,"/>
+
+                <f:facet name="footer">
+                    <p:commandButton onclick="rc_u();"
+                                     value="Guardar"
+                                     icon="fa fa-save"
+                                     class="cssWhite">
+                        <p:confirm header="ADVERTENCIA" 
+                                   icon="fa fa-exclamation-triangle" escape="false"
+                                   message="Verificar los datos. &lt;br/&gt;Una vez confirme el registro no podrá editar los campos!"
+                                   class="cssWhite"/>
+                    </p:commandButton>
+
+                </f:facet>
+            </p:panelGrid>
+        </h:form>
+    </p:dialog>
+</ui:composition>

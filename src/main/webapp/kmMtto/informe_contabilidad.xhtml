@@ -1,0 +1,420 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <p:panel header="INFORME DE CONTABILIDAD">
+            <h:form id="frmCargaKmConciliado">
+                <p:growl id="messages" showDetail="true"
+                         >
+                    <p:effect type="pulsate" event="load" delay="500"/>
+                </p:growl>
+                <p:tabView id="tabView">
+                    <p:ajax event="tabChange" 
+                            listener="#{informeContabilidadBean.onChange}"/>
+                    <p:tab title="Liquidación diaria" id="tbLiqDiaria" rendered="#{informeContabilidadBean.validarUrlBMO()}">
+                        <p:staticMessage severity="warn" summary="AVISO! (SOLO PARA BOGOTA MÓVIL)" 
+                                         detail="&lt;h3&gt; Antes de generar el informe de contabilidad, debe 
+                                         liquidar los días correspondientes de la semana a generar (POR DIA),
+                                         es decir, se distribuirá el vacío entre la cantidad de vehículos (POR TIPOLOGIA) que trabajaron
+                                         en la fecha seleccionada.&lt;/h3&gt;" 
+                                         escape="false">
+                            <p:effect type="pulsate" event="load" delay="500"/>
+                        </p:staticMessage>
+                        <div class="ui-fluid" >
+                            <div class="ui-g ">
+                                <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" jsf:id="PGridDiaria">
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5"
+                                         jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <p:outputLabel value="Unidad funcional: " />
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <p:selectOneMenu 
+                                                styleClass="custom-filter" 
+                                                filter="true" 
+                                                value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                                filterMatchMode="contains" 
+                                                style="width: 99.999%" title="Seleccione Uno..">
+                                                <f:selectItem itemLabel="-" 
+                                                              itemValue="#{0}"
+                                                              itemDescription="Seleccione Uno.."/>
+                                                <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                               var="uf" itemLabel="#{uf.nombre}"
+                                                               itemValue="#{uf.idGopUnidadFuncional}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                        <p:outputLabel for="fecha" value="Seleccione fecha: " />
+                                        <p:calendar id="fecha" value="#{informeContabilidadBean.fecha}"
+                                                    showOn="button"
+                                                    readonlyInput="true"
+                                                    pattern="yyyy-MM-dd"
+                                                    placeholder="Seleccione fecha a liquidar"
+                                                    locale="es"
+                                                    onkeypress="if (event.keyCode === 13) {
+                                                                return false;
+                                                            }">
+                                            <p:ajax event="dateSelect" 
+                                                    listener="#{informeContabilidadBean.liquidar()}"
+                                                    update="pGridLiquidacion,frmCargaKmConciliado:messages"/>
+                                        </p:calendar>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" jsf:id="pGridLiquidacion">
+                                    <p:spacer height="15"/>
+                                    <p:cache disabled="true"/>
+                                    <p:dataTable var="kmConciliado" value="#{informeContabilidadBean.lstKmConciliado}"
+                                                 id="dtKmConciliado"      
+                                                 rowIndexVar="nroFila"
+                                                 widgetVar="dtKmConciliado"
+                                                 reflow="true"
+                                                 scrollable="true"
+                                                 scrollHeight="600"
+                                                 paginator="true"
+                                                 rendered="#{informeContabilidadBean.lstKmConciliado.size() gt 0}"
+                                                 filterDelay="1000"
+                                                 emptyMessage="Sin datos">
+
+                                        <f:facet name="header">
+                                            <div align="right" >
+                                                <h:commandLink>
+                                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                         alt="excel" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="xlsx" 
+                                                                    target="dtKmConciliado" 
+                                                                    fileName="REPORTE CONTABILIDAD (#{informeContabilidadBean.formatearFecha(informeContabilidadBean.fecha)})"
+                                                                    />
+                                                </h:commandLink>
+                                                <h:commandLink>
+                                                    <img src="../resources/img/pdf.png" title="Exportar en formato pdf"
+                                                         alt="pdf" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="pdf" target="dtKmConciliado" fileName="Cumplediario #{now}" />
+                                                </h:commandLink>
+                                                <h:commandLink>
+                                                    <img src="../resources/img/csv.png" title="Exportar en formato csv" 
+                                                         alt="csv" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="csv" target="dtKmConciliado" fileName="Cumplediario #{now}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </f:facet>
+
+                                        <p:column headerText="#" style="width: 30px" exportable="false">
+                                            <h:outputText value="#{nroFila+1}" />
+                                        </p:column>
+                                        <p:column headerText="Fecha">
+                                            <h:outputText value="#{kmConciliado.fecha}" >
+                                                <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                                            </h:outputText>
+                                        </p:column>
+                                        <p:column headerText="Vehículo" 
+                                                  filterBy="#{kmConciliado.idVehiculo.codigo}">
+                                            <h:outputText value="#{kmConciliado.idVehiculo.codigo}" />
+                                        </p:column>
+                                        <p:column headerText="Tipo Vehículo">
+                                            <h:outputText value="#{kmConciliado.idVehiculo.idVehiculoTipo.nombreTipoVehiculo}"/>
+                                        </p:column>
+                                        <p:column headerText="KM_Contables">
+                                            <h:outputText value="#{kmConciliado.kmContabilidad}" >
+                                            </h:outputText>
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>
+                            </div>
+                        </div>
+                    </p:tab>
+                    <p:tab id="tbInforme">
+                        <f:facet name="title">
+                            <c:if test="#{informeContabilidadBean.validarUrlBMO()}">
+                                Informe
+                            </c:if> 
+                            <c:if test="#{informeContabilidadBean.validarUrlBMO() eq false}">
+                                Informe NO 2,35%
+                            </c:if> 
+                        </f:facet>
+                        <div class="ui-fluid" jsf:id="pGridInforme">
+                            <div class="ui-g ">
+
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5"
+                                     jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Unidad funcional: " />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:selectOneMenu 
+                                            styleClass="custom-filter" 
+                                            filter="true" 
+                                            value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                            filterMatchMode="contains" 
+                                            style="width: 99.999%" title="Seleccione Uno..">
+                                            <f:selectItem itemLabel="-" 
+                                                          itemValue="#{0}"
+                                                          itemDescription="Seleccione Uno.."/>
+                                            <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                           var="uf" itemLabel="#{uf.nombre}"
+                                                           itemValue="#{uf.idGopUnidadFuncional}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5" 
+                                     jsf:rendered="#{informeContabilidadBean.validarUrlBMO() eq true}" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="fecha_inicio"
+                                                       value="Fecha Inicio: "  />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:calendar id="fecha_inicio" value="#{informeContabilidadBean.fecha_inicio}"
+                                                    pattern="yyyy-MM-dd"
+                                                    showOn="button"
+                                                    readonlyInput="true"
+                                                    required="true"
+                                                    requiredMessage="Debe seleccionar la fecha de inicio"
+                                                    rendered="#{informeContabilidadBean.validarUrlBMO() eq true}"
+                                                    placeholder="Seleccione fecha inicio"
+                                                    locale="es"
+                                                    onkeypress="if (event.keyCode === 13) {
+                                                                return false;
+                                                            }">
+                                            <p:ajax event="dateSelect" 
+                                                    update="fecha_fin,@this"/>
+                                        </p:calendar>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5"  jsf:rendered="#{informeContabilidadBean.validarUrlBMO() eq false}">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="fecha_inicio_cx" value="Fecha Inicio: "/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:calendar id="fecha_inicio_cx" value="#{informeContabilidadBean.fecha_inicio_CX}"
+                                                    pattern="yyyy-MM-dd"
+                                                    showOn="button"
+                                                    readonlyInput="true"
+                                                    required="true"
+                                                    rendered="#{informeContabilidadBean.validarUrlBMO() eq false}"
+                                                    requiredMessage="Debe seleccionar la fecha de inicio"
+                                                    placeholder="Seleccione fecha inicio"
+                                                    locale="es"
+                                                    onkeypress="if (event.keyCode === 13) {
+                                                                return false;
+                                                            }">
+                                        </p:calendar>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5" 
+                                     jsf:rendered="#{informeContabilidadBean.validarUrlBMO() eq true}" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="fecha_fin"
+                                                       value="Fecha Fin: "/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:calendar id="fecha_fin" value="#{informeContabilidadBean.fecha_fin}"
+                                                    pattern="yyyy-MM-dd"
+                                                    showOn="button"
+                                                    readonlyInput="true"
+                                                    required="true"
+                                                    rendered="#{informeContabilidadBean.validarUrlBMO() eq true}"
+                                                    requiredMessage="Debe seleccionar una fecha fin"
+                                                    mindate="#{informeContabilidadBean.fecha_inicio}"
+                                                    placeholder="Seleccione fecha fin"
+                                                    locale="es"
+                                                    onkeypress="if (event.keyCode === 13) {
+                                                                return false;
+                                                            }">
+                                            <p:ajax event="dateSelect" 
+                                                    listener="#{informeContabilidadBean.cargarReporte()}"
+                                                    update="@this,pGridReporte,frmCargaKmConciliado:messages"/>
+                                        </p:calendar>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5" jsf:rendered="#{informeContabilidadBean.validarUrlBMO() eq false}">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="fecha_fin_cx" 
+                                                       value="Fecha Fin: " 
+                                                       />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:calendar id="fecha_fin_cx" value="#{informeContabilidadBean.fecha_fin_CX}"
+                                                    pattern="yyyy-MM-dd"
+                                                    showOn="button"
+                                                    readonlyInput="true"
+                                                    required="true"
+                                                    rendered="#{informeContabilidadBean.validarUrlBMO() eq false}"
+                                                    requiredMessage="Debe seleccionar una fecha fin"
+                                                    placeholder="Seleccione fecha fin"
+                                                    locale="es"
+                                                    onkeypress="if (event.keyCode === 13) {
+                                                                return false;
+                                                            }">
+                                        </p:calendar>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                            <p:outputLabel style="visibility: hidden" value="-"/>
+                                        </div>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+
+                                        <p:commandButton value="Generar reporte" icon="fa fa-download"
+                                                         class="cssWhite"
+                                                         process="@this,fecha_inicio_cx,fecha_fin_cx"
+                                                         ajax="false"
+                                                         actionListener="#{informeContabilidadBean.generarReporte()}"
+                                                         rendered="#{informeContabilidadBean.validarUrlBMO() eq false}"
+                                                         update="frmCargaKmConciliado:messages">
+                                            <p:fileDownload value="#{informeContabilidadBean.file}" />
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-fluid" jsf:id="pGridReporte">
+                            <div class="ui-g ">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+
+                                    <p:dataTable var="kmContabilidad" value="#{informeContabilidadBean.lstKmContablidad}"
+                                                 id="dtKmContabilidad"      
+                                                 rowIndexVar="nroFila"
+                                                 reflow="true"
+                                                 scrollable="true"
+                                                 scrollHeight="600"
+                                                 paginator="true"
+                                                 filterDelay="1000"
+                                                 rendered="#{informeContabilidadBean.lstKmContablidad.size() gt 0 and informeContabilidadBean.validarUrlBMO()}"
+                                                 emptyMessage="No existen datos para ese rango de fechas">
+
+                                        <f:facet name="header">
+                                            REPORTE CONTABILIDAD (#{informeContabilidadBean.formatearFecha( informeContabilidadBean.fecha_inicio)}  a  #{informeContabilidadBean.formatearFecha(informeContabilidadBean.fecha_fin )})
+                                            <div align="right" >
+                                                <p:commandButton value="Generar reporte" icon="fa fa-download"
+                                                                 class="cssWhite"
+                                                                 ajax="false"
+                                                                 actionListener="#{informeContabilidadBean.generarReporte()}"
+                                                                 update="frmCargaKmConciliado:messages">
+                                                    <p:fileDownload value="#{informeContabilidadBean.file}" />
+                                                </p:commandButton>
+                                                <h:commandLink>
+                                                    <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                                         alt="excel" style="width: 24px;height: 24px"/>
+                                                    <p:dataExporter type="xlsx" 
+                                                                    target="dtKmContabilidad" 
+                                                                    fileName="REPORTE CONTABILIDAD (#{informeContabilidadBean.formatearFecha(informeContabilidadBean.fecha_inicio)} - #{informeContabilidadBean.formatearFecha(informeContabilidadBean.fecha_fin)})"
+                                                                    />
+                                                </h:commandLink>
+                                            </div>
+                                        </f:facet>
+
+                                        <p:column headerText="#" style="width: 30px" exportable="false">
+                                            <h:outputText value="#{nroFila+1}" />
+                                        </p:column>
+                                        <p:column headerText="Vehículo" 
+                                                  filterBy="#{kmContabilidad.codigo_vehiculo}">
+                                            <h:outputText value="#{kmContabilidad.codigo_vehiculo}" />
+                                        </p:column>
+                                        <p:column headerText="KM_Comercial">
+                                            <h:outputText value="#{kmContabilidad.total}"/>
+                                        </p:column>
+                                        <p:column headerText="KM_Recorrido">
+                                            <h:outputText value="#{kmContabilidad.total}" >
+                                            </h:outputText>
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>
+                            </div>
+                        </div>
+                    </p:tab>
+                    <p:tab title="Informe 2,35" id="tbInforme235" rendered="#{informeContabilidadBean.validarUrlBMO() eq false}">
+                        <div class="ui-fluid" jsf:id="pGridInforme235">
+                            <div class="ui-g ">
+                                <div class="ui-g-12 ui-md-3 ui-lg-2 Padding5"
+                                     jsf:rendered="#{uniFuncSessionBean.filtradoUF}">
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel value="Unidad funcional: " />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:selectOneMenu 
+                                            styleClass="custom-filter" 
+                                            filter="true" 
+                                            value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                            filterMatchMode="contains" 
+                                            style="width: 99.999%" title="Seleccione Uno..">
+                                            <f:selectItem itemLabel="-" 
+                                                          itemValue="#{0}"
+                                                          itemDescription="Seleccione Uno.."/>
+                                            <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}"
+                                                           var="uf" itemLabel="#{uf.nombre}"
+                                                           itemValue="#{uf.idGopUnidadFuncional}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-4 ui-lg-2 Padding5"  >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="fecha_inicio_235" value="Fecha Inicio: " />
+                                        <p:calendar id="fecha_inicio_235" value="#{informeContabilidadBean.fecha_inicio}"
+                                                    pattern="yyyy-MM-dd"
+                                                    showOn="button"
+                                                    readonlyInput="true"
+                                                    required="true"
+                                                    requiredMessage="Debe seleccionar la fecha de inicio"
+                                                    placeholder="Seleccione fecha inicio"
+                                                    locale="es"
+                                                    onkeypress="if (event.keyCode === 13) {
+                                                                return false;
+                                                            }">
+                                            <p:ajax event="dateSelect" 
+                                                    update="fecha_fin_235,@this"/>
+                                        </p:calendar>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-3 ui-lg-2 Padding5"  >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel for="fecha_fin_235" value="Fecha Fin: " />
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:calendar id="fecha_fin_235" value="#{informeContabilidadBean.fecha_fin}"
+                                                    pattern="yyyy-MM-dd"
+                                                    showOn="button"
+                                                    readonlyInput="true"
+                                                    required="true"
+                                                    requiredMessage="Debe seleccionar una fecha fin"
+                                                    placeholder="Seleccione fecha fin"
+                                                    locale="es"
+                                                    onkeypress="if (event.keyCode === 13) {
+                                                                return false;
+                                                            }">
+                                        </p:calendar>
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-3 ui-lg-2 Padding5"  >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:outputLabel style="visibility: hidden" value="-"/>
+                                    </div>
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                        <p:commandButton value="Generar reporte (2,35%)" icon="fa fa-download"
+                                                         class="cssWhite"
+                                                         process="@this,fecha_inicio_235,fecha_fin_235"
+                                                         ajax="false"
+                                                         actionListener="#{informeContabilidadBean.generarReporte235()}"
+                                                         update="frmCargaKmConciliado:messages">
+                                            <p:fileDownload value="#{informeContabilidadBean.file}" />
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

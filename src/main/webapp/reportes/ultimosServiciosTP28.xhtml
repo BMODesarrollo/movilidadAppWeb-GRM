@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g" >
+                        <div class="ui-g-12 ui-ml-7 ui-lg-8 Padding0">
+                            <h:outputText value="ULTIMOS SERVICIOS TP28"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-5 ui-lg-4 Padding0" >
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                 filter="true" 
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Una unidad funcional" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax global="false"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="form_ultimos_servicios_tp28">
+                <p:dataTable id="db_ultimos_servicios_tp28_id" var="item" 
+                             scrollable="true"
+                             styleClass="verticalHeader"
+                             widgetVar="wlVdb_ultimos_servicios_tp28_id"
+                             scrollHeight="600"
+                             rows="50"
+                             filterDelay="1700"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="50,100,200"
+                             emptyMessage="No existen registros"
+                             value="#{tp28ultimosServiciosBean.list}">
+
+                    <f:facet name="header">
+                        <div align="right" >
+                            <p:outputLabel for="fecha" style="color: white" value="Fecha: " />
+                            <p:calendar id="fecha" 
+                                        pattern="yyyy/MM/dd"
+                                        value="#{tp28ultimosServiciosBean.fecha}"
+                                        locale="es"
+                                        inputStyle="width: 90px"
+                                        navigator="true"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }">
+                                <p:ajax event="dateSelect"
+                                        process="@this" global="false"/>
+                            </p:calendar>
+                            <p:commandButton
+                                icon="fa fa-search"
+                                value="Consultar"
+                                action="#{tp28ultimosServiciosBean.consultar()}"
+                                class="cssWhite"
+                                update="msgs,form_ultimos_servicios_tp28:db_ultimos_servicios_tp28_id"/>   
+                        </div>
+                    </f:facet>
+                    <p:column headerText="FECHA" width="10%" styleClass="text-center">
+                        <h:outputText value="#{item.fecha}" >
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="UNIDAD FUNCIONAL"
+                              filterable="true"
+                              rendered="#{uniFuncSessionBean.filtradoUF}"
+                              filterMatchMode="contains"
+                              filterBy="#{item.nombreUf}">
+                        <h:outputText value="#{item.nombreUf}" />
+                    </p:column>
+                    <p:column headerText="HORA"
+                              filterable="true"
+                              filterMatchMode="contains"
+                              filterBy="#{item.horaSalida}">
+                        <h:outputText value="#{item.horaSalida}" />
+                    </p:column>
+                    <p:column headerText="RUTA"
+                              filterable="true"                              
+                              filterMatchMode="contains"
+                              filterBy="#{item.ruta}">
+                        <h:outputText value="#{item.ruta}" />
+                    </p:column>
+                    <p:column headerText="TABLA"
+                              filterable="true"                            
+                              filterMatchMode="exact"
+                              filterBy="#{item.tabla}">
+                        <h:outputText value="#{item.tabla}" />
+                    </p:column>
+                    <p:column headerText="OPERADOR"
+                              filterable="true"           
+                              filterMatchMode="contains"
+                              filterBy="#{item.codigoTm}">
+                        <h:outputText value="#{item.codigoTm}" />
+                    </p:column>
+                    <p:column headerText="NOMBRE"
+                              filterable="true"     
+                              width="15%"
+                              filterMatchMode="contains"
+                              filterBy="#{item.nombreOperador} #{item.apellidoOperador}">
+                        <h:outputText value="#{item.nombreOperador} #{item.apellidoOperador}" />
+                    </p:column>
+                    <p:column headerText="TELEFONO"
+                              filterable="true"     
+                              width="15%"
+                              filterMatchMode="contains"
+                              filterBy="#{item.telefono}">
+                        <h:outputText value="#{item.telefono}" />
+                    </p:column>
+                    <p:column headerText="PIR"
+                              filterable="true"
+                              width="10%"
+                              filterMatchMode="contains"
+                              filterBy="#{item.lugarSalida}">
+                        <h:outputText value="#{item.lugarSalida}" />
+                    </p:column>
+
+                    <p:column headerText="MÓVIL"
+                              filterable="true"                              
+                              filterMatchMode="contains"
+                              filterBy="#{item.vehiculo}">
+                        <h:outputText value="#{item.vehiculo}" />
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{tp28ultimosServiciosBean.list.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="db_ultimos_servicios_tp28_id" 
+                                                fileName="ULTIMOS SERVICIOS TP28"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>

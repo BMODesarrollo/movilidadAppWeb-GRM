@@ -1,0 +1,267 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="../../WEB-INF/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="content">
+        <div class="ui-fluid no-print">
+            <div class="ui-g">
+                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3" jsf:id="panel-tab">     
+                    <h:form id="carga-info"  enctype="multipart/form-data"> 
+                        <p:panel header="Carga Medicina Laboral"
+                                 toggleable="true" 
+                                 toggleSpeed="500" 
+                                 closeSpeed="500"  
+                                 collapsed="true"
+                                 widgetVar="panel" 
+                                 style="margin-bottom:20px">
+                            <p:messages id="messages" escape="false" showDetail="true" closable="true">
+                            </p:messages>
+                            <h:panelGrid columns="2" style="text-align: center; margin: 0 auto">
+                                <p:fileUpload fileUploadListener="#{plaRecuMedicinaBean.cargarMedicina}" mode="advanced" dragDropSupport="false"
+                                              update="messages" sizeLimit="2000000" fileLimit="1" allowTypes="/(\.|\/)(xlsx)$/" 
+                                              label="Buscar archivo" uploadLabel="Cargar" cancelLabel="Cancelar carga"
+                                              invalidFileMessage="Debe cargar un archivo excel válido"
+                                              invalidSizeMessage="El archivo no debe ser mayor a 2mb"
+                                              oncomplete="PF('w_Medicina').clearFilters(); PF('w_Medicina').filter();"/>
+                            </h:panelGrid>
+                        </p:panel>
+                    </h:form>
+                    <h:form id="frmMedicina" prependId="false">
+                        <p:growl id="cj-grow" showDetail="true" showSummary="true" life="6000"/>
+                        <p:panel>
+                            <f:facet name="header">
+                                <div class="ui-fluid">
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                                            UNIDAD FUNCIONAL
+                                        </div>
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                            <p:selectOneMenu id="uni_func" 
+                                                             value="#{uniFuncSessionBean.i_unidad_funcional}" 
+                                                             filter="true"
+                                                             style="width: 99.9999%"
+                                                             filterMatchMode="contains">
+                                                <f:selectItem itemLabel="Seleccione Uno" itemValue="#{0}" />
+                                                <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                               var="uniFunc" 
+                                                               itemLabel="#{uniFunc.nombre}"
+                                                               itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                                <p:ajax process="@this"
+                                                        event="change"
+                                                        listener="#{plaRecuMedicinaBean.cargarDatos()}"
+                                                        update="@form"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                    </div>
+                                </div>
+                            </f:facet>
+                        </p:panel>
+                        <p:panel header="REGISTRO DE MEDICINA LABORAL" id="panelGrid">
+                            <p:dataTable id="dtMedicina" var="item" 
+                                         scrollable="true"
+                                         widgetVar="w_Medicina"
+                                         disabledTextSelection="false"
+                                         rows="20"
+                                         rowKey="#{item.idPlaRecuMedicina}"
+                                         filterDelay="1700"
+                                         paginator="true"
+                                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="20,60,150"
+                                         emptyMessage="No existen registros"
+                                         value="#{plaRecuMedicinaBean.listMedicinaLaboral}"
+                                         sortBy="#{item.empleado.idEmpleadoEstado.nombre}"
+                                         sortOrder="ascending">
+
+                                <f:facet name="header">
+                                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
+                                        <p:outputLabel value="Semana a Programar " class="cssWhite Fs20" for="desde" />
+                                        <p:calendar id="desde" 
+                                                    label="Fecha de Consulta de Servicio: " 
+                                                    value="#{plaRecuMedicinaBean.desde}"
+                                                    pattern="yyyy-MM-dd"
+                                                    style="width: 160px;"
+                                                    mindate="#{plaRecuMedicinaBean.dia_inicio}"
+                                                    maxdate="#{plaRecuMedicinaBean.dia_fin}">
+                                            <p:ajax event="dateSelect" listener="#{plaRecuMedicinaBean.consultar()}" 
+                                                    update="dtMedicina"></p:ajax>
+                                        </p:calendar>
+                                        -
+                                        <p:calendar id="hasta" 
+                                                    label="Fecha de Consulta de Servicio: " 
+                                                    value="#{plaRecuMedicinaBean.hasta}"
+                                                    pattern="yyyy-MM-dd"
+                                                    mindate="#{plaRecuMedicinaBean.dia_inicio}"
+                                                    maxdate="#{plaRecuMedicinaBean.dia_fin}"
+                                                    style="margin-left: 5px; width: 160px">
+                                            <p:ajax event="dateSelect" listener="#{plaRecuMedicinaBean.consultar()}" 
+                                                    update="dtMedicina"></p:ajax>
+                                        </p:calendar>
+                                        <p:commandButton id="plantalla_id"
+                                                         value="Plantilla"
+                                                         icon="fa fa-download"
+                                                         ajax="false"
+                                                         class="cssWhite GreenButton"
+                                                         style="width: 18%"
+                                                         actionListener="#{plaRecuMedicinaBean.prepDownloadLocal('PLANTILLA_CARGA_RECURSOS_MEDICINA')}">
+                                            <p:fileDownload value="#{viewDocuJSFMB.download}" />
+                                        </p:commandButton>
+                                        <p:commandButton id="crear_medicina"
+                                                         icon="fa fa-plus"
+                                                         value="Registro"
+                                                         title="Crear nuevo Registro"
+                                                         update="dlgPlaRecuMedicina"
+                                                         actionListener="#{plaRecuMedicinaBean.preGestionar()}"
+                                                         class="cssWhite"
+                                                         style="margin-left: 5px; width: 160px;"
+                                                         oncomplete="PF('wvPlaRecuMedicina').show()" />
+
+                                        <p:commandButton id="toggler" type="button" 
+                                                         title="Columnas" style="float:right" 
+                                                         icon="fa fa-align-justify" 
+                                                         class="OrangeButton cssWhite"/>
+                                        <p:columnToggler datasource="dtMedicina" trigger="toggler" />
+
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="Fecha Inicio"
+                                          filterBy="#{item.fechaInicio}"
+                                          filterMatchMode="contains"
+                                          styleClass="text-center">
+                                    <h:outputText value="#{item.fechaInicio}">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Fecha Fin"
+                                          filterBy="#{item.fechaFin}"
+                                          filterMatchMode="contains"
+                                          styleClass="text-center">
+                                    <h:outputText value="#{item.fechaFin}">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Descripción"
+                                          filterBy="#{item.observaciones}"
+                                          filterMatchMode="contains"
+                                          styleClass="text-center">
+                                    <h:outputText value="#{item.observaciones}" />
+                                </p:column>
+
+                                <p:column headerText="Identificación"
+                                          filterBy="#{item.empleado.identificacion}"
+                                          filterMatchMode="contains"
+                                          styleClass="text-center">
+                                    <h:outputText value="#{item.empleado.identificacion}" />
+                                </p:column>
+
+                                <p:column headerText="Código TM"
+                                          filterBy="#{item.empleado.codigoTm}"
+                                          filterMatchMode="contains"
+                                          styleClass="text-center">
+                                    <h:outputText value="#{item.empleado.codigoTm}" />
+                                </p:column>
+
+                                <p:column headerText="Nombres"
+                                          filterBy="#{item.empleado.nombresApellidos}"
+                                          filterMatchMode="contains"
+                                          styleClass="text-center">
+                                    <h:outputText value="#{item.empleado.nombresApellidos}" />
+                                </p:column>
+
+                                <p:column headerText="Estado Empleado"
+                                          filterBy="#{item.empleado.idEmpleadoEstado.nombre}"
+                                          filterMatchMode="contains"
+                                          styleClass="#{item.empleado.idEmpleadoEstado.nombre eq 'Activo' ? 'cssGreen' : 'cssRed'}"
+                                          sortBy="#{item.empleado.idEmpleadoEstado.nombre}"
+                                          sortable="true">
+                                    <h:outputText value="#{item.empleado.idEmpleadoEstado.nombre}"
+                                                  style="color: white;"/>
+                                </p:column>
+
+                                <p:column headerText="Conduccion"
+                                          filterBy="#{item.idPlaRecuConduccion.descripcion}"
+                                          filterMatchMode="contains"
+                                          styleClass="text-center">
+                                    <h:outputText value="#{item.idPlaRecuConduccion.descripcion}" />
+                                </p:column>
+
+                                <p:column headerText="Turno"
+                                          filterBy="#{item.idPlaRecuTurno.turno}"
+                                          filterMatchMode="contains"
+                                          styleClass="text-center">
+                                    <h:outputText value="#{item.idPlaRecuTurno.turno}" />
+                                </p:column>
+
+                                <p:column headerText="Vigente"
+                                          filterBy="#{plaRecuMedicinaBean.getVigencia(item.fechaFin)}"
+                                          filterMatchMode="contains"
+                                          styleClass="#{plaRecuMedicinaBean.getVigencia(item.fechaFin) eq 'VIGENTE' ? 'cssGreen' : 'cssRed'}">
+                                    <h:outputText value="#{plaRecuMedicinaBean.getVigencia(item.fechaFin)}" 
+                                                  style="color: white;"/>
+                                </p:column>
+
+                                <p:column headerText="User create" filterBy="#{item.usernameCreate}" filterMatchMode="contains" visible="false" >
+                                    <h:outputText value="#{item.usernameCreate}" title="nombre del usuario que creó el registro"/>
+                                </p:column>
+                                <p:column headerText="Date create" filterBy="#{item.creado}" filterMatchMode="contains" visible="false" >
+                                    <h:outputText value="#{item.creado}" title="Fecha de creación del registro">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="User modify" filterBy="#{item.usernameEdit}" filterMatchMode="contains" visible="false" >
+                                    <h:outputText value="#{item.usernameEdit}" title="nombre del último usuario que modifica el registro"/>
+                                </p:column>
+                                <p:column headerText="Date modify" filterBy="#{item.modificado}" filterMatchMode="contains" visible="false" >
+                                    <h:outputText value="#{item.modificado}" title="Fecha de la última modificación del registro">
+                                        <f:convertDateTime pattern="yyyy-MM-dd" type="date"/>
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Opción">
+                                    <p:commandButton id ="btnModificar"
+                                                     icon="fa fa-pencil"
+                                                     class="GreenButton cssWhite" 
+                                                     title="Modificar Registro" 
+                                                     process="@this"
+                                                     actionListener="#{plaRecuMedicinaBean.editarMedicina(item)}"
+                                                     update="dlgPlaRecuMedicina"
+                                                     oncomplete="PF('wvPlaRecuMedicina').show()"
+                                                     disabled="#{item.empleado.idEmpleadoEstado.nombre eq 'Retirado'}"> 
+                                    </p:commandButton>          
+                                </p:column>
+
+                                <p:remoteCommand name="rc" 
+                                                 class="cssWhite"
+                                                 action="#{plaRecuMedicinaBean.crearMedicina()}"
+                                                 process="@form"
+                                                 update="@form,:msgs"
+                                                 oncomplete="PF('wvPlaRecuMedicina').hide()"/>
+
+                                <f:facet name="footer">
+                                    En total existen #{plaRecuMedicinaBean.listMedicinaLaboral.size()} registros.
+                                    <div style="float: right;padding-bottom: 5px">
+                                        <h:commandLink>
+                                            <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                                 alt="excel" style="width: 24px;height: 24px"/>
+                                            <p:dataExporter type="xlsx" target=":frmMedicina:dtMedicina" 
+                                                            fileName="Listado Medicina Laboral"/>
+                                        </h:commandLink>
+                                    </div>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                        <ui:include src="modal/create.xhtml"/>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

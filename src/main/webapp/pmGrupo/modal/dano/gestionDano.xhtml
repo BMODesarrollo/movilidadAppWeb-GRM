@@ -1,0 +1,222 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <p:dialog widgetVar="gestion_dano_wv" 
+              id="gestion_dano_id"
+              modal="true" 
+              closeOnEscape="true"
+              closable="false"
+              class="mr1024_70 mr500_90"
+              responsive="true"
+              position="center top"
+              resizable="false" appendTo="@(body)">
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            <c:if test="#{gestionDanoNovPuntBean.novedadDano != null }">
+                                Editar novedad de daño a: #{gestionDanoNovPuntBean.novedadDano.idEmpleado.nombres.toUpperCase()} #{gestionDanoNovPuntBean.novedadDano.idEmpleado.apellidos.toUpperCase()}
+                            </c:if>
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('gestion_dano_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+        <h:form id="gestion_dano_form">
+            <p:messages id="messages" showDetail="true" closable="true">
+            </p:messages>
+            <div class="ui-fluid" jsf:id="pGrid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <p:outputLabel for="fecha" value="Fecha:" />
+                        <p:calendar id="fecha" 
+                                    pattern="dd-MM-yyyy"
+                                    value="#{gestionDanoNovPuntBean.novedadDano.fecha}"
+                                    maxdate="today"
+                                    showOn="button" 
+                                    locale="es"
+                                    required="true"
+                                    requiredMessage="Debe seleccionar una fecha"
+                                    showTodayButton="true"
+                                    navigator="true">
+                            <p:ajax process="@this"/>
+                        </p:calendar>
+                    </div>                         
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel for="vehiculo" value="Vehículo"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText placeholder="Código de vehículo"
+                                             title="Ingrese código de vehículo"
+                                             id="vehiculo"
+                                             value="#{gestionDanoNovPuntBean.vehiculo.codigo}"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un vehículo para realizar la novedad"
+                                             readonly="#{facesContext.renderResponse}"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Seleccione vehículo"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     update="frmPrincipalListVehiculo"
+                                                     actionListener="#{gestionDanoNovPuntBean.prepareVehiculos()}"
+                                                     oncomplete="PF('VehiculoListDialog').show()"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Operador:" for="operador"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText placeholder="Código TM operador"
+                                             id="operador"
+                                             value="#{gestionDanoNovPuntBean.empleado.nombres} #{gestionDanoNovPuntBean.empleado.apellidos}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Seleccione empleado"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     update=":frmEmpleadoList"
+                                                     actionListener="#{gestionDanoNovPuntBean.prepareListEmpleados()}"                                     
+                                                     oncomplete="PF('EmpleadoListDialog_').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Componente Vehículo:" for="cte"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+
+                                <p:inputText placeholder="Seleccione componente"
+                                             id="cte"
+                                             value="#{gestionDanoNovPuntBean.vehiculoComponente.descripcion} #{gestionDanoNovPuntBean.vehiculoComponente.nombre}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Pulse aquí para seleccionar componente"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     update=":frmVehiculoCteList"
+                                                     actionListener="#{gestionDanoNovPuntBean.prepareVehiculoCte}"                                     
+                                                     oncomplete="PF('VehiculoCteDialog').show()">
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Daño Vehículo: " for="cteDano"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione daño"
+                                             id="cteDano"
+                                             value="#{gestionDanoNovPuntBean.vehiculoComponenteDano.idVehiculoDano.nombre}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Pulse aquí para seleccionar daño"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     update=":frmVehiculoCteDanoList,msgs,messages"
+                                                     actionListener="#{gestionDanoNovPuntBean.prepareVehiculoComponenteDano}"                                     
+                                                     oncomplete="PF('VehiculoCteDanoDialog').show()"
+                                                     >
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-4 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Severidad daño:"/>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                                <p:inputText placeholder="Seleccione Severidad de daño"
+                                             id="severidadDano"
+                                             value="#{gestionDanoNovPuntBean.vehiculoDanoSeveridad.nombre}"
+                                             readonly="true"/>
+                                <div class="botonFloat" >
+                                    <p:commandButton title="Pulse aquí para seleccionar la severidad de daño"
+                                                     icon="fa fa-list"
+                                                     class="cssWhite"
+                                                     style="margin: 0px"
+                                                     update=":frmVehiculoDanoServeridadList"
+                                                     actionListener="#{gestionDanoNovPuntBean.prepareDanoSeveridad()}"                                     
+                                                     oncomplete="PF('VehiculoDanoServeridadDialog').show()"
+                                                     >
+                                    </p:commandButton>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <div align="center">
+                            <div class="ui-g-12 ui-md-6 ui-lg-4 Padding0" >
+                                <p:commandButton title="Cargar foto(s) de la novedad"
+                                                 icon="fa fa-file-image-o"
+                                                 value="Cargar Foto(s)"
+                                                 class="cssWhite OrangeButton"
+                                                 update="frmAddFiles"
+                                                 oncomplete="PF('AddFilesListDialog').show()"
+                                                 >
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5" >
+                        <p:outputLabel for="descripcion" value="Descripción" />
+                        <p:inputTextarea id="descripcion" 
+                                         value="#{gestionDanoNovPuntBean.novedadDano.descripcion}"
+                                         autoResize="true"
+                                         style="width: 100%;height: 100px ;font-size: 16px"
+                                         required="true"
+                                         requiredMessage="Debe ingresar una descripción"
+                                         />
+                    </div>
+                </div>
+            </div>
+
+
+            <p:remoteCommand name="rc_dan_upd"
+                             process="@this,gestion_dano_form"
+                             update="msgs,frmPrincipal:idTablaPmGrupoDialog,
+                             frmPrincipal:tbNovs,
+                             frmPrincipal:master_id,
+                             frmPrincipal:donut_chart,
+                             frmPrincipal:info_id"
+                             actionListener="#{gestionDanoNovPuntBean.actualizar()}" 
+                             action="#{gruposNovSFMB.updateInfo()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Actualizar"
+                             style="color: white"
+                             onclick="rc_dan_upd()"
+                             icon="fa fa-check" />
+        </f:facet>
+    </p:dialog>
+    <ui:include src="ListVehiculos.xhtml" />
+    <ui:include src="ListVehiculoCte.xhtml" />
+    <ui:include src="ListVehiculoCteDano.xhtml" />
+    <ui:include src="ListVehiculoDanoSeveridad.xhtml" />
+    <ui:include src="ListaEmpleados.xhtml" />
+</ui:composition>

@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="../WEB-INF/template.xhtml">
+    <ui:define name="content">
+        <h:form id="PmDiasEmpresaListForm">
+            <p:panel header="Pm Días Empresa">
+                <p:dataTable id="datalist" 
+                             value="#{pmDiasEmpresaController.items}" 
+                             var="item"
+                             selectionMode="single" 
+                             selection="#{pmDiasEmpresaController.selected}"
+                             paginator="true"
+                             rowKey="#{item.idPmDiasEmpresa}"
+                             rows="20"
+                             rowsPerPageTemplate="20,50,100"
+                             widgetVar="dtdatalist"
+                             filterDelay="2000">
+
+                    <p:ajax event="rowSelect"   update="createButton,editButton"/>
+                    <p:ajax event="rowUnselect" update="createButton,editButton"/>
+
+                    <p:column filterBy="#{item.desde}" headerText="Desde"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:calendar id="id-desde" 
+                                        pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" 
+                                        showTodayButton="true"
+                                        inputStyle="width: 99%;"
+                                        placeholder="Clic para filtrar fecha"
+                                        onkeyup="PF('dtdatalist').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dtdatalist').filter()" update="datalist"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.desde}">
+                            <f:convertDateTime pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.hasta}" headerText="Hasta"
+                              filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:calendar id="id-hasta" 
+                                        pattern="yyyy-MM-dd" 
+                                        locale="es"
+                                        autocomplete="off"
+                                        required="false"
+                                        navigator="true" 
+                                        showTodayButton="true"
+                                        inputStyle="width: 99%;"
+                                        placeholder="Clic para filtrar fecha"
+                                        onkeyup="PF('dtdatalist').filter()"
+                                        onkeypress="if (event.keyCode === 13) {
+                                                    return false;
+                                                }"
+                                        >
+                                <p:ajax event="dateSelect" oncomplete="PF('dtdatalist').filter()" update="datalist"/>
+                            </p:calendar> 
+                        </f:facet>
+                        <h:outputText value="#{item.hasta}">
+                            <f:convertDateTime pattern="yyyy-MM-dd"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column filterBy="#{item.nroDias}"
+                              filterMatchMode="exact">
+                        <f:facet name="header">
+                            <h:outputText value="Número de días"/>
+                        </f:facet>
+                        <h:outputText value="#{item.nroDias}"/>
+                    </p:column>
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton 
+                                class="cssWhite"
+                                id="createButton" 
+                                icon="fa fa-plus"   
+                                value="#{bundle.Create}"
+                                actionListener="#{pmDiasEmpresaController.prepareCreate}" 
+                                update=":PmDiasEmpresaCreateForm" 
+                                oncomplete="PF('PmDiasEmpresaCreateDialog').show()">
+                                <p:resetInput target="PmDiasEmpresaCreateDlg" />
+                            </p:commandButton>
+                            <p:commandButton 
+                                id="editButton"  
+                                icon="fa fa-pencil" 
+                                class="cssWhite GreenButton"
+                                actionListener="#{pmDiasEmpresaController.premodificar()}"
+                                style="color: white"
+                                value="#{bundle.Edit}" 
+                                update=":PmDiasEmpresaEditForm" 
+                                oncomplete="PF('PmDiasEmpresaEditDialog').show()" 
+                                disabled="#{empty pmDiasEmpresaController.selected.idPmDiasEmpresa}">
+                                <p:resetInput target="PmDiasEmpresaEditDlg" />
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+        <ui:include src="Create.xhtml"/>
+        <ui:include src="Edit.xhtml"/>
+    </ui:define>
+</ui:composition>
+
+

@@ -1,0 +1,155 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <p:dialog id="SncDetalleCreateDlg" 
+              widgetVar="SncDetalleCreateDialog" 
+              modal="true" 
+              class="mr1024_50 mr500_90"
+              closeOnEscape="true"
+              position="center top"
+              responsive="true"
+              resizable="false" appendTo="@(body)">
+        <c:if test="#{sncDetalleController.selected.idSncDetalle == null }">
+            <f:facet name="header">
+                Nuevo snc detalle
+            </f:facet>
+        </c:if>
+        <c:if test="#{sncDetalleController.selected.idSncDetalle != null }">
+            <f:facet name="header">
+                Editar snc detalle: #{sncDetalleController.selected.codigo.toUpperCase()}
+            </f:facet>
+        </c:if>
+        <h:form id="SncDetalleCreateForm">
+            <div class="ui-fluid" jsf:rendered="#{sncDetalleController.selected!=null}">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="#{bundle.CreateSncDetalleLabel_codigo}" for="codigo" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText
+                                maxlength="6"
+                                id="codigo" 
+                                value="#{sncDetalleController.selected.codigo}" 
+                                title="#{bundle.CreateSncDetalleTitle_codigo}"
+                                required="true"
+                                requiredMessage="Debe ingresar CODIGO"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Nombre" for="nombre" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea 
+                                maxlength="150"
+                                id="nombre" 
+                                value="#{sncDetalleController.selected.nombre}" 
+                                title="#{bundle.CreateSncDetalleTitle_nombre}" 
+                                required="true" 
+                                requiredMessage="Debe ingresar el NOMBRE"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="#{bundle.CreateSncDetalleLabel_idSncArea}" for="idSncArea" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu 
+                                id="idSncArea" 
+                                value="#{sncDetalleController.selected.idSncArea}" 
+                                required="true" 
+                                style="width: 99.9999%"
+                                requiredMessage="Debe seleccionar AREA"
+                                filter="true" filterMatchMode="startsWith">
+                                <f:selectItem itemLabel="Seleccione Area" itemValue="" />
+                                <f:selectItems value="#{sncAreaController.itemsAvailableSelectOne}"
+                                               var="idSncAreaItem"
+                                               itemLabel="#{idSncAreaItem.codigo}"
+                                               itemValue="#{idSncAreaItem}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="#{bundle.CreateSncDetalleLabel_idSncCorrecion}" for="idSncCorrecion" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu 
+                                style="width: 99.9999%"
+                                id="idSncCorrecion" value="#{sncDetalleController.selected.idSncCorrecion}" 
+                                filter="true" filterMatchMode="startsWith">
+                                <f:selectItem itemLabel="Seleccione Corrección" itemValue="" />
+                                <f:selectItems value="#{sncCorrecionController.itemsAvailableSelectOne}"
+                                               var="idSncCorrecionItem"
+                                               itemLabel="#{idSncCorrecionItem.codigo}"
+                                               itemValue="#{idSncCorrecionItem}"
+                                               />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="#{bundle.CreateSncDetalleLabel_idSncTipo}" for="idSncTipo" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:selectOneMenu 
+                                style="width: 99.9999%"
+                                id="idSncTipo" value="#{sncDetalleController.selected.idSncTipo}" 
+                                required="true" 
+                                requiredMessage="Debe seleccionar TIPO"
+                                filter="true" filterMatchMode="startsWith">
+                                <f:selectItem itemLabel="Seleccione Tipo" itemValue="" />
+                                <f:selectItems value="#{sncTipoController.itemsAvailableSelectOne}"
+                                               var="idSncTipoItem"
+                                               itemLabel="#{idSncTipoItem.codigo}"
+                                               itemValue="#{idSncTipoItem}"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Descripción" for="descripcion" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputTextarea 
+                                maxlength="150"
+                                id="descripcion" 
+                                counter="count"
+                                counterTemplate="{0} caracteres restantes."
+                                value="#{sncDetalleController.selected.descripcion}" 
+                                title="#{bundle.CreateSncDetalleTitle_descripcion}" />
+                            <p:outputLabel id="count" /> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p:remoteCommand 
+                action="#{sncDetalleController.create()}" 
+                name="rc_snc_det"
+                update="SncDetalleCreateForm,:SncDetalleListForm:datalist,msgs" />
+
+            <p:remoteCommand 
+                action="#{sncDetalleController.update}" 
+                name="rc_update_snc_det"
+                update="SncDetalleListForm:datalist,@form,msgs" />
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton onclick="rc_snc_det();" 
+                             value="Guardar" 
+                             rendered="#{empty sncDetalleController.selected.idSncArea}" 
+                             icon="fa fa-save"
+                             class="cssWhite"/>
+            <p:commandButton onclick="rc_update_snc_det();" 
+                             value="Actualizar" 
+                             rendered="#{!empty sncDetalleController.selected.idSncArea}" 
+                             icon="fa fa-save"
+                             class="cssWhite"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>
+

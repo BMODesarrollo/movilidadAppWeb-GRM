@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0" jsf:id="idDisponible" >
+        <p:panel style="border: none">
+            <f:facet name="header">
+                <p:commandButton icon="fa fa-user" 
+                                 action="#{prgTcJSFMB.cargarDisponibles()}"
+                                 update="frmOpeDispo:tbOpDispo"
+                                 value="Disponible"
+                                 title="Consultar los operadores disponibles"
+                                 class="cssWhite"/>
+            </f:facet>
+            <h:form id="frmOpeDispo">
+                <p:dataTable var="opd"
+                             value="#{prgTcJSFMB.listaDisponibles}"
+                             style="padding: 0px"
+                             rows="10"
+                             selection="#{prgTcJSFMB.prgTcOpDispo}"
+                             selectionMode="single"
+                             filterDelay="1000"
+                             scrollHeight="400"
+                             scrollable="true"
+                             widgetVar="opdWV"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                             rowIndexVar="nroFila"
+                             id="tbOpDispo"
+                             emptyMessage="no hay disponibles"
+                             rowKey="#{opd.idPrgTc}"
+                             reflow="true"
+                             paginator="true">
+                    <p:ajax event="rowSelect" global="false" update="msgs,
+                            prgtcForm:tblPrgTc,
+                            prgtcForm:operadorPrtTc,
+                            :formConsultaEmpl"
+                            listener="#{prgTcJSFMB.onRowSelectOpDispo}"/>
+
+                    <p:column headerText="Codigo Tm - punto Ini - tipologia"
+                              filterBy="#{opd.idEmpleado.codigoTm} #{opd.fromStop.name} #{opd.idEmpleado.idEmpleadoCargo.nombreCargo}"
+                              class="#{opd.sercon eq 'DP_CONTINGC' ? 'rowGrisOscuroStyle':''}"
+                              filterMatchMode="contains" >
+                        <span class="ui-fluid">
+                            <span class="ui-g">
+                                <span class="ui-g-12 ui-md-12 ui-lg-11" style="padding: 2px;font-weight: bold">
+                                    <span class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;font-weight: bold">
+                                        #{opd.idEmpleado.codigoTm}&nbsp;#{opd.sercon}
+                                    </span>
+                                    <span class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;font-weight: bold;color: red">
+                                        #{opd.timeOrigin}-#{opd.timeDestiny}
+                                    </span>
+                                    <span class="ui-g-12 ui-md-12 ui-lg-12" style="padding: 2px;font-weight: bold">
+                                        #{opd.fromStop.name}&nbsp;#{opd.idEmpleado.idEmpleadoCargo.nombreCargo}
+                                    </span>
+                                </span>
+                                <span class="ui-g-12 ui-md-12 ui-lg-1" style="padding: 2px;font-weight: bold">
+                                    <span class="Fs25 #{(opd.idEmpleado.certificado==1 or opd.idEmpleado.idEmpleadoCargo.idEmpleadoTipoCargo==29)
+                                                        ? 'yellowCar fa fa-bus': 'redCar fa fa-bus'}"/>
+                                </span>
+                            </span>
+                        </span>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </div>
+    <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0" jsf:id="idBusEnPatio">
+        <p:panel style="border: none">
+            <f:facet name="header">
+                <p:commandButton icon="fa fa-bus" 
+                                 action="#{prgTcJSFMB.listarVehiculoDispo()}"
+                                 update="frmVDispo:tbVDispo,:msgs"
+                                 title="Consultar los vehiculos disponibles"
+                                 value="Disponible" 
+                                 class="cssWhite"/>
+            </f:facet>
+            <h:form id="frmVDispo">
+                <p:dataTable var="vd"
+                             value="#{prgTcJSFMB.listaDisponiblesV}"
+                             style="padding: 0px"
+                             filterDelay="1000"
+                             widgetVar="vdWV"
+                             scrollHeight="400"
+                             scrollable="true"
+                             rowIndexVar="indexv"
+                             id="tbVDispo"
+                             emptyMessage="no hay vehículos disponibles"
+                             rowKey="#{vd.idVehiculo}"
+                             reflow="true"
+                             rowStyleClass="#{vd.vehiculoVia != null ? 'background-vehiculo-via' : null}"
+                             selection="#{vehiculoViaJSF.vehiculoSelect}"
+                             selectionMode="single">
+
+                    <p:ajax event="rowSelect" 
+                            update=":frmVDispo:contxtMenuVehiculoDispo"
+                            process="@this"
+                            listener="#{vehiculoViaJSF.onRowlClckSelect}"/>
+
+                    <p:column headerText="Vehículo - Tipo vehículo"
+                              filterBy="#{vd.codigo} #{vd.idVehiculoTipo.nombreTipoVehiculo}"
+                              filterMatchMode="contains" >
+                        <span class="Fs25 #{vd.idVehiculoTipo.idVehiculoTipo==1 ? 'redCar fa fa-bus': vd.idVehiculoTipo.idVehiculoTipo==2 ?  'yellowCar fa fa-bus' : 'white fa fa-bus'}"/>
+                        <span class="Fs12" style="font-weight: bold;">
+                            #{vd.codigo} &nbsp;
+                            <span title="Carga de Bateria" 
+                                  jsf:rendered="#{not empty gestorVehiculosDisponiblesBean.obtenerCargaBateriaPorVehiculo(vd.codigo)}">
+                                #{gestorVehiculosDisponiblesBean.obtenerCargaBateriaPorVehiculo(vd.codigo)}%
+                            </span>
+                        </span>
+                    </p:column>
+                </p:dataTable>
+                <p:contextMenu for="tbVDispo" id="contxtMenuVehiculoDispo" >
+                    <p:menuitem value="Vehículo no reportado como disponible en vía" 
+                                rendered="#{vehiculoViaJSF.vehiculoSelect.vehiculoVia == null}"
+                                update="@this" 
+                                icon="fa fa-check"/>
+                    <p:menuitem value="Liberar a disponible?" 
+                                update=":frmVDispo:tbVDispo,:msgs"
+                                rendered="#{vehiculoViaJSF.vehiculoSelect.vehiculoVia != null}"
+                                icon="fa fa-check"
+                                action="#{vehiculoViaJSF.updateVehiculoOffRoad()}"/>
+                </p:contextMenu>
+            </h:form>
+        </p:panel>
+    </div>
+</ui:composition>

@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <p:dialog id="cambiar_puntos_id" 
+              widgetVar="cambiar_puntos_wv"
+              modal="true" 
+              closable="false"
+              resizable="false" 
+              appendTo="@(body)"
+              blockScroll="true"
+              position="top" 
+              height="auto" 
+              class="mr1024_30 mr500_90">
+        <p:ajax event="close" listener="#{gruposNovSFMB.updateInfo()}"/>
+
+        <f:facet name="header">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-11 ui-md-11 ui-lg-11 Padding0">
+                            Conciliar Puntos
+                        </div>
+                        <div class="ui-g-1 ui-md-1 ui-lg-1 Padding0 TexAlRight" >
+                            <i onclick="PF('cambiar_puntos_wv').hide()"
+                               title="Cerrar ventana"
+                               style="cursor: pointer"
+                               class="cssWhite fa fa-close Fs20"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:facet>
+
+        <h:form id="cambiar_puntos_form" >
+            <div class="ui-fluid ">
+                <div class="ui-g Fs20">
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Puntos Novedad" class="Fs20"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="#{gestionDanoNovPuntBean.puntoView(gestionDanoNovPuntBean.novedad)}" class="cssBlack Fs20"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:outputLabel value="Puntos Conciliados" class="Fs20"/>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0" >
+                            <p:inputNumber placeholder="Puntos Conciliados"
+                                           value="#{gestionDanoNovPuntBean.i_puntosConciliados}"
+                                           maxValue="100"
+                                           minValue="0"
+                                           class="Fs20"
+                                           required="true"
+                                           requiredMessage="Puntos conciliados es Requerido">
+                            </p:inputNumber>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p:remoteCommand name="rc_cambio_puntos"
+                             update="msgs,frmPrincipal:idTablaPmGrupoDialog,
+                             frmPrincipal:tbNovs,
+                             frmPrincipal:master_id,
+                             frmPrincipal:donut_chart,
+                             frmPrincipal:info_id"
+                             action="#{gruposNovSFMB.updateInfo()}"
+                             actionListener="#{gestionDanoNovPuntBean.aplicarPuntosPM()}"/>
+        </h:form>
+        <f:facet name="footer">
+            <p:commandButton value="Aplicar"
+                             class="cssWhite Wid100"
+                             onclick="rc_cambio_puntos();"
+                             icon="fa fa-check">
+                <p:confirm header="Confirmación" message="Está seguro que desea aplicar los puntos?"
+                           icon="fa fa-exclamation-triangle"
+                           class="cssWhite"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,46 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="NotificacionProcesosDlg" 
+              closeOnEscape="true" widgetVar="wlVNotificacionProcesos" modal="true" 
+              resizable="false" appendTo="@(body)" header="Detalles tipo de novedad"
+              class="mr1024_70 mr500_90" responsive="true" position="center top">
+        <p:cache disabled="true"/>
+        <h:form id="frmNotificacionProcesosList">
+            <p:dataTable var="notificacionProceso" value="#{prgSolicitudNovedadParamBean.lstNotificacionProcesos}"
+                         id="dtNotificacionProceso" widgetVar="wlVDtNotificacionProceso"
+                         selectionMode="single" selection="#{prgSolicitudNovedadParamBean.notificacionProcesos}"                       
+                         liveScroll="true"
+                         filterDelay="1000"
+                         paginator="true"
+                         rows="8"
+                         rowKey="#{notificacionProceso.idNotificacionProceso}"
+                         emptyMessage="No existen listas de distribución registradas">
+                <p:ajax event="rowSelect" 
+                        listener="#{prgSolicitudNovedadParamBean.onRowNotificacionProcesoClckSelect}"
+                        update=":frmSolicitudNovedad:codProceso"
+                        oncomplete="PF('wlVNotificacionProcesos').hide()" />
+                <p:column headerText="Codigo_Proceso" 
+                              filterBy="#{notificacionProceso.codigoProceso}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{notificacionProceso.codigoProceso}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre_Proceso"
+                              filterBy="#{notificacionProceso.nombreProceso}"
+                              filterMatchMode="contains">
+                        <h:outputText value="#{notificacionProceso.nombreProceso}" />
+                    </p:column>
+
+                    <p:column headerText="Emails" width="500">
+                        <h:outputText value="#{notificacionProceso.emails}" />
+                    </p:column>
+                    <p:column headerText="Mensaje">
+                        <h:outputText value="#{notificacionProceso.mensaje}" />
+                    </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>

@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog id="mdRespuesta"
+              widgetVar="wvRespuesta"
+              modal="true" 
+              header="Informe Respondiente"
+              class="modalResponsivo"
+              closeOnEscape="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)"
+              style="position: absolute"
+              position="center top">
+        <h:form id="formRespuesta">
+            <div class="ui-fluid Padding0">
+                <div class="ui-g Padding0">
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:outputLabel value="Primer Respondiente" for="supervisor" />
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                            <p:inputText id="supervisor" 
+                                         value="#{cableAccInformeRespondienteJSF.cableAccInformeRespondiente.idEmpleadoSupervisor.nombres} #{cableAccInformeRespondienteJSF.cableAccInformeRespondiente.idEmpleadoSupervisor.apellidos}" 
+                                         placeholder="Operador"
+                                         readonly="true"
+                                         required="true"
+                                         requiredMessage="Primer Respondiente es requerido"
+                                         onkeypress="if (event.keyCode === 13) {
+                                                     return false;
+                                                 }">
+                            </p:inputText>
+                            <div class="botonFloat" >
+                                <p:commandButton id="btnOnSupervisor" 
+                                                 icon="fa fa-list"
+                                                 title="Cargar Empleados"
+                                                 class="cssWhite"
+                                                 style="margin: 0px"
+                                                 update=":formSupervisor"
+                                                 action="#{cableAccInformeRespondienteJSF.cargarListaEmpleado()}"
+                                                 process="@this" />
+                            </div>
+                        </div>
+                    </div>
+                    <p:repeat value="#{cableAccInformeRespondienteJSF.listCableAccInformeRespondienteDet}"
+                              var="det"
+                              varStatus="index" >
+                        <div class="ui-g-12 ui-md-12 ui-lg-12 Padding3">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:outputLabel value="#{index.index + 1}. #{det.idCableAccInformePregunta.pregunta}"
+                                               for="respuesta"
+                                               title="#{det.idCableAccInformePregunta.descripcion}"/>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                <p:inputTextarea id="respuesta"
+                                                 value="#{det.respuesta}"
+                                                 rows="3"
+                                                 required="#{det.idCableAccInformePregunta.requerido == 1}"
+                                                 requiredMessage="#{det.idCableAccInformePregunta.pregunta} es requerido"
+                                                 autoResize="false"
+                                                 maxlength="65535"/>
+                            </div>
+                        </div>
+                    </p:repeat>
+                    <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                        <div class="ui-g-9 ui-md-9 ui-lg-6 Padding0"><span style="visibility: hidden">ss</span></div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-3 Padding3">
+                            <p:commandButton id="guardar"
+                                             value="Guardar"
+                                             process="@form"
+                                             update="@form,:tInformacion:formInformeRespondiente,:accidente-form:msg"
+                                             icon="fa fa-check"
+                                             actionListener="#{cableAccInformeRespondienteJSF.guardar()}"
+                                             rendered="#{empty cableAccInformeRespondienteJSF.cableAccInformeRespondiente.idCableAccInformeRespondiente}"
+                                             class="cssWhite GreenButton" />
+                            <p:commandButton id="actualizar"
+                                             value="Actualizar"
+                                             process="@form,@this"
+                                             update="@form,:tInformacion:formInformeRespondiente,:accidente-form:msg"
+                                             actionListener="#{cableAccInformeRespondienteJSF.actualizar()}"
+                                             rendered="#{not empty cableAccInformeRespondienteJSF.cableAccInformeRespondiente.idCableAccInformeRespondiente}"
+                                             icon="fa fa-check"
+                                             class="cssWhite GreenButton" />
+                        </div>
+                        <div class="ui-g-6 ui-md-6 ui-lg-3 Padding3">
+                            <p:commandButton id="cancel"
+                                             value="Cancelar"
+                                             actionListener="#{cableAccInformeRespondienteJSF.reset()}"
+                                             update="@form,:tInformacion:formInformeRespondiente,:accidente-form:msg"
+                                             process="@this"
+                                             oncomplete="PF('wvRespuesta').hide();"
+                                             icon="fa fa-times"
+                                             class="cssWhite" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

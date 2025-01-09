@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./../../WEB-INF/template.xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:define name="head">
+        <style>
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+            .text-center{
+                text-align: center;
+            }
+            .aTexAlRight{
+                text-align: right;
+            }
+
+            @media only screen and (max-width: 600px) {
+                .texto-blanco {
+                    color: white !important;
+                    font-weight: bolder !important;
+                }
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel>
+            <f:facet name="header">
+                <div class="ui-fluid">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-8 ui-lg-8 Padding0">
+                            Consulta Ausentismos
+                        </div>
+                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                            <h:form id="uf">
+                                <p:selectOneMenu id="uni_func" value="#{uniFuncSessionBean.i_unidad_funcional}"
+                                                 rendered="#{uniFuncSessionBean.filtradoUF}"
+                                                 filter="true" 
+                                                 style="width: 99.9999%"
+                                                 filterMatchMode="contains">
+                                    <f:selectItem itemLabel="Seleccione Uno" itemValue="#{null}" />
+                                    <f:selectItems value="#{selectUnidFuncBean.listGopUnidadFuncional}" 
+                                                   var="uniFunc" 
+                                                   itemLabel="#{uniFunc.nombre}"
+                                                   itemValue="#{uniFunc.idGopUnidadFuncional}"/>
+                                    <p:ajax update="frmPrincipal:dtConsultaAusentismos" 
+                                            listener="#{consultaAusentismoBean.consultar()}"
+                                            process="@this"/>
+                                </p:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </f:facet>
+            <h:form id="frmPrincipal">
+                
+                <p:remoteCommand name="cargarListadoConsultaAusentismo"
+                                 action="#{consultaAusentismoBean.consultar()}"
+                                 update="dtConsultaAusentismos"/>
+                
+                <p:dataTable id="dtConsultaAusentismos" var="item" 
+                             scrollable="true"
+                             widgetVar="wlVdt_consultaAusentismos"
+                             scrollHeight="600"
+                             disabledTextSelection="false"
+                             rows="10"
+                             filterDelay="1700"
+                             paginator="true"
+                             tableStyle="layout:auto"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,50,100"
+                             emptyMessage="No existen registros"
+                             value="#{consultaAusentismoBean.lista}">
+
+                    <f:facet name="header">
+                        <div jsf:id="botones">
+                            <div class="ui-fluid">
+                                <div class="ui-g">
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                    </div>
+                                    <div class="ui-g-12 ui-md-6 ui-lg-6 Padding5">
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding0">
+                                            <p:outputLabel value=" -" style="visibility: hidden"/>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5" style="text-align: left">
+                                            <p:outputLabel value="Fecha: " for="fecha" class="cssWhite"/>
+                                            <p:calendar id="fecha" 
+                                                        maxdate="today"
+                                                        showOn="button"
+                                                        readonlyInput="true"
+                                                        locale="es" navigator="true"
+                                                        value="#{consultaAusentismoBean.fecha}" placeholder="Fecha">
+                                                <p:ajax event="dateSelect" process="@this"/>
+                                            </p:calendar>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-4 ui-lg-4 Padding5">
+                                            <p:outputLabel value="- " style="visibility: hidden"/>
+                                            <p:commandButton
+                                                icon="fa fa-search"
+                                                value="Buscar"
+                                                process="@this"
+                                                action="#{consultaAusentismoBean.consultar()}"
+                                                class="cssWhite"
+                                                update="dtConsultaAusentismos"
+                                                >
+                                            </p:commandButton>       
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </f:facet>
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column headerText="Código"/>
+                            <p:column headerText="Operador"/>
+                            <ui:repeat value="#{consultaAusentismoBean.fechas}" var="fecha">
+                                <p:column headerText="#{fecha}" />
+                            </ui:repeat>
+                            <p:column headerText="Acciones" exportable="false"/>
+                        </p:row>
+                    </p:columnGroup>
+
+                    <p:column class="TexAlCenter" headerText="Código TM">
+                        <h:outputText value="#{item.diaActual.idEmpleado != null ? item.diaActual.idEmpleado.codigoTm:item.diaSiguiente.idEmpleado.codigoTm}" />
+                    </p:column>
+                    <p:column class="TexAlCenter" headerText="Nombre Operador">
+                        <h:outputText value="#{item.diaActual.idEmpleado.nombres} #{item.diaActual.idEmpleado.apellidos}" rendered="#{item.diaActual.idEmpleado != null}"/>
+                        <h:outputText value="#{item.diaSiguiente.idEmpleado.nombres} #{item.diaSiguiente.idEmpleado.apellidos}" rendered="#{item.diaActual.idEmpleado == null}"/>
+                    </p:column>
+
+                    <p:column class="TexAlCenter" headerText="#{consultaAusentismoBean.fechaActualFormateada}">
+                        <h:outputText value="#{item.diaActual.idNovedadTipoDetalle.tituloTipoNovedad}"/>
+                    </p:column>
+                    <p:column class="TexAlCenter" headerText="#{consultaAusentismoBean.fechaSiguienteFormateada}">
+                        <h:outputText value="#{item.diaSiguiente.idNovedadTipoDetalle.tituloTipoNovedad}"/>
+                    </p:column>
+                    <p:column exportable="false" class="TexAlCenter">
+                        <p:commandButton value="Asignar" 
+                                         class="cssWhite"
+                                         update=":frmAsignacionAusentismo,:msgs"
+                                         rendered="#{item.diaSiguiente != null}"
+                                         action="#{consultaAusentismoAsignacionBean.prepareAsignarOperador()}">
+                            <f:setPropertyActionListener value="#{item}"
+                                                         target="#{consultaAusentismoAsignacionBean.consultaAusentismo}"
+                                                         />
+                        </p:commandButton>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        En total existen #{consultaAusentismoBean.lista.size()} registros.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtConsultaAusentismos" 
+                                                fileName="Consulta Ausentismos"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+        
+        <ui:include src="asignacionOperador.xhtml" />
+        
+    </ui:define>
+
+</ui:composition>

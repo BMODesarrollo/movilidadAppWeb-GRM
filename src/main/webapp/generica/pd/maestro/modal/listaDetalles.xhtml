@@ -1,0 +1,124 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <p:dialog id="pdListaDetalle"
+              widgetVar="wlvPdListaDetalle" 
+              modal="true" 
+              header="LISTADO DE DETALLES"
+              closeOnEscape="true"
+              class="mr1024_50 mr500_90"
+              responsive="true"
+              resizable="false" 
+              fitViewport="true"
+              appendTo="@(body)" 
+              position="center top">
+        <h:form id="frmPdListaDetalle">
+            <p:dataTable id="dtListaDetalle" var="detalle" 
+                         scrollable="true"
+                         widgetVar="wlVdtListaDetalle"
+                         scrollHeight="600"
+                         disabledTextSelection="false"
+                         reflow="true"
+                         rows="10"
+                         filterDelay="1700"
+                         paginator="true"
+                         currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,50,100"
+                         emptyMessage="No existen registros"
+                         value="#{genericaPdMaestroBean.selected.genericaPdMaestroDetalleList}">
+
+                <p:column headerText="Fecha Novedad" 
+                          filterBy="#{detalle.idGenerica.fecha}" 
+                          filterMatchMode="startsWith"
+                          styleClass="text-center">
+
+                    <f:facet name="filter">
+                        <p:calendar id="search1" pattern="yyyy-MM-dd" 
+                                    locale="es"
+                                    autocomplete="off"
+                                    required="false"
+                                    navigator="true" showTodayButton="true"
+                                    inputStyle="width: 100%;"
+                                    placeholder="Fecha"
+                                    onkeyup="PF('wlVdtListaDetalle').filter()"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }">
+                            <p:ajax event="dateSelect" oncomplete="PF('wlVdtListaDetalle').filter()" update="dtListaDetalle"/>
+                        </p:calendar> 
+                    </f:facet>
+
+                    <h:outputText value="#{detalle.idGenerica.fecha}">
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Tipo Novedad" filterBy="#{detalle.idGenerica.idGenericaTipo.nombreTipoNovedad}">
+                    <h:outputText value="#{detalle.idGenerica.idGenericaTipo.nombreTipoNovedad}" />
+                </p:column>
+
+                <p:column id="detTipoNovedad" filterBy="#{detalle.idGenerica.idGenericaTipoDetalle.tituloTipoGenerica}">
+                    <f:facet name="header">
+                        <h:outputText value="Detalle Novedad" title="Detalle Tipo de Novedad"/>
+                    </f:facet>
+                    <h:outputText value="#{detalle.idGenerica.idGenericaTipoDetalle.tituloTipoGenerica}" 
+                                  title="#{detalle.idGenerica.idGenericaTipoDetalle.tituloTipoGenerica}" />
+
+                </p:column>
+
+                <p:column exportable="false" filterBy="#{detalle.idGenerica.idEmpleado.identificacion} #{detalle.idGenerica.idEmpleado.nombres} #{detalle.idGenerica.idEmpleado.apellidos}"
+                          filterMatchMode="contains"
+                          headerText="Operador">
+                    <h:outputText value="#{detalle.idGenerica.idEmpleado.identificacion}" class="cssBlack"/>
+                    <h:outputText value=" #{detalle.idGenerica.idEmpleado.nombres.concat(' ').concat(detalle.idGenerica.idEmpleado.apellidos)}"/>
+                </p:column>
+
+                <p:column headerText="Observaciones" class="cortar">
+                    <h:outputText value="#{detalle.idGenerica.observaciones}" />
+                </p:column>
+
+                <p:column headerText="Fecha Proceso" 
+                          filterBy="#{detalle.fechaProceso}" 
+                          filterMatchMode="startsWith"
+                          styleClass="text-center">
+
+                    <f:facet name="filter">
+                        <p:calendar id="search2" pattern="yyyy-MM-dd" 
+                                    locale="es"
+                                    autocomplete="off"
+                                    required="false"
+                                    navigator="true" showTodayButton="true"
+                                    inputStyle="width: 100%;"
+                                    placeholder="Fecha"
+                                    onkeyup="PF('wlVdtListaDetalle').filter()"
+                                    onkeypress="if (event.keyCode === 13) {
+                                                return false;
+                                            }">
+                            <p:ajax event="dateSelect" oncomplete="PF('wlVdtListaDetalle').filter()" update="dtListaDetalle"/>
+                        </p:calendar> 
+                    </f:facet>
+
+                    <h:outputText value="#{detalle.fechaProceso}">
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                </p:column>
+
+                <f:facet name="footer">
+                    En total existen #{genericaPdMaestroBean.lstProcesos.size()} registros.
+                    <div style="float: right;padding-bottom: 5px">
+                        <h:commandLink>
+                            <img src="../../../../resources/img/excel.png" title="Exportar en formato Excel"
+                                 alt="excel" style="width: 24px;height: 24px"/>
+                            <p:dataExporter type="xlsx" target="dtListaDetalle" 
+                                            fileName="Lista de detalles"/>
+                        </h:commandLink>
+                    </div>
+                </f:facet>
+
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+</ui:composition>     

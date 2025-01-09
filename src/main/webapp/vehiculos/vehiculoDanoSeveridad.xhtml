@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="./../WEB-INF/template.xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="head">
+        <style type="text/css">
+            .text-center {
+                text-align: center;
+            }
+
+            .text-word-wrap {
+                white-space: normal;
+                word-wrap: break-word;
+                word-break: break-all;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:panel header="Severidad de daños">
+            <h:form id="frmPrincipalVhclDanoSev">
+                <p:dataTable var="vehiculoDanoSeveridad" value="#{vehiculoDanoSeveridadBean.lista}"
+                             id="dtTipo"
+                             rowIndexVar="nroFila"
+                             reflow="true"
+                             rows="7"
+                             filterDelay="1000"
+                             paginator="true"
+                             currentPageReportTemplate="Mostrando {endRecord} de {totalRecords} registros"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="7,10,15"
+                             emptyMessage="No existen severidad de daño registradas">
+
+                    <f:facet name="header">
+                        <div align="right">
+                            <p:commandButton action="#{vehiculoDanoSeveridadBean.nuevo()}" 
+                                             oncomplete="PF('mtipo').show();"
+                                             title="Agregar nuevo tipo de severidad" 
+                                             icon="fa fa-plus"
+                                             styleClass="cssWhite"
+                                             update=":frmNuevoTipo"
+                                             value="Nuevo">
+                                <p:resetInput target=":frmNuevoTipo:pGrid" />
+                            </p:commandButton>
+                            <p:spacer width="2"/>
+                            <p:commandButton id="toggler" type="button" 
+                                             title="Columnas" style="float:right" 
+                                             icon="fa fa-align-justify" 
+                                             class="OrangeButton cssWhite"/>
+                            <p:columnToggler datasource="dtTipo" trigger="toggler" />
+                        </div>
+                    </f:facet>
+
+
+                    <p:column headerText="#" style="width: 30px">
+                        <h:outputText value="#{nroFila+1}" />
+                    </p:column>
+                    <p:column headerText="Nombre" filterBy="#{vehiculoDanoSeveridad.nombre}">
+                        <h:outputText value="#{vehiculoDanoSeveridad.nombre}" />
+                    </p:column>
+                    <p:column headerText="Puntos PM" 
+                              styleClass="text-center"
+                              width="100">
+                        <h:outputText value="#{vehiculoDanoSeveridad.puntosPm}" />
+                    </p:column>
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{vehiculoDanoSeveridad.descripcion}"
+                                      styleClass="text-word-wrap"/>
+                    </p:column>
+                    <p:column headerText="Acción"
+                              styleClass="text-center"
+                              width="10%">
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12">
+                                <p:commandButton icon="fa fa-pencil"
+                                                 title="Editar registro"
+                                                 class="GreenButton cssWhite"
+                                                 action="#{vehiculoDanoSeveridadBean.editar()}"
+                                                 update=":frmNuevoTipo"
+                                                 oncomplete="PF('mtipo').show();"
+                                                 >
+                                    <f:setPropertyActionListener target="#{vehiculoDanoSeveridadBean.selected}" value="#{vehiculoDanoSeveridad}"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                        <p:commandButton icon="fa fa-refresh"
+                                         title="Cambiar estado"
+                                         action="#{vehiculoDanoSeveridadBean.cambiarEstado()}"
+                                         update=":frmNuevoTipo:modal,:frmNuevoTipo:messages,dtTipo"
+                                         rendered="false">
+                            <f:setPropertyActionListener target="#{vehiculoDanoSeveridadBean.selected}" value="#{vehiculoDano}"/>
+                            <p:confirm header="Confirmación" 
+                                       message="Ésta seguro de cambiar el estado?" 
+                                       icon="fa fa-exclamation-triangle" />
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        En total existen #{vehiculoDanoSeveridadBean.lista.size()} tipos.
+                        <div style="float: right;padding-bottom: 5px">
+                            <h:commandLink>
+                                <img src="../resources/img/excel.png" title="Exportar en formato Excel"
+                                     alt="excel" style="width: 24px;height: 24px"/>
+                                <p:dataExporter type="xlsx" target="dtTipo" 
+                                                fileName="Severidad de daños"/>
+                            </h:commandLink>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <h:form id="frmNuevoTipo">
+                <p:dialog widgetVar="mtipo" id="modal" 
+                          modal="true" closeOnEscape="true" 
+                          responsive="true" resizable="false"
+                          class="mr1024_30 mr500_90" position="center top">
+                    <c:if test="#{vehiculoDanoSeveridadBean.selected == null }">
+                        <f:facet name="header">
+                            Nueva severidad de daño
+                        </f:facet>
+                    </c:if>
+                    <c:if test="#{vehiculoDanoSeveridadBean.selected != null }">
+                        <f:facet name="header">
+                            Editar severidad de daño
+                        </f:facet>
+                    </c:if>
+
+                    <div jsf:id="pGrid" class="ui-fluid">
+                        <p:messages id="messages" showDetail="true" closable="true"/>
+                        <p:focus context="nombre"/>
+
+                        <div class="ui-g">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Nombre:" for="nombre"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputText id="nombre" 
+                                                 value="#{vehiculoDanoSeveridadBean.vehiculoDanoSeveridad.nombre}"
+                                                 required="true" requiredMessage="Debe ingresar un nombre"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Puntos PM:" for="puntospm"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputNumber id="puntospm" 
+                                                   minValue="0"
+                                                   value="#{vehiculoDanoSeveridadBean.vehiculoDanoSeveridad.puntosPm}"
+                                                   required="true" requiredMessage="Debe ingresar los puntos del PM"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 Padding5">
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:outputLabel value="Descripción:" for="descripcion"/>
+                                </div>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 Padding0">
+                                    <p:inputTextarea id="descripcion" 
+                                                     autoResize="false"
+                                                     value="#{vehiculoDanoSeveridadBean.vehiculoDanoSeveridad.descripcion}"
+                                                     required="true" requiredMessage="Debe ingresar una descripción"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar"
+                                         class="cssWhite"
+                                         icon="fa fa-check"
+                                         actionListener="#{vehiculoDanoSeveridadBean.guardar()}"
+                                         update=":frmPrincipalVhclDanoSev:dtTipo,pGrid,messages"
+                                         rendered="#{vehiculoDanoSeveridadBean.selected == null }"
+                                         >
+                        </p:commandButton>
+                        <p:commandButton value="Actualizar" 
+                                         class="cssWhite"
+                                         icon="fa fa-check"
+                                         actionListener="#{vehiculoDanoSeveridadBean.actualizar()}"
+                                         update=":frmPrincipalVhclDanoSev:dtTipo,messages"
+                                         rendered="#{vehiculoDanoSeveridadBean.selected != null }"
+                                         />
+                    </f:facet>
+                </p:dialog>  
+            </h:form>
+        </p:panel>
+    </ui:define>
+</ui:composition>
+
