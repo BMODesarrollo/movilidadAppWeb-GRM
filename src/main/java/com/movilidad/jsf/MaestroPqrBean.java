@@ -609,6 +609,8 @@ public class MaestroPqrBean implements Serializable {
                     Map mailProperties = new HashMap();
                     SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     mailProperties.put("radicado", pqrMaestro.getRadicado());
+                    mailProperties.put("fechaRadicado", formateador.format(pqrMaestro.getFecha_radicado()));
+                    mailProperties.put("fechaEvento", formateador.format(pqrMaestro.getFecha_evento()));
                     mailProperties.put("fechaEstimada", formateador.format(pqrMaestro.getFecha_estimada2()));
                     mailProperties.put("tipoPqr", pqrMaestro.getIdPqrTipo().getDescripcion());
                     mailProperties.put("clasificacion", clasificacionTipo);
