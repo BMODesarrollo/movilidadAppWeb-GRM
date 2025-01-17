@@ -42,8 +42,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -2604,4 +2602,7 @@ public class LiqJornadaJSFManagedBean implements Serializable {
         this.nSemana = nSemana;
     }
 
+    public String getUsername() {
+        return user.getUsername();
+    }
 }
