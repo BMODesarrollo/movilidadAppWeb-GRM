@@ -499,7 +499,7 @@ public class NovedadDanoJSFManagedBean implements Serializable {
         this.vehiculoComponente = novedadDano.getIdVehiculoComponente();
         this.vehiculoDanoSeveridad = novedadDano.getIdVehiculoDanoSeveridad();
         this.archivos = new ArrayList<>();
-        this.idRutaSelected = novedadDano.getIdPrgRoute().getIdPrgRoute();
+        this.idRutaSelected = novedadDano.getIdPrgRoute() == null ? 0: novedadDano.getIdPrgRoute().getIdPrgRoute();
         this.flagVandalismo = novedadDano.getIdVehiculoDanoSeveridad().getIdVehiculoDanoSeveridad() == 1 ? true : false;
         this.danoFlotaComponente = new ArrayList<>();
         this.editVandalismo = novedadDano.getIdVehiculoDanoSeveridad().getIdVehiculoDanoSeveridad();
